@@ -1,0 +1,109 @@
+---
+project: rytm
+deployed_at: 2026-09-18
+platform: Vercel
+plan: Hobby
+team: kamilps-projects
+vercel_project: rytm
+region: fra1
+production_url: https://rytm-phi.vercel.app
+deploy_path: github-actions-gate
+repository: https://github.com/vince307/rytm
+supabase_project_ref: psqbtvooufapkatpkxlw
+supabase_region: eu-central-1
+context_type: mvp
+source_contracts:
+  - context/foundation/infrastructure.md
+  - context/foundation/tech-stack.md
+---
+
+# Deploy plan — first production deployment
+
+Audit trail for the first deployment, executed from Plan Mode on 2026-09-18 against the decision in `infrastructure.md` (Vercel over Cloudflare Workers). This file is the source of truth for **what is already deployed and which secrets are wired**; milestone planning reads it before touching infrastructure.
+
+## Decisions taken during the deploy
+
+| Decision               | Choice                                                                                                                                              | Why                                                                                                                                                                       |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hosted Supabase        | New project `rytm`, `eu-central-1`, created from the CLI (`supabase projects create`)                                                               | Same region as the `fra1` function; keeps `getUser()` round-trips inside Frankfurt                                                                                        |
+| Production path        | **GitHub Actions after the gate**: push to `main` → `ci` + `smoke` → `deploy` (`vercel pull` → `npm run build` → `vercel deploy --prebuilt --prod`) | `tech-stack.md` asks for auto-deploy-on-merge _and_ the risk register wanted CI to be a real gate; Vercel's Git integration cannot do both                                |
+| Vercel Git integration | Connected, but `main` disabled in `vercel.json` (`git.deploymentEnabled.main = false`)                                                              | Previews for every other branch/PR still build automatically                                                                                                              |
+| Framework preset       | `"framework": "astro"` in `vercel.json`                                                                                                             | `vercel link --yes` created the project as "Other"                                                                                                                        |
+| Node version           | `engines.node = "22.x"` in `package.json`                                                                                                           | Vercel defaults new projects to 24.x; `.nvmrc` is 22.14                                                                                                                   |
+| `astro preview`        | Removed from `package.json`                                                                                                                         | `@astrojs/vercel` 11 has no preview entrypoint (confirmed: "The @astrojs/vercel adapter does not support the preview command"); CI smoke runs against `astro dev` instead |
+| ESLint                 | `design/**` ignored                                                                                                                                 | The read-only design kit's prototype JS had 103 errors that would have failed the gate on every push                                                                      |
+
+## What changed in the repo
+
+Commits `4b27098` (swap) and `aaad9c9` (framework preset), then this file.
+
+- `package.json` / `package-lock.json`: `@astrojs/cloudflare` + `wrangler` → `@astrojs/vercel@11.0.10`; `engines.node`; no `preview` script
+- `astro.config.mjs`: `adapter: vercel()` (no sub-path, default Node middleware, `env.schema` unchanged)
+- `wrangler.jsonc`: deleted · `vercel.json`: new
+- `.gitignore`: Cloudflare entries removed (`.vercel/` was already ignored)
+- `.github/workflows/ci.yml`: `smoke` fixed (no `.dev.vars`, empty-secret guard, `astro dev` target); new `deploy` job
+- `eslint.config.js`: ignore `design/**`
+- Docs: `CLAUDE.md`, `AGENTS.md`, `README.md.scaffold`, `scripts/smoke.mjs` header — every Cloudflare reference replaced
+- Untouched: `src/lib/supabase.ts`, `src/middleware.ts` (already read `astro:env/server`, which maps to Vercel env vars)
+
+## What is deployed
+
+- **Vercel** project `rytm` in team `kamilps-projects` (Hobby), function region `fra1`, Node 22.x, framework Astro, Build Output API (`.vercel/output/`)
+- **Production alias**: `https://rytm-phi.vercel.app` (also `rytm-kamilps-projects.vercel.app`). `rytm.vercel.app` belongs to a different account — do not use it.
+- Raw deployment URLs (`rytm-<hash>-kamilps-projects.vercel.app`) sit behind Vercel Authentication and answer **302 to SSO**, not the app — verify against the alias, never the deployment URL.
+- First production deploy: `vercel deploy --prod --yes` from this machine on 2026-09-18 (human gate). Every later production deploy comes from the `deploy` job.
+- **Supabase** hosted project `rytm` (`psqbtvooufapkatpkxlw`, Postgres 17, `eu-central-1`). No migrations exist yet (`supabase/migrations/` absent); the local project is not `supabase link`ed. Auth uses the new-style **publishable** key.
+- **GitHub** `vince307/rytm` (private), default branch `main`, remote `origin`.
+
+## Secrets inventory
+
+| Where                     | Name                                                   | Environments / notes                                                                                      |
+| ------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| Vercel env                | `SUPABASE_URL`                                         | production, preview (encrypted)                                                                           |
+| Vercel env                | `SUPABASE_KEY`                                         | production, preview (`--sensitive`: cannot be read back with `vercel env pull`)                           |
+| GitHub secrets            | `SUPABASE_URL`, `SUPABASE_KEY`                         | used by the `ci` build step                                                                               |
+| GitHub secrets            | `VERCEL_TOKEN`                                         | account token `rytm-github-actions`, scope kamilp's projects — created in the dashboard, used by `deploy` |
+| GitHub secrets            | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`                   | from `.vercel/project.json`                                                                               |
+| GitHub secrets            | `VERCEL_AUTOMATION_BYPASS_SECRET`                      | **not yet created** — needed only when a preview-smoke job is added                                       |
+| Local `.env` (gitignored) | `SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_DB_PASSWORD` | the only copy of the DB password; keep it                                                                 |
+
+No secret value has ever been written to the repo or pasted into a chat; `vercel env add` and `gh secret set` were fed from `.env` via stdin.
+
+## Operating model (who may do what)
+
+- **Agent, unattended**: `npx vercel` (preview deploy), `vercel ls`, `vercel inspect <url> --logs`, `vercel logs <url>`, `vercel env ls`, `gh run watch`, `npm run smoke` against a local/preview server.
+- **Human only**: `vercel deploy --prod` outside the workflow, `vercel rollback` / `vercel promote <url>`, `vercel env rm/add` (rotation → then redeploy), plan changes, deleting the project, Supabase migrations against the hosted DB, rotating `VERCEL_TOKEN` (expiry ≤ 1 year — set a reminder).
+- **Rollback**: `vercel rollback` (Hobby: only to the immediately previous production deployment) or `vercel promote <deployment-url>`. Neither touches Supabase.
+- **Logs**: 1-hour runtime retention on Hobby — import failures should be persisted app-side (risk register).
+
+## Verification results (2026-09-18)
+
+| Check                                                                             | Result                                                                         |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Local: `npm run lint`, `npx astro check`, `npm run build`                         | 0 errors; adapter `@astrojs/vercel`                                            |
+| Local: `astro dev` `/` → 200, `/dashboard` → 302 `/auth/signin`                   | pass                                                                           |
+| Supabase Auth API health/settings with the stored key                             | 200 / 200                                                                      |
+| `vercel inspect`: target production, status Ready                                 | pass                                                                           |
+| `https://rytm-phi.vercel.app/`                                                    | 200, `<title>10x Astro Starter</title>` (starter page — real UI not built yet) |
+| `/dashboard` → 302 `/auth/signin`; `/auth/signin`, `/auth/signup` → 200 with form | pass                                                                           |
+| Function region from `x-vercel-id`                                                | `arn1::fra1::…` → runs in `fra1` (`arn1` = edge PoP)                           |
+| GitHub Actions run 35389120232 (before `VERCEL_TOKEN` existed)                    | `ci` ✅ `smoke` ✅ `deploy` ❌ (empty token — expected)                        |
+| GitHub Actions run for this commit                                                | see run list — first green `deploy` closes the loop                            |
+
+Not run against production: `npm run smoke` (creates real users, sends real emails).
+
+## Manual steps still open
+
+1. **Supabase Auth URL configuration** (dashboard only): Site URL `https://rytm-phi.vercel.app`; redirect URLs `https://rytm-phi.vercel.app/**` and `https://rytm-*-kamilps-projects.vercel.app/**`. Until this is set, confirmation emails link to `localhost:3000`.
+2. One real signup → confirm email → signin on the live site.
+3. Optional: create the Protection Bypass for Automation secret and store it as `VERCEL_AUTOMATION_BYPASS_SECRET`.
+
+## Deferred (from the risk register)
+
+- Preview-smoke job hitting the Vercel preview URL with `x-vercel-protection-bypass` (needs the bypass secret; smoke must assert on a page marker, not on 200).
+- CSV import size cap + time budget (Hobby 4 active-CPU-hours is a project-wide kill switch); 4.5 MB body limit surfaced in the import UI.
+- Persist import failures in a Supabase table (1-hour log retention).
+- `/10x-rule-review` on `CLAUDE.md` and `AGENTS.md` after the doc rewrite.
+- `npm audit`: `path-to-regexp` (high) via `@vercel/routing-utils` inside `@astrojs/vercel` — build-time only, no fix upstream yet; re-check on adapter updates.
+- Local git is 2.28.0 and needs `http.version=HTTP/1.1` + `http.postBuffer` (set in this repo's `.git/config`) to push to GitHub; upgrading git removes the workaround.
+- Monetisation or any non-personal use triggers the Hobby fair-use clause → re-run `/10x-infra-research` (Cloudflare Workers is the pre-approved runner-up).

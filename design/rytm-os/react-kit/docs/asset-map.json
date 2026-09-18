@@ -22,5 +22,6 @@
     "emptyStateDark": "assets/illustrations/rytm-pusty-stan-ciemny.svg"
   },
   "social": {"og": "assets/social/rytm-og-1200x630.svg"},
-  "font": "assets/fonts/Manrope-Variable.ttf"
+  "font": "assets/fonts/Manrope-Variable.ttf",
+  "uiIcons": "assets/icons/ui/ui.svg"
 }

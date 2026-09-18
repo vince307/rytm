@@ -9,10 +9,11 @@ Ten katalog zawiera minimalny zestaw do odtworzenia strony Rytm w React, Next.js
 - `assets/favicon/` — automatyczny SVG, ICO oraz warianty PNG 16/32 px.
 - `assets/illustrations/` — ilustracja pustego stanu w dwóch wariantach.
 - `assets/social/` — grafika Open Graph 1200 × 630.
+- `assets/icons/ui/` — liniowy sprite ikon 16/20 px: przegląd, wzorce, koszty stałe, import, konto, upload, scalanie, zmiana typu, wykluczenie, edycja, szukanie, sortowanie, zamknięcie, strzałki, ostrzeżenie, sukces i info.
 - `assets/fonts/` — Manrope Variable i licencja OFL.
 - `styles/brand.css` — font-face, tokeny kolorów i podstawowa geometria znaku.
 - `docs/content.json` — wszystkie teksty widoków jako dane do komponentów.
-- `docs/routes.md` — mapa tras.
+- `docs/routes.md` — mapa wszystkich tras, w tym dashboardu, wzorców, kosztów stałych, importu i ustawień.
 - `docs/asset-map.json` — referencje do plików dla bundlera.
 
 ## Szybkie użycie

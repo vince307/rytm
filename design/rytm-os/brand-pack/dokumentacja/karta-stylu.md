@@ -63,3 +63,11 @@ Na jasnym tle stosuj logo granatowe, na ciemnym — białe. Ikona jasna ma kremo
 Motyw pomocniczy powtarza skos z nogi R. Bursztyn pojawia się po granicy nadwyżki. Pusty stan pokazuje dokument i regularną sekwencję elementów prowadzącą do miejsca importu; pozostaje neutralny, bez sugerowania nadwyżki przed wgraniem danych.
 
 Grafika OG: **1200 × 630 px**, zdanie „Zobacz, gdzie cicho ucieka pieniądz.”. Ilustracja pustego stanu: **640 × 360 px**, wariant jasny i ciemny, bez tekstu.
+
+## Elementy UI — runda 1
+
+Etykieta `ponad próg` jest zawsze tekstowa i może mieć bursztynowe tło. Sam kolor bursztynowy nie może być jedynym sygnałem nadwyżki. Typ wzorca używa osobnych badge'y: `stały` w przygaszonej zieleni, `częsty` w jasnym szaroniebieskim tle, `wykluczony` w neutralnej szarości, `nowy` i `zmiana kwoty` w delikatnym tle bursztynowym.
+
+Ikony UI są liniowe, mają obrys 1,8 px, kąty 45° i nie używają ozdobnych zaokrągleń. W prototypie znajdują się w `assets/icons/ui/ui.svg`; komponenty React mogą korzystać z tych samych symboli przez SVG `<use>` albo przepisać je do własnego komponentu ikon.
+
+W rundzie 1 nie wprowadzamy pełnego systemowego dark mode. Istniejące ciemne powierzchnie (header autoryzacji, karta hero, CTA, ikona aplikacji) są elementem kompozycji i mają własny wariant jasnego znaku. Decyzję o pełnym dark mode odkładamy do testów dashboardu z prawdziwymi danymi, aby nie dublować semantyki bursztynu i zieleni.

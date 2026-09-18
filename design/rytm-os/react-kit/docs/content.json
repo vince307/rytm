@@ -19,7 +19,7 @@
     "steps": [
       {"number": "01", "title": "Wgraj CSV", "body": "Wrzuć wyciąg z banku. Rytm rozpozna sprzedawców i powtarzające się kwoty."},
       {"number": "02", "title": "Ustaw granicę", "body": "Sam decydujesz, ile kaw, dostaw lub subskrypcji mieści się w Twoim miesiącu."},
-      {"number": "03", "title": "Zobacz wzorzec", "body": "Nadwyżka trafia do widoku „spalone w tym miesiącu”. Bez wstydu, z konkretem."}
+      {"number": "03", "title": "Zobacz ponad progiem", "body": "Nadwyżka trafia do widoku „ponad progiem w tym miesiącu”. Bez wstydu, z konkretem."}
     ]
   },
   "howItWorks": {
@@ -29,8 +29,8 @@
     "primaryCta": "Zacznij od swojego CSV",
     "steps": [
       {"number": "01", "title": "Wgraj wyciąg", "body": "Wybierz plik CSV z banku. Rytm czyta datę, sprzedawcę i kwotę, a potem grupuje podobne transakcje.", "caption": "Masz kontrolę nad plikiem"},
-      {"number": "02", "title": "Rozpoznaj rytm", "body": "Stałe koszty i częste zakupy układają się w sekwencje. Widzisz, co wraca co miesiąc, tydzień lub kilka dni.", "caption": "Wzorzec zamiast szumu"},
-      {"number": "03", "title": "Ustaw granicę", "body": "Próg jest Twój. Rytm zaznacza dopiero kolejne powtórzenia, a ich suma trafia do „spalone w tym miesiącu”.", "caption": "Bez oceniania, z konkretem"}
+      {"number": "02", "title": "Rozpoznaj rytm", "body": "Stałe koszty i częste zakupy układają się w sekwencje. Widzisz, co wraca w kolejnych miesiącach.", "caption": "Wzorzec zamiast szumu"},
+      {"number": "03", "title": "Ustaw granicę", "body": "Próg jest Twój. Rytm zaznacza dopiero kolejne powtórzenia, a ich suma trafia do „ponad progiem w tym miesiącu”.", "caption": "Bez oceniania, z konkretem"}
     ],
     "explanation": [
       {"title": "Stałe koszty", "body": "Ta sama usługa, podobna kwota — od razu widać podwyżkę albo nową pozycję."},
@@ -60,7 +60,7 @@
     "greeting": "Dzień dobry, Olu.",
     "description": "Oto rytm Twoich wydatków w maju.",
     "stats": [
-      {"label": "Spalone w tym miesiącu", "value": "284,40 zł", "foot": "+42,20 zł względem kwietnia"},
+      {"label": "Ponad progiem w tym miesiącu", "value": "284,40 zł", "foot": "+42,20 zł względem kwietnia"},
       {"label": "Rozpoznane wydatki", "value": "3 842,60 zł", "foot": "64 transakcje · 12 wzorców"},
       {"label": "Koszty stałe", "value": "1 920 zł", "foot": "2 pozycje podrożały"}
     ],
@@ -70,7 +70,56 @@
       {"merchant": "Kawa i spółka", "meta": "11 razy · próg 8", "amount": "+61 zł"}
     ],
     "importTitle": "Dodaj najnowszy wyciąg",
-    "importBody": "CSV z Twojego banku · dane zostają na tym urządzeniu"
+    "importBody": "CSV z Twojego banku · plik nie jest przechowywany po imporcie"
   },
-  "footer": {"copyright": "© 2025 Rytm. Spokojnie o pieniądzach.", "privacy": "Prywatność", "contact": "Kontakt"}
+  "patterns": {
+    "title": "To, co wraca.",
+    "description": "Każdy sprzedawca ma jeden typ. Możesz zmienić go w dowolnym momencie.",
+    "columns": ["Sprzedawca", "Typ", "Wystąpienia", "Suma", "Próg", "Ponad progiem"],
+    "searchPlaceholder": "Szukaj sprzedawcy",
+    "sortOptions": ["suma", "liczba", "nazwa"]
+  },
+  "patternDetail": {
+    "back": "Wróć do wzorców",
+    "sumLabel": "Suma w maju",
+    "transactions": "Transakcje z wyciągu",
+    "rawDescription": "opis surowy · kwota"
+  },
+  "threshold": {
+    "acceptedAmount": "Akceptowana kwota",
+    "countPerMonth": "Liczba na miesiąc",
+    "sumPerMonth": "Suma na miesiąc",
+    "empty": "Ustaw próg, aby Rytm mógł oznaczać kolejne wystąpienia jako ponad próg.",
+    "active": "Po przekroczeniu granicy kolejne wystąpienia zostaną oznaczone etykietą „ponad próg”.",
+    "save": "Zapisz próg",
+    "remove": "Usuń próg"
+  },
+  "patternActions": {"merge": "Scal z…", "changeType": "Zmień typ", "rename": "Zmień nazwę", "exclude": "Wyklucz z analizy", "restore": "Przywróć"},
+  "fixedCosts": {
+    "title": "Co zmieniło się samo?",
+    "changed": "Zmieniły kwotę",
+    "new": "Nowe w tym miesiącu",
+    "unchanged": "Bez zmian"
+  },
+  "trend": {
+    "title": "Ponad progiem",
+    "range": "miesięcznie · wszystkie dane",
+    "legend": "suma ponad progiem",
+    "current": "bieżący, niepełny miesiąc",
+    "tooShort": "Trend pojawi się po 3 miesiącach danych."
+  },
+  "importFlow": {
+    "title": "Dodaj wyciąg.",
+    "steps": ["Plik CSV", "Rachunek", "Podsumowanie"],
+    "supported": "Obsługujemy wyciągi ING Bank Śląski w PLN. Później dołączymy Santander.",
+    "oneAccount": "Import obejmuje jeden rachunek i tylko obciążenia.",
+    "overlap": "Zakres nachodzi na istniejący import. Po potwierdzeniu dane nie będą automatycznie deduplikowane.",
+    "result": "Wzorce są już widoczne."
+  },
+  "emptyState": {"title": "Nie masz jeszcze żadnego importu.", "body": "Wgraj jeden plik CSV z wyciągu bankowego. Przed importem wybierzesz rachunek i zobaczysz zakres danych.", "cta": "Wgraj CSV"},
+  "settings": {"title": "Twoje konto.", "data": "Plik CSV nie jest przechowywany po imporcie. Konto przechowuje wynik analizy i Twoje decyzje.", "deleteTitle": "Usuń konto", "deleteBody": "Usunięcie konta kasuje importy, wzorce, progi i wszystkie decyzje bez śladu.", "confirmation": "Wpisz USUŃ, aby potwierdzić."},
+  "mobileNav": {"overview": "Przegląd", "patterns": "Wzorce", "fixed": "Stałe", "imports": "Importy", "settings": "Konto"},
+  "components": {"excluded": "wykluczony", "new": "nowy", "changed": "zmiana kwoty", "success": "Sukces — próg zapisany.", "error": "Błąd — sprawdź plik CSV.", "info": "Informacja — trend pojawi się po 3 miesiącach."},
+  "authStates": {"loginError": "Nie rozpoznaliśmy tego e-maila i hasła. Spróbuj ponownie.", "resetTitle": "Odzyskaj dostęp.", "resetBody": "Podaj e-mail, którego używasz w Rytmie.", "checkInbox": "Jeśli konto istnieje, wysłaliśmy instrukcję zmiany hasła."},
+  "footer": {"copyright": "© {year} Rytm. Spokojnie o pieniądzach.", "privacy": "Prywatność", "contact": "Kontakt"}
 }

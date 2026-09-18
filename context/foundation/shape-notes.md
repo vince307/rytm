@@ -248,6 +248,11 @@ Informacyjne, poza schematem PRD — do przejęcia przez wybór stacku:
 - Brainstorming wskazywał „Vercel + Postgres” jako naturalne dopasowanie — to preferencja z doświadczenia, nie decyzja.
 - Syntetyczny zestaw CSV jako artefakt pierwszego tygodnia: testy, demo, seed publicznej instancji.
 
+## Forward: design
+
+- UI/UX ma gotowe źródło prawdy: `design/rytm-os/` (identyfikacja „Rytm — Oś”, tokeny, copy, prototyp 6 widoków) — kontrakt, konflikty z tym dokumentem (m.in. etykieta „spalone” vs „ponad progiem”, FR-011) i rejestr braków G1–G16 w `context/foundation/design-kit.md`.
+- Zasada: brakujące elementy UI są **zgłaszane, nie dorabiane** — autor generuje je i dostarcza do `design/rytm-os/`.
+
 ## Forward: technical-roadmap
 
 - Pierwszy kamień milowy (z oceny pomysłu): CSV z ING → lista wzorców z liczbą wystąpień i sumą — odsłania największą niewiadomą (jakość grupowania na prawdziwych danych).

@@ -1,0 +1,26 @@
+{
+  "logo": {
+    "horizontal": "assets/brand/rytm-logo-granat.svg",
+    "horizontalBlack": "assets/brand/rytm-logo-czarny.svg",
+    "horizontalWhite": "assets/brand/rytm-logo-bialy.svg",
+    "mark": "assets/brand/rytm-sygnet-granat.svg",
+    "markBlack": "assets/brand/rytm-sygnet-czarny.svg",
+    "markWhite": "assets/brand/rytm-sygnet-bialy.svg"
+  },
+  "appIcon": {
+    "light": "assets/icons/rytm-ikona-jasna-1024.svg",
+    "dark": "assets/icons/rytm-ikona-ciemna-1024.svg"
+  },
+  "favicon": {
+    "autoTheme": "assets/favicon/favicon.svg",
+    "ico": "assets/favicon/favicon.ico",
+    "png16": "assets/favicon/rytm-favicon-16-granat.png",
+    "png32": "assets/favicon/rytm-favicon-32-granat.png"
+  },
+  "illustration": {
+    "emptyStateLight": "assets/illustrations/rytm-pusty-stan-jasny.svg",
+    "emptyStateDark": "assets/illustrations/rytm-pusty-stan-ciemny.svg"
+  },
+  "social": {"og": "assets/social/rytm-og-1200x630.svg"},
+  "font": "assets/fonts/Manrope-Variable.ttf"
+}

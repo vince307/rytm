@@ -1,0 +1,76 @@
+{
+  "brand": {
+    "name": "Rytm",
+    "ogSentence": "Zobacz, gdzie cicho ucieka pieniądz."
+  },
+  "navigation": {
+    "howItWorks": "Jak działa",
+    "forWho": "Dla kogo",
+    "login": "Zaloguj się",
+    "start": "Zacznij"
+  },
+  "landing": {
+    "eyebrow": "Spokojnie o pieniądzach",
+    "headline": ["Pieniądze uciekają w rytmie.", "Rytm ten rytm pokazuje."],
+    "description": "Wgraj wyciąg bankowy i zobacz, które wydatki wracają zbyt często. Bez oceniania. Z jasną granicą, którą ustawiasz sam.",
+    "primaryCta": "Zobacz swój rytm",
+    "secondaryCta": "Jak to działa?",
+    "note": "Darmowy start · dane zostają u Ciebie",
+    "steps": [
+      {"number": "01", "title": "Wgraj CSV", "body": "Wrzuć wyciąg z banku. Rytm rozpozna sprzedawców i powtarzające się kwoty."},
+      {"number": "02", "title": "Ustaw granicę", "body": "Sam decydujesz, ile kaw, dostaw lub subskrypcji mieści się w Twoim miesiącu."},
+      {"number": "03", "title": "Zobacz wzorzec", "body": "Nadwyżka trafia do widoku „spalone w tym miesiącu”. Bez wstydu, z konkretem."}
+    ]
+  },
+  "howItWorks": {
+    "eyebrow": "Jak działa Rytm",
+    "headline": ["Najpierw wzorzec.", "Potem decyzja."],
+    "description": "Rytm porządkuje powtarzalne transakcje, żebyś raz w miesiącu widział to, co zwykle ginie w historii konta.",
+    "primaryCta": "Zacznij od swojego CSV",
+    "steps": [
+      {"number": "01", "title": "Wgraj wyciąg", "body": "Wybierz plik CSV z banku. Rytm czyta datę, sprzedawcę i kwotę, a potem grupuje podobne transakcje.", "caption": "Masz kontrolę nad plikiem"},
+      {"number": "02", "title": "Rozpoznaj rytm", "body": "Stałe koszty i częste zakupy układają się w sekwencje. Widzisz, co wraca co miesiąc, tydzień lub kilka dni.", "caption": "Wzorzec zamiast szumu"},
+      {"number": "03", "title": "Ustaw granicę", "body": "Próg jest Twój. Rytm zaznacza dopiero kolejne powtórzenia, a ich suma trafia do „spalone w tym miesiącu”.", "caption": "Bez oceniania, z konkretem"}
+    ],
+    "explanation": [
+      {"title": "Stałe koszty", "body": "Ta sama usługa, podobna kwota — od razu widać podwyżkę albo nową pozycję."},
+      {"title": "Częste zakupy", "body": "Ten sam sprzedawca niezależnie od kwoty — dostawy, kawa, małe decyzje."},
+      {"title": "Nadwyżka", "body": "Rytm nie mówi, co masz robić. Pokazuje miejsce, w którym możesz zdecydować."}
+    ]
+  },
+  "forWho": {
+    "eyebrow": "Dla kogo jest Rytm",
+    "headline": ["Dla osoby, która chce", "wiedzieć bez liczenia."],
+    "description": "Masz dwa konta, kilka subskrypcji i zero ochoty na kolejny arkusz. Rytm daje Ci jeden spokojny moment prawdy w miesiącu.",
+    "quote": "Nie chcę budżetu na każdy dzień. Chcę widzieć wzorce.",
+    "cards": [
+      {"index": "A", "title": "Pracujesz i ogarniasz dużo", "body": "Nie potrzebujesz kolejnego systemu do prowadzenia. Potrzebujesz krótkiego, prawdziwego obrazu.", "link": "Raz w miesiącu"},
+      {"index": "B", "title": "Masz wydatki, które wracają", "body": "Subskrypcje, jedzenie z dowozem, kawa po drodze. Rytm pokaże częstotliwość bez moralizowania.", "link": "Zobacz powroty"},
+      {"index": "C", "title": "Chcesz ustawić własną granicę", "body": "Nie chodzi o zakaz. Chodzi o moment, w którym nadwyżka staje się widoczna i możesz coś z nią zrobić.", "link": "Ustaw swój próg"}
+    ],
+    "closing": "Rytm zostawia miejsce na normalne życie. Pomaga tylko zauważyć, kiedy małe decyzje zaczynają się powtarzać."
+  },
+  "auth": {
+    "login": {"eyebrow": "Witaj ponownie", "title": "Zaloguj się", "description": "Wróć do spokojnego widoku swoich wydatków."},
+    "register": {"eyebrow": "Nowe konto", "title": "Utwórz konto", "description": "Zacznij od adresu e-mail. Resztę ustawisz później."},
+    "fields": {"name": "Imię", "email": "E-mail", "password": "Hasło"}
+  },
+  "dashboard": {
+    "eyebrow": "Przegląd miesiąca",
+    "greeting": "Dzień dobry, Olu.",
+    "description": "Oto rytm Twoich wydatków w maju.",
+    "stats": [
+      {"label": "Spalone w tym miesiącu", "value": "284,40 zł", "foot": "+42,20 zł względem kwietnia"},
+      {"label": "Rozpoznane wydatki", "value": "3 842,60 zł", "foot": "64 transakcje · 12 wzorców"},
+      {"label": "Koszty stałe", "value": "1 920 zł", "foot": "2 pozycje podrożały"}
+    ],
+    "patterns": [
+      {"merchant": "Wolt", "meta": "8 razy · próg 4", "amount": "+84 zł"},
+      {"merchant": "Spotify", "meta": "co miesiąc", "amount": "24,99 zł"},
+      {"merchant": "Kawa i spółka", "meta": "11 razy · próg 8", "amount": "+61 zł"}
+    ],
+    "importTitle": "Dodaj najnowszy wyciąg",
+    "importBody": "CSV z Twojego banku · dane zostają na tym urządzeniu"
+  },
+  "footer": {"copyright": "© 2025 Rytm. Spokojnie o pieniądzach.", "privacy": "Prywatność", "contact": "Kontakt"}
+}

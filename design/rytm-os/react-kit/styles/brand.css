@@ -1,0 +1,23 @@
+@font-face {
+  font-family: "Manrope";
+  src: url("../assets/fonts/Manrope-Variable.ttf") format("truetype");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --rytm-ink: #202F40;
+  --rytm-paper: #F2F1EC;
+  --rytm-paper-soft: #E8ECEA;
+  --rytm-excess: #C79D62;
+  --rytm-excess-text: #7E5726;
+  --rytm-muted: #606E7C;
+  --rytm-line: #CED3D5;
+  --rytm-green: #2E5C50;
+  --rytm-font: "Manrope", system-ui, sans-serif;
+}
+
+/* Sygnet: siatka 32 × 32, widoczny obrys x: 5–28, y: 3–29. */
+.rytm-mark { width: 1em; height: 1em; color: var(--rytm-ink); }
+.rytm-mark path { fill: currentColor; }

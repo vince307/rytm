@@ -1,0 +1,10 @@
+/* Rytm / Oś */
+:root {
+  --rytm-ink: #202f40;
+  --rytm-paper: #f2f1ec;
+  --rytm-excess: #c79d62;
+  --rytm-excess-text: #7e5726;
+  --rytm-muted: #606E7C;
+  --rytm-line: #ced3d5;
+  --rytm-font: "Manrope", system-ui, sans-serif;
+}

@@ -79,6 +79,8 @@ const scriptsConfig = defineConfig({
 
 export default defineConfig(
   includeIgnoreFile(gitignorePath),
+  // design/ is the read-only UI kit (prototype JS, not app code) — never linted, never edited.
+  { ignores: ["design/**"] },
   baseConfig,
   reactConfig,
   eslintPluginAstro.configs["flat/recommended"],

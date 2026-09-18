@@ -1,4 +1,4 @@
-// Smoke test: proves the built app, the Cloudflare adapter and the Supabase auth flow still work together.
+// Smoke test: proves the built app, the Vercel adapter and the Supabase auth flow still work together.
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";

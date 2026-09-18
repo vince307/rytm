@@ -24,6 +24,8 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
+  # Runs the auth-flow smoke test against `astro dev` (the Vercel adapter has no
+  # `astro preview` entrypoint) backed by a throwaway local Supabase.
   smoke:
     runs-on: ubuntu-latest
     steps:
@@ -40,16 +42,39 @@ jobs:
         run: |
           supabase start -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,realtime,storage-api,postgres-meta,supavisor
           supabase status -o env | grep -E '^(API_URL|ANON_KEY)=' > supabase.env
-      - name: Configure secrets for build and preview
+      - name: Configure secrets for the dev server
         run: |
           source supabase.env
+          test -n "$API_URL" && test -n "$ANON_KEY" || { echo "local Supabase did not expose API_URL/ANON_KEY"; exit 1; }
           printf 'SUPABASE_URL=%s\nSUPABASE_KEY=%s\n' "$API_URL" "$ANON_KEY" > .env
-          cp .env .dev.vars
       - run: npm run build
-      - name: Run smoke test against production preview
+      - name: Run smoke test against the dev server
+        env:
+          ASTRO_TELEMETRY_DISABLED: 1
         run: |
-          npm run preview -- --port 4321 &
+          npm run dev -- --port 4321 &
           for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:4321/ && break; sleep 1; done
           BASE_URL=http://localhost:4321 npm run smoke
       - if: always()
         run: supabase stop --no-backup
+
+  # Production ships only from here: push to main -> lint/check/build + smoke green -> prebuilt deploy.
+  # Vercel's Git integration is disabled for main in vercel.json; it still builds previews for other branches.
+  deploy:
+    needs: [ci, smoke]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency: production
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx vercel@48 pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      - run: npm run build
+      - run: npx vercel@48 deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

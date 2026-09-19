@@ -8,11 +8,11 @@ const year = new Date().getFullYear();
 <footer class="flex justify-between border-t border-line py-7 text-xs text-muted max-[559px]:block max-[559px]:leading-loose">
   <span>{f.copyright.replace("{year}", String(year))}</span>
   <span>
-    {/* eslint-disable-next-line astro/jsx-a11y/anchor-is-valid */}
+    {/* eslint-disable-next-line astro/jsx-a11y/anchor-is-valid -- kit specifies placeholder "#" links */}
     <a href="#" class="ml-[18px] text-muted no-underline max-[559px]:mr-[15px] max-[559px]:ml-0">
       {f.privacy}
     </a>
-    {/* eslint-disable-next-line astro/jsx-a11y/anchor-is-valid */}
+    {/* eslint-disable-next-line astro/jsx-a11y/anchor-is-valid -- kit specifies placeholder "#" links */}
     <a href="#" class="ml-[18px] text-muted no-underline max-[559px]:mr-[15px] max-[559px]:ml-0">
       {f.contact}
     </a>

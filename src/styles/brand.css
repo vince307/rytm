@@ -1,0 +1,38 @@
+@font-face {
+  font-family: "Manrope";
+  src: url("/rytm/fonts/Manrope-Variable.ttf") format("truetype");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --rytm-ink: #202F40;
+  --rytm-paper: #F2F1EC;
+  --rytm-paper-soft: #E8ECEA;
+  --rytm-excess: #C79D62;
+  --rytm-excess-text: #7E5726;
+  --rytm-muted: #606E7C;
+  --rytm-line: #CED3D5;
+  --rytm-green: #2E5C50;
+  --rytm-font: "Manrope", system-ui, sans-serif;
+}
+
+/* Sygnet: siatka 32 × 32, widoczny obrys x: 5–28, y: 3–29. */
+.rytm-mark { width: 1em; height: 1em; color: var(--rytm-ink); }
+.rytm-mark path { fill: currentColor; }
+
+/*
+ * Dark mode decision for round 1: no separate system-wide dark theme yet.
+ * The product already has dark brand surfaces and a dark app-icon variant;
+ * use --rytm-ink as the surface and --rytm-paper as the foreground where
+ * a dark panel is intentionally part of the composition. Revisit a full
+ * theme after the first data-heavy dashboard usability pass.
+ */
+.rytm-badge { display: inline-flex; align-items: center; min-height: 23px; border-radius: 999px; padding: 3px 8px; font-size: 11px; font-weight: 800; }
+.rytm-badge--fixed { background: #DFE7E4; color: var(--rytm-green); }
+.rytm-badge--frequent { background: #E2E7EC; color: var(--rytm-ink); }
+.rytm-badge--excess { background: var(--rytm-excess); color: var(--rytm-ink); }
+.rytm-badge--excluded { background: #E3E2DF; color: var(--rytm-muted); }
+.rytm-badge--new, .rytm-badge--changed { background: #EFE4D1; color: var(--rytm-excess-text); }
+.rytm-icon { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: miter; }

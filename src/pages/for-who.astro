@@ -20,24 +20,27 @@ const eyebrow = "text-xs font-extrabold tracking-[0.14em] text-excess-text upper
       <p class="mb-[30px] max-w-[520px] text-lg leading-relaxed text-muted">{w.description}</p>
       <div class="flex items-center gap-3 max-[559px]:flex-col max-[559px]:items-stretch">
         <a href="/register" class:list={buttonVariants({ variant: "primary" })}>
-          {copy.navigation.start} <span aria-hidden="true">↗</span>
+          {x.primaryCta} <span aria-hidden="true">↗</span>
         </a>
         <a href="/how-it-works" class:list={buttonVariants({ variant: "ghost" })}>
           {x.secondaryCta}
         </a>
       </div>
     </div>
-    <blockquote class="flex items-start gap-5 rounded-2xl border border-line bg-paper-soft p-8 max-[899px]:max-w-[560px]">
+    <blockquote class="relative flex min-h-[280px] items-end justify-between overflow-hidden rounded-2xl bg-excess p-7 max-[899px]:max-w-[560px]">
       <span
-        class="grid size-11 shrink-0 place-items-center rounded-xl bg-ink text-lg font-extrabold text-paper"
+        class="pointer-events-none absolute top-[-100px] right-[-120px] size-[250px] rounded-full border border-ink/20"
         aria-hidden="true"
-      >
+      ></span>
+      <span class="self-start text-[130px] leading-[0.7] font-extrabold tracking-[-0.12em] text-ink" aria-hidden="true">
         R
       </span>
-      <p class="text-2xl leading-tight tracking-[-0.03em]">
-        <span class="font-medium text-muted">„{w.quote.split(". ")[0]}.</span>
+      <p class="mb-px ml-[15px] text-xl leading-[1.25] tracking-[-0.04em]">
+        „{x.quoteLines[0]}
         <br />
-        <strong>{w.quote.split(". ")[1]}”</strong>
+        {x.quoteLines[1]}
+        <br />
+        <strong class="font-extrabold">{x.quoteStrong}”</strong>
       </p>
     </blockquote>
   </section>

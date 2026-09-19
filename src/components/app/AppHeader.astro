@@ -2,11 +2,9 @@
 import Brand from "@/components/Brand.astro";
 import { buttonVariants } from "@/components/ui/button";
 import { copyExtra } from "@/content/copy";
+import { formatMonthYear } from "@/lib/format";
 
-// Poland-only product: month label follows Warsaw time, not the server's UTC clock.
-const month = new Intl.DateTimeFormat("pl-PL", { month: "long", year: "numeric", timeZone: "Europe/Warsaw" }).format(
-  new Date(),
-);
+const month = formatMonthYear();
 ---
 
 <header class="flex h-[72px] items-center justify-between border-b border-line bg-paper px-[30px] max-[899px]:px-[18px]">

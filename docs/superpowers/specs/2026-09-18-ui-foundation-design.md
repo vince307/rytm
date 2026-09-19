@@ -33,7 +33,7 @@ Decisions taken in brainstorming (2026-09-18):
 
 ### Copy
 
-- `src/content/copy.ts`: `import content from "../../design/rytm-os/react-kit/docs/content.json"` (typed `as const`) re-exported as `copy`, plus `copyExtra` for strings the prototype renders but `content.json` lacks (K11, see §5). Components receive copy through props; no string literals in components.
+- `src/content/copy.ts`: `import content from "../../design/rytm-os/react-kit/docs/content.json"` (typed from the JSON import; `as const` is not applicable to JSON modules) re-exported as `copy`, plus `copyExtra` for strings the prototype renders but `content.json` lacks (K11, see §5). Components receive copy through props; no string literals in components.
 - Footer year is rendered dynamically (K7).
 
 ### Icons

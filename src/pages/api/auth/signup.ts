@@ -1,18 +1,20 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase";
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 
 export const prerender = false;
 
 const schema = z.object({
   email: z.string().trim().pipe(z.email()),
-  password: z.string().min(6),
+  password: z.string().min(MIN_PASSWORD_LENGTH),
   name: z
     .string()
     .trim()
     .max(80)
     .optional()
-    .transform((v) => v ?? undefined),
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- an empty trimmed string must also become undefined, not just null/undefined
+    .transform((v) => v || undefined),
 });
 
 export const POST: APIRoute = async (context) => {

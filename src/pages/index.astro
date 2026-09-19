@@ -3,6 +3,7 @@ import MarketingLayout from "@/layouts/MarketingLayout.astro";
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
 import { cn } from "@/lib/utils";
+import { formatMonthYear } from "@/lib/format";
 
 const l = copy.landing;
 const x = copyExtra.landing;
@@ -15,9 +16,16 @@ const barHeights = ["32%", "49%", "41%", "65%", "54%", "72%", "88%", "62%"];
     <div>
       <div class:list={eyebrow}>{l.eyebrow}</div>
       <h1 class="my-[17px] mb-6 max-w-[700px] text-[clamp(46px,6.3vw,82px)] leading-[0.98] tracking-[-0.075em] max-[559px]:text-[50px]">
-        {l.headline[0]}
+        {l.headline[0].endsWith(x.headlineEmphasis) ? (
+          <>
+            {l.headline[0].slice(0, -x.headlineEmphasis.length)}
+            <span class="text-excess-text">{x.headlineEmphasis}</span>
+          </>
+        ) : (
+          l.headline[0]
+        )}
         <br />
-        <span class="text-excess-text">{l.headline[1]}</span>
+        {l.headline[1]}
       </h1>
       <p class="mb-8 max-w-[520px] text-lg leading-relaxed text-muted max-[559px]:text-base">{l.description}</p>
       <div class="flex items-center gap-3 max-[559px]:flex-col max-[559px]:items-stretch">
@@ -37,7 +45,7 @@ const barHeights = ["32%", "49%", "41%", "65%", "54%", "72%", "88%", "62%"];
       <span class="absolute -right-10 -bottom-[120px] size-[290px] rounded-full border border-paper/15"></span>
       <div class="flex items-center justify-between text-xs text-paper/80">
         <span>{x.heroCardTop}</span>
-        <span>{new Intl.DateTimeFormat("pl-PL", { month: "long", year: "numeric" }).format(new Date())}</span>
+        <span>{formatMonthYear()}</span>
       </div>
       <div class="mt-[35px] mb-2 text-[42px] font-bold tracking-[-0.06em]">3 842,60 zł</div>
       <div class="text-xs text-paper/60">{x.heroCardSub}</div>

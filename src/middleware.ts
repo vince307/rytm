@@ -16,7 +16,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.locals.user = null;
   }
 
-  const path = context.url.pathname;
+  const path = context.url.pathname.replace(/\/+$/, "") || "/";
   const isProtected = PROTECTED_ROUTES.some((route) => path === route || path.startsWith(`${route}/`));
   const isAuthRoute = AUTH_ROUTES.includes(path);
 

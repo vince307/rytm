@@ -28,7 +28,6 @@ export const copyExtra = {
     namePlaceholder: "np. Ola",
     emailPlaceholder: "ty@przyklad.pl",
     passwordPlaceholder: "••••••••",
-    rememberMe: "Zapamiętaj mnie",
     forgotPassword: "Nie pamiętam hasła",
     terms: "Zakładając konto akceptujesz regulamin.",
     noAccount: "Nie masz jeszcze konta?",
@@ -59,7 +58,6 @@ export const copyExtra = {
     emptyEyebrow: "Przegląd miesiąca",
     emptyTitle: "Zacznij od pierwszego importu.",
     emptyLead: "Rytm pokaże Ci wzorce, kiedy dostanie pierwszy wyciąg.",
-    uploadCta: "+ Wgraj CSV",
     emptyIllustrationAlt: "Dokument czekający na import",
   },
   imports: {
@@ -88,6 +86,7 @@ export const copyExtra = {
     navLabel: "Nawigacja aplikacji",
   },
   landing: {
+    headlineEmphasis: "rytmie.",
     stepsEyebrow: "Bez arkusza",
     stepsTitle: "Trzy kroki do jasności.",
     stepsNote: "Wystarczy jeden wieczór w miesiącu.",
@@ -105,6 +104,9 @@ export const copyExtra = {
     stepsNote: "Bez ręcznego kategoryzowania.",
   },
   forWho: {
+    primaryCta: "Sprawdź swój rytm",
+    quoteLines: ["Nie chcę budżetu", "na każdy dzień."],
+    quoteStrong: "Chcę widzieć wzorce.",
     cardsEyebrow: "Brzmi znajomo?",
     cardsTitle: "Rytm pasuje do Twojego tempa.",
     secondaryCta: "Zobacz jak działa",

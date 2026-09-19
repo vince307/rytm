@@ -25,9 +25,9 @@ Full server-side rendering (`output: "server"` in astro.config.mjs). All pages a
 
 - `src/lib/supabase.ts` — creates a Supabase SSR client using `@supabase/ssr` with cookie-based sessions. Uses `astro:env/server` for `SUPABASE_URL` and `SUPABASE_KEY` (server-only secrets declared in astro.config.mjs `env.schema`).
 - `src/middleware.ts` — runs on every request, resolves the current user, attaches to `context.locals.user`. Redirects unauthenticated users away from routes listed in `PROTECTED_ROUTES`.
-- API endpoints: `src/pages/api/auth/{signin,signup,signout}.ts`
-- Auth pages: `src/pages/auth/{signin,signup,confirm-email}.astro`
-- Protected page example: `src/pages/dashboard.astro`
+- API endpoints: `src/pages/api/auth/{signin,signup,signout,reset}.ts`
+- Auth pages: `src/pages/{login,register,reset,confirm-email}.astro` (AuthLayout)
+- Protected pages: `/home`, `/patterns`, `/fixed`, `/imports`, `/settings` (AppLayout); middleware also sends signed-in users from `/login` and `/register` to `/home`
 
 ### Key conventions
 
@@ -40,6 +40,7 @@ Full server-side rendering (`output: "server"` in astro.config.mjs). All pages a
 - **React**: no Next.js directives ("use client" etc.). Extract hooks to `src/components/hooks/`.
 - **Services/helpers** go in `src/lib/` (or `src/lib/services/` for extracted business logic).
 - **Shared types** (entities, DTOs) go in `src/types.ts`.
+- **Design kit**: `design/rytm-os/` is read-only; assets via `scripts/sync-kit.sh` → `public/rytm/` + `src/styles/brand.css`; colors only via the Tailwind names `ink`/`paper`/`paper-soft`/`excess`/`excess-text`/`muted`/`line`/`green`; copy from `src/content/copy.ts` (`copy` = kit JSON, `copyExtra` = kit gaps K11); missing UI → gap row in `context/foundation/design-kit.md` + `DESIGN-GAP` comment, never invented.
 
 ### Environment
 

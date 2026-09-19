@@ -17,14 +17,16 @@ Rytm is an Astro 7 SSR app (React 19 islands, Tailwind 4, shadcn/ui, Supabase au
 - `npx astro check` — type-checks `.astro` files; part of the CI gate
 - `npm run build` — SSR production build via `@astrojs/vercel` (emits `.vercel/output/`)
 - `npm run smoke` — auth-flow smoke test against a running server (`BASE_URL`, default `http://localhost:4321`); never against production
+- `./scripts/sync-kit.sh` — re-copy the kit after a new design delivery
 
 Pre-commit: husky + lint-staged (`eslint --fix`, `prettier --write`).
 
 ## Structure
 
 - `src/pages/` — routes. API routes under `src/pages/api/` export uppercase `GET`/`POST`, set `prerender = false`, validate input with zod.
-- `src/components/` — `.astro` for static content, `.tsx` only when interactive. shadcn/ui primitives in `src/components/ui/`, feature groups like `src/components/auth/`.
+- `src/components/` — `.astro` for static content, `.tsx` only when interactive. shadcn/ui primitives in `src/components/ui/`, feature groups in `src/components/{marketing,app,auth}/`.
 - `src/lib/` — helpers and services (`supabase.ts`, `utils.ts` with `cn()`); `src/middleware.ts` guards `PROTECTED_ROUTES`.
+- `src/content/copy.ts` — kit copy (`copy` = kit JSON, `copyExtra` = kit-missing strings).
 - `context/` — product contracts; `design/` — the kit; `supabase/` — config and `migrations/`.
 
 ## Style

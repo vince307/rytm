@@ -87,6 +87,7 @@ Nowe konflikty wykryte w dostawie rundy 1:
 | K8 | Krok `/imports/new/summary`: nachodzący zakres pokazany jako **info** („Zakres nachodzi na istniejący import z maja. Po potwierdzeniu dane nie będą automatycznie deduplikowane.”), a przycisk „Importuj 64 obciążenia” pozostaje aktywny | **FR-005: import z nachodzącym zakresem jest odrzucany**; nie ma potwierdzania ani deduplikacji | Kontrakt wygrywa. W implementacji: stan błędu blokujący (alert `error`), zakres istniejącego importu + link do niego, brak przycisku importu. Copy w kicie do poprawy przez autora (→ runda 2). |
 | K9 | `prototype/styles.css`: `.badge.new` szaroniebieski (`#e2e7ec`) | `brand.css` i karta stylu: „nowy” i „zmiana kwoty” w delikatnym bursztynie (`.rytm-badge--new`) | Kanoniczny jest `brand.css`; w prototypie do poprawy. |
 | K10 | Zdanie „dane nie będą automatycznie deduplikowane” sugeruje deduplikację jako opcję | Deduplikacji nie ma w produkcie (FR-005) | Usunąć razem z K8. |
+| K11 | `content.json` nie zawiera copy, które prototyp renderuje: panele wizualne auth („Zacznij widzieć więcej.”, „Wróć do swojego rytmu.” + leady), tytuł i lead pustego dashboardu, nagłówki resetu i „Sprawdź skrzynkę / Link jest w drodze.”, tytuł/lead widoku importów, etykiety sidebaru, sekcje landing/how-it-works/for-who poza hero | copy ma pochodzić z `content.json` (reguła 4) | Tymczasowo w `src/content/copy.ts` → `copyExtra` (dosłownie z `prototype/app.js`). Autor dodaje klucze do `content.json`; wtedy `copyExtra` się kurczy. |
 
 ## Rejestr braków (gap register)
 
@@ -111,7 +112,10 @@ Pierwsza runda — porównanie kitu z 6-krokowym przepływem MVP i FR-001…FR-0
 | G13 | **Zestaw ikon** | nawigacja, akcje | `.side-icon` to pusty kwadrat-placeholder; potrzebne ikony: przegląd, wzorce, koszty stałe, importy, ustawienia, plus akcje (scal, wyklucz, edytuj, usuń, wgraj) | delivered · `react-kit/assets/icons/ui/ui.svg` (19 symboli, obrys 1,8 px) |
 | G14 | **Komponenty ogólne** nieobecne w prototypie | wszędzie | badge/tag (typ wzorca, „ponad próg”), modal/dialog, toast/alert (sukces, błąd), select/dropdown, tabs, tabela z nagłówkiem, pagination lub „pokaż więcej”, skeleton/loading, walidacja pól formularza (stan błędu) | delivered częściowo · badge, modal (wariant destrukcyjny), toast, alert, select, tabela z sortowaniem, „Pokaż więcej”, skeleton, błąd pola; **brak `tabs`**; paginacja świadomie odłożona (→ runda 2 tylko jeśli potrzebne) |
 | G15 | **Tryb ciemny** | opcjonalnie | `favicon.svg` i ikona app mają warianty jasny/ciemny; brak palety ciemnej dla UI aplikacji — decyzja: MVP tylko jasny? | decided · MVP tylko jasny; zapisane w karcie stylu (sekcja „Elementy UI — runda 1”) |
-| G16 | **Stany formularzy auth** | FR-001 | błąd logowania, e-mail zajęty, reset hasła (link „Nie pamiętam hasła” prowadzi donikąd) | delivered częściowo · błąd logowania, `/reset`, „sprawdź skrzynkę”; **brak**: „e-mail zajęty”, walidacja hasła (→ runda 2) |
+| G16 | **Stany formularzy auth** | FR-001 | błąd logowania, e-mail zajęty, reset hasła (link „Nie pamiętam hasła” prowadzi donikąd) | delivered częściowo · błąd logowania, `/reset`, „sprawdź skrzynkę”; **brak**: „e-mail zajęty”, walidacja hasła (→ runda 2); slice 1 używa placeholderów: komunikaty walidacji pól, „Pokaż/Ukryj” hasło, ogólny błąd rejestracji (`copyExtra.auth`) |
+| G17 | **Strona „ustaw nowe hasło”** (`/reset/new`) dla linku z e-maila Supabase | FR-001, reset hasła | ekran w `auth-shell`: nowe hasło + powtórzenie, stan błędu, sukces → `/login` | open · do dostarczenia link „Nie pamiętam hasła” jest ukryty na `/login` |
+| G18 | **Widok niedostępny / pusty widok aplikacji** (wzorce, koszty stałe, importy, ustawienia przed danymi) | stuby tras w slice 1 | copy + kompozycja stanu „ten widok pojawi się po pierwszym imporcie” | placeholder · `InlineAlert info` z copy w `copyExtra.stub`, `DESIGN-GAP: G18` |
+| G19 | **Ekran „potwierdź e-mail”** po rejestracji | FR-001 (Supabase wysyła link aktywacyjny) | copy + kompozycja; może reużyć „Sprawdź skrzynkę” z `/reset` | placeholder · `src/pages/confirm-email.astro`, `DESIGN-GAP: G19` |
 
 Reguła utrzymania: nowy brak wykryty podczas implementacji dostaje kolejny numer `G17…`, wpis w tej tabeli i (jeśli użyto placeholdera) komentarz `DESIGN-GAP: Gn` w kodzie. Autor po dostarczeniu zmienia status na `delivered` i wskazuje pliki.
 
@@ -124,6 +128,10 @@ Reguła utrzymania: nowy brak wykryty podczas implementacji dostaje kolejny nume
 5. **K5** — powitanie na dashboardzie bez imienia.
 6. **K9** — `.badge.new` w prototypie na bursztyn zgodnie z `brand.css`.
 7. **G14** — `tabs` (tylko jeśli implementacja ich potrzebuje).
+8. **G17** — strona „ustaw nowe hasło”.
+9. **G18** — stan „widok niedostępny”.
+10. **G19** — ekran „potwierdź e-mail”.
+11. **K11** — brakujące klucze w content.json.
 
 ## Jak kit wchodzi do aplikacji (dla `/10x-bootstrapper` i dalej)
 

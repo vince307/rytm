@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Mail, Lock, UserPlus } from "lucide-react";
 import { FormField } from "@/components/auth/FormField";
 import { PasswordToggle } from "@/components/auth/PasswordToggle";
 import { SubmitButton } from "@/components/auth/SubmitButton";
@@ -7,128 +6,97 @@ import { ServerError } from "@/components/auth/ServerError";
 
 const MIN_PASSWORD_LENGTH = 6;
 
+export interface SignUpLabels {
+  name: string;
+  optional: string;
+  namePlaceholder: string;
+  email: string;
+  password: string;
+  emailPlaceholder: string;
+  passwordPlaceholder: string;
+  showPassword: string;
+  hidePassword: string;
+  terms: string;
+  submit: string;
+  pending: string;
+  emailRequired: string;
+  passwordTooShort: string;
+}
+
 interface Props {
+  labels: SignUpLabels;
   serverError?: string | null;
 }
 
-export default function SignUpForm({ serverError }: Props) {
+export default function SignUpForm({ labels, serverError }: Props) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   function validate() {
     const next: typeof errors = {};
-
-    if (!email.trim()) {
-      next.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      next.email = "Enter a valid email address";
-    }
-
-    if (!password) {
-      next.password = "Password is required";
-    } else if (password.length < MIN_PASSWORD_LENGTH) {
-      next.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters`;
-    }
-
-    if (!confirmPassword) {
-      next.confirmPassword = "Please confirm your password";
-    } else if (password !== confirmPassword) {
-      next.confirmPassword = "Passwords do not match";
-    }
-
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) next.email = labels.emailRequired;
+    if (password.length < MIN_PASSWORD_LENGTH) next.password = labels.passwordTooShort;
     setErrors(next);
     return Object.keys(next).length === 0;
   }
 
-  function clearError(field: keyof typeof errors) {
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
-  }
-
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    if (!validate()) {
-      e.preventDefault();
-    }
+    if (!validate()) e.preventDefault();
   }
-
-  const passwordHint =
-    !errors.password && password.length > 0 && password.length < MIN_PASSWORD_LENGTH ? (
-      <p className="mt-1 text-xs text-blue-100/50">
-        {MIN_PASSWORD_LENGTH - password.length} more character
-        {MIN_PASSWORD_LENGTH - password.length !== 1 ? "s" : ""} needed
-      </p>
-    ) : undefined;
 
   return (
-    <form method="POST" action="/api/auth/signup" className="space-y-4" onSubmit={handleSubmit} noValidate>
+    <form method="POST" action="/api/auth/signup" onSubmit={handleSubmit} noValidate>
+      <ServerError message={serverError} />
+      <FormField
+        id="name"
+        autoComplete="given-name"
+        label={labels.name}
+        optionalLabel={labels.optional}
+        value={name}
+        onChange={setName}
+        placeholder={labels.namePlaceholder}
+      />
       <FormField
         id="email"
         type="email"
-        label="Email"
+        autoComplete="email"
+        label={labels.email}
         value={email}
         onChange={(v) => {
           setEmail(v);
-          clearError("email");
+          setErrors((p) => ({ ...p, email: undefined }));
         }}
-        placeholder="you@example.com"
+        placeholder={labels.emailPlaceholder}
         error={errors.email}
-        icon={<Mail className="size-4" />}
       />
-
       <FormField
         id="password"
-        label="Password"
         type={showPassword ? "text" : "password"}
+        autoComplete="new-password"
+        label={labels.password}
         value={password}
         onChange={(v) => {
           setPassword(v);
-          clearError("password");
+          setErrors((p) => ({ ...p, password: undefined }));
         }}
-        placeholder="Min. 6 characters"
+        placeholder={labels.passwordPlaceholder}
         error={errors.password}
-        hint={passwordHint}
-        icon={<Lock className="size-4" />}
         endContent={
           <PasswordToggle
             visible={showPassword}
             onToggle={() => {
               setShowPassword(!showPassword);
             }}
+            showLabel={labels.showPassword}
+            hideLabel={labels.hidePassword}
           />
         }
       />
-
-      <FormField
-        id="confirmPassword"
-        name="confirmPassword"
-        label="Confirm password"
-        type={showConfirmPassword ? "text" : "password"}
-        value={confirmPassword}
-        onChange={(v) => {
-          setConfirmPassword(v);
-          clearError("confirmPassword");
-        }}
-        placeholder="Re-enter your password"
-        error={errors.confirmPassword}
-        icon={<Lock className="size-4" />}
-        endContent={
-          <PasswordToggle
-            visible={showConfirmPassword}
-            onToggle={() => {
-              setShowConfirmPassword(!showConfirmPassword);
-            }}
-          />
-        }
-      />
-
-      <ServerError message={serverError} />
-
-      <SubmitButton pendingText="Creating account..." icon={<UserPlus className="size-4" />}>
-        Create account
-      </SubmitButton>
+      <p className="text-muted my-[11px] mb-[22px] text-xs">{labels.terms}</p>
+      <SubmitButton pendingText={labels.pending}>{labels.submit}</SubmitButton>
     </form>
   );
 }

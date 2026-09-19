@@ -44,6 +44,16 @@ export const copyExtra = {
     confirmEmailBody: "Wysłaliśmy link aktywacyjny na podany adres e-mail. Kliknij go, aby dokończyć rejestrację.",
     // DESIGN-GAP: G16 — kit has no generic registration error copy.
     registerError: "Nie udało się utworzyć konta. Sprawdź adres e-mail i spróbuj ponownie.",
+    // DESIGN-GAP: G16 — no kit copy for the password-toggle button.
+    showPassword: "Pokaż",
+    hidePassword: "Ukryj",
+    // DESIGN-GAP: G16 — kit has no field-validation copy.
+    emailRequired: "Podaj poprawny adres e-mail.",
+    passwordRequired: "Podaj hasło.",
+    passwordTooShort: "Hasło musi mieć co najmniej 6 znaków.",
+    signingIn: "Logowanie…",
+    creating: "Tworzenie konta…",
+    sending: "Wysyłanie…",
   },
   home: {
     emptyEyebrow: "Przegląd miesiąca",

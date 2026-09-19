@@ -1,0 +1,24 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import SiteHeader from "@/components/marketing/SiteHeader.astro";
+import SiteFooter from "@/components/marketing/SiteFooter.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<Layout title={title} description={description}>
+  <div class="min-h-screen">
+    <div class="mx-auto max-w-[1180px] px-[34px] max-[559px]:px-5">
+      <SiteHeader />
+      <main>
+        <slot />
+      </main>
+      <SiteFooter />
+    </div>
+  </div>
+</Layout>

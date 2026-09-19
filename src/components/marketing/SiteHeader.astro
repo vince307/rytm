@@ -1,0 +1,26 @@
+---
+import Brand from "@/components/Brand.astro";
+import { buttonVariants } from "@/components/ui/button";
+import { copy } from "@/content/copy";
+import { cn } from "@/lib/utils";
+
+const nav = copy.navigation;
+---
+
+<header class="flex h-[78px] items-center justify-between border-b border-ink/10 max-[559px]:h-[68px]">
+  <Brand />
+  <nav class="flex items-center gap-[27px] max-[899px]:gap-[13px]">
+    <a href="/how-it-works" class="text-sm font-semibold text-muted hover:text-ink max-[899px]:hidden">
+      {nav.howItWorks}
+    </a>
+    <a href="/for-who" class="text-sm font-semibold text-muted hover:text-ink max-[559px]:text-xs">
+      {nav.forWho}
+    </a>
+    <a href="/login" class:list={cn(buttonVariants({ variant: "ghost" }), "max-[559px]:text-xs")}>
+      {nav.login}
+    </a>
+    <a href="/register" class:list={cn(buttonVariants({ variant: "primary" }), "max-[559px]:text-xs")}>
+      {nav.start}
+    </a>
+  </nav>
+</header>

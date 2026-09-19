@@ -1,0 +1,77 @@
+---
+import MarketingLayout from "@/layouts/MarketingLayout.astro";
+import { buttonVariants } from "@/components/ui/button";
+import { copy, copyExtra } from "@/content/copy";
+
+const h = copy.howItWorks;
+const x = copyExtra.howItWorks;
+const eyebrow = "text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase";
+const rClip = "clip-path:polygon(0 0,57% 0,100% 43%,62% 66%,100% 100%,55% 100%,30% 70%,30% 100%,0 100%)";
+---
+
+<MarketingLayout title={copy.navigation.howItWorks} description={h.description}>
+  <section class="grid grid-cols-[1.05fr_0.95fr] items-center gap-[90px] py-[86px] pb-[92px] max-[899px]:grid-cols-1 max-[899px]:gap-[35px] max-[899px]:pt-[55px]">
+    <div>
+      <div class:list={eyebrow}>{h.eyebrow}</div>
+      <h1 class="my-[17px] mb-6 text-[clamp(48px,6.4vw,78px)] leading-[0.98] tracking-[-0.075em]">
+        {h.headline[0]}
+        <br />
+        <span class="text-excess-text">{h.headline[1]}</span>
+      </h1>
+      <p class="mb-[30px] max-w-[520px] text-lg leading-relaxed text-muted">{h.description}</p>
+      <a href="/register" class:list={buttonVariants({ variant: "primary" })}>
+        {h.primaryCta} <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+    <div
+      class="flex min-h-[270px] flex-col justify-center rounded-2xl bg-ink p-[31px] text-paper shadow-[0_18px_48px_rgba(32,47,64,0.08)]"
+      aria-hidden="true"
+    >
+      <div class="text-xs font-extrabold tracking-[0.13em] text-paper/70 uppercase">{x.sequenceCaption}</div>
+      <div class="my-[46px] mb-5 flex items-center gap-[13px]">
+        {[0, 1, 2].map(() => (
+          <span class="size-[27px] bg-paper/45" style={rClip}></span>
+        ))}
+        <i class="mx-[5px] h-[51px] border-l border-paper/55"></i>
+        {[0, 1].map(() => (
+          <span class="size-[27px] bg-excess" style={rClip}></span>
+        ))}
+      </div>
+      <div class="flex justify-between text-xs text-paper/65">
+        <span>{x.sequenceThreshold}</span>
+        <b class="text-excess">{x.sequenceOver}</b>
+      </div>
+    </div>
+  </section>
+
+  <section class="pt-[30px] pb-[100px]">
+    <div class="mb-7 flex items-end justify-between">
+      <div>
+        <div class:list={eyebrow}>{x.stepsEyebrow}</div>
+        <h2 class="mt-2.5 text-[38px] tracking-[-0.06em] max-[559px]:text-[31px]">{x.stepsTitle}</h2>
+      </div>
+      <span class="text-muted">{x.stepsNote}</span>
+    </div>
+    <div class="grid grid-cols-3 gap-3.5 max-[899px]:grid-cols-1">
+      {h.steps.map((s) => (
+        <article class="flex min-h-[285px] flex-col rounded-xl border border-line bg-paper-soft p-[25px]">
+          <span class="text-xs font-extrabold tracking-[0.12em] text-excess-text">{s.number}</span>
+          <h3 class="mt-3 text-[21px] tracking-[-0.04em]">{s.title}</h3>
+          <p class="mt-2.5 text-sm leading-relaxed text-muted">{s.body}</p>
+          <span class="mt-auto pt-5 text-xs font-bold text-ink">{s.caption}</span>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="pb-[100px]">
+    <div class="grid grid-cols-3 gap-4 max-[899px]:grid-cols-1 max-[899px]:gap-5">
+      {h.explanation.map((e) => (
+        <article class="border-t-2 border-ink pt-5 pr-2 pb-2.5">
+          <h3 class="mb-2.5 text-lg">{e.title}</h3>
+          <p class="text-sm leading-relaxed text-muted">{e.body}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+</MarketingLayout>

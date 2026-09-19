@@ -1,8 +1,92 @@
 ---
-import Welcome from "@/components/Welcome.astro";
-import Layout from "@/layouts/Layout.astro";
+import MarketingLayout from "@/layouts/MarketingLayout.astro";
+import { buttonVariants } from "@/components/ui/button";
+import { copy, copyExtra } from "@/content/copy";
+import { cn } from "@/lib/utils";
+
+const l = copy.landing;
+const x = copyExtra.landing;
+const eyebrow = "text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase";
+const barHeights = ["32%", "49%", "41%", "65%", "54%", "72%", "88%", "62%"];
 ---
 
-<Layout title="Start">
-  <Welcome />
-</Layout>
+<MarketingLayout title={l.primaryCta} description={l.description}>
+  <section class="grid grid-cols-[1.05fr_0.95fr] items-center gap-20 py-[88px] pb-[100px] max-[899px]:grid-cols-1 max-[899px]:gap-[45px] max-[899px]:pt-[55px]">
+    <div>
+      <div class:list={eyebrow}>{l.eyebrow}</div>
+      <h1 class="my-[17px] mb-6 max-w-[700px] text-[clamp(46px,6.3vw,82px)] leading-[0.98] tracking-[-0.075em] max-[559px]:text-[50px]">
+        {l.headline[0]}
+        <br />
+        <span class="text-excess-text">{l.headline[1]}</span>
+      </h1>
+      <p class="mb-8 max-w-[520px] text-lg leading-relaxed text-muted max-[559px]:text-base">{l.description}</p>
+      <div class="flex items-center gap-3 max-[559px]:flex-col max-[559px]:items-stretch">
+        <a href="/register" class:list={buttonVariants({ variant: "primary" })}>
+          {l.primaryCta} <span aria-hidden="true">↗</span>
+        </a>
+        <a href="/how-it-works" class:list={buttonVariants({ variant: "ghost" })}>
+          {l.secondaryCta}
+        </a>
+      </div>
+      <div class="mt-[17px] text-xs text-muted">{l.note}</div>
+    </div>
+    <div
+      class="relative overflow-hidden rounded-[20px] bg-ink p-7 text-paper shadow-[0_18px_48px_rgba(32,47,64,0.08)] max-[899px]:max-w-[560px]"
+      aria-hidden="true"
+    >
+      <span class="absolute -right-10 -bottom-[120px] size-[290px] rounded-full border border-paper/15"></span>
+      <div class="flex items-center justify-between text-xs text-paper/80">
+        <span>{x.heroCardTop}</span>
+        <span>{new Intl.DateTimeFormat("pl-PL", { month: "long", year: "numeric" }).format(new Date())}</span>
+      </div>
+      <div class="mt-[35px] mb-2 text-[42px] font-bold tracking-[-0.06em]">3 842,60 zł</div>
+      <div class="text-xs text-paper/60">{x.heroCardSub}</div>
+      <div class="mt-[30px] flex h-[145px] items-end gap-[11px] border-b border-paper/15 px-3.5">
+        {barHeights.map((h, i) => (
+          <i class:list={["w-6 rounded-t", i >= 6 ? "bg-excess" : "bg-paper/30"]} style={`height:${h}`}></i>
+        ))}
+      </div>
+      <div class="mt-[23px] flex gap-[9px]">
+        {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+          <i
+            class:list={["size-5", i >= 5 ? "bg-excess" : "bg-paper/35"]}
+            style="clip-path:polygon(0 0,55% 0,100% 42%,63% 66%,100% 100%,54% 100%,30% 70%,30% 100%,0 100%)"
+          ></i>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="pt-[30px] pb-[100px]">
+    <div class="mb-7 flex items-end justify-between">
+      <div>
+        <div class:list={eyebrow}>{x.stepsEyebrow}</div>
+        <h2 class="mt-2.5 text-[38px] tracking-[-0.06em] max-[559px]:text-[31px]">{x.stepsTitle}</h2>
+      </div>
+      <span class="text-muted">{x.stepsNote}</span>
+    </div>
+    <div class="grid grid-cols-3 gap-4 max-[899px]:grid-cols-1">
+      {l.steps.map((s) => (
+        <article class="border-t-2 border-ink pt-5 pr-2 pb-2.5">
+          <h3 class="mb-2.5 text-lg">
+            {s.number} — {s.title}
+          </h3>
+          <p class="text-sm leading-relaxed text-muted">{s.body}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="-mx-[34px] bg-ink py-[55px] text-paper max-[559px]:-mx-5">
+    <div class="mx-auto flex max-w-[1180px] items-center justify-between gap-[30px] px-[34px] max-[899px]:block max-[559px]:px-5">
+      <h2 class="text-[35px] tracking-[-0.06em] max-[559px]:text-[30px]">
+        {x.ctaTitle[0]}
+        <br />
+        {x.ctaTitle[1]}
+      </h2>
+      <a href="/register" class:list={cn(buttonVariants({ variant: "amber" }), "max-[899px]:mt-[22px]")}>
+        {x.ctaButton}
+      </a>
+    </div>
+  </section>
+</MarketingLayout>

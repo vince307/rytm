@@ -1,0 +1,22 @@
+---
+import type { IconName } from "@/content/copy";
+import { cn } from "@/lib/utils";
+
+interface Props {
+  name: IconName;
+  size?: 15 | 16 | 17 | 20 | 28;
+  class?: string;
+}
+
+const { name, size = 16, class: className } = Astro.props;
+---
+
+<svg
+  class:list={cn("rytm-icon inline-block shrink-0 align-[-0.18em]", className)}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  aria-hidden="true"
+>
+  <use href={`/rytm/icons/ui/ui.svg#${name}`}></use>
+</svg>

@@ -1,0 +1,56 @@
+---
+import Icon from "@/components/Icon.astro";
+import type { NavKey } from "@/components/app/nav";
+import type { IconName } from "@/content/copy";
+import { copyExtra } from "@/content/copy";
+import { cn } from "@/lib/utils";
+
+interface Props {
+  active: NavKey;
+}
+
+const { active } = Astro.props;
+const a = copyExtra.app;
+const link =
+  "flex items-center gap-[11px] rounded-lg px-3 py-[11px] text-[13px] font-bold text-muted no-underline hover:bg-paper-soft hover:text-ink";
+const activeLink = "bg-paper-soft text-ink";
+const label = "mx-3 mt-5 mb-[9px] text-[11px] font-extrabold tracking-[0.13em] text-muted uppercase";
+const items: { key: NavKey; href: string; text: string; icon: IconName }[] = [
+  { key: "home", href: "/home", text: a.overview, icon: "overview" },
+  { key: "patterns", href: "/patterns", text: a.patternsLong, icon: "patterns" },
+  { key: "fixed", href: "/fixed", text: a.fixedLong, icon: "fixed" },
+];
+---
+
+<aside class="relative min-h-[calc(100vh-72px)] border-r border-line bg-paper px-4 py-7 max-[899px]:hidden">
+  <div class:list={label}>{a.sidebarView}</div>
+  {items.map((i) => (
+    <a
+      href={i.href}
+      class:list={cn(link, active === i.key && activeLink)}
+      aria-current={active === i.key ? "page" : undefined}
+    >
+      <Icon name={i.icon} size={17} />
+      <span>{i.text}</span>
+    </a>
+  ))}
+  <div class:list={label}>{a.sidebarData}</div>
+  <a
+    href="/imports"
+    class:list={cn(link, active === "imports" && activeLink)}
+    aria-current={active === "imports" ? "page" : undefined}
+  >
+    <Icon name="import" size={17} />
+    <span>{a.importsLong}</span>
+  </a>
+  <div class="absolute right-4 bottom-[25px] left-4">
+    <a
+      href="/settings"
+      class:list={cn(link, active === "settings" && activeLink)}
+      aria-current={active === "settings" ? "page" : undefined}
+    >
+      <Icon name="settings" size={17} />
+      <span>{a.settingsLong}</span>
+    </a>
+  </div>
+</aside>

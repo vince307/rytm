@@ -1,0 +1,21 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import PageTitle from "@/components/app/PageTitle.astro";
+import EmptyState from "@/components/app/EmptyState.astro";
+import { copy, copyExtra } from "@/content/copy";
+
+const h = copyExtra.home;
+const e = copy.emptyState;
+---
+
+<AppLayout title={copy.dashboard.eyebrow} active="home">
+  <PageTitle eyebrow={h.emptyEyebrow} title={h.emptyTitle} lead={h.emptyLead} />
+  <EmptyState
+    title={e.title}
+    body={e.body}
+    cta={e.cta}
+    href="/imports/new"
+    illustration="/rytm/illustrations/rytm-pusty-stan-jasny.svg"
+    illustrationAlt={h.emptyIllustrationAlt}
+  />
+</AppLayout>

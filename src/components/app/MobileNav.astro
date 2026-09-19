@@ -1,0 +1,40 @@
+---
+import Icon from "@/components/Icon.astro";
+import type { NavKey } from "@/components/app/nav";
+import type { IconName } from "@/content/copy";
+import { copy, copyExtra } from "@/content/copy";
+import { cn } from "@/lib/utils";
+
+interface Props {
+  active: NavKey;
+}
+
+const { active } = Astro.props;
+const m = copy.mobileNav;
+const items: { key: NavKey; href: string; text: string; icon: IconName }[] = [
+  { key: "home", href: "/home", text: m.overview, icon: "overview" },
+  { key: "patterns", href: "/patterns", text: m.patterns, icon: "patterns" },
+  { key: "fixed", href: "/fixed", text: m.fixed, icon: "fixed" },
+  { key: "imports", href: "/imports", text: m.imports, icon: "import" },
+  { key: "settings", href: "/settings", text: m.settings, icon: "settings" },
+];
+---
+
+<nav
+  class="fixed inset-x-0 bottom-0 z-20 hidden justify-around border-t border-line bg-paper px-1 pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] shadow-[0_-8px_25px_rgba(32,47,64,0.07)] max-[899px]:flex"
+  aria-label={copyExtra.app.navLabel}
+>
+  {items.map((i) => (
+    <a
+      href={i.href}
+      class:list={cn(
+        "grid justify-items-center gap-[3px] rounded-[7px] px-2 py-1 text-[10px] font-bold text-muted no-underline",
+        active === i.key && "bg-paper-soft text-ink",
+      )}
+      aria-current={active === i.key ? "page" : undefined}
+    >
+      <Icon name={i.icon} size={17} />
+      <span>{i.text}</span>
+    </a>
+  ))}
+</nav>

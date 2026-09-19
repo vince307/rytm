@@ -1,0 +1,27 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import AppHeader from "@/components/app/AppHeader.astro";
+import Sidebar from "@/components/app/Sidebar.astro";
+import MobileNav from "@/components/app/MobileNav.astro";
+import type { NavKey } from "@/components/app/nav";
+
+interface Props {
+  title: string;
+  active: NavKey;
+}
+
+const { title, active } = Astro.props;
+---
+
+<Layout title={title}>
+  <div class="min-h-screen bg-paper-soft">
+    <AppHeader />
+    <div class="mx-auto grid max-w-[1440px] grid-cols-[230px_1fr] max-[899px]:grid-cols-1">
+      <Sidebar active={active} />
+      <main class="w-full max-w-[1100px] px-[42px] pt-[35px] pb-[60px] max-[899px]:px-[18px] max-[899px]:pt-[26px] max-[899px]:pb-[88px]">
+        <slot />
+      </main>
+    </div>
+    <MobileNav active={active} />
+  </div>
+</Layout>

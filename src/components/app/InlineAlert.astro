@@ -1,0 +1,23 @@
+---
+// InlineAlert.astro — prototype .inline-alert
+import Icon from "@/components/Icon.astro";
+import { cn } from "@/lib/utils";
+interface Props {
+  kind: "success" | "error" | "info";
+}
+const { kind } = Astro.props;
+const tone = { success: "bg-green/15 text-green", error: "bg-excess/25 text-excess-text", info: "bg-ink/8 text-ink" }[
+  kind
+];
+const icon = { success: "success", error: "warning", info: "info" } as const;
+---
+
+<div
+  role={kind === "error" ? "alert" : "status"}
+  class:list={cn("flex items-start gap-[9px] rounded-lg px-[13px] py-3 text-[13px] leading-snug", tone)}
+>
+  <Icon name={icon[kind]} size={16} class="mt-px" />
+  <span>
+    <slot />
+  </span>
+</div>

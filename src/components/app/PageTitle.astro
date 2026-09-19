@@ -1,0 +1,18 @@
+---
+// PageTitle.astro — prototype .dash-title
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead?: string;
+}
+const { eyebrow, title, lead } = Astro.props;
+---
+
+<div class="mb-7 flex items-end justify-between gap-5 max-[899px]:items-start">
+  <div>
+    <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{eyebrow}</div>
+    <h1 class="mt-2 mb-1 text-[37px] tracking-[-0.07em] max-[899px]:text-[31px]">{title}</h1>
+    {lead && <p class="text-sm text-muted">{lead}</p>}
+  </div>
+  <slot />
+</div>

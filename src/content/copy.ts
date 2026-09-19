@@ -60,6 +60,7 @@ export const copyExtra = {
     emptyTitle: "Zacznij od pierwszego importu.",
     emptyLead: "Rytm pokaże Ci wzorce, kiedy dostanie pierwszy wyciąg.",
     uploadCta: "+ Wgraj CSV",
+    emptyIllustrationAlt: "Dokument czekający na import",
   },
   imports: {
     eyebrow: "Importy CSV",
@@ -83,6 +84,7 @@ export const copyExtra = {
     importsLong: "Importy CSV",
     settingsLong: "Ustawienia",
     overview: "Przegląd",
+    navLabel: "Nawigacja aplikacji",
   },
   landing: {
     stepsEyebrow: "Bez arkusza",

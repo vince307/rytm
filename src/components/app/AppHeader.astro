@@ -1,0 +1,19 @@
+---
+import Brand from "@/components/Brand.astro";
+import { buttonVariants } from "@/components/ui/button";
+import { copyExtra } from "@/content/copy";
+
+const month = new Intl.DateTimeFormat("pl-PL", { month: "long", year: "numeric" }).format(new Date());
+---
+
+<header class="flex h-[72px] items-center justify-between border-b border-line bg-paper px-[30px] max-[899px]:px-[18px]">
+  <Brand href="/home" />
+  <div class="flex items-center gap-4">
+    <span class="text-sm text-muted">{month}</span>
+    <form method="POST" action="/api/auth/signout">
+      <button type="submit" class:list={buttonVariants({ variant: "ghost" })}>
+        {copyExtra.app.exit}
+      </button>
+    </form>
+  </div>
+</header>

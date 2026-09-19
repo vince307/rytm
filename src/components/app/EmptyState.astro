@@ -1,0 +1,23 @@
+---
+// EmptyState.astro — prototype .empty-dashboard
+import Panel from "@/components/app/Panel.astro";
+import { buttonVariants } from "@/components/ui/button";
+interface Props {
+  title: string;
+  body: string;
+  cta: string;
+  href: string;
+  illustration: string;
+  illustrationAlt: string;
+}
+const { title, body, cta, href, illustration, illustrationAlt } = Astro.props;
+---
+
+<Panel class="flex flex-col items-center p-[35px] text-center">
+  <img src={illustration} alt={illustrationAlt} class="h-auto w-[min(460px,100%)]" />
+  <h2 class="mb-[7px] text-[25px] tracking-[-0.05em]">{title}</h2>
+  <p class="mb-5 max-w-[470px] text-sm leading-[1.55] text-muted">{body}</p>
+  <a href={href} class:list={buttonVariants({ variant: "primary" })}>
+    {cta} <span aria-hidden="true">↗</span>
+  </a>
+</Panel>

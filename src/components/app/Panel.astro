@@ -1,0 +1,12 @@
+---
+// Panel.astro — prototype .panel
+import { cn } from "@/lib/utils";
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<section class:list={cn("rounded-xl border border-line bg-paper p-[22px] max-[559px]:p-[17px]", className)}>
+  <slot />
+</section>

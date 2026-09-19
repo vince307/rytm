@@ -9,6 +9,8 @@ import { copy, copyExtra } from "@/content/copy";
 
 const f = copy.importFlow;
 const x = copyExtra.imports;
+
+// Inert in slice 1: the import backend does not exist yet. Enabled by the import slice.
 ---
 
 <AppLayout title={f.title} active="imports">
@@ -24,7 +26,6 @@ const x = copyExtra.imports;
     </div>
     <h2 class="mt-[22px] mb-2 text-[23px] tracking-[-0.04em]">{x.dropTitle}</h2>
     <p class="mb-[22px] text-[13px] text-muted">{f.supported}</p>
-    // Inert in slice 1: the import backend does not exist yet. Enabled by the import slice.
     <button type="button" class:list={buttonVariants({ variant: "primary" })} disabled>
       {x.choose}
     </button>

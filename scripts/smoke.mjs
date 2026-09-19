@@ -32,30 +32,43 @@ async function request(path, { method = "GET", form } = {}) {
     body: form ? new URLSearchParams(form).toString() : undefined,
   });
   storeCookies(response);
-  return { status: response.status, location: response.headers.get("location") ?? "" };
+  const body = response.status === 200 ? await response.text() : "";
+  return { status: response.status, location: response.headers.get("location") ?? "", body };
 }
 
 const steps = [
-  ["home renders", () => request("/"), { status: 200 }],
-  ["dashboard redirects anonymous user", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
+  ["landing renders", () => request("/"), { status: 200, contains: "Zobacz swój rytm" }],
+  ["login renders", () => request("/login"), { status: 200, contains: "Zaloguj się" }],
+  ["home redirects anonymous user", () => request("/home"), { status: 302, location: "/login" }],
+  ["settings redirects anonymous user", () => request("/settings"), { status: 302, location: "/login" }],
   [
     "signup creates account",
     () => request("/api/auth/signup", { method: "POST", form: { email, password } }),
-    { status: 302, location: "/auth/confirm-email" },
+    { status: 302, location: "/confirm-email" },
   ],
   [
     "signin rejects wrong password",
     () => request("/api/auth/signin", { method: "POST", form: { email, password: "wrong" } }),
-    { status: 302, location: "/auth/signin?error=" },
+    { status: 302, location: "/login?error=1" },
   ],
   [
     "signin accepts correct password",
     () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
-    { status: 302, location: "/" },
+    { status: 302, location: "/home" },
   ],
-  ["dashboard renders for signed-in user", () => request("/dashboard"), { status: 200 }],
+  [
+    "home renders empty state for signed-in user",
+    () => request("/home"),
+    { status: 200, contains: "Nie masz jeszcze żadnego importu." },
+  ],
+  ["login redirects signed-in user", () => request("/login"), { status: 302, location: "/home" }],
+  [
+    "reset always says check inbox",
+    () => request("/api/auth/reset", { method: "POST", form: { email: "nobody@example.com" } }),
+    { status: 302, location: "/reset?sent=1" },
+  ],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
-  ["dashboard redirects after signout", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
+  ["home redirects after signout", () => request("/home"), { status: 302, location: "/login" }],
 ];
 
 let failed = 0;
@@ -63,11 +76,12 @@ for (const [name, run, expected] of steps) {
   const actual = await run();
   const ok =
     actual.status === expected.status &&
-    (expected.location === undefined || actual.location.startsWith(expected.location));
+    (expected.location === undefined || actual.location.startsWith(expected.location)) &&
+    (expected.contains === undefined || actual.body.includes(expected.contains));
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
-    console.log(`      expected ${expected.status} ${expected.location ?? ""}`);
+    console.log(`      expected ${expected.status} ${expected.location ?? ""} ${expected.contains ?? ""}`);
   }
 }
 

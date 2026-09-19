@@ -1,20 +1,31 @@
 import type { APIRoute } from "astro";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase";
 
+export const prerender = false;
+
+const schema = z.object({
+  email: z.string().trim().pipe(z.email()),
+  password: z.string().min(6),
+  name: z
+    .string()
+    .trim()
+    .max(80)
+    .optional()
+    .transform((v) => v ?? undefined),
+});
+
 export const POST: APIRoute = async (context) => {
-  const form = await context.request.formData();
-  const email = form.get("email") as string;
-  const password = form.get("password") as string;
-
+  const form = Object.fromEntries(await context.request.formData());
+  const parsed = schema.safeParse(form);
   const supabase = createClient(context.request.headers, context.cookies);
-  if (!supabase) {
-    return context.redirect(`/auth/signup?error=${encodeURIComponent("Supabase is not configured")}`);
+  if (!parsed.success || !supabase) {
+    return context.redirect("/register?error=1");
   }
-  const { error } = await supabase.auth.signUp({ email, password });
-
+  const { email, password, name } = parsed.data;
+  const { error } = await supabase.auth.signUp({ email, password, options: name ? { data: { name } } : undefined });
   if (error) {
-    return context.redirect(`/auth/signup?error=${encodeURIComponent(error.message)}`);
+    return context.redirect("/register?error=1");
   }
-
-  return context.redirect("/auth/confirm-email");
+  return context.redirect("/confirm-email");
 };

@@ -1,20 +1,21 @@
 import type { APIRoute } from "astro";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase";
 
+export const prerender = false;
+
+const schema = z.object({ email: z.string().trim().pipe(z.email()), password: z.string().min(1) });
+
 export const POST: APIRoute = async (context) => {
-  const form = await context.request.formData();
-  const email = form.get("email") as string;
-  const password = form.get("password") as string;
-
+  const form = Object.fromEntries(await context.request.formData());
+  const parsed = schema.safeParse(form);
   const supabase = createClient(context.request.headers, context.cookies);
-  if (!supabase) {
-    return context.redirect(`/auth/signin?error=${encodeURIComponent("Supabase is not configured")}`);
+  if (!parsed.success || !supabase) {
+    return context.redirect("/login?error=1");
   }
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-
+  const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) {
-    return context.redirect(`/auth/signin?error=${encodeURIComponent(error.message)}`);
+    return context.redirect("/login?error=1");
   }
-
-  return context.redirect("/");
+  return context.redirect("/home");
 };

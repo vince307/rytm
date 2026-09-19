@@ -1,0 +1,33 @@
+---
+import { cn } from "@/lib/utils";
+interface Props {
+  steps: readonly string[];
+  current: number;
+}
+const { steps, current } = Astro.props;
+---
+
+<ol class="-mt-[7px] mb-6 flex max-w-[620px] list-none items-center p-0">
+  {steps.map((label, i) => (
+    <>
+      {i > 0 && <span class="mx-3.5 h-px flex-1 bg-line max-[559px]:mx-2" aria-hidden="true"></span>}
+      <li
+        class:list={cn(
+          "flex items-center gap-2 text-xs whitespace-nowrap text-muted",
+          i + 1 === current && "font-extrabold text-ink",
+        )}
+        aria-current={i + 1 === current ? "step" : undefined}
+      >
+        <b
+          class:list={cn(
+            "grid size-[25px] place-items-center rounded-full border border-line",
+            i + 1 === current && "border-ink bg-ink text-paper",
+          )}
+        >
+          {i + 1}
+        </b>
+        <span class="max-[559px]:hidden">{label}</span>
+      </li>
+    </>
+  ))}
+</ol>

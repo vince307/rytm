@@ -1,0 +1,12 @@
+---
+// DESIGN-GAP: G18 — placeholder body for a view that is not available yet.
+import AppLayout from "@/layouts/AppLayout.astro";
+import PageTitle from "@/components/app/PageTitle.astro";
+import InlineAlert from "@/components/app/InlineAlert.astro";
+import { copy, copyExtra } from "@/content/copy";
+---
+
+<AppLayout title={copy.fixedCosts.title} active="fixed">
+  <PageTitle eyebrow={copyExtra.fixed.eyebrow} title={copy.fixedCosts.title} lead={copyExtra.fixed.lead} />
+  <InlineAlert kind="info">{copyExtra.stub.info}</InlineAlert>
+</AppLayout>

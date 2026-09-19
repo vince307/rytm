@@ -1,0 +1,32 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import PageTitle from "@/components/app/PageTitle.astro";
+import Panel from "@/components/app/Panel.astro";
+import Stepper from "@/components/app/Stepper.astro";
+import Icon from "@/components/Icon.astro";
+import { buttonVariants } from "@/components/ui/button";
+import { copy, copyExtra } from "@/content/copy";
+
+const f = copy.importFlow;
+const x = copyExtra.imports;
+---
+
+<AppLayout title={f.title} active="imports">
+  <PageTitle eyebrow={x.newEyebrow} title={f.title} lead={x.newLead}>
+    <a href="/imports" class="inline-flex items-center gap-1.5 text-[13px] font-extrabold text-ink no-underline">
+      <Icon name="arrow-left" size={15} /> {x.back}
+    </a>
+  </PageTitle>
+  <Stepper steps={f.steps} current={1} />
+  <Panel class="flex min-h-[360px] flex-col items-center justify-center border-dashed border-muted text-center">
+    <div class="grid size-[60px] place-items-center rounded-[13px] bg-ink text-paper">
+      <Icon name="upload" size={28} />
+    </div>
+    <h2 class="mt-[22px] mb-2 text-[23px] tracking-[-0.04em]">{x.dropTitle}</h2>
+    <p class="mb-[22px] text-[13px] text-muted">{f.supported}</p>
+    // Inert in slice 1: the import backend does not exist yet. Enabled by the import slice.
+    <button type="button" class:list={buttonVariants({ variant: "primary" })} disabled>
+      {x.choose}
+    </button>
+  </Panel>
+</AppLayout>

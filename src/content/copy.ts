@@ -71,6 +71,7 @@ export const copyExtra = {
     back: "Wróć do importów",
     dropTitle: "Upuść plik CSV tutaj",
     choose: "Wybierz plik",
+    newImport: "+ Nowy import",
   },
   patterns: { eyebrow: "Wzorce wydatków" },
   fixed: { eyebrow: "Koszty stałe", lead: "Rytm porównuje miesiące kalendarzowe i pokazuje różnice." },

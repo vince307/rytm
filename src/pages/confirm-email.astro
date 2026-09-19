@@ -1,0 +1,17 @@
+---
+// DESIGN-GAP: G19 — no kit screen for "confirm your e-mail"; reuses the reset "check inbox" composition.
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { buttonVariants } from "@/components/ui/button";
+import { copyExtra } from "@/content/copy";
+
+const x = copyExtra.auth;
+---
+
+<AuthLayout title={x.confirmEmailTitle} visual={x.registerVisual}>
+  <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{x.checkInboxEyebrow}</div>
+  <h1 class="mt-4 mb-2 text-[34px] tracking-[-0.06em]">{x.confirmEmailTitle}</h1>
+  <p class="mb-7 text-sm text-muted">{x.confirmEmailBody}</p>
+  <a href="/login" class={buttonVariants({ variant: "primary", size: "full" })}>
+    {x.backToLogin}
+  </a>
+</AuthLayout>

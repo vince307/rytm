@@ -1,0 +1,41 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import SignUpForm from "@/components/auth/SignUpForm";
+import { copy, copyExtra } from "@/content/copy";
+
+const hasError = Astro.url.searchParams.has("error");
+const a = copy.auth;
+const x = copyExtra.auth;
+---
+
+<AuthLayout title={a.register.title} visual={x.registerVisual}>
+  <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{a.register.eyebrow}</div>
+  <h1 class="mt-4 mb-2 text-[34px] tracking-[-0.06em]">{a.register.title}</h1>
+  <p class="mb-7 text-sm text-muted">{a.register.description}</p>
+  <SignUpForm
+    client:load
+    serverError={hasError ? x.registerError : null}
+    labels={{
+      name: a.fields.name,
+      optional: x.optional,
+      namePlaceholder: x.namePlaceholder,
+      email: a.fields.email,
+      password: a.fields.password,
+      emailPlaceholder: x.emailPlaceholder,
+      passwordPlaceholder: x.passwordPlaceholder,
+      showPassword: x.showPassword,
+      hidePassword: x.hidePassword,
+      terms: x.terms,
+      submit: a.register.title,
+      pending: x.creating,
+      emailRequired: x.emailRequired,
+      passwordTooShort: x.passwordTooShort,
+    }}
+  />
+  <p class="mt-[22px] text-center text-[13px] text-muted">
+    {x.haveAccount}{" "}
+    <a href="/login" class="font-bold text-excess-text">
+      {copy.navigation.login}
+    </a>
+  </p>
+</AuthLayout>

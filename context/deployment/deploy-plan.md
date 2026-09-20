@@ -108,12 +108,27 @@ Run 35505256578 (commit `fe4f549`): `ci` ✅ `smoke` ✅ `deploy` ✅ — the fi
 
 Facts read from production `auth.users` with a read-only `SELECT` over the session pooler (`aws-0-eu-central-1.pooler.supabase.com:5432`, DB password from `.env`); nothing was written.
 
+## E-mail delivery (2026-09-20, evening) — custom SMTP via Brevo
+
+Done by the owner in the dashboards; verified by reading `auth.users` (read-only) and the app's runtime logs.
+
+| Step                                                                                                                                                                    | Result                                                                                                                                                                                                          |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Supabase Auth URL configuration re-checked                                                                                                                              | the first two signups still carried `redirect_to=http://localhost:3000` (auth log `referer`), i.e. the earlier save had not applied; fixed by the owner                                                         |
+| Brevo SMTP in Supabase (Auth → SMTP Settings): host `smtp-relay.brevo.com`, port `587`, username = Brevo SMTP login (`…@smtp-brevo.com`), password = Brevo **SMTP key** | first attempt: auth log `535 "5.7.8 Authentication failed"` → wrong credential pair; fixed                                                                                                                      |
+| Sender                                                                                                                                                                  | `noreply@rytm.app` was rejected by Brevo (_sender not valid_: the domain is not ours). Sender is now `vince307@gmail.com` (Brevo single-sender verification), name `Rytm`                                       |
+| Signup with a non-member address (Yahoo)                                                                                                                                | user created 19:14:04 UTC; after the sender fix the confirmation was re-sent 19:24:59, **delivered to Inbox**, link `redirect_to=https://rytm-phi.vercel.app/login`, confirmed 19:25:21, signed in 19:40:43 UTC |
+| Rate limit                                                                                                                                                              | Supabase default with custom SMTP: 30 e-mails/hour (Auth → Rate Limits) — enough for the MVP                                                                                                                    |
+
+Secrets: the Brevo SMTP key exists only in the Brevo and Supabase dashboards; nothing in the repo, Vercel or GitHub.
+
+Recommendation (not a blocker): authenticate an owned domain in Brevo (DKIM/DMARC) and send from `noreply@<domain>`; a Gmail sender relayed through Brevo relies on Gmail's `p=none` DMARC and may land in spam at stricter providers.
+
 ## Manual steps still open
 
-1. **Custom SMTP for Supabase Auth** (dashboard: Auth → SMTP Settings, e.g. Resend free tier). Supabase's built-in mailer delivers only to addresses of the project's organization members and is rate-limited to a few mails per hour, so **nobody outside the owner can register on production today** (blocks FR-001 / the public seed instance, FR-014). Until then, test accounts must be organization members.
-2. **Supabase Auth URL configuration** — Site URL set to `https://rytm-phi.vercel.app` on 2026-09-20 (owner, dashboard); redirect URLs `https://rytm-phi.vercel.app/**` and `https://rytm-*-kamilps-projects.vercel.app/**` reported set. Since `fe4f549` the app passes `emailRedirectTo` itself, so the link no longer depends on Site URL — **not yet observed in a delivered mail** (blocked by step 1); verify the first link after SMTP is configured: it must read `redirect_to=https://rytm-phi.vercel.app/login`.
-3. PKCE: the confirmation link lands on `/login?code=…` and the code is not exchanged (no `/auth/callback`); password signin works after confirmation. Tracked at G19 in `design-kit.md`.
-4. Optional: create the Protection Bypass for Automation secret and store it as `VERCEL_AUTOMATION_BYPASS_SECRET`.
+1. PKCE: the confirmation link lands on `/login?code=…` and the code is not exchanged (no `/auth/callback`); password signin works after confirmation. Tracked at G19 in `design-kit.md`.
+2. Optional: create the Protection Bypass for Automation secret and store it as `VERCEL_AUTOMATION_BYPASS_SECRET`.
+3. Optional: sender domain for Brevo (see recommendation above).
 
 ## Deferred (from the risk register)
 

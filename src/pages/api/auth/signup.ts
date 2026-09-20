@@ -35,6 +35,8 @@ export const POST: APIRoute = async (context) => {
     options: { emailRedirectTo, ...(name ? { data: { name } } : {}) },
   });
   if (error) {
+    // Status + message only (no e-mail): an SMTP failure surfaces here as "Error sending confirmation email".
+    console.error("auth/signup failed", error.status, error.code, error.message);
     return context.redirect("/register?error=1");
   }
   return context.redirect("/confirm-email");

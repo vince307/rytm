@@ -14,7 +14,11 @@ export const POST: APIRoute = async (context) => {
   if (parsed.success && supabase) {
     // /reset/new is the G17 page (not built yet); the link in the e-mail 404s until it ships.
     const redirectTo = new URL("/reset/new", context.url.origin).toString();
-    await supabase.auth.resetPasswordForEmail(parsed.data.email, { redirectTo });
+    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, { redirectTo });
+    if (error) {
+      // The page still says "check your inbox" (no account enumeration); the failure is only visible in the logs.
+      console.error("auth/reset failed", error.status, error.code, error.message);
+    }
   }
   return context.redirect("/reset?sent=1");
 };

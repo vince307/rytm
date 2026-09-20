@@ -124,6 +124,8 @@ Reguła utrzymania: nowy brak wykryty podczas implementacji dostaje kolejny nume
 
 ### Do rundy 2 (zebrane 2026-09-18 po weryfikacji rundy 1)
 
+Prompt dla autora: `design/prompts/2026-09-20-gaps-round-2.md` (runda 1: `design/prompts/2026-09-18-gaps-round-1.md`).
+
 1. **K8/K10** — nachodzący zakres jako błąd blokujący w `/imports/new/summary` (bez przycisku importu, zakres i link do istniejącego importu).
 2. **G8** — stany błędów importu: nieznany format (z listą obsługiwanych banków), waluta ≠ PLN, pusty plik / brak obciążeń.
 3. **G4** — akcja „Przywróć” dla wykluczonego wzorca (+ sekcja wykluczonych w `/patterns`, jeśli jej nie ma).

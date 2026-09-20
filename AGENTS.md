@@ -27,7 +27,7 @@ Pre-commit: husky + lint-staged (`eslint --fix`, `prettier --write`).
 - `src/components/` — `.astro` for static content, `.tsx` only when interactive. shadcn/ui primitives in `src/components/ui/`, feature groups in `src/components/{marketing,app,auth}/`.
 - `src/lib/` — helpers and services (`supabase.ts`, `utils.ts` with `cn()`); `src/middleware.ts` guards `PROTECTED_ROUTES`.
 - `src/content/copy.ts` — kit copy (`copy` = kit JSON, `copyExtra` = kit-missing strings).
-- `context/` — product contracts; `design/` — the kit; `supabase/` — config and `migrations/`.
+- `context/` — product contracts; `design/` — the kit; `supabase/` — config, `migrations/` and `seed.sql` (local/CI test account `test@rytm.local`, see `@CLAUDE.md`).
 
 ## Style
 

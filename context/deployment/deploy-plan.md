@@ -57,15 +57,15 @@ Commits `4b27098` (swap) and `aaad9c9` (framework preset), then this file.
 
 ## Secrets inventory
 
-| Where                     | Name                                                   | Environments / notes                                                                                      |
-| ------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| Vercel env                | `SUPABASE_URL`                                         | production, preview (encrypted)                                                                           |
-| Vercel env                | `SUPABASE_KEY`                                         | production, preview (`--sensitive`: cannot be read back with `vercel env pull`)                           |
-| GitHub secrets            | `SUPABASE_URL`, `SUPABASE_KEY`                         | used by the `ci` build step                                                                               |
-| GitHub secrets            | `VERCEL_TOKEN`                                         | account token `rytm-github-actions`, scope kamilp's projects — created in the dashboard, used by `deploy` |
-| GitHub secrets            | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`                   | from `.vercel/project.json`                                                                               |
-| GitHub secrets            | `VERCEL_AUTOMATION_BYPASS_SECRET`                      | **not yet created** — needed only when a preview-smoke job is added                                       |
-| Local `.env` (gitignored) | `SUPABASE_URL`, `SUPABASE_KEY`, `SUPABASE_DB_PASSWORD` | the only copy of the DB password; keep it                                                                 |
+| Where                     | Name                                 | Environments / notes                                                                                                                                                                                                           |
+| ------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Vercel env                | `SUPABASE_URL`                       | production, preview (encrypted)                                                                                                                                                                                                |
+| Vercel env                | `SUPABASE_KEY`                       | production, preview (`--sensitive`: cannot be read back with `vercel env pull`)                                                                                                                                                |
+| GitHub secrets            | `SUPABASE_URL`, `SUPABASE_KEY`       | used by the `ci` build step                                                                                                                                                                                                    |
+| GitHub secrets            | `VERCEL_TOKEN`                       | account token `rytm-github-actions`, scope kamilp's projects — created in the dashboard, used by `deploy`                                                                                                                      |
+| GitHub secrets            | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | from `.vercel/project.json`                                                                                                                                                                                                    |
+| GitHub secrets            | `VERCEL_AUTOMATION_BYPASS_SECRET`    | **not yet created** — needed only when a preview-smoke job is added                                                                                                                                                            |
+| Local `.env` (gitignored) | `SUPABASE_DB_PASSWORD`               | the only copy of the DB password; keep it. Since 2026-09-20 `SUPABASE_URL`/`SUPABASE_KEY` here point at the local Docker Supabase (values from `.env.example`); the production pair lives only on Vercel and in GitHub secrets |
 
 No secret value has ever been written to the repo or pasted into a chat; `vercel env add` and `gh secret set` were fed from `.env` via stdin.
 

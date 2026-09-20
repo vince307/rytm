@@ -45,8 +45,9 @@ Full server-side rendering (`output: "server"` in astro.config.mjs). All pages a
 ### Environment
 
 - Node.js v22.14.0 (see `.nvmrc`)
-- Env vars: `SUPABASE_URL`, `SUPABASE_KEY` (copy `.env.example` to `.env`, gitignored). On Vercel they are project env vars (`vercel env ls`), read at runtime through `astro:env/server`
-- Local Supabase: `npx supabase start` (requires Docker)
+- Env vars: `SUPABASE_URL`, `SUPABASE_KEY` (copy `.env.example` to `.env`, gitignored). `.env.example` already holds the local-Supabase values, so a fresh clone runs against Docker, never production. On Vercel they are project env vars (`vercel env ls`), read at runtime through `astro:env/server`
+- Local Supabase: start Docker Desktop, then `npx supabase start` (project `rytm`; API `:54321`, Studio `:54323`, Mailpit `:54324`). `supabase/seed.sql` runs on every `start` / `db reset` and creates the confirmed test account `test@rytm.local` / `Rytm-Test-Passw0rd!` (fixed UUID `11111111-1111-4111-8111-111111111111`); local signup needs no email confirmation (`enable_confirmations = false`). Seed is local/CI only — `db push` never applies it
+- First local run: `npx supabase start` → `npm run dev` → `npm run smoke` (must be 14/14 PASS, including "seeded test user signs in")
 - Production deploy: push to `main` → GitHub Actions `deploy` job (`vercel deploy --prebuilt --prod`). Vercel's Git integration is disabled for `main` (`vercel.json`) and only builds previews for other branches/PRs
 - Preview deploy from a working tree: `npx vercel` (Vercel Authentication gates previews by default). Never run `vercel --prod` by hand except for an emergency; rollback is `vercel rollback` / `vercel promote <url>` (human-only)
 - Deployment state and secret inventory: `context/deployment/deploy-plan.md`

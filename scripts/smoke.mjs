@@ -4,6 +4,8 @@
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
 const email = `smoke-${Date.now()}@example.com`;
 const password = "Smoke-Test-Passw0rd!";
+// Seeded by supabase/seed.sql on every `supabase start` / `db reset` (local and CI).
+const seeded = { email: "test@rytm.local", password: "Rytm-Test-Passw0rd!" };
 const jar = new Map();
 
 function cookieHeader() {
@@ -69,6 +71,12 @@ const steps = [
   ],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   ["home redirects after signout", () => request("/home"), { status: 302, location: "/login" }],
+  [
+    "seeded test user signs in",
+    () => request("/api/auth/signin", { method: "POST", form: seeded }),
+    { status: 302, location: "/home" },
+  ],
+  ["signout seeded user", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
 ];
 
 let failed = 0;

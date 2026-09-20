@@ -92,11 +92,28 @@ No secret value has ever been written to the repo or pasted into a chat; `vercel
 
 Not run against production: `npm run smoke` (creates real users, sends real emails).
 
+## Verification results (2026-09-20) — live auth flow
+
+Run 35505256578 (commit `fe4f549`): `ci` ✅ `smoke` ✅ `deploy` ✅ — the first fully green pipeline; production serves that build.
+
+| Check                                                                                           | Result                                                                                                                                                                                               |
+| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Real signup on `/register` with the project owner's Gmail (done by the owner in the browser)    | 302 `/confirm-email`; confirmation mail arrived                                                                                                                                                      |
+| Confirmation link (first signup, before `fe4f549`)                                              | `…/auth/v1/verify?token=pkce_…&type=signup&redirect_to=http://localhost:3000` — Site URL not yet applied; clicking it still confirmed the account (`auth.users.email_confirmed_at` set 10:25:23 UTC) |
+| Signin on `/login` → `/home` (owner)                                                            | pass; session cookie `sb-…-auth-token` set                                                                                                                                                           |
+| Signed-in: `/login`, `/register` → redirect to `/home`; `/home`, `/settings`, `/patterns` → 200 | pass                                                                                                                                                                                                 |
+| Console errors / failed requests on `/home`, `/settings`                                        | none (5 requests, 200/304)                                                                                                                                                                           |
+| `Wyjdź` → `POST /api/auth/signout` → `/`; cookie gone; `/home` → redirect `/login`              | pass                                                                                                                                                                                                 |
+| Second signup with a non-member address (Yahoo) at 10:43 UTC                                    | `confirmation_sent_at` set, **mail never arrived** — see open step 1                                                                                                                                 |
+
+Facts read from production `auth.users` with a read-only `SELECT` over the session pooler (`aws-0-eu-central-1.pooler.supabase.com:5432`, DB password from `.env`); nothing was written.
+
 ## Manual steps still open
 
-1. **Supabase Auth URL configuration** (dashboard only): Site URL `https://rytm-phi.vercel.app`; redirect URLs `https://rytm-phi.vercel.app/**` and `https://rytm-*-kamilps-projects.vercel.app/**`. Until this is set, confirmation emails link to `localhost:3000`.
-2. One real signup → confirm email → signin on the live site.
-3. Optional: create the Protection Bypass for Automation secret and store it as `VERCEL_AUTOMATION_BYPASS_SECRET`.
+1. **Custom SMTP for Supabase Auth** (dashboard: Auth → SMTP Settings, e.g. Resend free tier). Supabase's built-in mailer delivers only to addresses of the project's organization members and is rate-limited to a few mails per hour, so **nobody outside the owner can register on production today** (blocks FR-001 / the public seed instance, FR-014). Until then, test accounts must be organization members.
+2. **Supabase Auth URL configuration** — Site URL set to `https://rytm-phi.vercel.app` on 2026-09-20 (owner, dashboard); redirect URLs `https://rytm-phi.vercel.app/**` and `https://rytm-*-kamilps-projects.vercel.app/**` reported set. Since `fe4f549` the app passes `emailRedirectTo` itself, so the link no longer depends on Site URL — **not yet observed in a delivered mail** (blocked by step 1); verify the first link after SMTP is configured: it must read `redirect_to=https://rytm-phi.vercel.app/login`.
+3. PKCE: the confirmation link lands on `/login?code=…` and the code is not exchanged (no `/auth/callback`); password signin works after confirmation. Tracked at G19 in `design-kit.md`.
+4. Optional: create the Protection Bypass for Automation secret and store it as `VERCEL_AUTOMATION_BYPASS_SECRET`.
 
 ## Deferred (from the risk register)
 

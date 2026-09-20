@@ -25,7 +25,15 @@ export const POST: APIRoute = async (context) => {
     return context.redirect("/register?error=1");
   }
   const { email, password, name } = parsed.data;
-  const { error } = await supabase.auth.signUp({ email, password, options: name ? { data: { name } } : undefined });
+  // Derived from the request origin (like reset.ts) so the confirmation link never depends on the
+  // dashboard Site URL: production, previews and local dev each get their own. PKCE: Supabase confirms
+  // the e-mail on /verify and lands on /login?code=…; the code is not exchanged (see G19) — sign in with the password.
+  const emailRedirectTo = new URL("/login", context.url.origin).toString();
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo, ...(name ? { data: { name } } : {}) },
+  });
   if (error) {
     return context.redirect("/register?error=1");
   }

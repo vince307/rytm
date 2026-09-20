@@ -36,6 +36,7 @@ export const POST: APIRoute = async (context) => {
   });
   if (error) {
     // Status + message only (no e-mail): an SMTP failure surfaces here as "Error sending confirmation email".
+    // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
     console.error("auth/signup failed", error.status, error.code, error.message);
     return context.redirect("/register?error=1");
   }

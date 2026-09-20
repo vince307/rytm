@@ -17,6 +17,7 @@ export const POST: APIRoute = async (context) => {
     const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, { redirectTo });
     if (error) {
       // The page still says "check your inbox" (no account enumeration); the failure is only visible in the logs.
+      // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
       console.error("auth/reset failed", error.status, error.code, error.message);
     }
   }

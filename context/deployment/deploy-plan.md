@@ -124,6 +124,14 @@ Secrets: the Brevo SMTP key exists only in the Brevo and Supabase dashboards; no
 
 Recommendation (not a blocker): authenticate an owned domain in Brevo (DKIM/DMARC) and send from `noreply@<domain>`; a Gmail sender relayed through Brevo relies on Gmail's `p=none` DMARC and may land in spam at stricter providers.
 
+## Verification results (2026-09-21, afternoon) — round-2 empty views (G18)
+
+- Commit `ae72f1e` (`feat(app): empty views before the first import`) went through the `deploy` job (run 35615416702: `ci`, `smoke`, `deploy` all green) — the second production deploy done entirely by the GitHub Actions gate, no `vercel --prod` by hand.
+- `/patterns`, `/fixed`, `/imports` now render the kit's empty view (`ViewEmpty.astro`, copy from `copy.emptyViews`) instead of the `InlineAlert` placeholder; anonymous requests still answer 302 → `/login`.
+- **Verified on production by the owner** the same day: signed-in views show „Wgraj pierwszy wyciąg” + „Wgraj CSV ↗” → `/imports/new`.
+- Smoke grew to 24 steps (`patterns renders empty view`, seeded user). No new secrets, env vars or Vercel settings — the secrets inventory above is unchanged.
+- Still a placeholder: `/settings` (`copyExtra.stub`, waits for the G11 + FR-019 slice).
+
 ## Manual steps still open
 
 1. ~~PKCE callback~~ — done 2026-09-21 (`fe68166`) and **verified on production by the owner** the same day: signup with a non-member address → `/confirm-email` → „Wyślij ponownie” (re-sent 14:06:15 UTC) → link → `/auth/callback` → signed in on `/home` (`email_confirmed_at` 14:07:26, `last_sign_in_at` 14:08:56 UTC); „Nie pamiętam hasła” → link → `/reset/new` → new password → sign-in; `/register` with a taken address → occupied state. The Brevo mail landed in Yahoo's spam folder — see the sender-domain recommendation.

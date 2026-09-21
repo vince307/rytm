@@ -25,8 +25,10 @@ Full server-side rendering (`output: "server"` in astro.config.mjs). All pages a
 
 - `src/lib/supabase.ts` — creates a Supabase SSR client using `@supabase/ssr` with cookie-based sessions. Uses `astro:env/server` for `SUPABASE_URL` and `SUPABASE_KEY` (server-only secrets declared in astro.config.mjs `env.schema`).
 - `src/middleware.ts` — runs on every request, resolves the current user, attaches to `context.locals.user`. Redirects unauthenticated users away from routes listed in `PROTECTED_ROUTES`.
-- API endpoints: `src/pages/api/auth/{signin,signup,signout,reset}.ts`
-- Auth pages: `src/pages/{login,register,reset,confirm-email}.astro` (AuthLayout)
+- API endpoints: `src/pages/api/auth/{signin,signup,signout,reset,resend}.ts`, `src/pages/api/auth/reset/new.ts` (set password for the recovery session, then sign out)
+- `src/pages/auth/callback.ts` — landing point of every e-mailed link (PKCE `?code=` + `sb_flow_id`): exchanges the code for a session and continues to `next` (`/home` or `/reset/new`, allow-listed in `src/lib/auth-rules.ts`). A failed exchange (other browser, expired) falls back to `/login?confirmed=1` or `/reset/new?state=expired` — the e-mail is confirmed on Supabase's `/verify` regardless
+- Signup stores the address in the `rytm-pending-email` cookie (httpOnly, 15 min) so `/confirm-email` can offer "Wyślij ponownie" (`/api/auth/resend`, 60 s cooldown mirrored client-side); an existing address answers `/register?error=occupied` (Supabase returns a placeholder user with no identities when confirmations are on, `user_already_exists` when off)
+- Auth pages: `src/pages/{login,register,reset,confirm-email}.astro`, `src/pages/reset/new.astro` (AuthLayout)
 - Protected pages: `/home`, `/patterns`, `/fixed`, `/imports`, `/settings` (AppLayout); middleware also sends signed-in users from `/login` and `/register` to `/home`
 
 ### Key conventions

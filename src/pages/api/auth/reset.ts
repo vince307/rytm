@@ -12,8 +12,8 @@ export const POST: APIRoute = async (context) => {
   const parsed = schema.safeParse(form);
   const supabase = createClient(context.request.headers, context.cookies);
   if (parsed.success && supabase) {
-    // /reset/new is the G17 page (not built yet); the link in the e-mail 404s until it ships.
-    const redirectTo = new URL("/reset/new", context.url.origin).toString();
+    // The link lands on /auth/callback, which exchanges the PKCE code and continues to /reset/new.
+    const redirectTo = new URL("/auth/callback?next=/reset/new", context.url.origin).toString();
     const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, { redirectTo });
     if (error) {
       // The page still says "check your inbox" (no account enumeration); the failure is only visible in the logs.

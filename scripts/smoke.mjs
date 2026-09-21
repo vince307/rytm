@@ -41,6 +41,29 @@ async function request(path, { method = "GET", form } = {}) {
 const steps = [
   ["landing renders", () => request("/"), { status: 200, contains: "Zobacz swój rytm" }],
   ["login renders", () => request("/login"), { status: 200, contains: "Zaloguj się" }],
+  ["login offers password reset", () => request("/login"), { status: 200, contains: "Nie pamiętam hasła" }],
+  [
+    "login shows e-mail confirmed state",
+    () => request("/login?confirmed=1"),
+    { status: 200, contains: "E-mail potwierdzony" },
+  ],
+  ["confirm-email renders", () => request("/confirm-email"), { status: 200, contains: "Link jest w drodze." }],
+  ["callback without code goes to login", () => request("/auth/callback"), { status: 302, location: "/login" }],
+  [
+    "callback with a bad code still says confirmed",
+    () => request("/auth/callback?code=bogus&next=/home"),
+    { status: 302, location: "/login?confirmed=1" },
+  ],
+  [
+    "callback with a bad recovery code expires the reset",
+    () => request("/auth/callback?code=bogus&next=/reset/new"),
+    { status: 302, location: "/reset/new?state=expired" },
+  ],
+  [
+    "reset/new without a session is expired",
+    () => request("/reset/new"),
+    { status: 200, contains: "Ten link już wygasł." },
+  ],
   ["home redirects anonymous user", () => request("/home"), { status: 302, location: "/login" }],
   ["settings redirects anonymous user", () => request("/settings"), { status: 302, location: "/login" }],
   [
@@ -71,6 +94,16 @@ const steps = [
   ],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   ["home redirects after signout", () => request("/home"), { status: 302, location: "/login" }],
+  [
+    "signup with a taken e-mail says occupied",
+    () => request("/api/auth/signup", { method: "POST", form: { email, password } }),
+    { status: 302, location: "/register?error=occupied" },
+  ],
+  [
+    "register shows the occupied state",
+    () => request("/register?error=occupied"),
+    { status: 200, contains: "jest już zajęty" },
+  ],
   [
     "seeded test user signs in",
     () => request("/api/auth/signin", { method: "POST", form: seeded }),

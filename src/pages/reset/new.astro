@@ -1,0 +1,60 @@
+---
+// Kit round 2 (G17): #/reset/new with ?state=expired and ?success=1. Visual panel copy: design-kit.md K13.
+// The form needs the session /auth/callback created from the recovery link; without it the link counts as expired.
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import InlineAlert from "@/components/app/InlineAlert.astro";
+import NewPasswordForm from "@/components/auth/NewPasswordForm";
+import { buttonVariants } from "@/components/ui/button";
+import { copy, copyExtra } from "@/content/copy";
+
+const r = copy.resetNew;
+const s = copy.authStates;
+const x = copyExtra.auth;
+const params = Astro.url.searchParams;
+const success = params.has("success");
+const expired = params.get("state") === "expired" || (!success && !Astro.locals.user);
+const hasError = params.has("error");
+---
+
+<AuthLayout title={r.title} visual={x.resetVisual}>
+  {success ? (
+    <>
+      <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{x.doneEyebrow}</div>
+      <h1 class="mt-4 mb-2 text-[34px] tracking-[-0.06em]">{r.success}</h1>
+      <p class="mb-7 text-sm text-muted">{x.resetSuccessLead}</p>
+      <a href="/login" class:list={buttonVariants({ variant: "primary", size: "full" })}>
+        {copy.navigation.login} <span aria-hidden="true">↗</span>
+      </a>
+    </>
+  ) : expired ? (
+    <>
+      <div class="mb-[22px]">
+        <InlineAlert kind="error">{r.expired}</InlineAlert>
+      </div>
+      <a href="/reset" class:list={buttonVariants({ variant: "primary", size: "full" })}>
+        {r.sendNew} <span aria-hidden="true">↗</span>
+      </a>
+    </>
+  ) : (
+    <>
+      <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{r.eyebrow}</div>
+      <h1 class="mt-4 mb-2 text-[34px] tracking-[-0.06em]">{r.title}</h1>
+      <p class="mb-7 text-sm text-muted">{r.lead}</p>
+      <NewPasswordForm
+        client:load
+        serverError={hasError ? x.resetNewError : null}
+        labels={{
+          password: x.newPassword,
+          confirm: x.repeatPassword,
+          passwordPlaceholder: x.passwordPlaceholder,
+          showPassword: s.showPassword,
+          hidePassword: s.hidePassword,
+          submit: x.saveNewPassword,
+          pending: x.saving,
+          passwordTooShort: s.passwordTooShort,
+          passwordsDiffer: x.passwordsDiffer,
+        }}
+      />
+    </>
+  )}
+</AuthLayout>

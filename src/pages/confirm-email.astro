@@ -1,17 +1,36 @@
 ---
-// DESIGN-GAP: G19 — no kit screen for "confirm your e-mail"; reuses the reset "check inbox" composition.
+// Kit round 2 (G19): #/confirm-email. Visual panel copy: design-kit.md K13 (kit ships none) — reuses the register panel.
 import AuthLayout from "@/layouts/AuthLayout.astro";
+import InlineAlert from "@/components/app/InlineAlert.astro";
+import ResendButton from "@/components/auth/ResendButton";
 import { buttonVariants } from "@/components/ui/button";
-import { copyExtra } from "@/content/copy";
+import { copy, copyExtra } from "@/content/copy";
+import { PENDING_EMAIL_COOKIE } from "@/lib/auth-rules";
 
+const c = copy.confirmEmail;
 const x = copyExtra.auth;
+const resent = Astro.url.searchParams.has("resent");
+const failed = Astro.url.searchParams.has("error");
+// Re-sending needs the address; signup left it in a short-lived cookie. Without it the button is not offered.
+const canResend = Boolean(Astro.cookies.get(PENDING_EMAIL_COOKIE)?.value);
 ---
 
-<AuthLayout title={x.confirmEmailTitle} visual={x.registerVisual}>
-  <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{x.checkInboxEyebrow}</div>
-  <h1 class="mt-4 mb-2 text-[34px] tracking-[-0.06em]">{x.confirmEmailTitle}</h1>
-  <p class="mb-7 text-sm text-muted">{x.confirmEmailBody}</p>
-  <a href="/login" class:list={buttonVariants({ variant: "primary", size: "full" })}>
-    {x.backToLogin}
-  </a>
+<AuthLayout title={c.title} visual={x.registerVisual}>
+  <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{c.eyebrow}</div>
+  <h1 class="mt-4 mb-2 text-[34px] tracking-[-0.06em]">{c.title}</h1>
+  <p class="mb-7 text-sm text-muted">{c.body}</p>
+  <div class="mb-[22px] grid gap-2">
+    {resent && <InlineAlert kind="success">{x.resent}</InlineAlert>}
+    {failed && <InlineAlert kind="error">{x.resendError}</InlineAlert>}
+    <InlineAlert kind="info">{c.spam}</InlineAlert>
+  </div>
+  {canResend && <ResendButton client:load label={c.resend} justSent={resent} />}
+  <p class="mt-[22px] text-center text-[13px] text-muted">
+    <a
+      href="/login"
+      class:list={canResend ? "font-bold text-excess-text" : buttonVariants({ variant: "primary", size: "full" })}
+    >
+      {c.back}
+    </a>
+  </p>
 </AuthLayout>

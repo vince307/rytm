@@ -38,21 +38,20 @@ export const copyExtra = {
     backToLogin: "Wróć do logowania",
     checkInboxEyebrow: "Sprawdź skrzynkę",
     checkInboxTitle: "Link jest w drodze.",
-    // DESIGN-GAP: G19 — confirm-e-mail page has no kit copy; reuses the reset "check inbox" composition.
-    confirmEmailTitle: "Sprawdź skrzynkę.",
-    confirmEmailBody: "Wysłaliśmy link aktywacyjny na podany adres e-mail. Kliknij go, aby dokończyć rejestrację.",
-    // DESIGN-GAP: G16 — kit has no generic registration error copy.
-    registerError: "Nie udało się utworzyć konta. Sprawdź adres e-mail i spróbuj ponownie.",
-    // DESIGN-GAP: G16 — no kit copy for the password-toggle button.
-    showPassword: "Pokaż",
-    hidePassword: "Ukryj",
-    // DESIGN-GAP: G16 — kit has no field-validation copy.
-    emailRequired: "Podaj poprawny adres e-mail.",
-    passwordRequired: "Podaj hasło.",
-    passwordTooShort: "Hasło musi mieć co najmniej 6 znaków.",
-    signingIn: "Logowanie…",
-    creating: "Tworzenie konta…",
-    sending: "Wysyłanie…",
+    // Round 2 prototype strings that content.json still lacks (design-kit.md K11, round 3):
+    confirmedLogin: "E-mail potwierdzony — zaloguj się.",
+    occupiedOr: "lub",
+    newPassword: "Nowe hasło",
+    repeatPassword: "Powtórz hasło",
+    saveNewPassword: "Zapisz nowe hasło",
+    doneEyebrow: "Gotowe",
+    resetSuccessLead: "Możesz teraz zalogować się do swojego rytmu.",
+    // DESIGN-GAP: K11 — states the kit names but gives no copy for.
+    passwordsDiffer: "Hasła muszą być takie same.",
+    resetNewError: "Nie udało się zmienić hasła. Spróbuj ponownie.",
+    saving: "Zapisywanie…",
+    resent: "Wysłaliśmy link ponownie.",
+    resendError: "Nie udało się wysłać ponownie. Spróbuj za chwilę.",
   },
   home: {
     emptyEyebrow: "Przegląd miesiąca",

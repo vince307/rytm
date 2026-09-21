@@ -20,9 +20,11 @@ export interface SignInLabels {
 interface Props {
   labels: SignInLabels;
   serverError?: string | null;
+  /** Kit `.form-row` under the password field (the "Zapamiętaj mnie" checkbox is intentionally not built). */
+  forgotPassword: { href: string; label: string };
 }
 
-export default function SignInForm({ labels, serverError }: Props) {
+export default function SignInForm({ labels, serverError, forgotPassword }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -79,7 +81,12 @@ export default function SignInForm({ labels, serverError }: Props) {
           />
         }
       />
-      <div className="mt-2 mb-[22px]">
+      <div className="text-muted mt-[11px] mb-[22px] flex justify-end text-xs">
+        <a href={forgotPassword.href} className="text-excess-text font-bold">
+          {forgotPassword.label}
+        </a>
+      </div>
+      <div className="mb-[22px]">
         <SubmitButton pendingText={labels.pending}>{labels.submit}</SubmitButton>
       </div>
     </form>

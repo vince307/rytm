@@ -1,20 +1,39 @@
 ---
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import SignUpForm from "@/components/auth/SignUpForm";
+import InlineAlert from "@/components/app/InlineAlert.astro";
 import { copy, copyExtra } from "@/content/copy";
 
-const hasError = Astro.url.searchParams.has("error");
+const error = Astro.url.searchParams.get("error");
+// Kit round 2: #/register?error=occupied — the address already has an account (links: sign in / reset password).
+const occupied = error === "occupied";
 const a = copy.auth;
+const s = copy.authStates;
 const x = copyExtra.auth;
 ---
 
 <AuthLayout title={a.register.title} visual={x.registerVisual}>
+  {occupied && (
+    <div class="mb-[22px]">
+      <InlineAlert kind="error">
+        {s.registerOccupied}{" "}
+        <a href="/login" class="font-bold underline">
+          {copy.navigation.login}
+        </a>{" "}
+        {x.occupiedOr}{" "}
+        <a href="/reset" class="font-bold underline">
+          {x.forgotPassword}
+        </a>
+        .
+      </InlineAlert>
+    </div>
+  )}
   <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{a.register.eyebrow}</div>
   <h1 class="mt-4 mb-2 text-[34px] tracking-[-0.06em]">{a.register.title}</h1>
   <p class="mb-7 text-sm text-muted">{a.register.description}</p>
   <SignUpForm
     client:load
-    serverError={hasError ? x.registerError : null}
+    serverError={error && !occupied ? s.registerError : null}
     labels={{
       name: a.fields.name,
       optional: x.optional,
@@ -23,13 +42,13 @@ const x = copyExtra.auth;
       password: a.fields.password,
       emailPlaceholder: x.emailPlaceholder,
       passwordPlaceholder: x.passwordPlaceholder,
-      showPassword: x.showPassword,
-      hidePassword: x.hidePassword,
+      showPassword: s.showPassword,
+      hidePassword: s.hidePassword,
       terms: x.terms,
       submit: a.register.title,
-      pending: x.creating,
-      emailRequired: x.emailRequired,
-      passwordTooShort: x.passwordTooShort,
+      pending: s.creating,
+      emailRequired: s.emailRequired,
+      passwordTooShort: s.passwordTooShort,
     }}
   />
   <p class="mt-[22px] text-center text-[13px] text-muted">

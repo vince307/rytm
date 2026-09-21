@@ -126,7 +126,7 @@ Recommendation (not a blocker): authenticate an owned domain in Brevo (DKIM/DMAR
 
 ## Manual steps still open
 
-1. ~~PKCE callback~~ — done 2026-09-21: e-mailed links land on `/auth/callback`, which exchanges the code and signs the user in (`/home`) or opens the set-new-password form (`/reset/new`). To verify on production with a real signup after the deploy.
+1. ~~PKCE callback~~ — done 2026-09-21 (`fe68166`) and **verified on production by the owner** the same day: signup with a non-member address → `/confirm-email` → „Wyślij ponownie” (re-sent 14:06:15 UTC) → link → `/auth/callback` → signed in on `/home` (`email_confirmed_at` 14:07:26, `last_sign_in_at` 14:08:56 UTC); „Nie pamiętam hasła” → link → `/reset/new` → new password → sign-in; `/register` with a taken address → occupied state. The Brevo mail landed in Yahoo's spam folder — see the sender-domain recommendation.
 2. Optional: create the Protection Bypass for Automation secret and store it as `VERCEL_AUTOMATION_BYPASS_SECRET`.
 3. Optional: sender domain for Brevo (see recommendation above).
 

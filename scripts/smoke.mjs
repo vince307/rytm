@@ -109,6 +109,7 @@ const steps = [
     () => request("/api/auth/signin", { method: "POST", form: seeded }),
     { status: 302, location: "/home" },
   ],
+  ["patterns renders empty view", () => request("/patterns"), { status: 200, contains: "Wgraj pierwszy wyciąg" }],
   ["signout seeded user", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
 ];
 

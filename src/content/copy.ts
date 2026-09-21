@@ -110,7 +110,9 @@ export const copyExtra = {
     cardsTitle: "Rytm pasuje do Twojego tempa.",
     secondaryCta: "Zobacz jak działa",
   },
-  // DESIGN-GAP: G18 — no kit copy for a view that is not available yet.
+  // DESIGN-GAP: K11 — the empty-view paragraph is in the prototype but not in content.json (round 3).
+  emptyViews: { body: "Jeden plik CSV wystarczy, aby Rytm mógł rozpoznać Twój rytm wydatków." },
+  // Only `/settings` still renders this placeholder (G11 + FR-019 pending); drop with that slice.
   stub: { info: "Ten widok pojawi się po pierwszym imporcie wyciągu." },
 } as const;
 

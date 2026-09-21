@@ -1,17 +1,13 @@
 ---
-// DESIGN-GAP: G18 — placeholder body for a view that is not available yet.
 import AppLayout from "@/layouts/AppLayout.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
-import InlineAlert from "@/components/app/InlineAlert.astro";
-import { buttonVariants } from "@/components/ui/button";
-import { copyExtra } from "@/content/copy";
+import ViewEmpty from "@/components/app/ViewEmpty.astro";
+import { copy, copyExtra } from "@/content/copy";
+
+const e = copy.emptyViews;
 ---
 
 <AppLayout title={copyExtra.imports.title} active="imports">
-  <PageTitle eyebrow={copyExtra.imports.eyebrow} title={copyExtra.imports.title} lead={copyExtra.imports.lead}>
-    <a href="/imports/new" class:list={buttonVariants({ variant: "primary" })}>
-      {copyExtra.imports.newImport}
-    </a>
-  </PageTitle>
-  <InlineAlert kind="info">{copyExtra.stub.info}</InlineAlert>
+  <PageTitle eyebrow={copyExtra.imports.eyebrow} title={e.imports.title} lead={e.imports.lead} />
+  <ViewEmpty icon="import" title={e.cta} body={copyExtra.emptyViews.body} cta={e.button} href="/imports/new" />
 </AppLayout>

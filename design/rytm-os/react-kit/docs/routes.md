@@ -22,3 +22,14 @@
 | `/components` | Biblioteka UI | — |
 
 W istniejącym prototypie trasy są obsługiwane przez hash routing. W React Routerze można użyć tych samych ścieżek bez prefiksu `#`.
+
+## Runda 2 — dodatkowe stany
+
+- `#/reset/new` — ustaw nowe hasło
+- `#/reset/new?state=expired` — wygasły link
+- `#/reset/new?success=1` — sukces zmiany hasła
+- `#/confirm-email` — potwierdzenie adresu e-mail
+- `#/login?confirmed=1` — e-mail potwierdzony
+- `#/register?error=occupied` — zajęty adres e-mail
+- `#/patterns-empty`, `#/fixed-empty`, `#/imports-empty` — puste widoki przed pierwszym importem
+- `#/home-no-name` — dashboard bez imienia użytkownika

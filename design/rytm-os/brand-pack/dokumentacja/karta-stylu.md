@@ -71,3 +71,11 @@ Etykieta `ponad próg` jest zawsze tekstowa i może mieć bursztynowe tło. Sam 
 Ikony UI są liniowe, mają obrys 1,8 px, kąty 45° i nie używają ozdobnych zaokrągleń. W prototypie znajdują się w `assets/icons/ui/ui.svg`; komponenty React mogą korzystać z tych samych symboli przez SVG `<use>` albo przepisać je do własnego komponentu ikon.
 
 W rundzie 1 nie wprowadzamy pełnego systemowego dark mode. Istniejące ciemne powierzchnie (header autoryzacji, karta hero, CTA, ikona aplikacji) są elementem kompozycji i mają własny wariant jasnego znaku. Decyzję o pełnym dark mode odkładamy do testów dashboardu z prawdziwymi danymi, aby nie dublować semantyki bursztynu i zieleni.
+
+## Runda 2 — stany i responsywność
+
+Poniżej 560 px nagłówek ukrywa link „Dla kogo”, zmniejsza padding przycisków i nie pozwala łamać etykiet. Stopka układa copyright i linki w dwóch wierszach, a `.section-head` przechodzi w jedną kolumnę.
+
+Powitanie na dashboardzie używa imienia tylko wtedy, gdy użytkownik je podał. Bez imienia stosuje neutralne „Dzień dobry.”.
+
+Stan „e-mail potwierdzony” używa `.inline-alert.success`. Błędy auth i importu są spokojne, konkretne i zawsze prowadzą do następnego kroku. Nakładający się zakres importu jest błędem blokującym, bez możliwości potwierdzenia mimo nakładania.

@@ -33,3 +33,16 @@
 - Operacje destrukcyjne i akcje wzorców pokazują bezpieczne stany dialogów/toastów, ale nie modyfikują danych.
 - Pełny dark mode nie jest wdrażany w tej rundzie; pozostają ciemne powierzchnie marki i warianty ikony aplikacji.
 - Paginacja nie jest potrzebna przy syntetycznych pięciu wzorcach; przycisk „Pokaż więcej” demonstruje miejsce na późniejszy komponent.
+
+## Runda 2 — poprawki po wdrożeniu
+
+- Naprawiono nakładający się import: błąd blokujący, zakres istniejącego importu i akcje „Wybierz inny plik” / „Wróć do importów”.
+- Ujednolicono badge „nowy” i „zmiana kwoty” z bursztynowym kanonem marki.
+- Dodano neutralne powitanie dashboardu bez imienia.
+- Dodano klucze rundy 2 do `content.json`.
+- Dodano `#/reset/new`, `#/confirm-email`, potwierdzenie e-maila po logowaniu, stany zajętego adresu i walidacji auth.
+- Dodano puste widoki wzorców, kosztów stałych i importów.
+- Dodano komunikaty błędów nieznanego formatu, waluty innej niż PLN oraz pustego pliku.
+- Dodano sekcję wykluczonych wzorców z odwracalną akcją „Przywróć”.
+- Dodano responsywne reguły nagłówka, stopki i `.section-head` dla 320–560 px.
+- `tabs` i paginacja pozostają odłożone: żaden z nowych ekranów nie wymaga zakładek ani paginacji.

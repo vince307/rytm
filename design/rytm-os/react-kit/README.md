@@ -32,3 +32,7 @@ export function Header() {
 ```
 
 Teksty, które pojawiają się na stronie, są zebrane w `docs/content.json`, więc komponenty mogą być pozbawione twardo zakodowanego copy. Standardowo używaj SVG; PNG zachowaj jako fallbacki i eksporty do systemów, które nie obsługują wektorów.
+
+## Runda 2
+
+Dodano stany auth (`#/reset/new`, `#/confirm-email`), puste widoki przed pierwszym importem, błędy importu, sekcję wykluczonych wzorców i reguły mobile 320–560 px. Prototypowe pliki HTML znajdują się w głównym eksporcie `rytm-os-views-html.zip`.

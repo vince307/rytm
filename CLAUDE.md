@@ -1,6 +1,12 @@
 # Rules for AI
 
-This file provides guidance to AI Agent when working with code in this repository.
+## Hard rules
+
+- Never run `npm run smoke` against production (it creates real users).
+- **Supabase migrations**: `supabase/migrations/` using naming format `YYYYMMDDHHmmss_short_description.sql`. Always enable RLS on new tables with granular per-operation, per-role policies.
+- **Design kit**: `design/rytm-os/` is read-only; assets via `scripts/sync-kit.sh` → `public/rytm/` + `src/styles/brand.css`; colors only via the Tailwind names `ink`/`paper`/`paper-soft`/`excess`/`excess-text`/`muted`/`line`/`green`; copy from `src/content/copy.ts` (`copy` = kit JSON, `copyExtra` = kit gaps K11); missing UI → gap row in `context/foundation/design-kit.md` + `DESIGN-GAP` comment, never invented.
+- Env vars: `SUPABASE_URL`, `SUPABASE_KEY` (copy `.env.example` to `.env`, gitignored). `.env.example` already holds the local-Supabase values, so a fresh clone runs against Docker, never production. On Vercel they are project env vars (`vercel env ls`), read at runtime through `astro:env/server`
+- Preview deploy from a working tree: `npx vercel` (Vercel Authentication gates previews by default). Never run `vercel --prod` by hand except for an emergency; rollback is `vercel rollback` / `vercel promote <url>` (human-only)
 
 ## Commands
 
@@ -9,7 +15,7 @@ This file provides guidance to AI Agent when working with code in this repositor
 - `npm run lint` — ESLint with type-checked rules
 - `npm run lint:fix` — auto-fix lint issues
 - `npm run format` — Prettier (includes prettier-plugin-astro + prettier-plugin-tailwindcss)
-- `npm run smoke` — dependency-free auth-flow smoke test (`scripts/smoke.mjs`) against a running server, `BASE_URL` env (default `http://localhost:4321`). Run after dependency upgrades; CI runs it against `astro dev` with a local Supabase. Never run it against production (it creates real users).
+- `npm run smoke` — dependency-free auth-flow smoke test (`scripts/smoke.mjs`) against a running server, `BASE_URL` env (default `http://localhost:4321`). Run after dependency upgrades; CI runs it against `astro dev` with a local Supabase.
 
 Pre-commit hooks: husky + lint-staged runs `eslint --fix` on `*.{ts,tsx,astro}` and `prettier --write` on `*.{json,css,md}`.
 
@@ -38,26 +44,18 @@ Full server-side rendering (`output: "server"` in astro.config.mjs). All pages a
 - **Tailwind class merging**: use the `cn()` helper from `@/lib/utils` (clsx + tailwind-merge) for conditional/merged class names. Do not concatenate class strings manually.
 - **shadcn/ui**: components live in `src/components/ui/`, "new-york" style variant. Install new ones with `npx shadcn@latest add [name]`.
 - **API routes**: use uppercase `GET`, `POST` exports; validate input with zod.
-- **Supabase migrations**: `supabase/migrations/` using naming format `YYYYMMDDHHmmss_short_description.sql`. Always enable RLS on new tables with granular per-operation, per-role policies.
 - **React**: no Next.js directives ("use client" etc.). Extract hooks to `src/components/hooks/`.
 - **Services/helpers** go in `src/lib/` (or `src/lib/services/` for extracted business logic).
 - **Shared types** (entities, DTOs) go in `src/types.ts`.
-- **Design kit**: `design/rytm-os/` is read-only; assets via `scripts/sync-kit.sh` → `public/rytm/` + `src/styles/brand.css`; colors only via the Tailwind names `ink`/`paper`/`paper-soft`/`excess`/`excess-text`/`muted`/`line`/`green`; copy from `src/content/copy.ts` (`copy` = kit JSON, `copyExtra` = kit gaps K11); missing UI → gap row in `context/foundation/design-kit.md` + `DESIGN-GAP` comment, never invented.
 
 ### Environment
 
 - Node.js v22.14.0 (see `.nvmrc`)
-- Env vars: `SUPABASE_URL`, `SUPABASE_KEY` (copy `.env.example` to `.env`, gitignored). `.env.example` already holds the local-Supabase values, so a fresh clone runs against Docker, never production. On Vercel they are project env vars (`vercel env ls`), read at runtime through `astro:env/server`
 - Local Supabase: start Docker Desktop, then `npx supabase start` (project `rytm`; API `:54321`, Studio `:54323`, Mailpit `:54324`). `supabase/seed.sql` runs on every `start` / `db reset` and creates the confirmed test account `test@rytm.local` / `Rytm-Test-Passw0rd!` (fixed UUID `11111111-1111-4111-8111-111111111111`); local signup needs no email confirmation (`enable_confirmations = false`). Seed is local/CI only — `db push` never applies it
 - First local run: `npx supabase start` → `npm run dev` → `npm run smoke` (must be 14/14 PASS, including "seeded test user signs in")
 - Production deploy: push to `main` → GitHub Actions `deploy` job (`vercel deploy --prebuilt --prod`). Vercel's Git integration is disabled for `main` (`vercel.json`) and only builds previews for other branches/PRs
-- Preview deploy from a working tree: `npx vercel` (Vercel Authentication gates previews by default). Never run `vercel --prod` by hand except for an emergency; rollback is `vercel rollback` / `vercel promote <url>` (human-only)
 - Deployment state and secret inventory: `context/deployment/deploy-plan.md`
 
 ## CI
 
-GitHub Actions workflow (`.github/workflows/ci.yml`), on every push and PR to `main`:
-
-- `ci` — `astro sync`, lint, `astro check`, build (needs `SUPABASE_URL` / `SUPABASE_KEY` repository secrets)
-- `smoke` — local Supabase + `astro dev` + `npm run smoke`
-- `deploy` — push to `main` only, after `ci` and `smoke` are green: `vercel pull` → `npm run build` → `vercel deploy --prebuilt --prod` (needs `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` secrets)
+CI gate and production deploy job: `@.github/workflows/ci.yml` (`ci` → `smoke` → `deploy` on push to `main`; `deploy` needs the `VERCEL_*` secrets listed in `context/deployment/deploy-plan.md`).

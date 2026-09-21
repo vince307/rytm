@@ -9,6 +9,7 @@ Rytm is an Astro 7 SSR app (React 19 islands, Tailwind 4, shadcn/ui, Supabase au
 - `context/archive/` is immutable. Contracts in `context/foundation/` (`prd.md`, `tech-stack.md`, `design-kit.md`, `shape-notes.md`, `import-formats.md`) are edited in place, never copied with dates.
 - Secrets only in `.env` (gitignored) locally and in Vercel project env vars in the cloud (`vercel env ls`). `SUPABASE_URL` and `SUPABASE_KEY` are server-only via `astro:env/server`.
 - Before committing, run the CI gate locally: `npm run lint && npx astro check && npm run build` (`@.github/workflows/ci.yml`).
+- Humans only: `vercel --prod`, `vercel rollback` / `vercel promote`, secret rotation, plan or project changes.
 
 ## Commands
 
@@ -39,7 +40,7 @@ No unit test runner yet. `scripts/smoke.mjs` is the only automated check; run it
 
 ## Deployment
 
-Production ships only from the `deploy` job in `@.github/workflows/ci.yml` (push to `main`, after `ci` + `smoke`). Vercel's Git integration builds previews for other branches; `main` is disabled in `@vercel.json`. Humans only: `vercel --prod`, `vercel rollback` / `vercel promote`, secret rotation, plan or project changes. Current state and secret inventory: `@context/deployment/deploy-plan.md`.
+Production ships only from the `deploy` job in `@.github/workflows/ci.yml` (push to `main`, after `ci` + `smoke`). Vercel's Git integration builds previews for other branches; `main` is disabled in `@vercel.json`. Current state and secret inventory: `@context/deployment/deploy-plan.md`.
 
 ## Commits
 

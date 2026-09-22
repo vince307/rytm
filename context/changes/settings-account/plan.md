@@ -366,18 +366,18 @@ Pierwsza migracja w repo. Lokalnie: `npx supabase migration up` (lub `db reset`)
 
 #### Automated
 
-- [x] 2.1 `npm run lint`, `npx astro check`, `npm run build` przechodzą
-- [x] 2.2 `npm run smoke` PASS 39/39
-- [x] 2.3 Brak `copyExtra.stub` i `DESIGN-GAP: G18` w `src/`
-- [x] 2.4 Słowo `USUŃ` tylko w `src/lib/auth-rules.ts`
+- [x] 2.1 `npm run lint`, `npx astro check`, `npm run build` przechodzą — d8d2594
+- [x] 2.2 `npm run smoke` PASS 39/39 — d8d2594
+- [x] 2.3 Brak `copyExtra.stub` i `DESIGN-GAP: G18` w `src/` — d8d2594
+- [x] 2.4 Słowo `USUŃ` tylko w `src/lib/auth-rules.ts` — d8d2594
 
 #### Manual
 
-- [ ] 2.5 Zrzuty ekranu wszystkich stanów zgodne z kompozycją kitu
-- [ ] 2.6 Klawiatura i blokada przycisku w dialogu
-- [ ] 2.7 Zmiana hasła w przeglądarce (pozostaje zalogowany; nowe loguje, stare nie)
-- [ ] 2.8 Usunięcie w przeglądarce (`/login?deleted=1`, `/home` → `/login`, ponowna rejestracja)
-- [ ] 2.9 Widok mobile 400 px
+- [x] 2.5 Zrzuty ekranu wszystkich stanów zgodne z kompozycją kitu
+- [x] 2.6 Klawiatura i blokada przycisku w dialogu
+- [x] 2.7 Zmiana hasła w przeglądarce (pozostaje zalogowany; nowe loguje, stare nie)
+- [x] 2.8 Usunięcie w przeglądarce (`/login?deleted=1`, `/home` → `/login`, ponowna rejestracja)
+- [x] 2.9 Widok mobile 400 px
 
 ### Phase 3: Wdrożenie produkcyjne i dokumentacja
 

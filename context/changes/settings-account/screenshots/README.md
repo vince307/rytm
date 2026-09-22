@@ -1,24 +1,39 @@
 # Bramka wizualna — `settings-account` Faza 2
 
-Źródło: `http://localhost:4399` (lokalny `astro dev` + lokalne Supabase, konto `test@rytm.local`), zrzuty z 2026-09-22 przez Claude-in-Chrome.
+Źródło: `http://localhost:4399` (lokalny `astro dev` + lokalne Supabase), zrzuty z 2026-09-22 przez Claude-in-Chrome. Konto na zrzutach: `test@rytm.local` (seed) — wiersze 2.7/2.8 zweryfikowano na koncie jednorazowym, nie na seedzie.
 
-## Stany desktop (klatka 1534×784)
+## Stany
 
-| Plik                                          | Stan                                                                  |
-| --------------------------------------------- | --------------------------------------------------------------------- |
-| `settings-default-desktop.png`                | `/settings` — góra: eyebrow, `Twoje konto.`, panel „Dane logowania”   |
-| `settings-default-lower-desktop.png`          | `/settings` — dół: wiersz „Przetwarzanie danych” + panel destrukcyjny |
-| `settings-password-changed-desktop.png`       | `/settings?password=changed` — `InlineAlert success`                  |
-| `settings-error-current-password-desktop.png` | `/settings?error=current-password` — `ServerError` w formularzu       |
-| `settings-error-delete-desktop.png`           | `/settings?error=delete` — dialog otwarty z błędem, przycisk zablokowany |
-| `settings-dialog-empty-desktop.png`           | Dialog otwarty, pusty input — przycisk nieaktywny                     |
-| `settings-dialog-confirm-desktop.png`         | Dialog z wpisanym `USUŃ` — przycisk aktywny                           |
-| `login-deleted-desktop.png`                   | `/login?deleted=1` — `InlineAlert success`                            |
+| Stan                              | desktop (1534×784)                            | mobile (400×780)                             |
+| --------------------------------- | --------------------------------------------- | -------------------------------------------- |
+| `/settings` — góra                | `settings-default-desktop.png`                | `settings-default-mobile.png`                |
+| `/settings` — dół (panel destr.)  | `settings-default-lower-desktop.png`          | `settings-default-lower-mobile.png`          |
+| `?password=changed`               | `settings-password-changed-desktop.png`       | `settings-password-changed-mobile.png`       |
+| `?error=current-password`         | `settings-error-current-password-desktop.png` | `settings-error-current-password-mobile.png` |
+| `?error=delete` (dialog + błąd)   | `settings-error-delete-desktop.png`           | `settings-error-delete-mobile.png`           |
+| Dialog, pusty input (nieaktywny)  | `settings-dialog-empty-desktop.png`           | `settings-dialog-empty-mobile.png`           |
+| Dialog z `USUŃ` (aktywny)         | `settings-dialog-confirm-desktop.png`         | `settings-dialog-confirm-mobile.png`         |
+| `/login?deleted=1`                | `login-deleted-desktop.png`                   | `login-deleted-mobile.png`                   |
 
 Stan domyślny zajmuje dwie klatki, bo strona jest wyższa niż obszar zrzutu.
 
-## Ograniczenia tej serii (do uzupełnienia ręcznie)
+## Jak powstał wariant mobile 400 px
 
-- **Format**: pipeline zrzutów zapisuje JPEG; pliki `.png` powstały przez `sips -s format png`, więc nie są bezstratne. Do oceny kompozycji wystarczają; nie nadają się na baseline testu screenshotowego (repo go nie ma — patrz „What We're NOT Doing” w planie).
-- **Brak wariantu mobile 400 px**: okno przeglądarki nie dało się zwęzić przez to narzędzie (viewport pozostawał 1512×773 po `resize_window`). Zrzuty `*-mobile.png` oraz ręczny wiersz 2.9 wymagają przeglądarki człowieka (DevTools, tryb urządzenia, 400 px).
-- Zweryfikowane przy okazji (wiersz 2.6, część): `usuń` nie odblokowuje przycisku, `USUŃ` odblokowuje, `Escape` zamyka dialog. Kolejność Tab i powrót fokusa na przycisk — do sprawdzenia ręcznie.
+Okna Chrome na tej maszynie nie da się zwęzić poniżej `innerWidth` 587 px, więc klatki mobilne renderowano w `<iframe>` o szerokości 400 px na stronie tego samego originu (tymczasowy `public/__mobile-preview.html`, usunięty po sesji — nigdy nie commitowany). Dokument w ramce ma prawdziwy viewport 400×780, więc media queries `max-[899px]` działają normalnie; potwierdzone `matchMedia('(max-width: 899px)').matches === true`.
+
+**Format**: pipeline zrzutów zapisuje JPEG; pliki `.png` powstały przez `sips -s format png`, więc nie są bezstratne. Wystarczają do oceny kompozycji; nie nadają się na baseline testu screenshotowego (repo go nie ma — patrz „What We're NOT Doing” w planie).
+
+## Co potwierdzono (wiersze 2.5–2.9)
+
+- **2.5** Kompozycja zgodna z kitem (`prototype/app.js:64,66`): eyebrow, `Twoje konto.`, panel „Dane logowania” z wierszami E-mail / Hasło / Przetwarzanie danych, panel `STREFA DESTRUKCYJNA` w obramowaniu `excess` z przyciskiem `excess-text`, dialog z eyebrow + tytułem + podpowiedzią i `USUŃ` w `<strong>`.
+- **2.6** Tab z „Zmień hasło” dochodzi do „Usuń konto” jednym skokiem; Enter otwiera dialog; fokus ląduje w inpucie (wpisany znak trafia do pola); Escape zamyka; fokus wraca na przycisk wyzwalający. Blokada przycisku: `usuń` i `XUSUŃ` → nieaktywny, `USUŃ` → aktywny (porównanie dokładne).
+- **2.7** Zmiana hasła formularzem w przeglądarce → `/settings?password=changed`, użytkownik pozostaje zalogowany; po wylogowaniu stare hasło → `/login?error=1`, nowe → `/home`.
+- **2.8** Usunięcie dialogiem → `/login?deleted=1` z notą; `/home` → `/login`; hasło usuniętego konta → `/login?error=1`; ponowna rejestracja tego samego adresu → `/confirm-email`, logowanie → `/home`. Konto testowe posprzątane (0 wierszy `manual-verify-%` w `auth.users`/`auth.identities`).
+- **2.9** 400 px: wiersze zwijają się do jednej kolumny (etykieta nad treścią), panel destrukcyjny w kolumnie, dialog mieści się w ekranie (400×348 w viewporcie 400×780), `/login` układa hero nad formularzem, dolna nawigacja mobilna widoczna.
+
+## Obserwacje do rundy 3 (nie blokują Fazy 2)
+
+1. **Modal bez marginesu bocznego na 400 px** — dialog ma `left: 0` i `width: 400`, czyli dotyka obu krawędzi ekranu. Kit `.modal` (`min(480px,100%)`) zachowuje się tak samo, więc marginesu nie wymyślano — zapisane jako luka w `design-kit.md` (G24).
+2. **Wartość inputu potwierdzenia przeżywa zamknięcie dialogu** — po wpisaniu znaku, zamknięciu Escape i ponownym otwarciu pole nadal zawiera poprzedni tekst. Bez wpływu na bezpieczeństwo (porównanie jest dokładne, a przycisk pozostaje nieaktywny), ale użytkownik widzi stary wpis.
+3. **Odstępy w wierszu E-mail na 400 px** — między etykietą „E-mail” a adresem jest duża przerwa (efekt `min-h-[70px]` przy zwiniętej kolumnie), a etykieta następnego wiersza przylega do linii oddzielającej.
+4. **Pierścień fokusa** `focus-visible:ring-[3px] ring-ink/15` jest subtelny na ciemnym przycisku `danger`. Styl bazowy przycisku istniał przed tą zmianą — wariant `danger` tylko go dziedziczy.

@@ -1,12 +1,89 @@
 ---
-// DESIGN-GAP: G18 — placeholder body for a view that is not available yet.
+// DESIGN-GAP: G23 (in-app password form), G24 (delete/password result states)
 import AppLayout from "@/layouts/AppLayout.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
+import Panel from "@/components/app/Panel.astro";
+import SettingsRow from "@/components/app/SettingsRow.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
+import NewPasswordForm from "@/components/auth/NewPasswordForm";
+import DeleteAccountDialog from "@/components/settings/DeleteAccountDialog";
 import { copy, copyExtra } from "@/content/copy";
+import { DELETE_CONFIRM_WORD } from "@/lib/auth-rules";
+
+const s = copy.settings;
+const a = copy.authStates;
+const x = copyExtra.settings;
+const xa = copyExtra.auth;
+const params = Astro.url.searchParams;
+const error = params.get("error");
+const passwordChanged = params.get("password") === "changed";
+// The middleware only lets a signed-in user reach /settings, so the address is always there.
+// roadmap: change e-mail parked — kit button not rendered
+const email = Astro.locals.user?.email;
+const passwordError =
+  error === "current-password" ? x.currentPasswordWrong : error === "password" ? xa.resetNewError : null;
 ---
 
-<AppLayout title={copy.settings.title} active="settings">
-  <PageTitle eyebrow={copyExtra.settings.eyebrow} title={copy.settings.title} lead={copyExtra.settings.lead} />
-  <InlineAlert kind="info">{copyExtra.stub.info}</InlineAlert>
+<AppLayout title={s.title} active="settings">
+  <PageTitle eyebrow={x.eyebrow} title={s.title} lead={x.lead} />
+  {passwordChanged && (
+    <div class="mb-[15px] max-w-[800px]">
+      <InlineAlert kind="success">{x.passwordChanged}</InlineAlert>
+    </div>
+  )}
+  <Panel class="max-w-[800px]">
+    <div class="mb-5 flex items-start justify-between">
+      <h2 class="m-0 text-[17px] tracking-[-0.03em]">{x.loginData}</h2>
+    </div>
+    <SettingsRow label={x.emailLabel}>
+      <strong>{email}</strong>
+    </SettingsRow>
+    <SettingsRow label={x.passwordLabel}>
+      <div class="max-w-[390px]">
+        <NewPasswordForm
+          client:load
+          action="/api/auth/password"
+          current={{ label: x.currentPassword }}
+          serverError={passwordError}
+          labels={{
+            password: xa.newPassword,
+            confirm: xa.repeatPassword,
+            passwordPlaceholder: xa.passwordPlaceholder,
+            showPassword: a.showPassword,
+            hidePassword: a.hidePassword,
+            submit: x.changePassword,
+            pending: xa.saving,
+            passwordTooShort: a.passwordTooShort,
+            passwordsDiffer: xa.passwordsDiffer,
+            currentRequired: a.passwordRequired,
+          }}
+        />
+      </div>
+    </SettingsRow>
+    <SettingsRow label={x.dataLabel}>
+      <p>{s.data}</p>
+    </SettingsRow>
+  </Panel>
+  <Panel variant="danger" class="mt-[15px] max-w-[800px]">
+    <div>
+      <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{x.dangerEyebrow}</div>
+      <h2 class="my-2 text-[18px]">{s.deleteTitle}</h2>
+      <p class="m-0 max-w-[500px] text-[13px] text-muted">{s.deleteBody}</p>
+    </div>
+    <DeleteAccountDialog
+      client:load
+      serverError={error === "delete" ? x.deleteError : null}
+      labels={{
+        trigger: s.deleteTitle,
+        eyebrow: x.deleteDialogEyebrow,
+        title: x.deleteDialogTitle,
+        body: x.deleteDialogBody,
+        confirmationHint: s.confirmation,
+        placeholder: DELETE_CONFIRM_WORD,
+        confirm: s.deleteTitle,
+        pending: x.deleting,
+        close: x.close,
+      }}
+    />
+  </Panel>
 </AppLayout>

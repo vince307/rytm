@@ -12,6 +12,7 @@ const buttonVariants = cva(
         primary: "bg-ink text-paper hover:bg-ink/90 hover:-translate-y-px",
         ghost: "bg-transparent text-ink border border-line hover:border-ink",
         amber: "bg-excess text-ink hover:bg-excess/90",
+        danger: "bg-excess-text text-paper hover:bg-excess-text/90 hover:-translate-y-px",
       },
       size: {
         default: "px-[18px] py-3",

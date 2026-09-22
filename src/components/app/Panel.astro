@@ -1,12 +1,20 @@
 ---
-// Panel.astro — prototype .panel
+// Panel.astro — prototype .panel; `danger` is .danger-panel (copy left, destructive action right).
 import { cn } from "@/lib/utils";
 interface Props {
   class?: string;
+  variant?: "default" | "danger";
 }
-const { class: className } = Astro.props;
+const { class: className, variant = "default" } = Astro.props;
+// Kit border #d9c2a0 has no token; `excess` is the nearest one (design-kit.md K15).
+const variantClass =
+  variant === "danger"
+    ? "border-excess flex items-center justify-between gap-5 max-[899px]:flex-col max-[899px]:items-start"
+    : "";
 ---
 
-<section class:list={cn("rounded-xl border border-line bg-paper p-[22px] max-[559px]:p-[17px]", className)}>
+<section
+  class:list={cn("rounded-xl border border-line bg-paper p-[22px] max-[559px]:p-[17px]", variantClass, className)}
+>
   <slot />
 </section>

@@ -52,6 +52,8 @@ export const copyExtra = {
     saving: "Zapisywanie…",
     resent: "Wysłaliśmy link ponownie.",
     resendError: "Nie udało się wysłać ponownie. Spróbuj za chwilę.",
+    // DESIGN-GAP: G24 — `/login?deleted=1` note the kit does not define.
+    deletedLogin: "Konto zostało usunięte.",
   },
   home: {
     emptyEyebrow: "Przegląd miesiąca",
@@ -72,7 +74,26 @@ export const copyExtra = {
   },
   patterns: { eyebrow: "Wzorce wydatków" },
   fixed: { eyebrow: "Koszty stałe", lead: "Rytm porównuje miesiące kalendarzowe i pokazuje różnice." },
-  settings: { eyebrow: "Ustawienia / konto", lead: "Sprawdź dane i ustawienia prywatności." },
+  settings: {
+    eyebrow: "Ustawienia / konto",
+    lead: "Sprawdź dane i ustawienia prywatności.",
+    loginData: "Dane logowania",
+    emailLabel: "E-mail",
+    passwordLabel: "Hasło",
+    dataLabel: "Przetwarzanie danych",
+    changePassword: "Zmień hasło",
+    dangerEyebrow: "Strefa destrukcyjna",
+    deleteDialogEyebrow: "Usunięcie konta",
+    deleteDialogTitle: "Usunąć konto bez śladu?",
+    deleteDialogBody: "Ta decyzja usunie wszystkie importy, wzorce i progi.",
+    close: "Zamknij",
+    // DESIGN-GAP: G23/G24 — states the kit does not define
+    currentPassword: "Obecne hasło",
+    passwordChanged: "Hasło zostało zmienione.",
+    currentPasswordWrong: "Obecne hasło jest nieprawidłowe.",
+    deleteError: "Nie udało się usunąć konta. Spróbuj ponownie.",
+    deleting: "Usuwanie…",
+  },
   app: {
     exit: "Wyjdź",
     sidebarView: "Widok",
@@ -112,8 +133,6 @@ export const copyExtra = {
   },
   // DESIGN-GAP: K11 — the empty-view paragraph is in the prototype but not in content.json (round 3).
   emptyViews: { body: "Jeden plik CSV wystarczy, aby Rytm mógł rozpoznać Twój rytm wydatków." },
-  // Only `/settings` still renders this placeholder (G11 + FR-019 pending); drop with that slice.
-  stub: { info: "Ten widok pojawi się po pierwszym imporcie wyciągu." },
 } as const;
 
 export const ICON_NAMES = [

@@ -1,0 +1,13 @@
+---
+// SettingsRow.astro — prototype .settings-row (190px label / value / action, one line per row).
+interface Props {
+  label: string;
+}
+const { label } = Astro.props;
+---
+
+<div class="grid min-h-[70px] grid-cols-[190px_1fr_auto] items-center gap-[15px] border-b border-line text-[13px] last:border-b-0 max-[899px]:grid-cols-[1fr_auto] [&>p]:col-start-2 [&>p]:col-end-[-1] [&>p]:m-0 [&>p]:text-[13px] [&>p]:leading-[1.55] [&>p]:text-muted max-[899px]:[&>p]:col-start-1">
+  <span class="text-xs text-muted max-[899px]:col-span-full">{label}</span>
+  <slot />
+  <slot name="action" />
+</div>

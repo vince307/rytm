@@ -15,22 +15,29 @@ export interface NewPasswordLabels {
   pending: string;
   passwordTooShort: string;
   passwordsDiffer: string;
+  currentRequired?: string;
 }
 
 interface Props {
   labels: NewPasswordLabels;
   serverError?: string | null;
+  /** Recovery session by default; `/settings` posts the signed-in change instead. */
+  action?: string;
+  /** When set, the form asks for the current password first (the in-app change verifies it server-side). */
+  current?: { label: string };
 }
 
-export default function NewPasswordForm({ labels, serverError }: Props) {
+export default function NewPasswordForm({ labels, serverError, action = "/api/auth/reset/new", current }: Props) {
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<{ password?: string; confirm?: string }>({});
+  const [errors, setErrors] = useState<{ current?: string; password?: string; confirm?: string }>({});
 
   function validate() {
     const next: typeof errors = {};
-    if (password.length < MIN_PASSWORD_LENGTH) next.password = labels.passwordTooShort;
+    if (current && currentPassword.length === 0) next.current = labels.currentRequired;
+    else if (password.length < MIN_PASSWORD_LENGTH) next.password = labels.passwordTooShort;
     else if (confirm !== password) next.confirm = labels.passwordsDiffer;
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -41,8 +48,23 @@ export default function NewPasswordForm({ labels, serverError }: Props) {
   }
 
   return (
-    <form method="POST" action="/api/auth/reset/new" onSubmit={handleSubmit} noValidate>
+    <form method="POST" action={action} onSubmit={handleSubmit} noValidate>
       <ServerError message={serverError} />
+      {current && (
+        <FormField
+          id="current"
+          type="password"
+          autoComplete="current-password"
+          label={current.label}
+          value={currentPassword}
+          onChange={(v) => {
+            setCurrentPassword(v);
+            setErrors({});
+          }}
+          placeholder={labels.passwordPlaceholder}
+          error={errors.current}
+        />
+      )}
       <FormField
         id="password"
         type={showPassword ? "text" : "password"}

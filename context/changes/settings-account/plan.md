@@ -352,24 +352,24 @@ Pierwsza migracja w repo. Lokalnie: `npx supabase migration up` (lub `db reset`)
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej bazie i funkcja `delete_own_account` istnieje
-- [x] 1.2 Rola `anon` nie może wywołać funkcji przez REST
-- [x] 1.3 `npm run lint` i `npx astro check` przechodzą
-- [x] 1.4 `npm run smoke` 37/39 (tylko dwa kroki `contains` z Fazy 2 czerwone)
+- [x] 1.1 Migracja stosuje się na czystej bazie i funkcja `delete_own_account` istnieje — 8c9ded6
+- [x] 1.2 Rola `anon` nie może wywołać funkcji przez REST — 8c9ded6
+- [x] 1.3 `npm run lint` i `npx astro check` przechodzą — 8c9ded6
+- [x] 1.4 `npm run smoke` 37/39 (tylko dwa kroki `contains` z Fazy 2 czerwone) — 8c9ded6
 
 #### Manual
 
-- [x] 1.5 Użytkownik smoke nie istnieje w `auth.users`/`auth.identities` po usunięciu
-- [x] 1.6 Log dev-serwera bez `auth/delete failed` / `auth/password failed`
+- [x] 1.5 Użytkownik smoke nie istnieje w `auth.users`/`auth.identities` po usunięciu — 8c9ded6
+- [x] 1.6 Log dev-serwera bez `auth/delete failed` / `auth/password failed` — 8c9ded6
 
 ### Phase 2: Widok ustawień (komponenty + copy + luki kitu)
 
 #### Automated
 
-- [ ] 2.1 `npm run lint`, `npx astro check`, `npm run build` przechodzą
-- [ ] 2.2 `npm run smoke` PASS 39/39
-- [ ] 2.3 Brak `copyExtra.stub` i `DESIGN-GAP: G18` w `src/`
-- [ ] 2.4 Słowo `USUŃ` tylko w `src/lib/auth-rules.ts`
+- [x] 2.1 `npm run lint`, `npx astro check`, `npm run build` przechodzą
+- [x] 2.2 `npm run smoke` PASS 39/39
+- [x] 2.3 Brak `copyExtra.stub` i `DESIGN-GAP: G18` w `src/`
+- [x] 2.4 Słowo `USUŃ` tylko w `src/lib/auth-rules.ts`
 
 #### Manual
 

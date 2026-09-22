@@ -7,6 +7,8 @@ import { copy, copyExtra } from "@/content/copy";
 const hasError = Astro.url.searchParams.has("error");
 // Kit round 2: #/login?confirmed=1 — the confirmation link was verified but /auth/callback could not open a session here.
 const confirmed = Astro.url.searchParams.has("confirmed");
+// G24: the account was deleted; /api/auth/delete lands here with the session already cleared.
+const deleted = Astro.url.searchParams.has("deleted");
 const a = copy.auth;
 const s = copy.authStates;
 const x = copyExtra.auth;
@@ -16,6 +18,11 @@ const x = copyExtra.auth;
   {confirmed && (
     <div class="mb-[22px]">
       <InlineAlert kind="success">{x.confirmedLogin}</InlineAlert>
+    </div>
+  )}
+  {deleted && (
+    <div class="mb-[22px]">
+      <InlineAlert kind="success">{x.deletedLogin}</InlineAlert>
     </div>
   )}
   <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{a.login.eyebrow}</div>

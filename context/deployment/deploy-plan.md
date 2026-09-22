@@ -52,7 +52,7 @@ Commits `4b27098` (swap) and `aaad9c9` (framework preset), then this file.
 - **Production alias**: `https://rytm-phi.vercel.app` (also `rytm-kamilps-projects.vercel.app`). `rytm.vercel.app` belongs to a different account — do not use it.
 - Raw deployment URLs (`rytm-<hash>-kamilps-projects.vercel.app`) sit behind Vercel Authentication and answer **302 to SSO**, not the app — verify against the alias, never the deployment URL.
 - First production deploy: `vercel deploy --prod --yes` from this machine on 2026-09-18 (human gate). Every later production deploy comes from the `deploy` job.
-- **Supabase** hosted project `rytm` (`psqbtvooufapkatpkxlw`, Postgres 17, `eu-central-1`). No migrations exist yet (`supabase/migrations/` absent); the local project is not `supabase link`ed. Auth uses the new-style **publishable** key.
+- **Supabase** hosted project `rytm` (`psqbtvooufapkatpkxlw`, Postgres 17, `eu-central-1`). First migration `20260921120000_delete_own_account.sql` applied on 2026-09-22 (details in the 2026-09-22 section). It went in through `psql`, **not** `supabase db push`, so `supabase_migrations.schema_migrations` does not exist yet and the next `db push` will apply that file again — harmless, the SQL is idempotent. The local project is still not `supabase link`ed (no Supabase CLI access token on this machine). Auth uses the new-style **publishable** key.
 - **GitHub** `vince307/rytm` (private), default branch `main`, remote `origin`.
 
 ## Secrets inventory
@@ -131,6 +131,15 @@ Recommendation (not a blocker): authenticate an owned domain in Brevo (DKIM/DMAR
 - **Verified on production by the owner** the same day: signed-in views show „Wgraj pierwszy wyciąg” + „Wgraj CSV ↗” → `/imports/new`.
 - Smoke grew to 24 steps (`patterns renders empty view`, seeded user). No new secrets, env vars or Vercel settings — the secrets inventory above is unchanged.
 - Still a placeholder: `/settings` (`copyExtra.stub`, waits for the G11 + FR-019 slice).
+
+## Verification results (2026-09-22) — S-08 settings account (`settings-account`)
+
+- Commits `8c9ded6` (backend + smoke), `d8d2594` (view), `f744e6c` (manual gate), `da073c5` (plan SHA) pushed to `main`. GitHub Actions run `35751978360` green end to end: `ci` → `smoke` → `deploy` (`vercel deploy --prebuilt --prod` from the workflow, not by hand).
+- Hosted migration applied **by an agent on the owner's explicit instruction**, which deviates from the "Human only … Supabase migrations against the hosted DB" line in the operating model below. Route: direct `psql` to `db.psqbtvooufapkatpkxlw.supabase.co` with `SUPABASE_DB_PASSWORD` from `.env`, because `supabase link` requires a CLI access token that is not on this machine (`~/.supabase` holds only telemetry). Follow-up: the first `npx supabase db push` will re-run `20260921120000` and create the migration ledger.
+- `public.delete_own_account` on the hosted DB: `security definer`, `search_path=""`, owner `postgres`, ACL `postgres=X/postgres authenticated=X/postgres service_role=X/postgres` — neither `anon` nor `public` may execute.
+- Guard checked without destroying anything: invoking it with no `auth.uid()` raises `delete_own_account requires an authenticated user`, and `auth.users` still holds 2 rows. `anon` through `POST /rest/v1/rpc/delete_own_account` → **401**.
+- Production alias `https://rytm-phi.vercel.app`: `/settings` → **302 `/login`**, `/login` → 200, `?deleted=1` renders "Konto zostało usunięte.", and the old `copyExtra.stub` placeholder is gone.
+- **Still open**: the full delete cycle on production with a disposable account (plan row 3.4). Production has e-mail confirmations on, so it needs a real inbox and stays with the owner.
 
 ## Manual steps still open
 

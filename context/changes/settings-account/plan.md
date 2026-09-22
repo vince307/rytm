@@ -383,11 +383,11 @@ Pierwsza migracja w repo. Lokalnie: `npx supabase migration up` (lub `db reset`)
 
 #### Automated
 
-- [ ] 3.1 GitHub Actions `ci` → `smoke` → `deploy` zielone na `main`
-- [ ] 3.2 Produkcyjny `/settings` odpowiada 302 na `/login`
+- [x] 3.1 GitHub Actions `ci` → `smoke` → `deploy` zielone na `main`
+- [x] 3.2 Produkcyjny `/settings` odpowiada 302 na `/login`
 
 #### Manual
 
-- [ ] 3.3 Funkcja `delete_own_account` istnieje na hostowanej bazie
+- [x] 3.3 Funkcja `delete_own_account` istnieje na hostowanej bazie
 - [ ] 3.4 Pełny cykl na produkcji na jednorazowym koncie, konto znika
-- [ ] 3.5 `deploy-plan.md` i `CLAUDE.md` opisują stan po wdrożeniu
+- [x] 3.5 `deploy-plan.md` i `CLAUDE.md` opisują stan po wdrożeniu

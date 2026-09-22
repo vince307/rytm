@@ -373,11 +373,11 @@ Pierwsza migracja w repo. Lokalnie: `npx supabase migration up` (lub `db reset`)
 
 #### Manual
 
-- [x] 2.5 Zrzuty ekranu wszystkich stanów zgodne z kompozycją kitu
-- [x] 2.6 Klawiatura i blokada przycisku w dialogu
-- [x] 2.7 Zmiana hasła w przeglądarce (pozostaje zalogowany; nowe loguje, stare nie)
-- [x] 2.8 Usunięcie w przeglądarce (`/login?deleted=1`, `/home` → `/login`, ponowna rejestracja)
-- [x] 2.9 Widok mobile 400 px
+- [x] 2.5 Zrzuty ekranu wszystkich stanów zgodne z kompozycją kitu — f744e6c
+- [x] 2.6 Klawiatura i blokada przycisku w dialogu — f744e6c
+- [x] 2.7 Zmiana hasła w przeglądarce (pozostaje zalogowany; nowe loguje, stare nie) — f744e6c
+- [x] 2.8 Usunięcie w przeglądarce (`/login?deleted=1`, `/home` → `/login`, ponowna rejestracja) — f744e6c
+- [x] 2.9 Widok mobile 400 px — f744e6c
 
 ### Phase 3: Wdrożenie produkcyjne i dokumentacja
 

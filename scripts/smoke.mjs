@@ -1,9 +1,11 @@
-// Smoke test: proves the built app, the Vercel adapter and the Supabase auth flow still work together.
+// Smoke test: proves the built app, the Vercel adapter and the Supabase auth flow still work together,
+// including the account contract (password change, self-service deletion) which also cleans up the smoke user.
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
 const email = `smoke-${Date.now()}@example.com`;
 const password = "Smoke-Test-Passw0rd!";
+const password2 = "Smoke-Test-Passw0rd-2!";
 // Seeded by supabase/seed.sql on every `supabase start` / `db reset` (local and CI).
 const seeded = { email: "test@rytm.local", password: "Rytm-Test-Passw0rd!" };
 const jar = new Map();
@@ -86,6 +88,41 @@ const steps = [
     () => request("/home"),
     { status: 200, contains: "Nie masz jeszcze żadnego importu." },
   ],
+  ["settings renders account e-mail", () => request("/settings"), { status: 200, contains: email }],
+  [
+    "password change rejects wrong current password",
+    () =>
+      request("/api/auth/password", {
+        method: "POST",
+        form: { current: "wrong", password: password2, confirm: password2 },
+      }),
+    { status: 302, location: "/settings?error=current-password" },
+  ],
+  [
+    "password change rejects short password",
+    () =>
+      request("/api/auth/password", { method: "POST", form: { current: password, password: "abc", confirm: "abc" } }),
+    { status: 302, location: "/settings?error=password" },
+  ],
+  [
+    "password change succeeds",
+    () =>
+      request("/api/auth/password", {
+        method: "POST",
+        form: { current: password, password: password2, confirm: password2 },
+      }),
+    { status: 302, location: "/settings?password=changed" },
+  ],
+  [
+    "settings shows password changed",
+    () => request("/settings?password=changed"),
+    { status: 200, contains: "Hasło zostało zmienione." },
+  ],
+  [
+    "delete without confirm word is rejected",
+    () => request("/api/auth/delete", { method: "POST", form: { confirm: "usuń" } }),
+    { status: 302, location: "/settings?error=delete" },
+  ],
   ["login redirects signed-in user", () => request("/login"), { status: 302, location: "/home" }],
   [
     "reset always says check inbox",
@@ -103,6 +140,47 @@ const steps = [
     "register shows the occupied state",
     () => request("/register?error=occupied"),
     { status: 200, contains: "jest już zajęty" },
+  ],
+  [
+    "signin rejects the old password",
+    () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
+    { status: 302, location: "/login?error=1" },
+  ],
+  [
+    "signin accepts the new password",
+    () => request("/api/auth/signin", { method: "POST", form: { email, password: password2 } }),
+    { status: 302, location: "/home" },
+  ],
+  [
+    "delete with confirm word removes the account",
+    () => request("/api/auth/delete", { method: "POST", form: { confirm: "USUŃ" } }),
+    { status: 302, location: "/login?deleted=1" },
+  ],
+  [
+    "login shows the deleted state",
+    () => request("/login?deleted=1"),
+    { status: 200, contains: "Konto zostało usunięte." },
+  ],
+  ["home redirects after deletion", () => request("/home"), { status: 302, location: "/login" }],
+  [
+    "signin after deletion is rejected",
+    () => request("/api/auth/signin", { method: "POST", form: { email, password: password2 } }),
+    { status: 302, location: "/login?error=1" },
+  ],
+  [
+    "signup after deletion is accepted again",
+    () => request("/api/auth/signup", { method: "POST", form: { email, password } }),
+    { status: 302, location: "/confirm-email" },
+  ],
+  [
+    "signin re-created account",
+    () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
+    { status: 302, location: "/home" },
+  ],
+  [
+    "delete re-created account (cleanup)",
+    () => request("/api/auth/delete", { method: "POST", form: { confirm: "USUŃ" } }),
+    { status: 302, location: "/login?deleted=1" },
   ],
   [
     "seeded test user signs in",

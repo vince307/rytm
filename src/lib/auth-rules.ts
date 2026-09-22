@@ -1,5 +1,8 @@
 export const MIN_PASSWORD_LENGTH = 6;
 
+/** Word the user must type to delete their account; the client gates the button, the server validates it. */
+export const DELETE_CONFIRM_WORD = "USUŃ";
+
 /** Supabase re-sends a confirmation e-mail at most once per this many seconds. */
 export const RESEND_COOLDOWN_SECONDS = 60;
 

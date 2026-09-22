@@ -79,8 +79,8 @@ const scriptsConfig = defineConfig({
 
 export default defineConfig(
   includeIgnoreFile(gitignorePath),
-  // design/ is the read-only UI kit (prototype JS, not app code) — never linted, never edited.
-  { ignores: ["design/**"] },
+  // design/ is the read-only UI kit (prototype JS, not app code) and .claude/ holds skill tooling scripts — neither is app code; never linted.
+  { ignores: ["design/**", ".claude/**"] },
   baseConfig,
   reactConfig,
   eslintPluginAstro.configs["flat/recommended"],

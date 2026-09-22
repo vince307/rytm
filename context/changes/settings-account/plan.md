@@ -389,5 +389,5 @@ Pierwsza migracja w repo. Lokalnie: `npx supabase migration up` (lub `db reset`)
 #### Manual
 
 - [x] 3.3 Funkcja `delete_own_account` istnieje na hostowanej bazie — 97fa999
-- [ ] 3.4 Pełny cykl na produkcji na jednorazowym koncie, konto znika
+- [x] 3.4 Pełny cykl na produkcji na jednorazowym koncie, konto znika
 - [x] 3.5 `deploy-plan.md` i `CLAUDE.md` opisują stan po wdrożeniu — 97fa999

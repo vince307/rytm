@@ -72,7 +72,7 @@ const passwordError =
     </div>
     <DeleteAccountDialog
       client:load
-      serverError={error === "delete" ? x.deleteError : null}
+      serverError={error === "delete-password" ? x.currentPasswordWrong : error === "delete" ? x.deleteError : null}
       labels={{
         trigger: s.deleteTitle,
         eyebrow: x.deleteDialogEyebrow,
@@ -80,6 +80,8 @@ const passwordError =
         body: x.deleteDialogBody,
         confirmationHint: s.confirmation,
         placeholder: DELETE_CONFIRM_WORD,
+        currentPassword: x.currentPassword,
+        passwordPlaceholder: xa.passwordPlaceholder,
         confirm: s.deleteTitle,
         pending: x.deleting,
         close: x.close,

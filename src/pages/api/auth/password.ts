@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { createClient, createStatelessClient } from "@/lib/supabase";
+import { createClient, verifyPassword } from "@/lib/supabase";
 import { MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 
 export const prerender = false;
@@ -14,7 +14,7 @@ const schema = z
   .refine((v) => v.password === v.confirm);
 
 // Changes the signed-in user's password after verifying the current one. The check runs on a
-// stateless client so the session cookies stay untouched and the user remains signed in.
+// stateless client (`verifyPassword`) so the session cookies stay untouched and the user remains signed in.
 export const POST: APIRoute = async (context) => {
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
@@ -28,15 +28,14 @@ export const POST: APIRoute = async (context) => {
   }
   const form = Object.fromEntries(await context.request.formData());
   const parsed = schema.safeParse(form);
-  const verifier = createStatelessClient();
-  if (!parsed.success || !verifier || !user.email) {
+  if (!parsed.success || !user.email) {
     return context.redirect("/settings?error=password");
   }
-  const { error: currentError } = await verifier.auth.signInWithPassword({
-    email: user.email,
-    password: parsed.data.current,
-  });
-  if (currentError) {
+  const verified = await verifyPassword(user.email, parsed.data.current);
+  if (verified === null) {
+    return context.redirect("/settings?error=password");
+  }
+  if (!verified) {
     return context.redirect("/settings?error=current-password");
   }
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });

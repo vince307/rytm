@@ -120,8 +120,18 @@ const steps = [
   ],
   [
     "delete without confirm word is rejected",
-    () => request("/api/auth/delete", { method: "POST", form: { confirm: "usuń" } }),
+    () => request("/api/auth/delete", { method: "POST", form: { current: password2, confirm: "usuń" } }),
     { status: 302, location: "/settings?error=delete" },
+  ],
+  [
+    "delete without current password is rejected",
+    () => request("/api/auth/delete", { method: "POST", form: { confirm: "USUŃ" } }),
+    { status: 302, location: "/settings?error=delete" },
+  ],
+  [
+    "delete with wrong current password is rejected",
+    () => request("/api/auth/delete", { method: "POST", form: { current: "wrong", confirm: "USUŃ" } }),
+    { status: 302, location: "/settings?error=delete-password" },
   ],
   ["login redirects signed-in user", () => request("/login"), { status: 302, location: "/home" }],
   [
@@ -152,8 +162,8 @@ const steps = [
     { status: 302, location: "/home" },
   ],
   [
-    "delete with confirm word removes the account",
-    () => request("/api/auth/delete", { method: "POST", form: { confirm: "USUŃ" } }),
+    "delete with password and confirm word removes the account",
+    () => request("/api/auth/delete", { method: "POST", form: { current: password2, confirm: "USUŃ" } }),
     { status: 302, location: "/login?deleted=1" },
   ],
   [
@@ -179,7 +189,7 @@ const steps = [
   ],
   [
     "delete re-created account (cleanup)",
-    () => request("/api/auth/delete", { method: "POST", form: { confirm: "USUŃ" } }),
+    () => request("/api/auth/delete", { method: "POST", form: { current: password, confirm: "USUŃ" } }),
     { status: 302, location: "/login?deleted=1" },
   ],
   [

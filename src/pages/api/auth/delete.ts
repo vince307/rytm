@@ -1,19 +1,22 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase";
+import { createClient, verifyPassword } from "@/lib/supabase";
 import { DELETE_CONFIRM_WORD } from "@/lib/auth-rules";
 
 export const prerender = false;
 
 const schema = z.object({
+  current: z.string().min(1),
   confirm: z
     .string()
     .trim()
     .refine((v) => v === DELETE_CONFIRM_WORD),
 });
 
-// Self-service account deletion (FR-019): the `delete_own_account` RPC removes the auth.users row
-// (Supabase cascades the identities and sessions), then the local cookies are cleared.
+// Self-service account deletion (FR-019): the current password is verified first (the irreversible
+// action is guarded at least as strongly as the reversible password change), then the
+// `delete_own_account` RPC removes the auth.users row (Supabase cascades the identities and
+// sessions) and the local cookies are cleared.
 export const POST: APIRoute = async (context) => {
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
@@ -27,8 +30,15 @@ export const POST: APIRoute = async (context) => {
   }
   const form = Object.fromEntries(await context.request.formData());
   const parsed = schema.safeParse(form);
-  if (!parsed.success) {
+  if (!parsed.success || !user.email) {
     return context.redirect("/settings?error=delete");
+  }
+  const verified = await verifyPassword(user.email, parsed.data.current);
+  if (verified === null) {
+    return context.redirect("/settings?error=delete");
+  }
+  if (!verified) {
+    return context.redirect("/settings?error=delete-password");
   }
   const { error } = await supabase.rpc("delete_own_account");
   if (error) {

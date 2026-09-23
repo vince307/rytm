@@ -52,7 +52,7 @@ Full server-side rendering (`output: "server"` in astro.config.mjs). All pages a
 
 - Node.js v22.14.0 (see `.nvmrc`)
 - Local Supabase: start Docker Desktop, then `npx supabase start` (project `rytm`; API `:54321`, Studio `:54323`, Mailpit `:54324`). `supabase/seed.sql` runs on every `start` / `db reset` and creates the confirmed test account `test@rytm.local` / `Rytm-Test-Passw0rd!` (fixed UUID `11111111-1111-4111-8111-111111111111`); local signup needs no email confirmation (`enable_confirmations = false`). Seed is local/CI only — `db push` never applies it
-- First local run: `npx supabase start` → `npm run dev` → `npm run smoke` (must be 39/39 PASS, including "seeded test user signs in")
+- First local run: `npx supabase start` → `npm run dev` → `npm run smoke` (must be 41/41 PASS, including "seeded test user signs in")
 - Migrations: `npx supabase start` applies everything in `supabase/migrations/`; after pulling new ones run `npx supabase migration up` (or `db reset`). Reaching the hosted DB is a human step — `npx supabase link --project-ref psqbtvooufapkatpkxlw` (needs a Supabase CLI access token, not just `SUPABASE_DB_PASSWORD`) then `npx supabase db push`, **before** merging the change that depends on them. `db push` never applies `seed.sql`
 - Production deploy: push to `main` → GitHub Actions `deploy` job (`vercel deploy --prebuilt --prod`). Vercel's Git integration is disabled for `main` (`vercel.json`) and only builds previews for other branches/PRs
 - Deployment state and secret inventory: `context/deployment/deploy-plan.md`

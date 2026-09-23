@@ -3,7 +3,7 @@
 ## Hard rules
 
 - Never run `npm run smoke` against production (it creates real users).
-- **Supabase migrations**: `supabase/migrations/` using naming format `YYYYMMDDHHmmss_short_description.sql`. Always enable RLS on new tables with granular per-operation, per-role policies.
+- **Supabase migrations**: `supabase/migrations/` using naming format `YYYYMMDDHHmmss_short_description.sql`. Always enable RLS on new tables with granular per-operation, per-role policies. Every table holding a user's data needs a `user_id` FK to `auth.users(id)` with `on delete cascade` (never `set null`, never a bare uuid) — account deletion (`delete_own_account`) removes only the `auth.users` row and relies on the cascade.
 - **Design kit**: `design/rytm-os/` is read-only; assets via `scripts/sync-kit.sh` → `public/rytm/` + `src/styles/brand.css`; colors only via the Tailwind names `ink`/`paper`/`paper-soft`/`excess`/`excess-text`/`muted`/`line`/`green`; copy from `src/content/copy.ts` (`copy` = kit JSON, `copyExtra` = kit gaps K11); missing UI → gap row in `context/foundation/design-kit.md` + `DESIGN-GAP` comment, never invented.
 - Env vars: `SUPABASE_URL`, `SUPABASE_KEY` (copy `.env.example` to `.env`, gitignored). `.env.example` already holds the local-Supabase values, so a fresh clone runs against Docker, never production. On Vercel they are project env vars (`vercel env ls`), read at runtime through `astro:env/server`
 - Preview deploy from a working tree: `npx vercel` (Vercel Authentication gates previews by default). Never run `vercel --prod` by hand except for an emergency; rollback is `vercel rollback` / `vercel promote <url>` (human-only)

@@ -81,7 +81,7 @@ Plan adherence across all 13 planned changes: no MISSING, no DRIFT, no unjustifi
   - Tradeoff: Still a convention, not a database-level guarantee.
   - Confidence: HIGH — mirrors how the RLS rule is already enforced in this repo.
   - Blind spot: Existing hosted tables outside `supabase/migrations/` were not audited.
-- **Decision**: PENDING
+- **Decision**: FIXED 2026-09-23 — rule added to the Supabase migrations hard rule in `CLAUDE.md` (FK to `auth.users(id)` with `on delete cascade` for every table holding user data). Still a convention; F-01 should verify it per table.
 
 ### F4 — The password-verification session is created and abandoned, never revoked
 

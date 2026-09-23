@@ -41,7 +41,7 @@ Pieniądze cicho uciekają z konta, a kategoryzacja banku nie odpowiada na pytan
 
 | ID   | Change ID                    | Outcome (user can …)                                                                                        | Prerequisites | PRD refs                               | Status      |
 | ---- | ---------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------- | -------------------------------------- | ----------- |
-| F-01 | domain-schema-rls            | (foundation) pierwsza migracja: importy, transakcje, wzorce z RLS per konto i kaskadą                       | —             | FR-002, FR-019, NFR izolacja           | in-progress |
+| F-01 | domain-schema-rls            | (foundation) pierwsza migracja: importy i transakcje z RLS per konto i kaskadą                              | —             | FR-002, FR-019, NFR izolacja           | in-progress |
 | F-02 | synthetic-ing-fixture        | (foundation) syntetyczny wyciąg ING z pułapkami jako fixture testów i seed demo                             | —             | FR-014, NFR prywatność                 | ready       |
 | S-01 | ing-csv-import               | wgrać CSV z ING (jeden rachunek, obciążenia), zobaczyć wynik importu; nakładający się zakres jest odrzucony | F-01, F-02    | US-01, FR-003, FR-005, FR-002          | proposed    |
 | S-02 | undo-import                  | zobaczyć listę importów i cofnąć błędny import wraz z jego transakcjami                                     | S-01          | US-02, FR-004                          | proposed    |
@@ -80,7 +80,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ### F-01: Schemat domeny z izolacją per konto
 
-- **Outcome:** (foundation) pierwsza migracja istnieje i jest zastosowana lokalnie i na hostowanej bazie: tabele importów, transakcji i wzorców sprzedawców należą do konta (RLS per operację, per rolę) i kasują się kaskadowo z kontem; ustalona jest ścieżka „migracja lokalnie → `db push` na produkcję”.
+- **Outcome:** (foundation) pierwsza migracja istnieje i jest zastosowana lokalnie i na hostowanej bazie: tabele importów i transakcji należą do konta (RLS per operację, per rolę) i kasują się kaskadowo z kontem; ustalona jest ścieżka „migracja lokalnie → `db push` na produkcję”.
 - **Change ID:** domain-schema-rls
 - **PRD refs:** FR-002, FR-019, NFR „prawo do usunięcia”, Access Control (model płaski, wielokontowy)
 - **Unlocks:** S-01 (bez tabel nie ma importu), S-08 (kaskada czyni „usunięcie usuwa wszystkie dane” prawdą bez kodu aplikacyjnego), ścieżka weryfikacji izolacji FR-002 (test: drugie konto nie widzi cudzych importów)
@@ -142,7 +142,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:**
   - Jaka jakość grupowania wychodzi na prawdziwym wyciągu (nie na fixture)? — Owner: user. Block: no (sprawdzane lokalnie po implementacji; błędy naprawia S-05).
-- **Risk:** Rdzeń produktu („cały projekt ukryty w jednej linii” FR-006); sekwencjonowane zaraz po imporcie, żeby największa niewiadoma wyszła przed budową progów, a F-02 daje mierzalny wynik zamiast wrażenia.
+- **Risk:** Rdzeń produktu („cały projekt ukryty w jednej linii” FR-006); sekwencjonowane zaraz po imporcie, żeby największa niewiadoma wyszła przed budową progów, a F-02 daje mierzalny wynik zamiast wrażenia; S-03 dodaje własną migrację tabeli sprzedawców/wzorców (F-01 tworzy tylko importy i transakcje), z tą samą regułą RLS i kaskady.
 - **Status:** proposed
 
 ### S-04: Próg na wzorcu i „ponad próg”

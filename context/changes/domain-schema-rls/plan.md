@@ -274,27 +274,27 @@ Tabele są nowe i puste na produkcji — brak migracji danych. Wycofanie przed p
 
 #### Automated
 
-- [x] 1.1 `npx supabase db reset` stosuje obie migracje i seed bez błędów
-- [x] 1.2 `npx supabase test db` przechodzi (wszystkie asercje pgTAP)
-- [x] 1.3 `npm run smoke` 41/41 PASS (bez regresji auth/usunięcia konta)
-- [x] 1.4 `npm run lint` i `npx astro check` przechodzą
+- [x] 1.1 `npx supabase db reset` stosuje obie migracje i seed bez błędów — 10929f3
+- [x] 1.2 `npx supabase test db` przechodzi (wszystkie asercje pgTAP) — 10929f3
+- [x] 1.3 `npm run smoke` 41/41 PASS (bez regresji auth/usunięcia konta) — 10929f3
+- [x] 1.4 `npm run lint` i `npx astro check` przechodzą — 10929f3
 
 #### Manual
 
-- [x] 1.5 Przegląd SQL migracji: user_id z kaskadą, RLS, polityki select/insert/delete tylko dla authenticated, brak update
-- [x] 1.6 Studio pokazuje obie tabele z RLS enabled i constraint `imports_no_overlap`
+- [x] 1.5 Przegląd SQL migracji: user_id z kaskadą, RLS, polityki select/insert/delete tylko dla authenticated, brak update — 10929f3
+- [x] 1.6 Studio pokazuje obie tabele z RLS enabled i constraint `imports_no_overlap` — 10929f3
 
 ### Phase 2: Typowany klient i dokumentacja
 
 #### Automated
 
-- [ ] 2.1 `npm run db:types` odtwarza `src/db/database.types.ts` bez różnic
-- [ ] 2.2 `npm run lint`, `npx astro check` i `npm run build` przechodzą
-- [ ] 2.3 `npm run smoke` 41/41 PASS
+- [x] 2.1 `npm run db:types` odtwarza `src/db/database.types.ts` bez różnic
+- [x] 2.2 `npm run lint`, `npx astro check` i `npm run build` przechodzą
+- [x] 2.3 `npm run smoke` 41/41 PASS
 
 #### Manual
 
-- [ ] 2.4 `CLAUDE.md` i roadmapa opisują stan po zmianie
+- [x] 2.4 `CLAUDE.md` i roadmapa opisują stan po zmianie
 
 ### Phase 3: Wdrożenie na hostowaną bazę
 

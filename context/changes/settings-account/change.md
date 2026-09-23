@@ -1,7 +1,7 @@
 ---
 change_id: settings-account
 title: Settings account
-status: implemented
+status: impl_reviewed
 created: 2026-09-21
 updated: 2026-09-22
 archived_at: null

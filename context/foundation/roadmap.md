@@ -3,7 +3,7 @@ project: Rytm
 version: 1
 status: draft
 created: 2026-09-21
-updated: 2026-09-21
+updated: 2026-09-23
 prd_version: 1
 main_goal: quality
 top_blocker: none
@@ -50,7 +50,7 @@ Pieniądze cicho uciekają z konta, a kategoryzacja banku nie odpowiada na pytan
 | S-05 | durable-pattern-decisions    | scalić, wykluczyć, zmienić typ i nazwę wzorca, a decyzje przetrwają kolejny import                          | S-03          | US-03, FR-009                          | proposed |
 | S-06 | fixed-cost-changes           | zobaczyć, które wzorce stałe zmieniły kwotę i które są nowe względem poprzedniego miesiąca                  | S-03          | US-04, FR-012                          | proposed |
 | S-07 | over-limit-trend             | zobaczyć sumę „ponad progiem” per miesiąc według dzisiejszych progów                                        | S-04          | US-05, FR-013                          | proposed |
-| S-08 | settings-account             | zobaczyć swoje konto, zmienić hasło i samodzielnie usunąć konto wraz z danymi                               | —             | FR-001, FR-019, NFR prawo do usunięcia | in-progress    |
+| S-08 | settings-account             | zobaczyć swoje konto, zmienić hasło i samodzielnie usunąć konto wraz z danymi                               | —             | FR-001, FR-019, NFR prawo do usunięcia | done     |
 | S-09 | public-demo-seed             | wejść na publiczną instancję i zobaczyć zaimportowany syntetyczny wyciąg bez prawdziwych danych             | F-02, S-03    | FR-014, NFR prywatność                 | proposed |
 
 ## Streams
@@ -203,7 +203,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Jedyny konieczny wycinek bez wymagań wstępnych, więc naturalny kandydat do pracy równoległej od zaraz; reguła „każda tabela domenowa kasuje się kaskadowo z kontem” musi obowiązywać w F-01 i każdym późniejszym wycinku, inaczej FR-019 przestanie być prawdą wraz z pierwszą nową tabelą.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-09: Publiczna instancja na syntetycznym wyciągu
 
@@ -262,3 +262,5 @@ Foundations below assume these are present and do NOT re-scaffold them.
 ## Done
 
 (Empty on first generation. `/10x-archive` appends an entry here — and flips that item's `Status` to `done` — when a change whose `Change ID` matches the item is archived. Do NOT pre-populate.)
+
+- **S-08: Użytkownik może zobaczyć swoje konto (e-mail, zmiana hasła, nota o przetwarzaniu danych) i samodzielnie usunąć konto po potwierdzeniu; usunięcie kasuje wszystkie jego dane bez śladu, a ponowne logowanie tym hasłem jest niemożliwe.** — Archived 2026-09-23 → `context/archive/2026-09-21-settings-account/`. Lesson: —.

@@ -39,19 +39,19 @@ Pieniądze cicho uciekają z konta, a kategoryzacja banku nie odpowiada na pytan
 
 ## At a glance
 
-| ID   | Change ID                    | Outcome (user can …)                                                                                        | Prerequisites | PRD refs                               | Status   |
-| ---- | ---------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------- | -------------------------------------- | -------- |
-| F-01 | domain-schema-rls            | (foundation) pierwsza migracja: importy, transakcje, wzorce z RLS per konto i kaskadą                       | —             | FR-002, FR-019, NFR izolacja           | ready    |
-| F-02 | synthetic-ing-fixture        | (foundation) syntetyczny wyciąg ING z pułapkami jako fixture testów i seed demo                             | —             | FR-014, NFR prywatność                 | ready    |
-| S-01 | ing-csv-import               | wgrać CSV z ING (jeden rachunek, obciążenia), zobaczyć wynik importu; nakładający się zakres jest odrzucony | F-01, F-02    | US-01, FR-003, FR-005, FR-002          | proposed |
-| S-02 | undo-import                  | zobaczyć listę importów i cofnąć błędny import wraz z jego transakcjami                                     | S-01          | US-02, FR-004                          | proposed |
-| S-03 | merchant-patterns            | zobaczyć listę wzorców: sprzedawca, typ, liczba wystąpień, suma, kwota dla stałych                          | S-01, F-02    | US-01, FR-006, FR-007                  | proposed |
-| S-04 | pattern-threshold-over-limit | otworzyć wzorzec, zobaczyć jego transakcje, ustawić próg i zobaczyć „ponad próg” z sumą miesiąca            | S-03          | US-01, FR-008, FR-010, FR-011          | proposed |
-| S-05 | durable-pattern-decisions    | scalić, wykluczyć, zmienić typ i nazwę wzorca, a decyzje przetrwają kolejny import                          | S-03          | US-03, FR-009                          | proposed |
-| S-06 | fixed-cost-changes           | zobaczyć, które wzorce stałe zmieniły kwotę i które są nowe względem poprzedniego miesiąca                  | S-03          | US-04, FR-012                          | proposed |
-| S-07 | over-limit-trend             | zobaczyć sumę „ponad progiem” per miesiąc według dzisiejszych progów                                        | S-04          | US-05, FR-013                          | proposed |
-| S-08 | settings-account             | zobaczyć swoje konto, zmienić hasło i samodzielnie usunąć konto wraz z danymi                               | —             | FR-001, FR-019, NFR prawo do usunięcia | done     |
-| S-09 | public-demo-seed             | wejść na publiczną instancję i zobaczyć zaimportowany syntetyczny wyciąg bez prawdziwych danych             | F-02, S-03    | FR-014, NFR prywatność                 | proposed |
+| ID   | Change ID                    | Outcome (user can …)                                                                                        | Prerequisites | PRD refs                               | Status      |
+| ---- | ---------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------- | -------------------------------------- | ----------- |
+| F-01 | domain-schema-rls            | (foundation) pierwsza migracja: importy, transakcje, wzorce z RLS per konto i kaskadą                       | —             | FR-002, FR-019, NFR izolacja           | in-progress |
+| F-02 | synthetic-ing-fixture        | (foundation) syntetyczny wyciąg ING z pułapkami jako fixture testów i seed demo                             | —             | FR-014, NFR prywatność                 | ready       |
+| S-01 | ing-csv-import               | wgrać CSV z ING (jeden rachunek, obciążenia), zobaczyć wynik importu; nakładający się zakres jest odrzucony | F-01, F-02    | US-01, FR-003, FR-005, FR-002          | proposed    |
+| S-02 | undo-import                  | zobaczyć listę importów i cofnąć błędny import wraz z jego transakcjami                                     | S-01          | US-02, FR-004                          | proposed    |
+| S-03 | merchant-patterns            | zobaczyć listę wzorców: sprzedawca, typ, liczba wystąpień, suma, kwota dla stałych                          | S-01, F-02    | US-01, FR-006, FR-007                  | proposed    |
+| S-04 | pattern-threshold-over-limit | otworzyć wzorzec, zobaczyć jego transakcje, ustawić próg i zobaczyć „ponad próg” z sumą miesiąca            | S-03          | US-01, FR-008, FR-010, FR-011          | proposed    |
+| S-05 | durable-pattern-decisions    | scalić, wykluczyć, zmienić typ i nazwę wzorca, a decyzje przetrwają kolejny import                          | S-03          | US-03, FR-009                          | proposed    |
+| S-06 | fixed-cost-changes           | zobaczyć, które wzorce stałe zmieniły kwotę i które są nowe względem poprzedniego miesiąca                  | S-03          | US-04, FR-012                          | proposed    |
+| S-07 | over-limit-trend             | zobaczyć sumę „ponad progiem” per miesiąc według dzisiejszych progów                                        | S-04          | US-05, FR-013                          | proposed    |
+| S-08 | settings-account             | zobaczyć swoje konto, zmienić hasło i samodzielnie usunąć konto wraz z danymi                               | —             | FR-001, FR-019, NFR prawo do usunięcia | done        |
+| S-09 | public-demo-seed             | wejść na publiczną instancję i zobaczyć zaimportowany syntetyczny wyciąg bez prawdziwych danych             | F-02, S-03    | FR-014, NFR prywatność                 | proposed    |
 
 ## Streams
 
@@ -89,7 +89,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Sekwencjonowane pierwsze, bo warstwa danych jest `absent`, a niesie 12 z 15 koniecznych FR; zakres ograniczony do encji potrzebnych przez S-01 i S-03 (progi i decyzje użytkownika dochodzą w S-04 i S-05), żeby nie budować całej warstwy przed pierwszym widocznym przepływem.
-- **Status:** ready
+- **Status:** in-progress
 
 ### F-02: Syntetyczny wyciąg ING z pułapkami
 

@@ -42,6 +42,9 @@ jobs:
         run: |
           supabase start -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,realtime,storage-api,postgres-meta,supavisor
           supabase status -o env | grep -E '^(API_URL|ANON_KEY)=' > supabase.env
+      # pgTAP (supabase/tests/database/): RLS isolation, FR-005 and the FR-019 cascade gate the deploy.
+      - name: Run database tests
+        run: supabase test db
       - name: Configure secrets for the dev server
         run: |
           source supabase.env

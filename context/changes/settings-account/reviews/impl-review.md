@@ -53,7 +53,7 @@ Plan adherence across all 13 planned changes: no MISSING, no DRIFT, no unjustifi
   - Tradeoff: Leaves the inverted-guardrail property permanently, with no record of why.
   - Confidence: MEDIUM — defensible for a personal-finance MVP, weaker once real money data lands (F-01).
   - Blind spot: No threat model for this app has been written down.
-- **Decision**: PENDING
+- **Decision**: FIXED 2026-09-23 (Fix A) — `verifyPassword()` in `src/lib/supabase.ts`; `delete.ts` requires `current`, wrong password → `?error=delete-password`; dialog field under G24; smoke 41/41. Residual: `delete_own_account` is still callable directly over PostgREST by any signed-in session (XSS path) — closing it needs a migration that verifies the password inside the function.
 
 ### F2 — Hosted migration ledger does not exist; the next migration will be mis-applied
 
@@ -67,7 +67,7 @@ Plan adherence across all 13 planned changes: no MISSING, no DRIFT, no unjustifi
   - Tradeoff: Requires the owner to obtain a Supabase CLI access token first.
   - Confidence: HIGH — `migration repair` exists precisely for hand-applied migrations.
   - Blind spot: Not verified against this exact CLI version.
-- **Decision**: PENDING
+- **Decision**: FIXED 2026-09-23 — `supabase migration list` against the linked hosted project shows `20260921120000` as applied remotely; the ledger exists.
 
 ### F3 — The "no trace" promise rests on a convention nothing enforces
 
@@ -91,7 +91,7 @@ Plan adherence across all 13 planned changes: no MISSING, no DRIFT, no unjustifi
 - **Location**: src/pages/api/auth/password.ts:35-41
 - **Detail**: `signInWithPassword` on the stateless verifier mints a real GoTrue session and refresh token server-side. The tokens are dropped rather than revoked, so every password-change attempt leaves an orphan row in `auth.sessions`/`auth.refresh_tokens` valid for its full refresh lifetime. The window is widest when verification succeeds but `updateUser` then fails (`:43-47`), where nothing downstream can clean up.
 - **Fix**: `await verifier.auth.signOut({ scope: "local" });` immediately after the check — `scope: "local"` revokes only the throwaway session, never the caller's.
-- **Decision**: PENDING
+- **Decision**: FIXED 2026-09-23 — `verifyPassword()` revokes the throwaway session with `signOut({ scope: "local" })`; measured locally: sign-in + 3 verified checks with a failing `updateUser` leaves 1 session (4 before the fix).
 
 ### F5 — The delete dialog's accessible description is a dangling reference
 

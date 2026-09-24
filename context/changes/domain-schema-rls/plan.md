@@ -300,11 +300,11 @@ Tabele są nowe i puste na produkcji — brak migracji danych. Wycofanie przed p
 
 #### Automated
 
-- [x] 3.1 GitHub Actions `ci` → `smoke` (z `supabase test db`) → `deploy` zielone na `main`
+- [x] 3.1 GitHub Actions `ci` → `smoke` (z `supabase test db`) → `deploy` zielone na `main` — 80f3873
 
 #### Manual
 
-- [x] 3.2 `npx supabase migration list` pokazuje nową migrację po obu stronach
-- [x] 3.3 Hostowana baza: RLS i polityki select/insert/delete dla authenticated na obu tabelach
-- [x] 3.4 Produkcyjne usunięcie jednorazowego konta nadal kończy się `/login?deleted=1`
-- [x] 3.5 `deploy-plan.md` opisuje stan po wdrożeniu
+- [x] 3.2 `npx supabase migration list` pokazuje nową migrację po obu stronach — 80f3873
+- [x] 3.3 Hostowana baza: RLS i polityki select/insert/delete dla authenticated na obu tabelach — 80f3873
+- [x] 3.4 Produkcyjne usunięcie jednorazowego konta nadal kończy się `/login?deleted=1` — 80f3873
+- [x] 3.5 `deploy-plan.md` opisuje stan po wdrożeniu — 80f3873

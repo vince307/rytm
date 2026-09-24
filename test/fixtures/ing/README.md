@@ -9,13 +9,14 @@ eksportem (tylko maski pól, cudzysłowy i liczniki — bez wartości):
 
 - cp1250 bez BOM, końce linii LF, separator `;`, 21 pól w wierszu danych i nagłówku (pola 15–20 puste);
 - preambuła o zmiennej długości (18 linii + 1 na rachunek): nagłówek banku, `Dokument nr …`, `Wygenerowany dnia: …`,
-  `Dane Użytkownika:`, `Wybrane rachunki:` (`"<nazwa> (PLN)";;"<numer> ";`), `Zakres dat:` / `Liczba transakcji:`,
+  `Dane Użytkownika:`, `Wybrane rachunki:` (`"<nazwa> (PLN)";;"<numer>";`), `Zakres dat:` / `Liczba transakcji:`,
   `Suma uznań (N):` / `Suma obciążeń (N):` (kwoty bez znaku, bez cudzysłowu); przy 2 rachunkach nagłówek kolumn
   od `"Data transakcji"` jest w linii 20 — parser ma go szukać, nie liczyć linii;
 - mieszane cudzysłowy: daty, kwota, waluta, `Nr rachunku` (`'<cyfry> '`) i `Nr transakcji` (`'<18 cyfr>'`) bez `"`;
-  `Dane kontrahenta` ze spacją na końcu, `Tytuł` ze spacją na początku, `Szczegóły` z dwiema spacjami po typie
+  `Dane kontrahenta` ze spacją na początku i na końcu, `Tytuł` ze spacją na początku, `Szczegóły` z dwiema spacjami po typie
   (`PRZ SP Ref SP: <ref> ` przy split payment), `Konto` = nazwa rachunku bez ` (PLN)`;
-- `TR.BLIK` prawie zawsze bez `Nr rachunku` i `Nazwa banku`; stopka `Dokument ma charakter informacyjny…`.
+- cudzysłów wewnątrz `Dane kontrahenta` nie jest podwajany (`" PHU "NAZWA" … "`) — pole kończy `"` przed `;` lub końcem linii;
+- `TR.BLIK` prawie zawsze bez `Nr rachunku` i `Nazwa banku`; stopka `"Dokument ma charakter informacyjny…";` po 2 pustych liniach.
 
 Wszystkie nazwy, numery, kwoty i daty są wymyślone — żadna wartość nie pochodzi z prawdziwego wyciągu
 (jedyny prawdziwy napis to nagłówek banku w linii 1).
@@ -24,10 +25,13 @@ Wszystkie nazwy, numery, kwoty i daty są wymyślone — żadna wartość nie po
 
 | Plik | Oczekiwany wynik |
 |---|---|
-| `Lista_transakcji_nr_0000123456_010926.csv` | ok; rachunek domyślny `Rachunek Firmowy Główny`, 231 wierszy, import 203 obciążeń, suma 64763,97 zł |
-| `expected.json` | klucz odpowiedzi: `files`, `rows` (każdy wiersz danych), `patterns` (oczekiwane wzorce) |
+| `Lista_transakcji_nr_0000123456_010926.csv` | ok; rachunek domyślny `Rachunek Firmowy Główny`, 234 wierszy, import 206 obciążeń, suma 64971,47 zł |
+| `Lista_transakcji_nr_0000123457_011026-overlap.csv` | reject (`overlap`): zakres nachodzi na główny wyciąg przy tym samym numerze rachunku; odrzucenie dopiero po zaimportowaniu głównego (FR-005, `imports_no_overlap`); wiersze danych: 7, zakres 2026-08-01 – 2026-09-30 |
+| `Lista_transakcji_nr_0000098765_011024-no-header.csv` | reject (`no-header`): brak wiersza nagłówka `"Data transakcji"` — preambuła przechodzi wprost w wiersze danych (reguła 1); wiersze danych: 4, zakres 2024-09-01 – 2024-09-30 |
+| `Lista_transakcji_nr_0000099876_021124-currency.csv` | reject (`currency`): jeden wiersz z `Waluta` = `EUR` (reguła 5); wiersze danych: 4, zakres 2024-10-01 – 2024-10-31 |
+| `expected.json` | klucz odpowiedzi: `files`, `rows` (każdy wiersz danych plików `ok`), `patterns` (oczekiwane wzorce) |
 
-Zakres głównego wyciągu: 2025-09-01 – 2026-08-31; rachunki: Rachunek Firmowy Główny (219), Rachunek VAT (12).
+Zakres głównego wyciągu: 2025-09-01 – 2026-08-31; rachunki: Rachunek Firmowy Główny (222), Rachunek VAT (12).
 
 ## Klucz odpowiedzi (`expected.json`)
 
@@ -39,6 +43,10 @@ Zakres głównego wyciągu: 2025-09-01 – 2026-08-31; rachunki: Rachunek Firmow
   `user-merge` / `user-exclude` (decyzje FR-009), `rawMerchants` = surowi sprzedawcy scaleni we wzorzec.
 - `files[].accounts[]` — `name` jak w kolumnie `Konto`, `preambleName` jak w preambule (z ` (PLN)`), `number` bez spacji;
   `imported.sumMinor` — suma importowanych obciążeń (dodatnia).
+- `files[].expect` — `ok` albo `reject` z `reason`: `overlap` (zakres nachodzi na plik z `overlapsWith` przy tym
+  samym numerze rachunku — odrzucenie dopiero po zaimportowaniu tamtego), `no-header` (brak wiersza
+  `"Data transakcji"`), `currency` (`Waluta` ≠ `PLN`). Plik `reject` nie importuje niczego (`imported.count` = 0),
+  a jego wiersze nie trafiają do `rows[]` ani `patterns[]`; poza swoją wadą ma ten sam kształt co główny wyciąg.
 
 ## Pułapki
 
@@ -46,24 +54,25 @@ Wiersze pułapki: `rows[]` z danym identyfikatorem w `traps`; wzorce: `patterns[
 
 | ID | Pułapka | Oczekiwany wynik | Linie w głównym pliku |
 |---|---|---|---|
-| T01 | Ten sam sprzedawca w dwóch zapisach (`sportowo.pl …` vs `SPORTOWO SP. Z O.O. …`) | jeden wzorzec, user-merge | 50, 75, 106, 126, 132, 167, 195, 216, 242 |
-| T02 | Nazwa sklepu zdublowana w kontrahencie (`PIEKARNIA KŁOSEK PIEKARNIA KŁOSEK …`) | jeden wzorzec, normalization | 43, 93, 142, 170, 203, 249 |
-| T03 | Sieć z numerem placówki, dwie placówki (`MINIMARKET PRZYSTANEK 0412/1187`) | jeden wzorzec, normalization | 28, 62, 101, 137, 155, 182, 213, 240 |
-| T04 | Operator płatności z domeną sprzedawcy w końcówce `Tytułu` BLIK | surowy sprzedawca = domena (D3), import | 40, 58, 60, 66, 80, 87, 102, 115, 122, 144, 145, 146, 161, 162, 165, 177, 188, 196, 209, 212, 230, 233, 251 |
-| T05 | Operator bez domeny w `Tytule` (Autopay) | surowy sprzedawca = kontrahent ze zwiniętymi spacjami | 114, 198 |
-| T06 | Przelew własny między rachunkami: para ±, to samo `Nr transakcji`, różne `Konto` | obciążenie na głównym importowane, strona VAT pominięta (D1) | 69, 70, 150, 151, 222, 223 |
-| T07 | Split payment VAT (`PRZ SP Ref SP: …`), para na głównym i VAT | obciążenie na głównym importowane, strona VAT pominięta (D1) | 63, 64, 128, 129, 178, 179, 236, 237 |
-| T08 | Powtarzalny przelew na własne konto w innym banku (D8) | wzorzec, user-exclude | 30, 51, 73, 96, 116, 138, 156, 169, 189, 206, 225, 243 |
-| T09 | Opłaty US/ZUS, powtarzalne, zmienna kwota | frequent | 23, 31, 47, 52, 65, 74, 90, 97, 112, 117, 133, 139, 148, 157, 166, 171, 180, 190, 200, 207, 218, 226, 239, 244 |
-| T10 | Abonament ze stałą kwotą | fixed | 33, 54, 76, 98, 118, 141, 158, 172, 192, 210, 228, 247 |
-| T11 | Abonament z jedną podwyżką ~12% | jeden wzorzec fixed przy D5 | 27, 49, 67, 91, 113, 134, 149, 168, 183, 202, 221, 241 |
-| T12 | Sprzedawca z rozrzutem ~45% | frequent | 22, 48, 81, 109, 125, 153, 176, 197, 220, 234 |
-| T13 | Zwrot BLIK (kwota dodatnia, `Zwrot transakcji BLIK … Nr zwrotu …`) | pominięty, skipReason credit (D2) | 126, 184 |
-| T14 | PayPal jako pośrednik | sprzedawca nieprzezroczysty (FR-014) | 38, 119, 163, 227 |
-| T15 | Allegro | sprzedawca nieprzezroczysty (D3) | 42, 95, 147, 184, 193, 201, 245 |
+| T01 | Ten sam sprzedawca w dwóch zapisach (`sportowo.pl …` vs `SPORTOWO SP. Z O.O. …`) | jeden wzorzec, user-merge | 50, 75, 107, 127, 133, 169, 197, 219, 245 |
+| T02 | Nazwa sklepu zdublowana w kontrahencie (`PIEKARNIA KŁOSEK PIEKARNIA KŁOSEK …`) | jeden wzorzec, normalization | 43, 94, 143, 172, 205, 252 |
+| T03 | Sieć z numerem placówki, dwie placówki (`MINIMARKET PRZYSTANEK 0412/1187`) | jeden wzorzec, normalization | 28, 62, 102, 138, 157, 184, 216, 243 |
+| T04 | Operator płatności z domeną sprzedawcy w końcówce `Tytułu` BLIK | surowy sprzedawca = domena (D3), import | 40, 58, 60, 66, 80, 88, 103, 116, 123, 145, 146, 147, 163, 164, 167, 179, 190, 198, 211, 215, 233, 236, 254 |
+| T05 | Operator bez domeny w `Tytule` (Autopay) | surowy sprzedawca = kontrahent ze zwiniętymi spacjami | 115, 200 |
+| T06 | Przelew własny między rachunkami: para ±, to samo `Nr transakcji`, różne `Konto` | obciążenie na głównym importowane, strona VAT pominięta (D1) | 69, 70, 152, 153, 225, 226 |
+| T07 | Split payment VAT (`PRZ SP Ref SP: …`), para na głównym i VAT | obciążenie na głównym importowane, strona VAT pominięta (D1) | 63, 64, 129, 130, 180, 181, 239, 240 |
+| T08 | Powtarzalny przelew na własne konto w innym banku (D8) | wzorzec, user-exclude | 30, 51, 73, 97, 117, 139, 158, 171, 191, 208, 228, 246 |
+| T09 | Opłaty US/ZUS, powtarzalne, zmienna kwota | frequent | 23, 31, 47, 52, 65, 74, 91, 98, 113, 118, 134, 140, 150, 159, 168, 173, 182, 192, 202, 209, 221, 229, 242, 247 |
+| T10 | Abonament ze stałą kwotą | fixed | 33, 54, 76, 99, 119, 142, 160, 174, 194, 212, 231, 250 |
+| T11 | Abonament z jedną podwyżką ~12% | jeden wzorzec fixed przy D5 | 27, 49, 67, 92, 114, 135, 151, 170, 185, 204, 224, 244 |
+| T12 | Sprzedawca z rozrzutem ~45% | frequent | 22, 48, 82, 110, 126, 155, 178, 199, 223, 237 |
+| T13 | Zwrot BLIK (kwota dodatnia, `Zwrot transakcji BLIK … Nr zwrotu …`) | pominięty, skipReason credit (D2) | 127, 186 |
+| T14 | PayPal jako pośrednik | sprzedawca nieprzezroczysty (FR-014) | 38, 120, 165, 230 |
+| T15 | Allegro | sprzedawca nieprzezroczysty (D3) | 42, 96, 149, 186, 195, 203, 248 |
 | T16 | Nowy wzorzec stały tylko w ostatnim miesiącu | fixed, firstMonth 2026-08 (D6) | 36 |
-| T17 | Uznania (przelew przychodzący, P.BLIK przychodzący) | pominięte, skipReason credit | 37, 57, 79, 85, 100, 121, 143, 159, 175, 194, 208, 211, 231, 250 |
-| T18 | Wiersze rachunku VAT poza parami T06/T07 | pominięte, skipReason other-account (D1) | 45, 110, 154, 164, 215 |
+| T17 | Uznania (przelew przychodzący, P.BLIK przychodzący) | pominięte, skipReason credit | 37, 57, 79, 86, 101, 122, 144, 161, 177, 196, 210, 213, 234, 253 |
+| T18 | Wiersze rachunku VAT poza parami T06/T07 | pominięte, skipReason other-account (D1) | 45, 111, 156, 166, 218 |
+| T19 | Cudzysłów w nazwie kontrahenta bez escapowania (ING nie podwaja `"`) | parser czyta pole łagodnie: `"` zamyka pole tylko przed `;` lub końcem linii; wzorzec, normalization | 81, 148, 214 |
 
 Pozostałe wiersze to szum (`TR.BLIK`, `P.BLIK`) z zasianego PRNG — też mają wpisy w `rows[]` i `patterns[]`.
 

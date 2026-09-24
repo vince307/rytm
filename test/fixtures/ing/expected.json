@@ -14,7 +14,7 @@
           "name": "Rachunek Firmowy Główny",
           "preambleName": "Rachunek Firmowy Główny (PLN)",
           "number": "11111100000000000000000001",
-          "rows": 219
+          "rows": 222
         },
         {
           "name": "Rachunek VAT",
@@ -28,10 +28,77 @@
         "start": "2025-09-01",
         "end": "2026-08-31"
       },
-      "declaredCount": 231,
+      "declaredCount": 234,
       "imported": {
-        "count": 203,
-        "sumMinor": 6476397
+        "count": 206,
+        "sumMinor": 6497147
+      }
+    },
+    "Lista_transakcji_nr_0000123457_011026-overlap.csv": {
+      "expect": "reject",
+      "reason": "overlap",
+      "accounts": [
+        {
+          "name": "Rachunek Firmowy Główny",
+          "preambleName": "Rachunek Firmowy Główny (PLN)",
+          "number": "11111100000000000000000001",
+          "rows": 7
+        }
+      ],
+      "defaultAccount": "Rachunek Firmowy Główny",
+      "period": {
+        "start": "2026-08-01",
+        "end": "2026-09-30"
+      },
+      "declaredCount": 7,
+      "imported": {
+        "count": 0,
+        "sumMinor": 0
+      },
+      "overlapsWith": "Lista_transakcji_nr_0000123456_010926.csv"
+    },
+    "Lista_transakcji_nr_0000098765_011024-no-header.csv": {
+      "expect": "reject",
+      "reason": "no-header",
+      "accounts": [
+        {
+          "name": "Rachunek Firmowy Główny",
+          "preambleName": "Rachunek Firmowy Główny (PLN)",
+          "number": "11111100000000000000000001",
+          "rows": 4
+        }
+      ],
+      "defaultAccount": "Rachunek Firmowy Główny",
+      "period": {
+        "start": "2024-09-01",
+        "end": "2024-09-30"
+      },
+      "declaredCount": 4,
+      "imported": {
+        "count": 0,
+        "sumMinor": 0
+      }
+    },
+    "Lista_transakcji_nr_0000099876_021124-currency.csv": {
+      "expect": "reject",
+      "reason": "currency",
+      "accounts": [
+        {
+          "name": "Rachunek Firmowy Główny",
+          "preambleName": "Rachunek Firmowy Główny (PLN)",
+          "number": "11111100000000000000000001",
+          "rows": 4
+        }
+      ],
+      "defaultAccount": "Rachunek Firmowy Główny",
+      "period": {
+        "start": "2024-10-01",
+        "end": "2024-10-31"
+      },
+      "declaredCount": 4,
+      "imported": {
+        "count": 0,
+        "sumMinor": 0
       }
     }
   },
@@ -39,7 +106,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 21,
-      "bankTxId": "310400000000233020",
+      "bankTxId": "310400000000236170",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-29",
       "amountMinor": -30441,
@@ -52,7 +119,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 22,
-      "bankTxId": "310400000000232787",
+      "bankTxId": "310400000000235826",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-22",
       "amountMinor": -5600,
@@ -67,7 +134,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 23,
-      "bankTxId": "310400000000231072",
+      "bankTxId": "310400000000234111",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-20",
       "amountMinor": -84700,
@@ -82,7 +149,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 24,
-      "bankTxId": "310400000000230352",
+      "bankTxId": "310400000000233502",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-18",
       "amountMinor": -6707,
@@ -95,7 +162,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 25,
-      "bankTxId": "310400000000229672",
+      "bankTxId": "310400000000232822",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-18",
       "amountMinor": -24418,
@@ -108,7 +175,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 26,
-      "bankTxId": "310400000000228806",
+      "bankTxId": "310400000000231956",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-18",
       "amountMinor": -11476,
@@ -121,7 +188,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 27,
-      "bankTxId": "310400000000227352",
+      "bankTxId": "310400000000230391",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-17",
       "amountMinor": -5599,
@@ -136,7 +203,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 28,
-      "bankTxId": "310400000000226676",
+      "bankTxId": "310400000000229715",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-14",
       "amountMinor": -2710,
@@ -151,7 +218,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 29,
-      "bankTxId": "310400000000225175",
+      "bankTxId": "310400000000228325",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-14",
       "amountMinor": -6899,
@@ -164,7 +231,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 30,
-      "bankTxId": "310400000000224537",
+      "bankTxId": "310400000000227576",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-11",
       "amountMinor": -150000,
@@ -179,7 +246,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 31,
-      "bankTxId": "310400000000223412",
+      "bankTxId": "310400000000226451",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-10",
       "amountMinor": -151230,
@@ -194,7 +261,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 32,
-      "bankTxId": "310400000000222544",
+      "bankTxId": "310400000000225694",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-10",
       "amountMinor": -28610,
@@ -207,7 +274,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 33,
-      "bankTxId": "310400000000221830",
+      "bankTxId": "310400000000224869",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-08",
       "amountMinor": -2499,
@@ -222,7 +289,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 34,
-      "bankTxId": "310400000000220665",
+      "bankTxId": "310400000000223815",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-08",
       "amountMinor": -2564,
@@ -235,7 +302,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 35,
-      "bankTxId": "310400000000219059",
+      "bankTxId": "310400000000222209",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-07",
       "amountMinor": -2601,
@@ -248,7 +315,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 36,
-      "bankTxId": "310400000000218086",
+      "bankTxId": "310400000000221125",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-05",
       "amountMinor": -12900,
@@ -263,7 +330,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 37,
-      "bankTxId": "310400000000217517",
+      "bankTxId": "310400000000220556",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-05",
       "amountMinor": 1021000,
@@ -278,7 +345,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 38,
-      "bankTxId": "310400000000216764",
+      "bankTxId": "310400000000219803",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-03",
       "amountMinor": -2199,
@@ -293,7 +360,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 39,
-      "bankTxId": "310400000000215342",
+      "bankTxId": "310400000000218492",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-03",
       "amountMinor": -12065,
@@ -306,7 +373,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 40,
-      "bankTxId": "310400000000214112",
+      "bankTxId": "310400000000217151",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-02",
       "amountMinor": -3900,
@@ -321,7 +388,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 41,
-      "bankTxId": "310400000000213390",
+      "bankTxId": "310400000000216540",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-01",
       "amountMinor": -8476,
@@ -334,7 +401,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 42,
-      "bankTxId": "310400000000211934",
+      "bankTxId": "310400000000214973",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-29",
       "amountMinor": -33000,
@@ -349,7 +416,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 43,
-      "bankTxId": "310400000000211185",
+      "bankTxId": "310400000000214224",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-25",
       "amountMinor": -1480,
@@ -364,7 +431,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 44,
-      "bankTxId": "310400000000210127",
+      "bankTxId": "310400000000213277",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-25",
       "amountMinor": -6667,
@@ -377,7 +444,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 45,
-      "bankTxId": "310400000000209635",
+      "bankTxId": "310400000000212674",
       "account": "Rachunek VAT",
       "occurredOn": "2026-07-24",
       "amountMinor": -58900,
@@ -392,7 +459,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 46,
-      "bankTxId": "310400000000208213",
+      "bankTxId": "310400000000211363",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-24",
       "amountMinor": -5198,
@@ -405,7 +472,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 47,
-      "bankTxId": "310400000000206723",
+      "bankTxId": "310400000000209762",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-20",
       "amountMinor": -30100,
@@ -420,7 +487,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 48,
-      "bankTxId": "310400000000206412",
+      "bankTxId": "310400000000209451",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-18",
       "amountMinor": -12400,
@@ -435,7 +502,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 49,
-      "bankTxId": "310400000000205029",
+      "bankTxId": "310400000000208068",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-17",
       "amountMinor": -5599,
@@ -450,7 +517,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 50,
-      "bankTxId": "310400000000203872",
+      "bankTxId": "310400000000206911",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-12",
       "amountMinor": -15490,
@@ -465,7 +532,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 51,
-      "bankTxId": "310400000000203227",
+      "bankTxId": "310400000000206266",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-11",
       "amountMinor": -150000,
@@ -480,7 +547,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 52,
-      "bankTxId": "310400000000202102",
+      "bankTxId": "310400000000205141",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-10",
       "amountMinor": -199945,
@@ -495,7 +562,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 53,
-      "bankTxId": "310400000000201344",
+      "bankTxId": "310400000000204494",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-09",
       "amountMinor": -3561,
@@ -508,7 +575,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 54,
-      "bankTxId": "310400000000200520",
+      "bankTxId": "310400000000203559",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-08",
       "amountMinor": -2499,
@@ -523,7 +590,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 55,
-      "bankTxId": "310400000000199430",
+      "bankTxId": "310400000000202580",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-07",
       "amountMinor": -22140,
@@ -536,7 +603,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 56,
-      "bankTxId": "310400000000197972",
+      "bankTxId": "310400000000201122",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-07",
       "amountMinor": -4066,
@@ -549,7 +616,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 57,
-      "bankTxId": "310400000000197220",
+      "bankTxId": "310400000000200259",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-05",
       "amountMinor": 1110000,
@@ -564,7 +631,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 58,
-      "bankTxId": "310400000000196434",
+      "bankTxId": "310400000000199473",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-03",
       "amountMinor": -8999,
@@ -579,7 +646,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 59,
-      "bankTxId": "310400000000195045",
+      "bankTxId": "310400000000198195",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-03",
       "amountMinor": -18859,
@@ -592,7 +659,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 60,
-      "bankTxId": "310400000000193815",
+      "bankTxId": "310400000000196854",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-07-02",
       "amountMinor": -3900,
@@ -607,7 +674,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 61,
-      "bankTxId": "310400000000192612",
+      "bankTxId": "310400000000195762",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-27",
       "amountMinor": -2034,
@@ -620,7 +687,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 62,
-      "bankTxId": "310400000000192086",
+      "bankTxId": "310400000000195125",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-26",
       "amountMinor": -6230,
@@ -635,7 +702,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 63,
-      "bankTxId": "310400000000189651",
+      "bankTxId": "310400000000192690",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-24",
       "amountMinor": -32200,
@@ -650,7 +717,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 64,
-      "bankTxId": "310400000000189651",
+      "bankTxId": "310400000000192690",
       "account": "Rachunek VAT",
       "occurredOn": "2026-06-24",
       "amountMinor": 32200,
@@ -665,7 +732,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 65,
-      "bankTxId": "310400000000188452",
+      "bankTxId": "310400000000191491",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-20",
       "amountMinor": -99900,
@@ -680,7 +747,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 66,
-      "bankTxId": "310400000000187959",
+      "bankTxId": "310400000000190998",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-18",
       "amountMinor": -1899,
@@ -695,7 +762,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 67,
-      "bankTxId": "310400000000186758",
+      "bankTxId": "310400000000189797",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-17",
       "amountMinor": -5599,
@@ -710,7 +777,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 68,
-      "bankTxId": "310400000000185890",
+      "bankTxId": "310400000000189040",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-17",
       "amountMinor": -4124,
@@ -723,7 +790,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 69,
-      "bankTxId": "310400000000184277",
+      "bankTxId": "310400000000187316",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-15",
       "amountMinor": -210000,
@@ -738,7 +805,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 70,
-      "bankTxId": "310400000000184277",
+      "bankTxId": "310400000000187316",
       "account": "Rachunek VAT",
       "occurredOn": "2026-06-15",
       "amountMinor": 210000,
@@ -753,7 +820,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 71,
-      "bankTxId": "310400000000182593",
+      "bankTxId": "310400000000185743",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-15",
       "amountMinor": -3408,
@@ -766,7 +833,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 72,
-      "bankTxId": "310400000000181689",
+      "bankTxId": "310400000000184839",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-13",
       "amountMinor": -4697,
@@ -779,7 +846,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 73,
-      "bankTxId": "310400000000180904",
+      "bankTxId": "310400000000183943",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-11",
       "amountMinor": -150000,
@@ -794,7 +861,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 74,
-      "bankTxId": "310400000000179779",
+      "bankTxId": "310400000000182818",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-10",
       "amountMinor": -158818,
@@ -809,7 +876,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 75,
-      "bankTxId": "310400000000178399",
+      "bankTxId": "310400000000181438",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-09",
       "amountMinor": -12900,
@@ -824,7 +891,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 76,
-      "bankTxId": "310400000000178197",
+      "bankTxId": "310400000000181236",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-08",
       "amountMinor": -2499,
@@ -839,7 +906,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 77,
-      "bankTxId": "310400000000176626",
+      "bankTxId": "310400000000179776",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-08",
       "amountMinor": -11012,
@@ -852,7 +919,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 78,
-      "bankTxId": "310400000000175871",
+      "bankTxId": "310400000000179021",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-06",
       "amountMinor": -7444,
@@ -865,7 +932,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 79,
-      "bankTxId": "310400000000174897",
+      "bankTxId": "310400000000177936",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-05",
       "amountMinor": 953000,
@@ -880,7 +947,7 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 80,
-      "bankTxId": "310400000000173518",
+      "bankTxId": "310400000000176557",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-06-02",
       "amountMinor": -3900,
@@ -895,7 +962,22 @@
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
       "line": 81,
-      "bankTxId": "310400000000172946",
+      "bankTxId": "310400000000175354",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-02",
+      "amountMinor": -6900,
+      "traps": [
+        "T19"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PHU \"PRZYKŁAD\" JAN TESTOWY UL. LEŚNA 3 PRZYKŁADOWO",
+      "pattern": "phu-przyklad"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 82,
+      "bankTxId": "310400000000174972",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-30",
       "amountMinor": -6900,
@@ -909,8 +991,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 82,
-      "bankTxId": "310400000000171374",
+      "line": 83,
+      "bankTxId": "310400000000173511",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-27",
       "amountMinor": -4730,
@@ -922,8 +1004,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 83,
-      "bankTxId": "310400000000170252",
+      "line": 84,
+      "bankTxId": "310400000000172389",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-26",
       "amountMinor": -2863,
@@ -935,8 +1017,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 84,
-      "bankTxId": "310400000000169498",
+      "line": 85,
+      "bankTxId": "310400000000171635",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-26",
       "amountMinor": -9910,
@@ -948,8 +1030,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 85,
-      "bankTxId": "310400000000168967",
+      "line": 86,
+      "bankTxId": "310400000000170993",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-24",
       "amountMinor": 4500,
@@ -963,8 +1045,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 86,
-      "bankTxId": "310400000000167841",
+      "line": 87,
+      "bankTxId": "310400000000169978",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-24",
       "amountMinor": -2699,
@@ -976,8 +1058,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 87,
-      "bankTxId": "310400000000166575",
+      "line": 88,
+      "bankTxId": "310400000000168601",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-23",
       "amountMinor": -12000,
@@ -991,8 +1073,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 88,
-      "bankTxId": "310400000000165852",
+      "line": 89,
+      "bankTxId": "310400000000167989",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-23",
       "amountMinor": -7123,
@@ -1004,8 +1086,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 89,
-      "bankTxId": "310400000000164579",
+      "line": 90,
+      "bankTxId": "310400000000166716",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-22",
       "amountMinor": -6049,
@@ -1017,8 +1099,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 90,
-      "bankTxId": "310400000000164090",
+      "line": 91,
+      "bankTxId": "310400000000166116",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-20",
       "amountMinor": -73400,
@@ -1032,8 +1114,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 91,
-      "bankTxId": "310400000000162409",
+      "line": 92,
+      "bankTxId": "310400000000164435",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-17",
       "amountMinor": -5599,
@@ -1047,8 +1129,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 92,
-      "bankTxId": "310400000000162060",
+      "line": 93,
+      "bankTxId": "310400000000163197",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-17",
       "amountMinor": -20240,
@@ -1060,8 +1142,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 93,
-      "bankTxId": "310400000000160498",
+      "line": 94,
+      "bankTxId": "310400000000162524",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-16",
       "amountMinor": -3120,
@@ -1075,8 +1157,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 94,
-      "bankTxId": "310400000000159220",
+      "line": 95,
+      "bankTxId": "310400000000161357",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-13",
       "amountMinor": -1655,
@@ -1088,8 +1170,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 95,
-      "bankTxId": "310400000000158208",
+      "line": 96,
+      "bankTxId": "310400000000160234",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-12",
       "amountMinor": -2890,
@@ -1103,8 +1185,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 96,
-      "bankTxId": "310400000000157568",
+      "line": 97,
+      "bankTxId": "310400000000159594",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-11",
       "amountMinor": -150000,
@@ -1118,8 +1200,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 97,
-      "bankTxId": "310400000000156443",
+      "line": 98,
+      "bankTxId": "310400000000158469",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-10",
       "amountMinor": -144009,
@@ -1133,8 +1215,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 98,
-      "bankTxId": "310400000000155874",
+      "line": 99,
+      "bankTxId": "310400000000157900",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-08",
       "amountMinor": -2499,
@@ -1148,8 +1230,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 99,
-      "bankTxId": "310400000000154190",
+      "line": 100,
+      "bankTxId": "310400000000156327",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-08",
       "amountMinor": -12758,
@@ -1161,8 +1243,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 100,
-      "bankTxId": "310400000000153587",
+      "line": 101,
+      "bankTxId": "310400000000155613",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-05",
       "amountMinor": 1067000,
@@ -1176,8 +1258,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 101,
-      "bankTxId": "310400000000152690",
+      "line": 102,
+      "bankTxId": "310400000000154716",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-02",
       "amountMinor": -4899,
@@ -1191,8 +1273,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 102,
-      "bankTxId": "310400000000151195",
+      "line": 103,
+      "bankTxId": "310400000000153221",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-02",
       "amountMinor": -3900,
@@ -1206,8 +1288,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 103,
-      "bankTxId": "310400000000150250",
+      "line": 104,
+      "bankTxId": "310400000000152387",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-02",
       "amountMinor": -3525,
@@ -1219,8 +1301,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 104,
-      "bankTxId": "310400000000149903",
+      "line": 105,
+      "bankTxId": "310400000000151040",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-02",
       "amountMinor": -6931,
@@ -1232,8 +1314,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 105,
-      "bankTxId": "310400000000148557",
+      "line": 106,
+      "bankTxId": "310400000000150694",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-05-01",
       "amountMinor": -3759,
@@ -1245,8 +1327,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 106,
-      "bankTxId": "310400000000147107",
+      "line": 107,
+      "bankTxId": "310400000000149133",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-28",
       "amountMinor": -5999,
@@ -1260,8 +1342,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 107,
-      "bankTxId": "310400000000146012",
+      "line": 108,
+      "bankTxId": "310400000000148149",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-28",
       "amountMinor": -8318,
@@ -1273,8 +1355,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 108,
-      "bankTxId": "310400000000145074",
+      "line": 109,
+      "bankTxId": "310400000000147211",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-27",
       "amountMinor": -1509,
@@ -1286,8 +1368,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 109,
-      "bankTxId": "310400000000144545",
+      "line": 110,
+      "bankTxId": "310400000000146571",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-25",
       "amountMinor": -9800,
@@ -1301,8 +1383,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 110,
-      "bankTxId": "310400000000143753",
+      "line": 111,
+      "bankTxId": "310400000000145779",
       "account": "Rachunek VAT",
       "occurredOn": "2026-04-24",
       "amountMinor": -47800,
@@ -1316,8 +1398,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 111,
-      "bankTxId": "310400000000142591",
+      "line": 112,
+      "bankTxId": "310400000000144728",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-22",
       "amountMinor": -27841,
@@ -1329,8 +1411,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 112,
-      "bankTxId": "310400000000141767",
+      "line": 113,
+      "bankTxId": "310400000000143793",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-20",
       "amountMinor": -55600,
@@ -1344,8 +1426,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 113,
-      "bankTxId": "310400000000140086",
+      "line": 114,
+      "bankTxId": "310400000000142112",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-17",
       "amountMinor": -5599,
@@ -1359,8 +1441,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 114,
-      "bankTxId": "310400000000139483",
+      "line": 115,
+      "bankTxId": "310400000000141509",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-16",
       "amountMinor": -8400,
@@ -1374,8 +1456,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 115,
-      "bankTxId": "310400000000138656",
+      "line": 116,
+      "bankTxId": "310400000000140682",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-11",
       "amountMinor": -3250,
@@ -1389,8 +1471,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 116,
-      "bankTxId": "310400000000137271",
+      "line": 117,
+      "bankTxId": "310400000000139297",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-11",
       "amountMinor": -150000,
@@ -1404,8 +1486,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 117,
-      "bankTxId": "310400000000136146",
+      "line": 118,
+      "bankTxId": "310400000000138172",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-10",
       "amountMinor": -187020,
@@ -1419,8 +1501,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 118,
-      "bankTxId": "310400000000135577",
+      "line": 119,
+      "bankTxId": "310400000000137603",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-08",
       "amountMinor": -2499,
@@ -1434,8 +1516,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 119,
-      "bankTxId": "310400000000134674",
+      "line": 120,
+      "bankTxId": "310400000000136700",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-07",
       "amountMinor": -7250,
@@ -1449,8 +1531,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 120,
-      "bankTxId": "310400000000133177",
+      "line": 121,
+      "bankTxId": "310400000000135314",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-06",
       "amountMinor": -5276,
@@ -1462,8 +1544,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 121,
-      "bankTxId": "310400000000132277",
+      "line": 122,
+      "bankTxId": "310400000000134303",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-05",
       "amountMinor": 894000,
@@ -1477,8 +1559,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 122,
-      "bankTxId": "310400000000130898",
+      "line": 123,
+      "bankTxId": "310400000000132924",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-02",
       "amountMinor": -3900,
@@ -1492,8 +1574,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 123,
-      "bankTxId": "310400000000130102",
+      "line": 124,
+      "bankTxId": "310400000000132239",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-04-01",
       "amountMinor": -6755,
@@ -1505,8 +1587,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 124,
-      "bankTxId": "310400000000129569",
+      "line": 125,
+      "bankTxId": "310400000000130706",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-31",
       "amountMinor": -6019,
@@ -1518,8 +1600,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 125,
-      "bankTxId": "310400000000128300",
+      "line": 126,
+      "bankTxId": "310400000000130326",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-28",
       "amountMinor": -5100,
@@ -1533,8 +1615,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 126,
-      "bankTxId": "310400000000127472",
+      "line": 127,
+      "bankTxId": "310400000000129498",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-26",
       "amountMinor": 25900,
@@ -1549,8 +1631,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 127,
-      "bankTxId": "310400000000125717",
+      "line": 128,
+      "bankTxId": "310400000000127854",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-25",
       "amountMinor": -2566,
@@ -1562,8 +1644,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 128,
-      "bankTxId": "310400000000123732",
+      "line": 129,
+      "bankTxId": "310400000000125758",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-24",
       "amountMinor": -18400,
@@ -1577,8 +1659,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 129,
-      "bankTxId": "310400000000123732",
+      "line": 130,
+      "bankTxId": "310400000000125758",
       "account": "Rachunek VAT",
       "occurredOn": "2026-03-24",
       "amountMinor": 18400,
@@ -1592,8 +1674,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 130,
-      "bankTxId": "310400000000122863",
+      "line": 131,
+      "bankTxId": "310400000000125000",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-23",
       "amountMinor": -5479,
@@ -1605,8 +1687,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 131,
-      "bankTxId": "310400000000121589",
+      "line": 132,
+      "bankTxId": "310400000000123726",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-23",
       "amountMinor": -13588,
@@ -1618,8 +1700,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 132,
-      "bankTxId": "310400000000120621",
+      "line": 133,
+      "bankTxId": "310400000000122647",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-21",
       "amountMinor": -25900,
@@ -1633,8 +1715,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 133,
-      "bankTxId": "310400000000120457",
+      "line": 134,
+      "bankTxId": "310400000000122483",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-20",
       "amountMinor": -148800,
@@ -1648,8 +1730,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 134,
-      "bankTxId": "310400000000118776",
+      "line": 135,
+      "bankTxId": "310400000000120802",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-17",
       "amountMinor": -5599,
@@ -1663,8 +1745,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 135,
-      "bankTxId": "310400000000118464",
+      "line": 136,
+      "bankTxId": "310400000000119601",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-16",
       "amountMinor": -9533,
@@ -1676,8 +1758,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 136,
-      "bankTxId": "310400000000116747",
+      "line": 137,
+      "bankTxId": "310400000000118884",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-15",
       "amountMinor": -5350,
@@ -1689,8 +1771,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 137,
-      "bankTxId": "310400000000116074",
+      "line": 138,
+      "bankTxId": "310400000000118100",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-13",
       "amountMinor": -1799,
@@ -1704,8 +1786,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 138,
-      "bankTxId": "310400000000114948",
+      "line": 139,
+      "bankTxId": "310400000000116974",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-11",
       "amountMinor": -150000,
@@ -1719,8 +1801,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 139,
-      "bankTxId": "310400000000113823",
+      "line": 140,
+      "bankTxId": "310400000000115849",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-10",
       "amountMinor": -163377,
@@ -1734,8 +1816,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 140,
-      "bankTxId": "310400000000112768",
+      "line": 141,
+      "bankTxId": "310400000000114905",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-10",
       "amountMinor": -5338,
@@ -1747,8 +1829,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 141,
-      "bankTxId": "310400000000112241",
+      "line": 142,
+      "bankTxId": "310400000000114267",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-08",
       "amountMinor": -2499,
@@ -1762,8 +1844,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 142,
-      "bankTxId": "310400000000110824",
+      "line": 143,
+      "bankTxId": "310400000000112850",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-07",
       "amountMinor": -1645,
@@ -1777,8 +1859,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 143,
-      "bankTxId": "310400000000109954",
+      "line": 144,
+      "bankTxId": "310400000000111980",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-05",
       "amountMinor": 1180000,
@@ -1792,8 +1874,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 144,
-      "bankTxId": "310400000000108575",
+      "line": 145,
+      "bankTxId": "310400000000110601",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-02",
       "amountMinor": -3900,
@@ -1807,8 +1889,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 145,
-      "bankTxId": "310400000000108006",
+      "line": 146,
+      "bankTxId": "310400000000110032",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-03-02",
       "amountMinor": -19900,
@@ -1822,8 +1904,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 146,
-      "bankTxId": "310400000000106882",
+      "line": 147,
+      "bankTxId": "310400000000108908",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-27",
       "amountMinor": -5670,
@@ -1837,8 +1919,23 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 147,
-      "bankTxId": "310400000000105495",
+      "line": 148,
+      "bankTxId": "310400000000107446",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-24",
+      "amountMinor": -7150,
+      "traps": [
+        "T19"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PHU \"PRZYKŁAD\" JAN TESTOWY UL. LEŚNA 3 PRZYKŁADOWO",
+      "pattern": "phu-przyklad"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 149,
+      "bankTxId": "310400000000106508",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-21",
       "amountMinor": -13700,
@@ -1852,8 +1949,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 148,
-      "bankTxId": "310400000000105225",
+      "line": 150,
+      "bankTxId": "310400000000106238",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-20",
       "amountMinor": -21000,
@@ -1867,8 +1964,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 149,
-      "bankTxId": "310400000000103544",
+      "line": 151,
+      "bankTxId": "310400000000104557",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-17",
       "amountMinor": -4999,
@@ -1882,8 +1979,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 150,
-      "bankTxId": "310400000000102150",
+      "line": 152,
+      "bankTxId": "310400000000103163",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-16",
       "amountMinor": -80000,
@@ -1897,8 +1994,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 151,
-      "bankTxId": "310400000000102150",
+      "line": 153,
+      "bankTxId": "310400000000103163",
       "account": "Rachunek VAT",
       "occurredOn": "2026-02-16",
       "amountMinor": 80000,
@@ -1912,8 +2009,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 152,
-      "bankTxId": "310400000000100575",
+      "line": 154,
+      "bankTxId": "310400000000101699",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-16",
       "amountMinor": -2155,
@@ -1925,8 +2022,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 153,
-      "bankTxId": "310400000000099899",
+      "line": 155,
+      "bankTxId": "310400000000100912",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-14",
       "amountMinor": -7300,
@@ -1940,8 +2037,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 154,
-      "bankTxId": "310400000000099255",
+      "line": 156,
+      "bankTxId": "310400000000100268",
       "account": "Rachunek VAT",
       "occurredOn": "2026-02-12",
       "amountMinor": 27600,
@@ -1955,8 +2052,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 155,
-      "bankTxId": "310400000000097951",
+      "line": 157,
+      "bankTxId": "310400000000098964",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-11",
       "amountMinor": -1575,
@@ -1970,8 +2067,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 156,
-      "bankTxId": "310400000000096677",
+      "line": 158,
+      "bankTxId": "310400000000097690",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-11",
       "amountMinor": -150000,
@@ -1985,8 +2082,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 157,
-      "bankTxId": "310400000000095552",
+      "line": 159,
+      "bankTxId": "310400000000096565",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-10",
       "amountMinor": -149912,
@@ -2000,8 +2097,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 158,
-      "bankTxId": "310400000000094983",
+      "line": 160,
+      "bankTxId": "310400000000095996",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-08",
       "amountMinor": -2499,
@@ -2015,8 +2112,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 159,
-      "bankTxId": "310400000000093709",
+      "line": 161,
+      "bankTxId": "310400000000094722",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-05",
       "amountMinor": 1002000,
@@ -2030,8 +2127,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 160,
-      "bankTxId": "310400000000092250",
+      "line": 162,
+      "bankTxId": "310400000000093374",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-04",
       "amountMinor": -8022,
@@ -2043,8 +2140,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 161,
-      "bankTxId": "310400000000091317",
+      "line": 163,
+      "bankTxId": "310400000000092330",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-02",
       "amountMinor": -3900,
@@ -2058,8 +2155,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 162,
-      "bankTxId": "310400000000090748",
+      "line": 164,
+      "bankTxId": "310400000000091761",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-02-02",
       "amountMinor": -19900,
@@ -2073,8 +2170,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 163,
-      "bankTxId": "310400000000090065",
+      "line": 165,
+      "bankTxId": "310400000000091078",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-29",
       "amountMinor": -15900,
@@ -2088,8 +2185,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 164,
-      "bankTxId": "310400000000089014",
+      "line": 166,
+      "bankTxId": "310400000000090027",
       "account": "Rachunek VAT",
       "occurredOn": "2026-01-26",
       "amountMinor": -64300,
@@ -2103,8 +2200,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 165,
-      "bankTxId": "310400000000087969",
+      "line": 167,
+      "bankTxId": "310400000000088982",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-24",
       "amountMinor": -12900,
@@ -2118,8 +2215,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 166,
-      "bankTxId": "310400000000086954",
+      "line": 168,
+      "bankTxId": "310400000000087967",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-20",
       "amountMinor": -67300,
@@ -2133,8 +2230,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 167,
-      "bankTxId": "310400000000085277",
+      "line": 169,
+      "bankTxId": "310400000000086290",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-17",
       "amountMinor": -34900,
@@ -2148,8 +2245,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 168,
-      "bankTxId": "310400000000084260",
+      "line": 170,
+      "bankTxId": "310400000000085273",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-17",
       "amountMinor": -4999,
@@ -2163,8 +2260,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 169,
-      "bankTxId": "310400000000083471",
+      "line": 171,
+      "bankTxId": "310400000000084484",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-11",
       "amountMinor": -150000,
@@ -2178,8 +2275,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 170,
-      "bankTxId": "310400000000082423",
+      "line": 172,
+      "bankTxId": "310400000000083436",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-10",
       "amountMinor": -890,
@@ -2193,8 +2290,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 171,
-      "bankTxId": "310400000000081333",
+      "line": 173,
+      "bankTxId": "310400000000082346",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-10",
       "amountMinor": -210533,
@@ -2208,8 +2305,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 172,
-      "bankTxId": "310400000000080764",
+      "line": 174,
+      "bankTxId": "310400000000081777",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-08",
       "amountMinor": -2499,
@@ -2223,8 +2320,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 173,
-      "bankTxId": "310400000000079230",
+      "line": 175,
+      "bankTxId": "310400000000080354",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-08",
       "amountMinor": -3683,
@@ -2236,8 +2333,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 174,
-      "bankTxId": "310400000000078920",
+      "line": 176,
+      "bankTxId": "310400000000079044",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-06",
       "amountMinor": -23843,
@@ -2249,8 +2346,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 175,
-      "bankTxId": "310400000000077464",
+      "line": 177,
+      "bankTxId": "310400000000078477",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-05",
       "amountMinor": 915000,
@@ -2264,8 +2361,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 176,
-      "bankTxId": "310400000000076563",
+      "line": 178,
+      "bankTxId": "310400000000077576",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-03",
       "amountMinor": -11600,
@@ -2279,8 +2376,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 177,
-      "bankTxId": "310400000000075072",
+      "line": 179,
+      "bankTxId": "310400000000076085",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-01-02",
       "amountMinor": -3900,
@@ -2294,8 +2391,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 178,
-      "bankTxId": "310400000000073008",
+      "line": 180,
+      "bankTxId": "310400000000074021",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-22",
       "amountMinor": -41400,
@@ -2309,8 +2406,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 179,
-      "bankTxId": "310400000000073008",
+      "line": 181,
+      "bankTxId": "310400000000074021",
       "account": "Rachunek VAT",
       "occurredOn": "2025-12-22",
       "amountMinor": 41400,
@@ -2324,8 +2421,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 180,
-      "bankTxId": "310400000000072735",
+      "line": 182,
+      "bankTxId": "310400000000073748",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-20",
       "amountMinor": -90500,
@@ -2339,8 +2436,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 181,
-      "bankTxId": "310400000000071014",
+      "line": 183,
+      "bankTxId": "310400000000072138",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-20",
       "amountMinor": -6953,
@@ -2352,8 +2449,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 182,
-      "bankTxId": "310400000000070452",
+      "line": 184,
+      "bankTxId": "310400000000071465",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-19",
       "amountMinor": -4120,
@@ -2367,8 +2464,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 183,
-      "bankTxId": "310400000000069028",
+      "line": 185,
+      "bankTxId": "310400000000070041",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-17",
       "amountMinor": -4999,
@@ -2382,8 +2479,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 184,
-      "bankTxId": "310400000000068125",
+      "line": 186,
+      "bankTxId": "310400000000069138",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-15",
       "amountMinor": 4999,
@@ -2398,8 +2495,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 185,
-      "bankTxId": "310400000000067666",
+      "line": 187,
+      "bankTxId": "310400000000068790",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-14",
       "amountMinor": -22789,
@@ -2411,8 +2508,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 186,
-      "bankTxId": "310400000000066357",
+      "line": 188,
+      "bankTxId": "310400000000067481",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-13",
       "amountMinor": -4780,
@@ -2424,8 +2521,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 187,
-      "bankTxId": "310400000000065342",
+      "line": 189,
+      "bankTxId": "310400000000066466",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-13",
       "amountMinor": -17628,
@@ -2437,8 +2534,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 188,
-      "bankTxId": "310400000000064299",
+      "line": 190,
+      "bankTxId": "310400000000065312",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-12",
       "amountMinor": -2345,
@@ -2452,8 +2549,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 189,
-      "bankTxId": "310400000000063174",
+      "line": 191,
+      "bankTxId": "310400000000064187",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-11",
       "amountMinor": -150000,
@@ -2467,8 +2564,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 190,
-      "bankTxId": "310400000000062049",
+      "line": 192,
+      "bankTxId": "310400000000063062",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-10",
       "amountMinor": -145580,
@@ -2482,8 +2579,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 191,
-      "bankTxId": "310400000000060958",
+      "line": 193,
+      "bankTxId": "310400000000062082",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-10",
       "amountMinor": -8938,
@@ -2495,8 +2592,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 192,
-      "bankTxId": "310400000000060467",
+      "line": 194,
+      "bankTxId": "310400000000061480",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-08",
       "amountMinor": -2499,
@@ -2510,8 +2607,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 193,
-      "bankTxId": "310400000000058860",
+      "line": 195,
+      "bankTxId": "310400000000059873",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-08",
       "amountMinor": -4999,
@@ -2525,8 +2622,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 194,
-      "bankTxId": "310400000000058180",
+      "line": 196,
+      "bankTxId": "310400000000059193",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-05",
       "amountMinor": 1230000,
@@ -2540,8 +2637,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 195,
-      "bankTxId": "310400000000056765",
+      "line": 197,
+      "bankTxId": "310400000000057778",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-03",
       "amountMinor": -7450,
@@ -2555,8 +2652,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 196,
-      "bankTxId": "310400000000055788",
+      "line": 198,
+      "bankTxId": "310400000000056801",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-12-02",
       "amountMinor": -3900,
@@ -2570,8 +2667,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 197,
-      "bankTxId": "310400000000055253",
+      "line": 199,
+      "bankTxId": "310400000000056266",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-29",
       "amountMinor": -6200,
@@ -2585,8 +2682,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 198,
-      "bankTxId": "310400000000054354",
+      "line": 200,
+      "bankTxId": "310400000000055367",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-26",
       "amountMinor": -2750,
@@ -2600,8 +2697,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 199,
-      "bankTxId": "310400000000052817",
+      "line": 201,
+      "bankTxId": "310400000000053941",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-22",
       "amountMinor": -9416,
@@ -2613,8 +2710,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 200,
-      "bankTxId": "310400000000052438",
+      "line": 202,
+      "bankTxId": "310400000000053451",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-20",
       "amountMinor": -38000,
@@ -2628,8 +2725,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 201,
-      "bankTxId": "310400000000050719",
+      "line": 203,
+      "bankTxId": "310400000000051732",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-20",
       "amountMinor": -21450,
@@ -2643,8 +2740,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 202,
-      "bankTxId": "310400000000049744",
+      "line": 204,
+      "bankTxId": "310400000000050757",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-17",
       "amountMinor": -4999,
@@ -2658,8 +2755,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 203,
-      "bankTxId": "310400000000048957",
+      "line": 205,
+      "bankTxId": "310400000000049970",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-15",
       "amountMinor": -2380,
@@ -2673,8 +2770,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 204,
-      "bankTxId": "310400000000047974",
+      "line": 206,
+      "bankTxId": "310400000000049098",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-15",
       "amountMinor": -4593,
@@ -2686,8 +2783,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 205,
-      "bankTxId": "310400000000047073",
+      "line": 207,
+      "bankTxId": "310400000000048197",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-14",
       "amountMinor": -10444,
@@ -2699,8 +2796,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 206,
-      "bankTxId": "310400000000045916",
+      "line": 208,
+      "bankTxId": "310400000000046929",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-11",
       "amountMinor": -150000,
@@ -2714,8 +2811,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 207,
-      "bankTxId": "310400000000044791",
+      "line": 209,
+      "bankTxId": "310400000000045804",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-10",
       "amountMinor": -191042,
@@ -2729,8 +2826,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 208,
-      "bankTxId": "310400000000044331",
+      "line": 210,
+      "bankTxId": "310400000000045344",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-09",
       "amountMinor": 6000,
@@ -2744,8 +2841,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 209,
-      "bankTxId": "310400000000042952",
+      "line": 211,
+      "bankTxId": "310400000000043965",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-08",
       "amountMinor": -6000,
@@ -2759,8 +2856,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 210,
-      "bankTxId": "310400000000042196",
+      "line": 212,
+      "bankTxId": "310400000000043209",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-08",
       "amountMinor": -2499,
@@ -2774,8 +2871,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 211,
-      "bankTxId": "310400000000040922",
+      "line": 213,
+      "bankTxId": "310400000000041935",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-05",
       "amountMinor": 870000,
@@ -2789,7 +2886,22 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 212,
+      "line": 214,
+      "bankTxId": "310400000000040551",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-04",
+      "amountMinor": -6700,
+      "traps": [
+        "T19"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PHU \"PRZYKŁAD\" JAN TESTOWY UL. LEŚNA 3 PRZYKŁADOWO",
+      "pattern": "phu-przyklad"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 215,
       "bankTxId": "310400000000039543",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-11-02",
@@ -2804,7 +2916,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 213,
+      "line": 216,
       "bankTxId": "310400000000039160",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-30",
@@ -2819,8 +2931,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 214,
-      "bankTxId": "310400000000038288",
+      "line": 217,
+      "bankTxId": "310400000000038399",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-30",
       "amountMinor": -3024,
@@ -2832,7 +2944,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 215,
+      "line": 218,
       "bankTxId": "310400000000037314",
       "account": "Rachunek VAT",
       "occurredOn": "2025-10-24",
@@ -2847,7 +2959,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 216,
+      "line": 219,
       "bankTxId": "310400000000035603",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-22",
@@ -2862,8 +2974,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 217,
-      "bankTxId": "310400000000034508",
+      "line": 220,
+      "bankTxId": "310400000000034619",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-22",
       "amountMinor": -5833,
@@ -2875,7 +2987,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 218,
+      "line": 221,
       "bankTxId": "310400000000034167",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-20",
@@ -2890,8 +3002,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 219,
-      "bankTxId": "310400000000032816",
+      "line": 222,
+      "bankTxId": "310400000000032927",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-19",
       "amountMinor": -4913,
@@ -2903,7 +3015,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 220,
+      "line": 223,
       "bankTxId": "310400000000031917",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-18",
@@ -2918,7 +3030,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 221,
+      "line": 224,
       "bankTxId": "310400000000030460",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-17",
@@ -2933,7 +3045,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 222,
+      "line": 225,
       "bankTxId": "310400000000029140",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-15",
@@ -2948,7 +3060,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 223,
+      "line": 226,
       "bankTxId": "310400000000029140",
       "account": "Rachunek VAT",
       "occurredOn": "2025-10-15",
@@ -2963,8 +3075,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 224,
-      "bankTxId": "310400000000027454",
+      "line": 227,
+      "bankTxId": "310400000000027565",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-15",
       "amountMinor": -4024,
@@ -2976,7 +3088,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 225,
+      "line": 228,
       "bankTxId": "310400000000026632",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-11",
@@ -2991,7 +3103,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 226,
+      "line": 229,
       "bankTxId": "310400000000025507",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-10",
@@ -3006,7 +3118,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 227,
+      "line": 230,
       "bankTxId": "310400000000025196",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-09",
@@ -3021,7 +3133,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 228,
+      "line": 231,
       "bankTxId": "310400000000023925",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-08",
@@ -3036,8 +3148,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 229,
-      "bankTxId": "310400000000022871",
+      "line": 232,
+      "bankTxId": "310400000000022982",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-08",
       "amountMinor": -4095,
@@ -3049,7 +3161,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 230,
+      "line": 233,
       "bankTxId": "310400000000022087",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-05",
@@ -3064,7 +3176,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 231,
+      "line": 234,
       "bankTxId": "310400000000020625",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-05",
@@ -3079,8 +3191,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 232,
-      "bankTxId": "310400000000020202",
+      "line": 235,
+      "bankTxId": "310400000000019313",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-03",
       "amountMinor": -2794,
@@ -3092,7 +3204,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 233,
+      "line": 236,
       "bankTxId": "310400000000019233",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-10-02",
@@ -3107,7 +3219,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 234,
+      "line": 237,
       "bankTxId": "310400000000017698",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-27",
@@ -3122,8 +3234,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 235,
-      "bankTxId": "310400000000017053",
+      "line": 238,
+      "bankTxId": "310400000000017164",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-26",
       "amountMinor": -28688,
@@ -3135,7 +3247,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 236,
+      "line": 239,
       "bankTxId": "310400000000015180",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-25",
@@ -3150,7 +3262,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 237,
+      "line": 240,
       "bankTxId": "310400000000015180",
       "account": "Rachunek VAT",
       "occurredOn": "2025-09-25",
@@ -3165,8 +3277,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 238,
-      "bankTxId": "310400000000013568",
+      "line": 241,
+      "bankTxId": "310400000000013679",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-23",
       "amountMinor": -6750,
@@ -3178,7 +3290,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 239,
+      "line": 242,
       "bankTxId": "310400000000012857",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-20",
@@ -3193,7 +3305,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 240,
+      "line": 243,
       "bankTxId": "310400000000011661",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-19",
@@ -3208,7 +3320,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 241,
+      "line": 244,
       "bankTxId": "310400000000010163",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-17",
@@ -3223,7 +3335,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 242,
+      "line": 245,
       "bankTxId": "310400000000009117",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-14",
@@ -3238,7 +3350,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 243,
+      "line": 246,
       "bankTxId": "310400000000008361",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-11",
@@ -3253,7 +3365,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 244,
+      "line": 247,
       "bankTxId": "310400000000007236",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-10",
@@ -3268,7 +3380,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 245,
+      "line": 248,
       "bankTxId": "310400000000006110",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-10",
@@ -3283,8 +3395,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 246,
-      "bankTxId": "310400000000005096",
+      "line": 249,
+      "bankTxId": "310400000000005207",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-09",
       "amountMinor": -2556,
@@ -3296,7 +3408,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 247,
+      "line": 250,
       "bankTxId": "310400000000004641",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-08",
@@ -3311,8 +3423,8 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 248,
-      "bankTxId": "310400000000003662",
+      "line": 251,
+      "bankTxId": "310400000000003773",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-07",
       "amountMinor": -27677,
@@ -3324,7 +3436,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 249,
+      "line": 252,
       "bankTxId": "310400000000002322",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-06",
@@ -3339,7 +3451,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 250,
+      "line": 253,
       "bankTxId": "310400000000001341",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-05",
@@ -3354,7 +3466,7 @@
     },
     {
       "file": "Lista_transakcji_nr_0000123456_010926.csv",
-      "line": 251,
+      "line": 254,
       "bankTxId": "310400000000000962",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2025-09-02",
@@ -3599,6 +3711,21 @@
       "sumMinor": 28848,
       "medianMinor": 5375,
       "firstMonth": "2025-10"
+    },
+    {
+      "key": "phu-przyklad",
+      "type": "fixed",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T19"
+      ],
+      "rawMerchants": [
+        "PHU \"PRZYKŁAD\" JAN TESTOWY UL. LEŚNA 3 PRZYKŁADOWO"
+      ],
+      "occurrences": 3,
+      "sumMinor": 20750,
+      "medianMinor": 6900,
+      "firstMonth": "2025-11"
     },
     {
       "key": "piekarnia-klosek",

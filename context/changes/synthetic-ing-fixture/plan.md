@@ -301,30 +301,30 @@ Brak zmian schematu i danych w bazie.
 
 #### Automated
 
-- [x] 1.1 Generator tworzy pliki: `npm run fixture:ing` kończy się kodem 0 i zapisuje główny wyciąg oraz `expected.json` do `test/fixtures/ing/`
-- [x] 1.2 Determinizm: drugie `npm run fixture:ing` nie zmienia plików (`git diff --exit-code test/fixtures` po `git add`)
-- [x] 1.3 Kodowanie: `node -e` dekodujący plik przez `TextDecoder('windows-1250')` znajduje wiersz zaczynający się od `"Data transakcji"` i polskie znaki w preambule; w bajtach brak BOM, każda linia kończy się CRLF
-- [x] 1.4 CSV trafia do gita mimo `*.csv`: `git check-ignore test/fixtures/ing/*.csv` nie zwraca nic
-- [x] 1.5 Lint przechodzi: `npm run lint`
+- [x] 1.1 Generator tworzy pliki: `npm run fixture:ing` kończy się kodem 0 i zapisuje główny wyciąg oraz `expected.json` do `test/fixtures/ing/` — 4b3a3a0
+- [x] 1.2 Determinizm: drugie `npm run fixture:ing` nie zmienia plików (`git diff --exit-code test/fixtures` po `git add`) — 4b3a3a0
+- [x] 1.3 Kodowanie: `node -e` dekodujący plik przez `TextDecoder('windows-1250')` znajduje wiersz zaczynający się od `"Data transakcji"` i polskie znaki w preambule; w bajtach brak BOM, każda linia kończy się CRLF — 4b3a3a0
+- [x] 1.4 CSV trafia do gita mimo `*.csv`: `git check-ignore test/fixtures/ing/*.csv` nie zwraca nic — 4b3a3a0
+- [x] 1.5 Lint przechodzi: `npm run lint` — 4b3a3a0
 
 #### Manual
 
-- [x] 1.6 Główny wyciąg otwarty w edytorze z kodowaniem Windows-1250 wygląda jak eksport ING (preambuła, nagłówek, stopka, apostrofy w numerach)
-- [x] 1.7 Każda pułapka T01–T18 ma w pliku rozpoznawalne wiersze i odpowiadające im wpisy w `expected.json`
-- [x] 1.8 Żadna nazwa, kwota, numer ani data nie pochodzi z prawdziwego wyciągu
+- [x] 1.6 Główny wyciąg otwarty w edytorze z kodowaniem Windows-1250 wygląda jak eksport ING (preambuła, nagłówek, stopka, apostrofy w numerach) — 4b3a3a0
+- [x] 1.7 Każda pułapka T01–T18 ma w pliku rozpoznawalne wiersze i odpowiadające im wpisy w `expected.json` — 4b3a3a0
+- [x] 1.8 Żadna nazwa, kwota, numer ani data nie pochodzi z prawdziwego wyciągu — 4b3a3a0
 
 ### Phase 2: Pliki błędów i bramka CI
 
 #### Automated
 
-- [ ] 2.1 Kontrola przechodzi: `npm run fixture:check` kończy się kodem 0
-- [ ] 2.2 Kontrola łapie zmianę: po ręcznej zmianie jednego bajtu w głównym CSV `npm run fixture:check` kończy się kodem ≠ 0 (potem `git checkout` pliku)
-- [ ] 2.3 Pliki błędów istnieją z wpisami `expect: "reject"` dla `overlap`, `no-header`, `currency` w `expected.json`
-- [ ] 2.4 `npm run fixture:shape` bez pliku w `data/` kończy się kodem 0 z komunikatem
-- [ ] 2.5 Lint przechodzi: `npm run lint`
+- [x] 2.1 Kontrola przechodzi: `npm run fixture:check` kończy się kodem 0
+- [x] 2.2 Kontrola łapie zmianę: po ręcznej zmianie jednego bajtu w głównym CSV `npm run fixture:check` kończy się kodem ≠ 0 (potem `git checkout` pliku)
+- [x] 2.3 Pliki błędów istnieją z wpisami `expect: "reject"` dla `overlap`, `no-header`, `currency` w `expected.json`
+- [x] 2.4 `npm run fixture:shape` bez pliku w `data/` kończy się kodem 0 z komunikatem
+- [x] 2.5 Lint przechodzi: `npm run lint`
 - [ ] 2.6 Job `ci` w GitHub Actions jest zielony z krokiem `fixture:check`
 
 #### Manual
 
-- [ ] 2.7 `npm run fixture:shape` na prawdziwym wyciągu lokalnie: wyjście nie zawiera żadnych danych (nazw, kwot, numerów, dat), a różnice struktury są zrozumiałe lub naprawione w generatorze
-- [ ] 2.8 `README.md` fixture pozwala osobie spoza projektu znaleźć wiersze danej pułapki i zregenerować pliki
+- [x] 2.7 `npm run fixture:shape` na prawdziwym wyciągu lokalnie: wyjście nie zawiera żadnych danych (nazw, kwot, numerów, dat), a różnice struktury są zrozumiałe lub naprawione w generatorze
+- [x] 2.8 `README.md` fixture pozwala osobie spoza projektu znaleźć wiersze danej pułapki i zregenerować pliki

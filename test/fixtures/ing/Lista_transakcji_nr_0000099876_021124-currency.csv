@@ -1,0 +1,26 @@
+"Lista transakcji";;;;;"ING Bank Œl¹ski S.A. ul. Sokolska 34, 40-086 Katowice";;;;;;;;;;;;;;;
+"Dokument nr 0000099876_021124";
+"Wygenerowany dnia: 2024-11-02, 09:15";;;;;;;;;;;;;;;;;;;;
+
+"Dane U¿ytkownika:";
+"PRZYK£ADOWA FIRMA JAN PRZYK£ADOWY , UL. TESTOWA 1A 00-001 PRZYK£ADOWO";
+
+"Wybrane rachunki:";
+"Rachunek Firmowy G³ówny (PLN)";;"11 1111 0000 0000 0000 0000 0001";
+
+"Zastosowane kryteria wyboru";;;;;"Podsumowanie";;
+
+"Zakres dat:";"2024-10-01 - 2024-10-31";"Typy transakcji:";"wszystkie";;"Liczba transakcji:";4;
+
+;;;;;"Suma uznañ (0):";0,00;PLN;;;;;;;;;;;;;
+
+"Ukryto saldo po transakcji";;;;;"Suma obci¹¿eñ (4):";1685,35;PLN;;;;;;;;;;;;;
+
+"Data transakcji";"Data ksiêgowania";"Dane kontrahenta";"Tytu³";"Nr rachunku";"Nazwa banku";"Szczegó³y";"Nr transakcji";"Kwota transakcji (waluta rachunku)";"Waluta";"Kwota blokady/zwolnienie blokady";"Waluta";"Kwota p³atnoœci w walucie";"Waluta";"Konto";;;;;;
+2024-10-18;2024-10-18;" DROGERIA LAWENDA UL. KWIATOWA 14 KRAKÓW ";" P³atnoœæ BLIK 18.10.2024 Nr transakcji 99801959893 lawenda.pl";;;"TR.BLIK  ";'310300000000003076';-29,15;EUR;;;;;"Rachunek Firmowy G³ówny";;;;;;
+2024-10-11;2024-10-11;" STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW ";" P³atnoœæ BLIK 11.10.2024 Nr transakcji 79955207987 DROGOWSKAZ";;;"TR.BLIK  ";'310300000000002100';-214,80;PLN;;;;;"Rachunek Firmowy G³ówny";;;;;;
+2024-10-10;2024-10-10;" ZAK£AD UBEZPIECZEÑ SPO£ECZNYCH ";" Sk³adki ZUS 10/2024";'77600000000000000000000002 ';"BANK TESTOWY S.A.";"PRZELEW  ";'310300000000001124';-1398,70;PLN;;;;;"Rachunek Firmowy G³ówny";;;;;;
+2024-10-04;2024-10-04;" DROGERIA LAWENDA UL. KWIATOWA 14 KRAKÓW ";" P³atnoœæ BLIK 04.10.2024 Nr transakcji 38989116654 lawenda.pl";;;"TR.BLIK  ";'310300000000000000';-42,70;PLN;;;;;"Rachunek Firmowy G³ówny";;;;;;
+
+
+"Dokument ma charakter informacyjny, nie stanowi dowodu ksiêgowego";

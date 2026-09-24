@@ -2,7 +2,7 @@
 project: "Rytm"
 context_type: greenfield
 created: 2026-09-18
-updated: 2026-09-18
+updated: 2026-09-24
 source: "analiza prawdziwych eksportów CSV (lokalnie, pliki nie trafiają do repo)"
 banks:
   - id: ing
@@ -37,30 +37,38 @@ Status: **MVP**. Weryfikacja bramki dnia pierwszego: pozytywna.
 
 | Cecha | Wartość |
 |---|---|
-| Kodowanie | **cp1250** (Windows-1250), bez BOM, CRLF |
+| Kodowanie | **cp1250** (Windows-1250), bez BOM, **LF**, znak nowej linii na końcu pliku |
 | Separator | `;` |
-| Cudzysłów pól | `"` — parser CSV z `quotechar='"'` |
-| Pułapka | Nr rachunku i Nr transakcji są dodatkowo ujęte w apostrofy `'…'` (trik pod Excela) i mają spacje na końcu — apostrofy i białe znaki trzeba zdjąć, to **nie** jest cudzysłów CSV |
+| Cudzysłów pól | **mieszany, stały per pole** — `"…"` przy polach tekstowych (Dane kontrahenta, Tytuł, Nazwa banku, Szczegóły, Konto, etykiety preambuły); daty, Nr rachunku, Nr transakcji, kwota, waluta i puste pola bez cudzysłowu. Parser CSV z `quotechar='"'` obsługuje oba |
+| Cudzysłów w polu | Cudzysłów wewnątrz pola nie jest escapowany — pole kończy `"` przed `;` lub końcem linii (np. `" FIRMA "NAZWA" SP. Z O.O. MIASTO "`, 3 na 791 wierszy, w Dane kontrahenta). Każdy inny `"` w polu to zwykły znak; `""` to dwa znaki, nie escape. Standardowy parser CSV (RFC 4180) takie pole rozbije — czytać łagodnie (T19) |
+| Pułapka | Nr rachunku i Nr transakcji są ujęte w apostrofy `'…'` (trik pod Excela; bez `"`) — to **nie** jest cudzysłów CSV. Nr transakcji: `'<18 cyfr>'` bez spacji; Nr rachunku: `'<26 cyfr> '` albo `'<7 cyfr>\<5 cyfr> '` ze spacją na końcu, puste w większości wierszy `TR.BLIK`. Apostrofy i białe znaki trzeba zdjąć |
+| Białe znaki | Dane kontrahenta ze spacją na początku i na końcu, Tytuł ze spacją na początku, Szczegóły `<TYP>␣␣` albo `<TYP> Ref SP: <ref>␣` — przyciąć przed użyciem |
 | Kwota | `-116,85` — przecinek dziesiętny, bez separatora tysięcy, minus = obciążenie |
 | Daty | `YYYY-MM-DD`; dwie kolumny: `Data transakcji` (używana) i `Data księgowania` (różnią się w ~1,5% wierszy) |
 | Waluta | kolumna `Waluta` przy każdej kwocie; w eksporcie konta PLN zawsze `PLN` |
 | Pola wielowierszowe | brak (0 na 791 wierszy) |
-| Liczba kolumn | 21 (ostatnie 6 puste) — stała dla każdego wiersza danych |
+| Liczba kolumn | 21 — stała dla nagłówka i każdego wiersza danych; nagłówek ma 15 nazw + 6 pustych pól (15–20) |
 | Zakres jednego eksportu | użytkownik wybiera ręcznie; **12 miesięcy w jednym pliku** potwierdzone |
 
 ### Struktura pliku
 
 ```
-wiersze 1–20   preambuła: nazwa dokumentu, data generowania, dane właściciela,
-               „Wybrane rachunki:” (nazwa rachunku ;; numer — 1..n wierszy),
-               „Zakres dat:”;"YYYY-MM-DD - YYYY-MM-DD", „Liczba transakcji:”;N,
-               suma uznań / obciążeń
-wiersz 21      nagłówek kolumn — zaczyna się od "Data transakcji"
-wiersze 22..   dane — każdy wiersz zaczyna się od daty YYYY-MM-DD
-koniec         puste wiersze + "Dokument ma charakter informacyjny…"
+preambuła (17 + n linii, n = liczba rachunków; puste linie między blokami):
+  "Lista transakcji";;;;;"<nagłówek banku>";…
+  "Dokument nr <10 cyfr>_<ddmmyy>";
+  "Wygenerowany dnia: YYYY-MM-DD, HH:MM";…
+  "Dane Użytkownika:";  +  "<właściciel> , <adres>";
+  "Wybrane rachunki:";  +  n × "<nazwa> (PLN)";;"<numer w grupach>";
+  "Zastosowane kryteria wyboru";;;;;"Podsumowanie";;
+  "Zakres dat:";"YYYY-MM-DD - YYYY-MM-DD";"Typy transakcji:";"wszystkie";;"Liczba transakcji:";N;
+  ;;;;;"Suma uznań (N):";<kwota>;PLN;…
+  "Ukryto saldo po transakcji";;;;;"Suma obciążeń (N):";<kwota bez znaku>;PLN;…
+linia 18 + n    nagłówek kolumn — zaczyna się od "Data transakcji" (przy 2 rachunkach: linia 20)
+dalej           dane — każdy wiersz zaczyna się od daty YYYY-MM-DD (bez cudzysłowu)
+koniec          2 puste linie + "Dokument ma charakter informacyjny, nie stanowi dowodu księgowego"; (+ znak nowej linii)
 ```
 
-Parser: szukaj wiersza zaczynającego się od `"Data transakcji"`, nie liczyć na stałe 20 wierszy preambuły. Wiersze danych rozpoznawać po regexie daty w pierwszej kolumnie; wszystko inne po nagłówku to stopka.
+Parser: szukaj wiersza zaczynającego się od `"Data transakcji"` — długość preambuły zależy od liczby rachunków. Wiersze danych rozpoznawać po regexie daty w pierwszej kolumnie; wszystko inne po nagłówku to stopka.
 
 ### Kolumny (indeks od 0)
 
@@ -68,21 +76,22 @@ Parser: szukaj wiersza zaczynającego się od `"Data transakcji"`, nie liczyć n
 |---|---|---|
 | 0 | Data transakcji | data transakcji |
 | 1 | Data księgowania | ignorowana |
-| 2 | Dane kontrahenta | **główne źródło sprzedawcy**; nazwa + adres, wielokrotne spacje |
-| 3 | Tytuł | dla BLIK: `Płatność BLIK dd.mm.yyyy Nr transakcji NNN <domena sprzedawcy>` — końcówka to sprzedawca, gdy kontrahent jest operatorem płatności (D3) |
-| 4 | Nr rachunku | kontrahenta; w `'…'` |
+| 2 | Dane kontrahenta | **główne źródło sprzedawcy**; nazwa + adres, wielokrotne spacje, spacja na początku i na końcu, czasem niepodwojony `"` w środku (T19) |
+| 3 | Tytuł | spacja na początku; dla BLIK: `Płatność BLIK dd.mm.yyyy Nr transakcji NNN <domena sprzedawcy>` — końcówka to sprzedawca, gdy kontrahent jest operatorem płatności (D3) |
+| 4 | Nr rachunku | kontrahenta; w `'…'` ze spacją na końcu; puste w większości `TR.BLIK` (wtedy puste też pole 5) |
 | 5 | Nazwa banku | ignorowana |
 | 6 | Szczegóły | typ: `TR.BLIK` (63%), `PRZELEW` (21%), `P.BLIK` (przelew na telefon), `PRZ SP Ref SP: …` (split payment VAT) |
-| 7 | Nr transakcji | **ID stabilne tylko w parze `(Nr transakcji, Konto)`** — samo ID powtarza się dla dwóch stron przelewu własnego i split payment |
+| 7 | Nr transakcji | `'<18 cyfr>'`; **ID stabilne tylko w parze `(Nr transakcji, Konto)`** — samo ID powtarza się dla dwóch stron przelewu własnego i split payment |
 | 8 | Kwota transakcji (waluta rachunku) | kwota |
 | 9 | Waluta | walidacja `PLN` |
 | 10–13 | Kwota blokady / Kwota płatności w walucie (+ waluty) | puste w eksporcie PLN; blokady nie występują w pliku |
-| 14 | Konto | **nazwa rachunku** — klucz filtra D1 |
+| 14 | Konto | **nazwa rachunku** (jak w preambule, bez ` (PLN)`) — klucz filtra D1 |
+| 15–20 | (bez nazwy) | zawsze puste |
 
 ### Reguły importu ING
 
 1. Dekoduj cp1250 → UTF-8. Odrzuć z komunikatem, jeśli brak wiersza `"Data transakcji"`.
-2. Odczytaj z preambuły: listę rachunków (nazwa → numer), zakres dat, liczbę transakcji (do kontroli poprawności parsowania: liczba wierszy danych == N).
+2. Odczytaj z preambuły: listę rachunków (`"<nazwa> (PLN)";;"<numer>"` → nazwa → numer bez spacji), zakres dat i liczbę transakcji — obie w jednej linii (`"Zakres dat:"` w polu 0–1, `"Liczba transakcji:"`;N w polu 5–6, N bez cudzysłowu); kontrola parsowania: liczba wierszy danych == N.
 3. Zaproponuj rachunek (najwięcej wierszy), użytkownik potwierdza (D1). Pomiń wiersze innych rachunków.
 4. Pomiń kwoty ≥ 0 (D2).
 5. Waluta ≠ `PLN` → odrzuć plik z komunikatem.
@@ -91,6 +100,8 @@ Parser: szukaj wiersza zaczynającego się od `"Data transakcji"`, nie liczyć n
 8. Zakres importu = `Zakres dat` z preambuły (D7).
 
 ### Kształty do seeda (bez danych)
+
+Odwzorowane w syntetycznym fixture `test/fixtures/ing/` — identyfikatory pułapek T01–T19 i wiersze w `test/fixtures/ing/README.md`.
 
 - Ten sam sprzedawca w dwóch zapisach: `marka.pl ADRES Miasto` vs `MARKA SP. Z O.O. ul. Adres Miasto`.
 - Nazwa sklepu zdublowana w polu kontrahenta (`SKLEP X SKLEP X Miasto`).

@@ -1,7 +1,7 @@
 // Synthetic ING statement fixture (F-02): deterministic generator of test/fixtures/ing/.
 // Shapes come from context/foundation/import-formats.md plus a structure-only comparison with a real export
 // (field masks, quoting, counts — no values); every name, number, amount and date below is invented,
-// nothing is copied from a real statement. Traps T01–T18 are declared as data; one run builds the CSV and
+// nothing is copied from a real statement. Traps T01–T19 are declared as data; one run builds the CSV and
 // expected.json together, so the answer key cannot drift from the file.
 // Zero dependencies on purpose, no clock, seeded PRNG. Run: npm run fixture:ing (writes test/fixtures/ing/).
 // Other scripts import { generate } to get the same files in memory (path -> Uint8Array | string).
@@ -101,6 +101,10 @@ export const TRAPS = {
   T16: ["Nowy wzorzec stały tylko w ostatnim miesiącu", "fixed, firstMonth 2026-08 (D6)"],
   T17: ["Uznania (przelew przychodzący, P.BLIK przychodzący)", "pominięte, skipReason credit"],
   T18: ["Wiersze rachunku VAT poza parami T06/T07", "pominięte, skipReason other-account (D1)"],
+  T19: [
+    'Cudzysłów w nazwie kontrahenta bez escapowania (ING nie podwaja `"`)',
+    'parser czyta pole łagodnie: `"` zamyka pole tylko przed `;` lub końcem linii; wzorzec, normalization',
+  ],
 };
 
 // cp1250 encoder: Node's TextDecoder only decodes windows-1250. A character outside the table throws.
@@ -612,6 +616,20 @@ const TRAP_SERIES = [
     entries: [["2026-02-12", 27600]],
     credit: true,
   },
+  {
+    traps: ["T19"],
+    details: "TR.BLIK",
+    // Literal quotes inside the name: ING writes them undoubled, so the field reads " PHU "PRZYKŁAD" JAN … ".
+    counterparty: 'PHU "PRZYKŁAD" JAN TESTOWY UL. LEŚNA 3 PRZYKŁADOWO',
+    title: blik("PRZYKLAD"),
+    entries: [
+      ["2025-11-04", 6700],
+      ["2026-02-24", 7150],
+      ["2026-06-02", 6900],
+    ],
+    pattern: "phu-przyklad",
+    resolvedBy: "normalization",
+  },
 ];
 
 // Noise: ordinary purchases from a small merchant pool, so the main account dominates (D1 default) and the
@@ -651,6 +669,140 @@ function noiseSeries(rng) {
   }));
 }
 
+// Reject files: small statements of the main account (same shape, fictional values), each breaking exactly one
+// import rule. `reason` is the machine code in expected.json; `why` is the README text. Only `overlap` shares
+// dates with the main file; the other two sit in 2024 so their only defect is the one they test.
+const REJECT_FILES = [
+  {
+    reason: "overlap",
+    why: "zakres nachodzi na główny wyciąg przy tym samym numerze rachunku; odrzucenie dopiero po zaimportowaniu głównego (FR-005, `imports_no_overlap`)",
+    fileName: "Lista_transakcji_nr_0000123457_011026-overlap.csv",
+    docNo: "0000123457",
+    generatedOn: "2026-10-01",
+    period: { start: "2026-08-01", end: "2026-09-30" },
+    idBase: 600000000000000,
+    series: [
+      {
+        details: "TR.BLIK",
+        counterparty: "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA",
+        title: blik("muzykalnia.pl"),
+        entries: [
+          ["2026-08-08", 2499],
+          ["2026-09-08", 2499],
+        ],
+        pattern: "muzykalnia",
+      },
+      {
+        details: "TR.BLIK",
+        counterparty: "PAYPRO SA UL. PRZYKŁADOWA 8 POZNAŃ",
+        title: blik("kawa-testowa.pl"),
+        entries: [
+          ["2026-08-02", 3900],
+          ["2026-09-02", 3900],
+        ],
+        pattern: "kawa-testowa.pl",
+      },
+      {
+        details: "PRZELEW",
+        counterparty: "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+        accountNo: "77600000000000000000000002",
+        title: monthTitle("Składki ZUS"),
+        entries: [["2026-09-10", 152300]],
+        pattern: "zus",
+      },
+      {
+        details: "TR.BLIK",
+        counterparty: "KAWIARNIA FILIŻANKA UL. RYNEK 3 KRAKÓW",
+        title: blik("filizanka"),
+        entries: [["2026-09-14", 1450]],
+        pattern: "kawiarnia-filizanka",
+      },
+      {
+        details: "PRZELEW",
+        counterparty: "KLIENT PRZYKŁADOWY SP. Z O.O. UL. ZLECENIOWA 1 GDAŃSK",
+        accountNo: "55444400000000000000000007",
+        title: monthTitle("Zapłata za FV"),
+        entries: [["2026-09-05", 998000]],
+        credit: true,
+      },
+    ],
+  },
+  {
+    reason: "no-header",
+    why: 'brak wiersza nagłówka `"Data transakcji"` — preambuła przechodzi wprost w wiersze danych (reguła 1)',
+    fileName: "Lista_transakcji_nr_0000098765_011024-no-header.csv",
+    docNo: "0000098765",
+    generatedOn: "2024-10-01",
+    period: { start: "2024-09-01", end: "2024-09-30" },
+    idBase: 200000000000000,
+    header: false,
+    series: [
+      {
+        details: "TR.BLIK",
+        counterparty: "PIEKARNIA KŁOSEK PIEKARNIA KŁOSEK ŁÓDŹ",
+        title: blik("KLOSEK"),
+        entries: [
+          ["2024-09-07", 1120],
+          ["2024-09-21", 2240],
+        ],
+        pattern: "piekarnia-klosek",
+      },
+      {
+        details: "PRZELEW",
+        counterparty: "URZĄD SKARBOWY W PRZYKŁADOWIE",
+        accountNo: "7710100\\00001",
+        title: monthTitle("PIT-5L zaliczka"),
+        entries: [["2024-09-20", 64100]],
+        pattern: "urzad-skarbowy",
+      },
+      {
+        details: "TR.BLIK",
+        counterparty: "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+        title: blik("kinoswiatlo.pl"),
+        entries: [["2024-09-13", 3800]],
+        pattern: "kino-swiatlo",
+      },
+    ],
+  },
+  {
+    reason: "currency",
+    why: "jeden wiersz z `Waluta` = `EUR` (reguła 5)",
+    fileName: "Lista_transakcji_nr_0000099876_021124-currency.csv",
+    docNo: "0000099876",
+    generatedOn: "2024-11-02",
+    period: { start: "2024-10-01", end: "2024-10-31" },
+    idBase: 300000000000000,
+    currency: (row) => (row.seq === 1 ? "EUR" : "PLN"),
+    series: [
+      {
+        details: "TR.BLIK",
+        counterparty: "DROGERIA LAWENDA UL. KWIATOWA 14 KRAKÓW",
+        title: blik("lawenda.pl"),
+        entries: [
+          ["2024-10-04", 4270],
+          ["2024-10-18", 2915],
+        ],
+        pattern: "drogeria-lawenda",
+      },
+      {
+        details: "TR.BLIK",
+        counterparty: "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+        title: blik("DROGOWSKAZ"),
+        entries: [["2024-10-11", 21480]],
+        pattern: "stacja-drogowskaz",
+      },
+      {
+        details: "PRZELEW",
+        counterparty: "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+        accountNo: "77600000000000000000000002",
+        title: monthTitle("Składki ZUS"),
+        entries: [["2024-10-10", 139870]],
+        pattern: "zus",
+      },
+    ],
+  },
+];
+
 // Expands series into rows (declaration order = tie-break order); counterparty account numbers are invented.
 function expand(seriesList, rng) {
   const rows = [];
@@ -660,7 +812,7 @@ function expand(seriesList, rng) {
       const title = typeof s.title === "function" ? s.title(date, rng) : s.title;
       const signed = s.credit ? amount : -amount;
       const pairKey = s.pair ? `p${rows.length}` : null;
-      const base = { occurredOn: date, title, splitRef: s.splitRef ?? null, traps: s.traps, pairKey };
+      const base = { occurredOn: date, title, splitRef: s.splitRef ?? null, traps: s.traps ?? [], pairKey };
       rows.push({
         ...base,
         details: s.details,
@@ -717,6 +869,12 @@ const quoteField = (value) => {
   if (/["\r\n]/.test(value)) throw new Error(`field cannot hold quotes or line breaks: ${value}`);
   return `"${value}"`;
 };
+// Dane kontrahenta only: ING puts literal `"` inside the field without doubling them (T19). Allowed on purpose here,
+// but never next to a `;`, at either end or doubled — the reader closes a quoted field only at `"` + `;`/end of line.
+const counterpartyField = (value) => {
+  if (/[\r\n]|"(;|$)|^"|""/.test(value)) throw new Error(`counterparty cannot be read back unambiguously: ${value}`);
+  return `"${value}"`;
+};
 const bareField = (value) => {
   if (/[";\r\n]/.test(value)) throw new Error(`bare field cannot hold quotes, separators or line breaks: ${value}`);
   return value;
@@ -729,8 +887,19 @@ const bankName = (accountNo) => BANKS[[...accountNo].reduce((s, ch) => s + ch.ch
 const detailsText = (row) => (row.splitRef ? `${row.details} Ref SP: ${row.splitRef} ` : `${row.details}  `);
 const preambleName = (account) => `${account.name} (PLN)`;
 
-// Builds one ING statement file and its manifest part. Options exist for the reject files (Phase 2).
-function buildStatement({ fileName, docNo, period, accounts, rows, header = true, currency = () => "PLN" }) {
+// Builds one ING statement file and its manifest part. `header`/`currency` exist for the reject files;
+// `idBase` keeps Nr transakcji unique across files of the same account.
+function buildStatement({
+  fileName,
+  docNo,
+  period,
+  accounts,
+  rows,
+  generatedOn = GENERATED_ON,
+  idBase = 400000000000000,
+  header = true,
+  currency = () => "PLN",
+}) {
   const ordered = [...rows].sort((a, b) =>
     a.occurredOn === b.occurredOn ? a.seq - b.seq : a.occurredOn < b.occurredOn ? 1 : -1,
   );
@@ -738,7 +907,7 @@ function buildStatement({ fileName, docNo, period, accounts, rows, header = true
   const ids = new Map();
   [...ordered].reverse().forEach((row, i) => {
     const key = row.pairKey ?? `r${row.seq}`;
-    if (!ids.has(key)) ids.set(key, `310${400000000000000 + i * 1013 + ((row.seq * 37) % 1000)}`);
+    if (!ids.has(key)) ids.set(key, `310${idBase + i * 1013 + ((row.seq * 37) % 1000)}`);
   });
   const dataLines = ordered.map((row, i) => {
     // ~1.5% of rows are booked a day later than the transaction date.
@@ -746,7 +915,7 @@ function buildStatement({ fileName, docNo, period, accounts, rows, header = true
     const fields = [
       bareField(row.occurredOn),
       bareField(shifted ? addDays(row.occurredOn, 1) : row.occurredOn),
-      quoteField(`${row.counterparty} `),
+      counterpartyField(` ${row.counterparty} `),
       quoteField(` ${row.title}`),
       row.accountNo ? bareField(`'${row.accountNo} '`) : "",
       row.accountNo ? quoteField(bankName(row.accountNo)) : "",
@@ -766,18 +935,18 @@ function buildStatement({ fileName, docNo, period, accounts, rows, header = true
   const credits = rows.filter((r) => r.amountMinor > 0);
   const debits = rows.filter((r) => r.amountMinor < 0);
   const sum = (list) => list.reduce((s, r) => s + Math.abs(r.amountMinor), 0);
-  const ddmmyy = `${GENERATED_ON.slice(8, 10)}${GENERATED_ON.slice(5, 7)}${GENERATED_ON.slice(2, 4)}`;
+  const ddmmyy = `${generatedOn.slice(8, 10)}${generatedOn.slice(5, 7)}${generatedOn.slice(2, 4)}`;
   // Layout of the real export; the header line number depends on the account count (18 + accounts).
   const preamble = [
     csvLine([quoteField("Lista transakcji"), "", "", "", "", quoteField(BANK_HEADER)], ROW_WIDTH),
     csvLine([quoteField(`Dokument nr ${docNo}_${ddmmyy}`)], 2),
-    csvLine([quoteField(`Wygenerowany dnia: ${GENERATED_ON}, ${GENERATED_AT}`)], ROW_WIDTH),
+    csvLine([quoteField(`Wygenerowany dnia: ${generatedOn}, ${GENERATED_AT}`)], ROW_WIDTH),
     "",
     csvLine([quoteField("Dane Użytkownika:")], 2),
     csvLine([quoteField(`${OWNER.name} , ${OWNER.address}`)], 2),
     "",
     csvLine([quoteField("Wybrane rachunki:")], 2),
-    ...accounts.map((a) => csvLine([quoteField(preambleName(a)), "", quoteField(`${a.number} `)], 4)),
+    ...accounts.map((a) => csvLine([quoteField(preambleName(a)), "", quoteField(a.number)], 4)),
     "",
     csvLine([quoteField("Zastosowane kryteria wyboru"), "", "", "", "", quoteField("Podsumowanie")], 8),
     "",
@@ -815,7 +984,11 @@ function buildStatement({ fileName, docNo, period, accounts, rows, header = true
     "",
   ];
   const headerLines = header ? [csvLine(COLUMNS.map(quoteField), ROW_WIDTH)] : [];
-  const footer = ["", "", quoteField("Dokument ma charakter informacyjny, nie stanowi dowodu księgowego.")];
+  const footer = [
+    "",
+    "",
+    csvLine([quoteField("Dokument ma charakter informacyjny, nie stanowi dowodu księgowego")], 2),
+  ];
   const text = [...preamble, ...headerLines, ...dataLines, ...footer].join("\n") + "\n";
   if (text.includes("\r")) throw new Error(`${fileName}: CR in output, line endings must be LF`);
   for (const line of dataLines) {
@@ -908,7 +1081,7 @@ function buildPatterns(manifestRows, ordered) {
   return patterns;
 }
 
-function readme(expected) {
+function readme(expected, rejectWhy) {
   const main = expected.files[MAIN_FILE];
   const trapRows = (id) =>
     expected.rows
@@ -927,13 +1100,14 @@ function readme(expected) {
     "",
     "- cp1250 bez BOM, końce linii LF, separator `;`, 21 pól w wierszu danych i nagłówku (pola 15–20 puste);",
     "- preambuła o zmiennej długości (18 linii + 1 na rachunek): nagłówek banku, `Dokument nr …`, `Wygenerowany dnia: …`,",
-    '  `Dane Użytkownika:`, `Wybrane rachunki:` (`"<nazwa> (PLN)";;"<numer> ";`), `Zakres dat:` / `Liczba transakcji:`,',
+    '  `Dane Użytkownika:`, `Wybrane rachunki:` (`"<nazwa> (PLN)";;"<numer>";`), `Zakres dat:` / `Liczba transakcji:`,',
     "  `Suma uznań (N):` / `Suma obciążeń (N):` (kwoty bez znaku, bez cudzysłowu); przy 2 rachunkach nagłówek kolumn",
     '  od `"Data transakcji"` jest w linii 20 — parser ma go szukać, nie liczyć linii;',
     "- mieszane cudzysłowy: daty, kwota, waluta, `Nr rachunku` (`'<cyfry> '`) i `Nr transakcji` (`'<18 cyfr>'`) bez `\"`;",
-    "  `Dane kontrahenta` ze spacją na końcu, `Tytuł` ze spacją na początku, `Szczegóły` z dwiema spacjami po typie",
+    "  `Dane kontrahenta` ze spacją na początku i na końcu, `Tytuł` ze spacją na początku, `Szczegóły` z dwiema spacjami po typie",
     "  (`PRZ SP Ref SP: <ref> ` przy split payment), `Konto` = nazwa rachunku bez ` (PLN)`;",
-    "- `TR.BLIK` prawie zawsze bez `Nr rachunku` i `Nazwa banku`; stopka `Dokument ma charakter informacyjny…`.",
+    '- cudzysłów wewnątrz `Dane kontrahenta` nie jest podwajany (`" PHU "NAZWA" … "`) — pole kończy `"` przed `;` lub końcem linii;',
+    '- `TR.BLIK` prawie zawsze bez `Nr rachunku` i `Nazwa banku`; stopka `"Dokument ma charakter informacyjny…";` po 2 pustych liniach.',
     "",
     "Wszystkie nazwy, numery, kwoty i daty są wymyślone — żadna wartość nie pochodzi z prawdziwego wyciągu",
     "(jedyny prawdziwy napis to nagłówek banku w linii 1).",
@@ -942,12 +1116,14 @@ function readme(expected) {
     "",
     "| Plik | Oczekiwany wynik |",
     "|---|---|",
-    ...Object.entries(expected.files).map(
-      ([name, f]) =>
-        `| \`${name}\` | ${f.expect}${f.reason ? ` (${f.reason})` : ""}; rachunek domyślny \`${f.defaultAccount}\`, ` +
-        `${f.declaredCount} wierszy, import ${f.imported.count} obciążeń, suma ${formatAmount(f.imported.sumMinor)} zł |`,
+    ...Object.entries(expected.files).map(([name, f]) =>
+      f.expect === "reject"
+        ? `| \`${name}\` | reject (\`${f.reason}\`): ${rejectWhy[name]}; wiersze danych: ${f.declaredCount}, ` +
+          `zakres ${f.period.start} – ${f.period.end} |`
+        : `| \`${name}\` | ok; rachunek domyślny \`${f.defaultAccount}\`, ${f.declaredCount} wierszy, ` +
+          `import ${f.imported.count} obciążeń, suma ${formatAmount(f.imported.sumMinor)} zł |`,
     ),
-    "| `expected.json` | klucz odpowiedzi: `files`, `rows` (każdy wiersz danych), `patterns` (oczekiwane wzorce) |",
+    "| `expected.json` | klucz odpowiedzi: `files`, `rows` (każdy wiersz danych plików `ok`), `patterns` (oczekiwane wzorce) |",
     "",
     `Zakres głównego wyciągu: ${main.period.start} – ${main.period.end}; rachunki: ${main.accounts
       .map((a) => `${a.name} (${a.rows})`)
@@ -963,6 +1139,10 @@ function readme(expected) {
     "  `user-merge` / `user-exclude` (decyzje FR-009), `rawMerchants` = surowi sprzedawcy scaleni we wzorzec.",
     "- `files[].accounts[]` — `name` jak w kolumnie `Konto`, `preambleName` jak w preambule (z ` (PLN)`), `number` bez spacji;",
     "  `imported.sumMinor` — suma importowanych obciążeń (dodatnia).",
+    "- `files[].expect` — `ok` albo `reject` z `reason`: `overlap` (zakres nachodzi na plik z `overlapsWith` przy tym",
+    "  samym numerze rachunku — odrzucenie dopiero po zaimportowaniu tamtego), `no-header` (brak wiersza",
+    '  `"Data transakcji"`), `currency` (`Waluta` ≠ `PLN`). Plik `reject` nie importuje niczego (`imported.count` = 0),',
+    "  a jego wiersze nie trafiają do `rows[]` ani `patterns[]`; poza swoją wadą ma ten sam kształt co główny wyciąg.",
     "",
     "## Pułapki",
     "",
@@ -999,17 +1179,32 @@ export function generate() {
     accounts: [MAIN, VAT],
     rows,
   });
+  // Own PRNG stream, so adding or changing a reject file never shifts a byte of the main file.
+  const rejectRng = mulberry32(SEED + 1);
+  const rejects = REJECT_FILES.map((spec) => {
+    const built = buildStatement({ ...spec, accounts: [MAIN], rows: expand(spec.series, rejectRng) });
+    // Rejected as a whole: nothing is imported, so its rows stay out of rows[]/patterns[].
+    const file = {
+      ...built.file,
+      expect: "reject",
+      reason: spec.reason,
+      ...(spec.reason === "overlap" ? { overlapsWith: MAIN_FILE } : {}),
+      imported: { count: 0, sumMinor: 0 },
+    };
+    return { name: spec.fileName, why: spec.why, bytes: built.bytes, file };
+  });
   const expected = {
     schema: 1,
     tolerance: TOLERANCE,
-    files: { [MAIN_FILE]: main.file },
+    files: { [MAIN_FILE]: main.file, ...Object.fromEntries(rejects.map((r) => [r.name, r.file])) },
     rows: main.manifestRows,
     patterns: buildPatterns(main.manifestRows, main.ordered),
   };
   return {
     [MAIN_FILE]: main.bytes,
+    ...Object.fromEntries(rejects.map((r) => [r.name, r.bytes])),
     "expected.json": JSON.stringify(expected, null, 2) + "\n",
-    "README.md": readme(expected),
+    "README.md": readme(expected, Object.fromEntries(rejects.map((r) => [r.name, r.why]))),
   };
 }
 

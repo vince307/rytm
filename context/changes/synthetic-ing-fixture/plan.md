@@ -317,14 +317,14 @@ Brak zmian schematu i danych w bazie.
 
 #### Automated
 
-- [x] 2.1 Kontrola przechodzi: `npm run fixture:check` kończy się kodem 0
-- [x] 2.2 Kontrola łapie zmianę: po ręcznej zmianie jednego bajtu w głównym CSV `npm run fixture:check` kończy się kodem ≠ 0 (potem `git checkout` pliku)
-- [x] 2.3 Pliki błędów istnieją z wpisami `expect: "reject"` dla `overlap`, `no-header`, `currency` w `expected.json`
-- [x] 2.4 `npm run fixture:shape` bez pliku w `data/` kończy się kodem 0 z komunikatem
-- [x] 2.5 Lint przechodzi: `npm run lint`
-- [ ] 2.6 Job `ci` w GitHub Actions jest zielony z krokiem `fixture:check`
+- [x] 2.1 Kontrola przechodzi: `npm run fixture:check` kończy się kodem 0 — b46c323
+- [x] 2.2 Kontrola łapie zmianę: po ręcznej zmianie jednego bajtu w głównym CSV `npm run fixture:check` kończy się kodem ≠ 0 (potem `git checkout` pliku) — b46c323
+- [x] 2.3 Pliki błędów istnieją z wpisami `expect: "reject"` dla `overlap`, `no-header`, `currency` w `expected.json` — b46c323
+- [x] 2.4 `npm run fixture:shape` bez pliku w `data/` kończy się kodem 0 z komunikatem — b46c323
+- [x] 2.5 Lint przechodzi: `npm run lint` — b46c323
+- [x] 2.6 Job `ci` w GitHub Actions jest zielony z krokiem `fixture:check` — b46c323
 
 #### Manual
 
-- [x] 2.7 `npm run fixture:shape` na prawdziwym wyciągu lokalnie: wyjście nie zawiera żadnych danych (nazw, kwot, numerów, dat), a różnice struktury są zrozumiałe lub naprawione w generatorze
-- [x] 2.8 `README.md` fixture pozwala osobie spoza projektu znaleźć wiersze danej pułapki i zregenerować pliki
+- [x] 2.7 `npm run fixture:shape` na prawdziwym wyciągu lokalnie: wyjście nie zawiera żadnych danych (nazw, kwot, numerów, dat), a różnice struktury są zrozumiałe lub naprawione w generatorze — b46c323
+- [x] 2.8 `README.md` fixture pozwala osobie spoza projektu znaleźć wiersze danej pułapki i zregenerować pliki — b46c323

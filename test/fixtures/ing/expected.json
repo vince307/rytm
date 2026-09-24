@@ -1,0 +1,3792 @@
+{
+  "schema": 1,
+  "tolerance": {
+    "pct": 15,
+    "minMinor": 1000,
+    "rule": "D5: max(15% mediany, 10 zł); |kwota - mediana| <= tolerancja; mediana parzystej liczby = średnia dwóch środkowych"
+  },
+  "files": {
+    "Lista_transakcji_nr_0000123456_010926.csv": {
+      "expect": "ok",
+      "reason": null,
+      "accounts": [
+        {
+          "name": "Rachunek Firmowy Główny",
+          "preambleName": "Rachunek Firmowy Główny (PLN)",
+          "number": "11111100000000000000000001",
+          "rows": 219
+        },
+        {
+          "name": "Rachunek VAT",
+          "preambleName": "Rachunek VAT (PLN)",
+          "number": "11111100000000000000000002",
+          "rows": 12
+        }
+      ],
+      "defaultAccount": "Rachunek Firmowy Główny",
+      "period": {
+        "start": "2025-09-01",
+        "end": "2026-08-31"
+      },
+      "declaredCount": 231,
+      "imported": {
+        "count": 203,
+        "sumMinor": 6476397
+      }
+    }
+  },
+  "rows": [
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 21,
+      "bankTxId": "310400000000233020",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-29",
+      "amountMinor": -30441,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 22,
+      "bankTxId": "310400000000232787",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-22",
+      "amountMinor": -5600,
+      "traps": [
+        "T12"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RESTAURACJA POD PRZYKŁADEM UL. SMACZNA 2 WROCŁAW",
+      "pattern": "restauracja-pod-przykladem"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 23,
+      "bankTxId": "310400000000231072",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-20",
+      "amountMinor": -84700,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "URZĄD SKARBOWY W PRZYKŁADOWIE",
+      "pattern": "urzad-skarbowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 24,
+      "bankTxId": "310400000000230352",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-18",
+      "amountMinor": -6707,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIZZERIA TRZY SERY UL. MAKOWA 9 KRAKÓW",
+      "pattern": "pizzeria-trzy-sery"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 25,
+      "bankTxId": "310400000000229672",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-18",
+      "amountMinor": -24418,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 26,
+      "bankTxId": "310400000000228806",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-18",
+      "amountMinor": -11476,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "SKLEP ZOOLOGICZNY PAZUREK UL. PSIA 6 KRAKÓW",
+      "pattern": "zoologiczny-pazurek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 27,
+      "bankTxId": "310400000000227352",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-17",
+      "amountMinor": -5599,
+      "traps": [
+        "T11"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA",
+      "pattern": "kinoteka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 28,
+      "bankTxId": "310400000000226676",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-14",
+      "amountMinor": -2710,
+      "traps": [
+        "T03"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MINIMARKET PRZYSTANEK 1187 AL. ŚWIERKOWA 5 KRAKÓW",
+      "pattern": "minimarket-przystanek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 29,
+      "bankTxId": "310400000000225175",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-14",
+      "amountMinor": -6899,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 30,
+      "bankTxId": "310400000000224537",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-11",
+      "amountMinor": -150000,
+      "traps": [
+        "T08"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-konto-osobiste"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 31,
+      "bankTxId": "310400000000223412",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-10",
+      "amountMinor": -151230,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+      "pattern": "zus"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 32,
+      "bankTxId": "310400000000222544",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-10",
+      "amountMinor": -28610,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 33,
+      "bankTxId": "310400000000221830",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-08",
+      "amountMinor": -2499,
+      "traps": [
+        "T10"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA",
+      "pattern": "muzykalnia"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 34,
+      "bankTxId": "310400000000220665",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-08",
+      "amountMinor": -2564,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "SKLEP ZOOLOGICZNY PAZUREK UL. PSIA 6 KRAKÓW",
+      "pattern": "zoologiczny-pazurek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 35,
+      "bankTxId": "310400000000219059",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-07",
+      "amountMinor": -2601,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ADAM TESTOWY",
+      "pattern": "adam-testowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 36,
+      "bankTxId": "310400000000218086",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-05",
+      "amountMinor": -12900,
+      "traps": [
+        "T16"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "SIŁOWNIA RUCH UL. MOCNA 10 KRAKÓW",
+      "pattern": "silownia-ruch"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 37,
+      "bankTxId": "310400000000217517",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-05",
+      "amountMinor": 1021000,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 38,
+      "bankTxId": "310400000000216764",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-03",
+      "amountMinor": -2199,
+      "traps": [
+        "T14"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PAYPAL EUROPE S.A.R.L. ET CIE S.C.A LUXEMBOURG",
+      "pattern": "paypal"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 39,
+      "bankTxId": "310400000000215342",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-03",
+      "amountMinor": -12065,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 40,
+      "bankTxId": "310400000000214112",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-02",
+      "amountMinor": -3900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kawa-testowa.pl",
+      "pattern": "kawa-testowa.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 41,
+      "bankTxId": "310400000000213390",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-08-01",
+      "amountMinor": -8476,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 42,
+      "bankTxId": "310400000000211934",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-29",
+      "amountMinor": -33000,
+      "traps": [
+        "T15"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ALLEGRO SP. Z O.O. UL. PRZYKŁADOWA 5 POZNAŃ",
+      "pattern": "allegro"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 43,
+      "bankTxId": "310400000000211185",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-25",
+      "amountMinor": -1480,
+      "traps": [
+        "T02"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIEKARNIA KŁOSEK PIEKARNIA KŁOSEK ŁÓDŹ",
+      "pattern": "piekarnia-klosek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 44,
+      "bankTxId": "310400000000210127",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-25",
+      "amountMinor": -6667,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIOTR FIKCYJNY",
+      "pattern": "piotr-fikcyjny"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 45,
+      "bankTxId": "310400000000209635",
+      "account": "Rachunek VAT",
+      "occurredOn": "2026-07-24",
+      "amountMinor": -58900,
+      "traps": [
+        "T18"
+      ],
+      "imported": false,
+      "skipReason": "other-account",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 46,
+      "bankTxId": "310400000000208213",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-24",
+      "amountMinor": -5198,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 47,
+      "bankTxId": "310400000000206723",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-20",
+      "amountMinor": -30100,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "URZĄD SKARBOWY W PRZYKŁADOWIE",
+      "pattern": "urzad-skarbowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 48,
+      "bankTxId": "310400000000206412",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-18",
+      "amountMinor": -12400,
+      "traps": [
+        "T12"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RESTAURACJA POD PRZYKŁADEM UL. SMACZNA 2 WROCŁAW",
+      "pattern": "restauracja-pod-przykladem"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 49,
+      "bankTxId": "310400000000205029",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-17",
+      "amountMinor": -5599,
+      "traps": [
+        "T11"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA",
+      "pattern": "kinoteka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 50,
+      "bankTxId": "310400000000203872",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-12",
+      "amountMinor": -15490,
+      "traps": [
+        "T01"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "SPORTOWO SP. Z O.O. ul. Biegowa 7 Gdynia",
+      "pattern": "sportowo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 51,
+      "bankTxId": "310400000000203227",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-11",
+      "amountMinor": -150000,
+      "traps": [
+        "T08"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-konto-osobiste"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 52,
+      "bankTxId": "310400000000202102",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-10",
+      "amountMinor": -199945,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+      "pattern": "zus"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 53,
+      "bankTxId": "310400000000201344",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-09",
+      "amountMinor": -3561,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 54,
+      "bankTxId": "310400000000200520",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-08",
+      "amountMinor": -2499,
+      "traps": [
+        "T10"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA",
+      "pattern": "muzykalnia"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 55,
+      "bankTxId": "310400000000199430",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-07",
+      "amountMinor": -22140,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 56,
+      "bankTxId": "310400000000197972",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-07",
+      "amountMinor": -4066,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 57,
+      "bankTxId": "310400000000197220",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-05",
+      "amountMinor": 1110000,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 58,
+      "bankTxId": "310400000000196434",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-03",
+      "amountMinor": -8999,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ksiegarnia-przyklad.pl",
+      "pattern": "ksiegarnia-przyklad.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 59,
+      "bankTxId": "310400000000195045",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-03",
+      "amountMinor": -18859,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 60,
+      "bankTxId": "310400000000193815",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-07-02",
+      "amountMinor": -3900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kawa-testowa.pl",
+      "pattern": "kawa-testowa.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 61,
+      "bankTxId": "310400000000192612",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-27",
+      "amountMinor": -2034,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KAWIARNIA FILIŻANKA UL. RYNEK 3 KRAKÓW",
+      "pattern": "kawiarnia-filizanka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 62,
+      "bankTxId": "310400000000192086",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-26",
+      "amountMinor": -6230,
+      "traps": [
+        "T03"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MINIMARKET PRZYSTANEK 0412 UL. TORUŃSKA 12 KRAKÓW",
+      "pattern": "minimarket-przystanek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 63,
+      "bankTxId": "310400000000189651",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-24",
+      "amountMinor": -32200,
+      "traps": [
+        "T07"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RACHUNEK VAT PRZYKŁADOWA FIRMA",
+      "pattern": "przeksiegowanie-vat"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 64,
+      "bankTxId": "310400000000189651",
+      "account": "Rachunek VAT",
+      "occurredOn": "2026-06-24",
+      "amountMinor": 32200,
+      "traps": [
+        "T07"
+      ],
+      "imported": false,
+      "skipReason": "other-account",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 65,
+      "bankTxId": "310400000000188452",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-20",
+      "amountMinor": -99900,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "URZĄD SKARBOWY W PRZYKŁADOWIE",
+      "pattern": "urzad-skarbowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 66,
+      "bankTxId": "310400000000187959",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-18",
+      "amountMinor": -1899,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "apteka-przyklad.pl",
+      "pattern": "apteka-przyklad.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 67,
+      "bankTxId": "310400000000186758",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-17",
+      "amountMinor": -5599,
+      "traps": [
+        "T11"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA",
+      "pattern": "kinoteka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 68,
+      "bankTxId": "310400000000185890",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-17",
+      "amountMinor": -4124,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 69,
+      "bankTxId": "310400000000184277",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-15",
+      "amountMinor": -210000,
+      "traps": [
+        "T06"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PRZYKŁADOWA FIRMA JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-wlasny-vat"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 70,
+      "bankTxId": "310400000000184277",
+      "account": "Rachunek VAT",
+      "occurredOn": "2026-06-15",
+      "amountMinor": 210000,
+      "traps": [
+        "T06"
+      ],
+      "imported": false,
+      "skipReason": "other-account",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 71,
+      "bankTxId": "310400000000182593",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-15",
+      "amountMinor": -3408,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KAWIARNIA FILIŻANKA UL. RYNEK 3 KRAKÓW",
+      "pattern": "kawiarnia-filizanka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 72,
+      "bankTxId": "310400000000181689",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-13",
+      "amountMinor": -4697,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MARIA PRZYKŁADOWA",
+      "pattern": "maria-przykladowa"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 73,
+      "bankTxId": "310400000000180904",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-11",
+      "amountMinor": -150000,
+      "traps": [
+        "T08"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-konto-osobiste"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 74,
+      "bankTxId": "310400000000179779",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-10",
+      "amountMinor": -158818,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+      "pattern": "zus"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 75,
+      "bankTxId": "310400000000178399",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-09",
+      "amountMinor": -12900,
+      "traps": [
+        "T01"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "sportowo.pl UL. BIEGOWA 7 GDYNIA",
+      "pattern": "sportowo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 76,
+      "bankTxId": "310400000000178197",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-08",
+      "amountMinor": -2499,
+      "traps": [
+        "T10"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA",
+      "pattern": "muzykalnia"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 77,
+      "bankTxId": "310400000000176626",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-08",
+      "amountMinor": -11012,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIZZERIA TRZY SERY UL. MAKOWA 9 KRAKÓW",
+      "pattern": "pizzeria-trzy-sery"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 78,
+      "bankTxId": "310400000000175871",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-06",
+      "amountMinor": -7444,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 79,
+      "bankTxId": "310400000000174897",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-05",
+      "amountMinor": 953000,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 80,
+      "bankTxId": "310400000000173518",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-06-02",
+      "amountMinor": -3900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kawa-testowa.pl",
+      "pattern": "kawa-testowa.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 81,
+      "bankTxId": "310400000000172946",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-30",
+      "amountMinor": -6900,
+      "traps": [
+        "T12"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RESTAURACJA POD PRZYKŁADEM UL. SMACZNA 2 WROCŁAW",
+      "pattern": "restauracja-pod-przykladem"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 82,
+      "bankTxId": "310400000000171374",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-27",
+      "amountMinor": -4730,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ADAM TESTOWY",
+      "pattern": "adam-testowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 83,
+      "bankTxId": "310400000000170252",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-26",
+      "amountMinor": -2863,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KAWIARNIA FILIŻANKA UL. RYNEK 3 KRAKÓW",
+      "pattern": "kawiarnia-filizanka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 84,
+      "bankTxId": "310400000000169498",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-26",
+      "amountMinor": -9910,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIZZERIA TRZY SERY UL. MAKOWA 9 KRAKÓW",
+      "pattern": "pizzeria-trzy-sery"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 85,
+      "bankTxId": "310400000000168967",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-24",
+      "amountMinor": 4500,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 86,
+      "bankTxId": "310400000000167841",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-24",
+      "amountMinor": -2699,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 87,
+      "bankTxId": "310400000000166575",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-23",
+      "amountMinor": -12000,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "https://www.bilety-przyklad.pl",
+      "pattern": "bilety-przyklad.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 88,
+      "bankTxId": "310400000000165852",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-23",
+      "amountMinor": -7123,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 89,
+      "bankTxId": "310400000000164579",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-22",
+      "amountMinor": -6049,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIOTR FIKCYJNY",
+      "pattern": "piotr-fikcyjny"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 90,
+      "bankTxId": "310400000000164090",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-20",
+      "amountMinor": -73400,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "URZĄD SKARBOWY W PRZYKŁADOWIE",
+      "pattern": "urzad-skarbowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 91,
+      "bankTxId": "310400000000162409",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-17",
+      "amountMinor": -5599,
+      "traps": [
+        "T11"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA",
+      "pattern": "kinoteka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 92,
+      "bankTxId": "310400000000162060",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-17",
+      "amountMinor": -20240,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 93,
+      "bankTxId": "310400000000160498",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-16",
+      "amountMinor": -3120,
+      "traps": [
+        "T02"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIEKARNIA KŁOSEK PIEKARNIA KŁOSEK ŁÓDŹ",
+      "pattern": "piekarnia-klosek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 94,
+      "bankTxId": "310400000000159220",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-13",
+      "amountMinor": -1655,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KAWIARNIA FILIŻANKA UL. RYNEK 3 KRAKÓW",
+      "pattern": "kawiarnia-filizanka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 95,
+      "bankTxId": "310400000000158208",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-12",
+      "amountMinor": -2890,
+      "traps": [
+        "T15"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ALLEGRO SP. Z O.O. UL. PRZYKŁADOWA 5 POZNAŃ",
+      "pattern": "allegro"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 96,
+      "bankTxId": "310400000000157568",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-11",
+      "amountMinor": -150000,
+      "traps": [
+        "T08"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-konto-osobiste"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 97,
+      "bankTxId": "310400000000156443",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-10",
+      "amountMinor": -144009,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+      "pattern": "zus"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 98,
+      "bankTxId": "310400000000155874",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-08",
+      "amountMinor": -2499,
+      "traps": [
+        "T10"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA",
+      "pattern": "muzykalnia"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 99,
+      "bankTxId": "310400000000154190",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-08",
+      "amountMinor": -12758,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ADAM TESTOWY",
+      "pattern": "adam-testowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 100,
+      "bankTxId": "310400000000153587",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-05",
+      "amountMinor": 1067000,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 101,
+      "bankTxId": "310400000000152690",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-02",
+      "amountMinor": -4899,
+      "traps": [
+        "T03"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MINIMARKET PRZYSTANEK 1187 AL. ŚWIERKOWA 5 KRAKÓW",
+      "pattern": "minimarket-przystanek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 102,
+      "bankTxId": "310400000000151195",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-02",
+      "amountMinor": -3900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kawa-testowa.pl",
+      "pattern": "kawa-testowa.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 103,
+      "bankTxId": "310400000000150250",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-02",
+      "amountMinor": -3525,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 104,
+      "bankTxId": "310400000000149903",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-02",
+      "amountMinor": -6931,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "SKLEP ZOOLOGICZNY PAZUREK UL. PSIA 6 KRAKÓW",
+      "pattern": "zoologiczny-pazurek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 105,
+      "bankTxId": "310400000000148557",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-05-01",
+      "amountMinor": -3759,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 106,
+      "bankTxId": "310400000000147107",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-28",
+      "amountMinor": -5999,
+      "traps": [
+        "T01"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "SPORTOWO SP. Z O.O. ul. Biegowa 7 Gdynia",
+      "pattern": "sportowo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 107,
+      "bankTxId": "310400000000146012",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-28",
+      "amountMinor": -8318,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ADAM TESTOWY",
+      "pattern": "adam-testowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 108,
+      "bankTxId": "310400000000145074",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-27",
+      "amountMinor": -1509,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "DROGERIA LAWENDA UL. KWIATOWA 14 KRAKÓW",
+      "pattern": "drogeria-lawenda"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 109,
+      "bankTxId": "310400000000144545",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-25",
+      "amountMinor": -9800,
+      "traps": [
+        "T12"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RESTAURACJA POD PRZYKŁADEM UL. SMACZNA 2 WROCŁAW",
+      "pattern": "restauracja-pod-przykladem"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 110,
+      "bankTxId": "310400000000143753",
+      "account": "Rachunek VAT",
+      "occurredOn": "2026-04-24",
+      "amountMinor": -47800,
+      "traps": [
+        "T18"
+      ],
+      "imported": false,
+      "skipReason": "other-account",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 111,
+      "bankTxId": "310400000000142591",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-22",
+      "amountMinor": -27841,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 112,
+      "bankTxId": "310400000000141767",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-20",
+      "amountMinor": -55600,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "URZĄD SKARBOWY W PRZYKŁADOWIE",
+      "pattern": "urzad-skarbowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 113,
+      "bankTxId": "310400000000140086",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-17",
+      "amountMinor": -5599,
+      "traps": [
+        "T11"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA",
+      "pattern": "kinoteka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 114,
+      "bankTxId": "310400000000139483",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-16",
+      "amountMinor": -8400,
+      "traps": [
+        "T05"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "AUTOPAY S.A. UL. PRZYKŁADOWA 9 SOPOT",
+      "pattern": "autopay"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 115,
+      "bankTxId": "310400000000138656",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-11",
+      "amountMinor": -3250,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ksiegarnia-przyklad.pl",
+      "pattern": "ksiegarnia-przyklad.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 116,
+      "bankTxId": "310400000000137271",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-11",
+      "amountMinor": -150000,
+      "traps": [
+        "T08"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-konto-osobiste"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 117,
+      "bankTxId": "310400000000136146",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-10",
+      "amountMinor": -187020,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+      "pattern": "zus"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 118,
+      "bankTxId": "310400000000135577",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-08",
+      "amountMinor": -2499,
+      "traps": [
+        "T10"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA",
+      "pattern": "muzykalnia"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 119,
+      "bankTxId": "310400000000134674",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-07",
+      "amountMinor": -7250,
+      "traps": [
+        "T14"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PAYPAL EUROPE S.A.R.L. ET CIE S.C.A LUXEMBOURG",
+      "pattern": "paypal"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 120,
+      "bankTxId": "310400000000133177",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-06",
+      "amountMinor": -5276,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 121,
+      "bankTxId": "310400000000132277",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-05",
+      "amountMinor": 894000,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 122,
+      "bankTxId": "310400000000130898",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-02",
+      "amountMinor": -3900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kawa-testowa.pl",
+      "pattern": "kawa-testowa.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 123,
+      "bankTxId": "310400000000130102",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-04-01",
+      "amountMinor": -6755,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIZZERIA TRZY SERY UL. MAKOWA 9 KRAKÓW",
+      "pattern": "pizzeria-trzy-sery"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 124,
+      "bankTxId": "310400000000129569",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-31",
+      "amountMinor": -6019,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "SKLEP ZOOLOGICZNY PAZUREK UL. PSIA 6 KRAKÓW",
+      "pattern": "zoologiczny-pazurek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 125,
+      "bankTxId": "310400000000128300",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-28",
+      "amountMinor": -5100,
+      "traps": [
+        "T12"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RESTAURACJA POD PRZYKŁADEM UL. SMACZNA 2 WROCŁAW",
+      "pattern": "restauracja-pod-przykladem"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 126,
+      "bankTxId": "310400000000127472",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-26",
+      "amountMinor": 25900,
+      "traps": [
+        "T01",
+        "T13"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 127,
+      "bankTxId": "310400000000125717",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-25",
+      "amountMinor": -2566,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KAWIARNIA FILIŻANKA UL. RYNEK 3 KRAKÓW",
+      "pattern": "kawiarnia-filizanka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 128,
+      "bankTxId": "310400000000123732",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-24",
+      "amountMinor": -18400,
+      "traps": [
+        "T07"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RACHUNEK VAT PRZYKŁADOWA FIRMA",
+      "pattern": "przeksiegowanie-vat"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 129,
+      "bankTxId": "310400000000123732",
+      "account": "Rachunek VAT",
+      "occurredOn": "2026-03-24",
+      "amountMinor": 18400,
+      "traps": [
+        "T07"
+      ],
+      "imported": false,
+      "skipReason": "other-account",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 130,
+      "bankTxId": "310400000000122863",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-23",
+      "amountMinor": -5479,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIZZERIA TRZY SERY UL. MAKOWA 9 KRAKÓW",
+      "pattern": "pizzeria-trzy-sery"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 131,
+      "bankTxId": "310400000000121589",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-23",
+      "amountMinor": -13588,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "SKLEP ZOOLOGICZNY PAZUREK UL. PSIA 6 KRAKÓW",
+      "pattern": "zoologiczny-pazurek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 132,
+      "bankTxId": "310400000000120621",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-21",
+      "amountMinor": -25900,
+      "traps": [
+        "T01"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "sportowo.pl UL. BIEGOWA 7 GDYNIA",
+      "pattern": "sportowo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 133,
+      "bankTxId": "310400000000120457",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-20",
+      "amountMinor": -148800,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "URZĄD SKARBOWY W PRZYKŁADOWIE",
+      "pattern": "urzad-skarbowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 134,
+      "bankTxId": "310400000000118776",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-17",
+      "amountMinor": -5599,
+      "traps": [
+        "T11"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA",
+      "pattern": "kinoteka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 135,
+      "bankTxId": "310400000000118464",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-16",
+      "amountMinor": -9533,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 136,
+      "bankTxId": "310400000000116747",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-15",
+      "amountMinor": -5350,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "DROGERIA LAWENDA UL. KWIATOWA 14 KRAKÓW",
+      "pattern": "drogeria-lawenda"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 137,
+      "bankTxId": "310400000000116074",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-13",
+      "amountMinor": -1799,
+      "traps": [
+        "T03"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MINIMARKET PRZYSTANEK 0412 UL. TORUŃSKA 12 KRAKÓW",
+      "pattern": "minimarket-przystanek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 138,
+      "bankTxId": "310400000000114948",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-11",
+      "amountMinor": -150000,
+      "traps": [
+        "T08"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-konto-osobiste"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 139,
+      "bankTxId": "310400000000113823",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-10",
+      "amountMinor": -163377,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+      "pattern": "zus"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 140,
+      "bankTxId": "310400000000112768",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-10",
+      "amountMinor": -5338,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MARIA PRZYKŁADOWA",
+      "pattern": "maria-przykladowa"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 141,
+      "bankTxId": "310400000000112241",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-08",
+      "amountMinor": -2499,
+      "traps": [
+        "T10"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA",
+      "pattern": "muzykalnia"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 142,
+      "bankTxId": "310400000000110824",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-07",
+      "amountMinor": -1645,
+      "traps": [
+        "T02"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIEKARNIA KŁOSEK PIEKARNIA KŁOSEK ŁÓDŹ",
+      "pattern": "piekarnia-klosek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 143,
+      "bankTxId": "310400000000109954",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-05",
+      "amountMinor": 1180000,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 144,
+      "bankTxId": "310400000000108575",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-02",
+      "amountMinor": -3900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kawa-testowa.pl",
+      "pattern": "kawa-testowa.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 145,
+      "bankTxId": "310400000000108006",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-03-02",
+      "amountMinor": -19900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kurs-przyklad.pl",
+      "pattern": "kurs-przyklad.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 146,
+      "bankTxId": "310400000000106882",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-27",
+      "amountMinor": -5670,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "apteka-przyklad.pl",
+      "pattern": "apteka-przyklad.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 147,
+      "bankTxId": "310400000000105495",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-21",
+      "amountMinor": -13700,
+      "traps": [
+        "T15"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ALLEGRO SP. Z O.O. UL. PRZYKŁADOWA 5 POZNAŃ",
+      "pattern": "allegro"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 148,
+      "bankTxId": "310400000000105225",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-20",
+      "amountMinor": -21000,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "URZĄD SKARBOWY W PRZYKŁADOWIE",
+      "pattern": "urzad-skarbowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 149,
+      "bankTxId": "310400000000103544",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-17",
+      "amountMinor": -4999,
+      "traps": [
+        "T11"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA",
+      "pattern": "kinoteka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 150,
+      "bankTxId": "310400000000102150",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-16",
+      "amountMinor": -80000,
+      "traps": [
+        "T06"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PRZYKŁADOWA FIRMA JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-wlasny-vat"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 151,
+      "bankTxId": "310400000000102150",
+      "account": "Rachunek VAT",
+      "occurredOn": "2026-02-16",
+      "amountMinor": 80000,
+      "traps": [
+        "T06"
+      ],
+      "imported": false,
+      "skipReason": "other-account",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 152,
+      "bankTxId": "310400000000100575",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-16",
+      "amountMinor": -2155,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MARIA PRZYKŁADOWA",
+      "pattern": "maria-przykladowa"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 153,
+      "bankTxId": "310400000000099899",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-14",
+      "amountMinor": -7300,
+      "traps": [
+        "T12"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RESTAURACJA POD PRZYKŁADEM UL. SMACZNA 2 WROCŁAW",
+      "pattern": "restauracja-pod-przykladem"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 154,
+      "bankTxId": "310400000000099255",
+      "account": "Rachunek VAT",
+      "occurredOn": "2026-02-12",
+      "amountMinor": 27600,
+      "traps": [
+        "T18"
+      ],
+      "imported": false,
+      "skipReason": "other-account",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 155,
+      "bankTxId": "310400000000097951",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-11",
+      "amountMinor": -1575,
+      "traps": [
+        "T03"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MINIMARKET PRZYSTANEK 1187 AL. ŚWIERKOWA 5 KRAKÓW",
+      "pattern": "minimarket-przystanek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 156,
+      "bankTxId": "310400000000096677",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-11",
+      "amountMinor": -150000,
+      "traps": [
+        "T08"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-konto-osobiste"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 157,
+      "bankTxId": "310400000000095552",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-10",
+      "amountMinor": -149912,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+      "pattern": "zus"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 158,
+      "bankTxId": "310400000000094983",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-08",
+      "amountMinor": -2499,
+      "traps": [
+        "T10"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA",
+      "pattern": "muzykalnia"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 159,
+      "bankTxId": "310400000000093709",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-05",
+      "amountMinor": 1002000,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 160,
+      "bankTxId": "310400000000092250",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-04",
+      "amountMinor": -8022,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 161,
+      "bankTxId": "310400000000091317",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-02",
+      "amountMinor": -3900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kawa-testowa.pl",
+      "pattern": "kawa-testowa.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 162,
+      "bankTxId": "310400000000090748",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-02-02",
+      "amountMinor": -19900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kurs-przyklad.pl",
+      "pattern": "kurs-przyklad.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 163,
+      "bankTxId": "310400000000090065",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-29",
+      "amountMinor": -15900,
+      "traps": [
+        "T14"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PAYPAL EUROPE S.A.R.L. ET CIE S.C.A LUXEMBOURG",
+      "pattern": "paypal"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 164,
+      "bankTxId": "310400000000089014",
+      "account": "Rachunek VAT",
+      "occurredOn": "2026-01-26",
+      "amountMinor": -64300,
+      "traps": [
+        "T18"
+      ],
+      "imported": false,
+      "skipReason": "other-account",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 165,
+      "bankTxId": "310400000000087969",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-24",
+      "amountMinor": -12900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ksiegarnia-przyklad.pl",
+      "pattern": "ksiegarnia-przyklad.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 166,
+      "bankTxId": "310400000000086954",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-20",
+      "amountMinor": -67300,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "URZĄD SKARBOWY W PRZYKŁADOWIE",
+      "pattern": "urzad-skarbowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 167,
+      "bankTxId": "310400000000085277",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-17",
+      "amountMinor": -34900,
+      "traps": [
+        "T01"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "SPORTOWO SP. Z O.O. ul. Biegowa 7 Gdynia",
+      "pattern": "sportowo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 168,
+      "bankTxId": "310400000000084260",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-17",
+      "amountMinor": -4999,
+      "traps": [
+        "T11"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA",
+      "pattern": "kinoteka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 169,
+      "bankTxId": "310400000000083471",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-11",
+      "amountMinor": -150000,
+      "traps": [
+        "T08"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-konto-osobiste"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 170,
+      "bankTxId": "310400000000082423",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-10",
+      "amountMinor": -890,
+      "traps": [
+        "T02"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIEKARNIA KŁOSEK PIEKARNIA KŁOSEK ŁÓDŹ",
+      "pattern": "piekarnia-klosek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 171,
+      "bankTxId": "310400000000081333",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-10",
+      "amountMinor": -210533,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+      "pattern": "zus"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 172,
+      "bankTxId": "310400000000080764",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-08",
+      "amountMinor": -2499,
+      "traps": [
+        "T10"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA",
+      "pattern": "muzykalnia"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 173,
+      "bankTxId": "310400000000079230",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-08",
+      "amountMinor": -3683,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KAWIARNIA FILIŻANKA UL. RYNEK 3 KRAKÓW",
+      "pattern": "kawiarnia-filizanka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 174,
+      "bankTxId": "310400000000078920",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-06",
+      "amountMinor": -23843,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 175,
+      "bankTxId": "310400000000077464",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-05",
+      "amountMinor": 915000,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 176,
+      "bankTxId": "310400000000076563",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-03",
+      "amountMinor": -11600,
+      "traps": [
+        "T12"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RESTAURACJA POD PRZYKŁADEM UL. SMACZNA 2 WROCŁAW",
+      "pattern": "restauracja-pod-przykladem"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 177,
+      "bankTxId": "310400000000075072",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2026-01-02",
+      "amountMinor": -3900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kawa-testowa.pl",
+      "pattern": "kawa-testowa.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 178,
+      "bankTxId": "310400000000073008",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-22",
+      "amountMinor": -41400,
+      "traps": [
+        "T07"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RACHUNEK VAT PRZYKŁADOWA FIRMA",
+      "pattern": "przeksiegowanie-vat"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 179,
+      "bankTxId": "310400000000073008",
+      "account": "Rachunek VAT",
+      "occurredOn": "2025-12-22",
+      "amountMinor": 41400,
+      "traps": [
+        "T07"
+      ],
+      "imported": false,
+      "skipReason": "other-account",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 180,
+      "bankTxId": "310400000000072735",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-20",
+      "amountMinor": -90500,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "URZĄD SKARBOWY W PRZYKŁADOWIE",
+      "pattern": "urzad-skarbowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 181,
+      "bankTxId": "310400000000071014",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-20",
+      "amountMinor": -6953,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "DROGERIA LAWENDA UL. KWIATOWA 14 KRAKÓW",
+      "pattern": "drogeria-lawenda"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 182,
+      "bankTxId": "310400000000070452",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-19",
+      "amountMinor": -4120,
+      "traps": [
+        "T03"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MINIMARKET PRZYSTANEK 0412 UL. TORUŃSKA 12 KRAKÓW",
+      "pattern": "minimarket-przystanek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 183,
+      "bankTxId": "310400000000069028",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-17",
+      "amountMinor": -4999,
+      "traps": [
+        "T11"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA",
+      "pattern": "kinoteka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 184,
+      "bankTxId": "310400000000068125",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-15",
+      "amountMinor": 4999,
+      "traps": [
+        "T13",
+        "T15"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 185,
+      "bankTxId": "310400000000067666",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-14",
+      "amountMinor": -22789,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 186,
+      "bankTxId": "310400000000066357",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-13",
+      "amountMinor": -4780,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIZZERIA TRZY SERY UL. MAKOWA 9 KRAKÓW",
+      "pattern": "pizzeria-trzy-sery"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 187,
+      "bankTxId": "310400000000065342",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-13",
+      "amountMinor": -17628,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIOTR FIKCYJNY",
+      "pattern": "piotr-fikcyjny"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 188,
+      "bankTxId": "310400000000064299",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-12",
+      "amountMinor": -2345,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "apteka-przyklad.pl",
+      "pattern": "apteka-przyklad.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 189,
+      "bankTxId": "310400000000063174",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-11",
+      "amountMinor": -150000,
+      "traps": [
+        "T08"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-konto-osobiste"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 190,
+      "bankTxId": "310400000000062049",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-10",
+      "amountMinor": -145580,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+      "pattern": "zus"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 191,
+      "bankTxId": "310400000000060958",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-10",
+      "amountMinor": -8938,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "DROGERIA LAWENDA UL. KWIATOWA 14 KRAKÓW",
+      "pattern": "drogeria-lawenda"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 192,
+      "bankTxId": "310400000000060467",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-08",
+      "amountMinor": -2499,
+      "traps": [
+        "T10"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA",
+      "pattern": "muzykalnia"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 193,
+      "bankTxId": "310400000000058860",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-08",
+      "amountMinor": -4999,
+      "traps": [
+        "T15"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ALLEGRO SP. Z O.O. UL. PRZYKŁADOWA 5 POZNAŃ",
+      "pattern": "allegro"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 194,
+      "bankTxId": "310400000000058180",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-05",
+      "amountMinor": 1230000,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 195,
+      "bankTxId": "310400000000056765",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-03",
+      "amountMinor": -7450,
+      "traps": [
+        "T01"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "sportowo.pl UL. BIEGOWA 7 GDYNIA",
+      "pattern": "sportowo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 196,
+      "bankTxId": "310400000000055788",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-12-02",
+      "amountMinor": -3900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kawa-testowa.pl",
+      "pattern": "kawa-testowa.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 197,
+      "bankTxId": "310400000000055253",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-29",
+      "amountMinor": -6200,
+      "traps": [
+        "T12"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RESTAURACJA POD PRZYKŁADEM UL. SMACZNA 2 WROCŁAW",
+      "pattern": "restauracja-pod-przykladem"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 198,
+      "bankTxId": "310400000000054354",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-26",
+      "amountMinor": -2750,
+      "traps": [
+        "T05"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "AUTOPAY S.A. UL. PRZYKŁADOWA 9 SOPOT",
+      "pattern": "autopay"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 199,
+      "bankTxId": "310400000000052817",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-22",
+      "amountMinor": -9416,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "DROGERIA LAWENDA UL. KWIATOWA 14 KRAKÓW",
+      "pattern": "drogeria-lawenda"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 200,
+      "bankTxId": "310400000000052438",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-20",
+      "amountMinor": -38000,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "URZĄD SKARBOWY W PRZYKŁADOWIE",
+      "pattern": "urzad-skarbowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 201,
+      "bankTxId": "310400000000050719",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-20",
+      "amountMinor": -21450,
+      "traps": [
+        "T15"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ALLEGRO SP. Z O.O. UL. PRZYKŁADOWA 5 POZNAŃ",
+      "pattern": "allegro"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 202,
+      "bankTxId": "310400000000049744",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-17",
+      "amountMinor": -4999,
+      "traps": [
+        "T11"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA",
+      "pattern": "kinoteka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 203,
+      "bankTxId": "310400000000048957",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-15",
+      "amountMinor": -2380,
+      "traps": [
+        "T02"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIEKARNIA KŁOSEK PIEKARNIA KŁOSEK ŁÓDŹ",
+      "pattern": "piekarnia-klosek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 204,
+      "bankTxId": "310400000000047974",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-15",
+      "amountMinor": -4593,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 205,
+      "bankTxId": "310400000000047073",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-14",
+      "amountMinor": -10444,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIZZERIA TRZY SERY UL. MAKOWA 9 KRAKÓW",
+      "pattern": "pizzeria-trzy-sery"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 206,
+      "bankTxId": "310400000000045916",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-11",
+      "amountMinor": -150000,
+      "traps": [
+        "T08"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-konto-osobiste"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 207,
+      "bankTxId": "310400000000044791",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-10",
+      "amountMinor": -191042,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+      "pattern": "zus"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 208,
+      "bankTxId": "310400000000044331",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-09",
+      "amountMinor": 6000,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 209,
+      "bankTxId": "310400000000042952",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-08",
+      "amountMinor": -6000,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "https://www.bilety-przyklad.pl",
+      "pattern": "bilety-przyklad.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 210,
+      "bankTxId": "310400000000042196",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-08",
+      "amountMinor": -2499,
+      "traps": [
+        "T10"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA",
+      "pattern": "muzykalnia"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 211,
+      "bankTxId": "310400000000040922",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-05",
+      "amountMinor": 870000,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 212,
+      "bankTxId": "310400000000039543",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-11-02",
+      "amountMinor": -3900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kawa-testowa.pl",
+      "pattern": "kawa-testowa.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 213,
+      "bankTxId": "310400000000039160",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-30",
+      "amountMinor": -3380,
+      "traps": [
+        "T03"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MINIMARKET PRZYSTANEK 1187 AL. ŚWIERKOWA 5 KRAKÓW",
+      "pattern": "minimarket-przystanek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 214,
+      "bankTxId": "310400000000038288",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-30",
+      "amountMinor": -3024,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "SKLEP ZOOLOGICZNY PAZUREK UL. PSIA 6 KRAKÓW",
+      "pattern": "zoologiczny-pazurek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 215,
+      "bankTxId": "310400000000037314",
+      "account": "Rachunek VAT",
+      "occurredOn": "2025-10-24",
+      "amountMinor": -51200,
+      "traps": [
+        "T18"
+      ],
+      "imported": false,
+      "skipReason": "other-account",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 216,
+      "bankTxId": "310400000000035603",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-22",
+      "amountMinor": -9990,
+      "traps": [
+        "T01"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "SPORTOWO SP. Z O.O. ul. Biegowa 7 Gdynia",
+      "pattern": "sportowo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 217,
+      "bankTxId": "310400000000034508",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-22",
+      "amountMinor": -5833,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "SKLEP ZOOLOGICZNY PAZUREK UL. PSIA 6 KRAKÓW",
+      "pattern": "zoologiczny-pazurek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 218,
+      "bankTxId": "310400000000034167",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-20",
+      "amountMinor": -125000,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "URZĄD SKARBOWY W PRZYKŁADOWIE",
+      "pattern": "urzad-skarbowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 219,
+      "bankTxId": "310400000000032816",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-19",
+      "amountMinor": -4913,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 220,
+      "bankTxId": "310400000000031917",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-18",
+      "amountMinor": -8900,
+      "traps": [
+        "T12"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RESTAURACJA POD PRZYKŁADEM UL. SMACZNA 2 WROCŁAW",
+      "pattern": "restauracja-pod-przykladem"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 221,
+      "bankTxId": "310400000000030460",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-17",
+      "amountMinor": -4999,
+      "traps": [
+        "T11"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA",
+      "pattern": "kinoteka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 222,
+      "bankTxId": "310400000000029140",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-15",
+      "amountMinor": -150000,
+      "traps": [
+        "T06"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PRZYKŁADOWA FIRMA JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-wlasny-vat"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 223,
+      "bankTxId": "310400000000029140",
+      "account": "Rachunek VAT",
+      "occurredOn": "2025-10-15",
+      "amountMinor": 150000,
+      "traps": [
+        "T06"
+      ],
+      "imported": false,
+      "skipReason": "other-account",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 224,
+      "bankTxId": "310400000000027454",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-15",
+      "amountMinor": -4024,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ADAM TESTOWY",
+      "pattern": "adam-testowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 225,
+      "bankTxId": "310400000000026632",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-11",
+      "amountMinor": -150000,
+      "traps": [
+        "T08"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-konto-osobiste"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 226,
+      "bankTxId": "310400000000025507",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-10",
+      "amountMinor": -152011,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+      "pattern": "zus"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 227,
+      "bankTxId": "310400000000025196",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-09",
+      "amountMinor": -3499,
+      "traps": [
+        "T14"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PAYPAL EUROPE S.A.R.L. ET CIE S.C.A LUXEMBOURG",
+      "pattern": "paypal"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 228,
+      "bankTxId": "310400000000023925",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-08",
+      "amountMinor": -2499,
+      "traps": [
+        "T10"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA",
+      "pattern": "muzykalnia"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 229,
+      "bankTxId": "310400000000022871",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-08",
+      "amountMinor": -4095,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW",
+      "pattern": "kino-swiatlo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 230,
+      "bankTxId": "310400000000022087",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-05",
+      "amountMinor": -4590,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ksiegarnia-przyklad.pl",
+      "pattern": "ksiegarnia-przyklad.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 231,
+      "bankTxId": "310400000000020625",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-05",
+      "amountMinor": 1045000,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 232,
+      "bankTxId": "310400000000020202",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-03",
+      "amountMinor": -2794,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "SKLEP ZOOLOGICZNY PAZUREK UL. PSIA 6 KRAKÓW",
+      "pattern": "zoologiczny-pazurek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 233,
+      "bankTxId": "310400000000019233",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-10-02",
+      "amountMinor": -3900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kawa-testowa.pl",
+      "pattern": "kawa-testowa.pl"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 234,
+      "bankTxId": "310400000000017698",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-27",
+      "amountMinor": -4500,
+      "traps": [
+        "T12"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RESTAURACJA POD PRZYKŁADEM UL. SMACZNA 2 WROCŁAW",
+      "pattern": "restauracja-pod-przykladem"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 235,
+      "bankTxId": "310400000000017053",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-26",
+      "amountMinor": -28688,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 236,
+      "bankTxId": "310400000000015180",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-25",
+      "amountMinor": -23000,
+      "traps": [
+        "T07"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "RACHUNEK VAT PRZYKŁADOWA FIRMA",
+      "pattern": "przeksiegowanie-vat"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 237,
+      "bankTxId": "310400000000015180",
+      "account": "Rachunek VAT",
+      "occurredOn": "2025-09-25",
+      "amountMinor": 23000,
+      "traps": [
+        "T07"
+      ],
+      "imported": false,
+      "skipReason": "other-account",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 238,
+      "bankTxId": "310400000000013568",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-23",
+      "amountMinor": -6750,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MARIA PRZYKŁADOWA",
+      "pattern": "maria-przykladowa"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 239,
+      "bankTxId": "310400000000012857",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-20",
+      "amountMinor": -41200,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "URZĄD SKARBOWY W PRZYKŁADOWIE",
+      "pattern": "urzad-skarbowy"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 240,
+      "bankTxId": "310400000000011661",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-19",
+      "amountMinor": -2345,
+      "traps": [
+        "T03"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MINIMARKET PRZYSTANEK 0412 UL. TORUŃSKA 12 KRAKÓW",
+      "pattern": "minimarket-przystanek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 241,
+      "bankTxId": "310400000000010163",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-17",
+      "amountMinor": -4999,
+      "traps": [
+        "T11"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA",
+      "pattern": "kinoteka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 242,
+      "bankTxId": "310400000000009117",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-14",
+      "amountMinor": -18999,
+      "traps": [
+        "T01"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "sportowo.pl UL. BIEGOWA 7 GDYNIA",
+      "pattern": "sportowo"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 243,
+      "bankTxId": "310400000000008361",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-11",
+      "amountMinor": -150000,
+      "traps": [
+        "T08"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO",
+      "pattern": "przelew-konto-osobiste"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 244,
+      "bankTxId": "310400000000007236",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-10",
+      "amountMinor": -148034,
+      "traps": [
+        "T09"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH",
+      "pattern": "zus"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 245,
+      "bankTxId": "310400000000006110",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-10",
+      "amountMinor": -8990,
+      "traps": [
+        "T15"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "ALLEGRO SP. Z O.O. UL. PRZYKŁADOWA 5 POZNAŃ",
+      "pattern": "allegro"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 246,
+      "bankTxId": "310400000000005096",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-09",
+      "amountMinor": -2556,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "KAWIARNIA FILIŻANKA UL. RYNEK 3 KRAKÓW",
+      "pattern": "kawiarnia-filizanka"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 247,
+      "bankTxId": "310400000000004641",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-08",
+      "amountMinor": -2499,
+      "traps": [
+        "T10"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA",
+      "pattern": "muzykalnia"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 248,
+      "bankTxId": "310400000000003662",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-07",
+      "amountMinor": -27677,
+      "traps": [],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW",
+      "pattern": "stacja-drogowskaz"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 249,
+      "bankTxId": "310400000000002322",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-06",
+      "amountMinor": -1250,
+      "traps": [
+        "T02"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "PIEKARNIA KŁOSEK PIEKARNIA KŁOSEK ŁÓDŹ",
+      "pattern": "piekarnia-klosek"
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 250,
+      "bankTxId": "310400000000001341",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-05",
+      "amountMinor": 984000,
+      "traps": [
+        "T17"
+      ],
+      "imported": false,
+      "skipReason": "credit",
+      "rawMerchant": null,
+      "pattern": null
+    },
+    {
+      "file": "Lista_transakcji_nr_0000123456_010926.csv",
+      "line": 251,
+      "bankTxId": "310400000000000962",
+      "account": "Rachunek Firmowy Główny",
+      "occurredOn": "2025-09-02",
+      "amountMinor": -3900,
+      "traps": [
+        "T04"
+      ],
+      "imported": true,
+      "skipReason": null,
+      "rawMerchant": "kawa-testowa.pl",
+      "pattern": "kawa-testowa.pl"
+    }
+  ],
+  "patterns": [
+    {
+      "key": "adam-testowy",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [],
+      "rawMerchants": [
+        "ADAM TESTOWY"
+      ],
+      "occurrences": 5,
+      "sumMinor": 32431,
+      "medianMinor": 4730,
+      "firstMonth": "2025-10"
+    },
+    {
+      "key": "allegro",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T15"
+      ],
+      "rawMerchants": [
+        "ALLEGRO SP. Z O.O. UL. PRZYKŁADOWA 5 POZNAŃ"
+      ],
+      "occurrences": 6,
+      "sumMinor": 85029,
+      "medianMinor": 11345,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "apteka-przyklad.pl",
+      "type": "frequent",
+      "resolvedBy": "import",
+      "traps": [
+        "T04"
+      ],
+      "rawMerchants": [
+        "apteka-przyklad.pl"
+      ],
+      "occurrences": 3,
+      "sumMinor": 9914,
+      "medianMinor": 2345,
+      "firstMonth": "2025-12"
+    },
+    {
+      "key": "autopay",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T05"
+      ],
+      "rawMerchants": [
+        "AUTOPAY S.A. UL. PRZYKŁADOWA 9 SOPOT"
+      ],
+      "occurrences": 2,
+      "sumMinor": 11150,
+      "medianMinor": 5575,
+      "firstMonth": "2025-11"
+    },
+    {
+      "key": "bilety-przyklad.pl",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T04"
+      ],
+      "rawMerchants": [
+        "https://www.bilety-przyklad.pl"
+      ],
+      "occurrences": 2,
+      "sumMinor": 18000,
+      "medianMinor": 9000,
+      "firstMonth": "2025-11"
+    },
+    {
+      "key": "drogeria-lawenda",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [],
+      "rawMerchants": [
+        "DROGERIA LAWENDA UL. KWIATOWA 14 KRAKÓW"
+      ],
+      "occurrences": 5,
+      "sumMinor": 32166,
+      "medianMinor": 6953,
+      "firstMonth": "2025-11"
+    },
+    {
+      "key": "kawa-testowa.pl",
+      "type": "fixed",
+      "resolvedBy": "import",
+      "traps": [
+        "T04"
+      ],
+      "rawMerchants": [
+        "kawa-testowa.pl"
+      ],
+      "occurrences": 12,
+      "sumMinor": 46800,
+      "medianMinor": 3900,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "kawiarnia-filizanka",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [],
+      "rawMerchants": [
+        "KAWIARNIA FILIŻANKA UL. RYNEK 3 KRAKÓW"
+      ],
+      "occurrences": 7,
+      "sumMinor": 18765,
+      "medianMinor": 2566,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "kino-swiatlo",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [],
+      "rawMerchants": [
+        "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW"
+      ],
+      "occurrences": 14,
+      "sumMinor": 67275,
+      "medianMinor": 4359,
+      "firstMonth": "2025-10"
+    },
+    {
+      "key": "kinoteka",
+      "type": "fixed",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T11"
+      ],
+      "rawMerchants": [
+        "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA"
+      ],
+      "occurrences": 12,
+      "sumMinor": 63588,
+      "medianMinor": 5299,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "ksiegarnia-przyklad.pl",
+      "type": "frequent",
+      "resolvedBy": "import",
+      "traps": [
+        "T04"
+      ],
+      "rawMerchants": [
+        "ksiegarnia-przyklad.pl"
+      ],
+      "occurrences": 4,
+      "sumMinor": 29739,
+      "medianMinor": 6795,
+      "firstMonth": "2025-10"
+    },
+    {
+      "key": "kurs-przyklad.pl",
+      "type": "fixed",
+      "resolvedBy": "import",
+      "traps": [
+        "T04"
+      ],
+      "rawMerchants": [
+        "kurs-przyklad.pl"
+      ],
+      "occurrences": 2,
+      "sumMinor": 39800,
+      "medianMinor": 19900,
+      "firstMonth": "2026-02"
+    },
+    {
+      "key": "maria-przykladowa",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [],
+      "rawMerchants": [
+        "MARIA PRZYKŁADOWA"
+      ],
+      "occurrences": 4,
+      "sumMinor": 18940,
+      "medianMinor": 5018,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "minimarket-przystanek",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T03"
+      ],
+      "rawMerchants": [
+        "MINIMARKET PRZYSTANEK 0412 UL. TORUŃSKA 12 KRAKÓW",
+        "MINIMARKET PRZYSTANEK 1187 AL. ŚWIERKOWA 5 KRAKÓW"
+      ],
+      "occurrences": 8,
+      "sumMinor": 27058,
+      "medianMinor": 3045,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "muzykalnia",
+      "type": "fixed",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T10"
+      ],
+      "rawMerchants": [
+        "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA"
+      ],
+      "occurrences": 12,
+      "sumMinor": 29988,
+      "medianMinor": 2499,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "paypal",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T14"
+      ],
+      "rawMerchants": [
+        "PAYPAL EUROPE S.A.R.L. ET CIE S.C.A LUXEMBOURG"
+      ],
+      "occurrences": 4,
+      "sumMinor": 28848,
+      "medianMinor": 5375,
+      "firstMonth": "2025-10"
+    },
+    {
+      "key": "piekarnia-klosek",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T02"
+      ],
+      "rawMerchants": [
+        "PIEKARNIA KŁOSEK PIEKARNIA KŁOSEK ŁÓDŹ"
+      ],
+      "occurrences": 6,
+      "sumMinor": 10765,
+      "medianMinor": 1563,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "piotr-fikcyjny",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [],
+      "rawMerchants": [
+        "PIOTR FIKCYJNY"
+      ],
+      "occurrences": 3,
+      "sumMinor": 30344,
+      "medianMinor": 6667,
+      "firstMonth": "2025-12"
+    },
+    {
+      "key": "pizzeria-trzy-sery",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [],
+      "rawMerchants": [
+        "PIZZERIA TRZY SERY UL. MAKOWA 9 KRAKÓW"
+      ],
+      "occurrences": 7,
+      "sumMinor": 55087,
+      "medianMinor": 6755,
+      "firstMonth": "2025-11"
+    },
+    {
+      "key": "przeksiegowanie-vat",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T07"
+      ],
+      "rawMerchants": [
+        "RACHUNEK VAT PRZYKŁADOWA FIRMA"
+      ],
+      "occurrences": 4,
+      "sumMinor": 115000,
+      "medianMinor": 27600,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "przelew-konto-osobiste",
+      "type": "fixed",
+      "resolvedBy": "user-exclude",
+      "traps": [
+        "T08"
+      ],
+      "rawMerchants": [
+        "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO"
+      ],
+      "occurrences": 12,
+      "sumMinor": 1800000,
+      "medianMinor": 150000,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "przelew-wlasny-vat",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T06"
+      ],
+      "rawMerchants": [
+        "PRZYKŁADOWA FIRMA JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO"
+      ],
+      "occurrences": 3,
+      "sumMinor": 440000,
+      "medianMinor": 150000,
+      "firstMonth": "2025-10"
+    },
+    {
+      "key": "restauracja-pod-przykladem",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T12"
+      ],
+      "rawMerchants": [
+        "RESTAURACJA POD PRZYKŁADEM UL. SMACZNA 2 WROCŁAW"
+      ],
+      "occurrences": 10,
+      "sumMinor": 78300,
+      "medianMinor": 7100,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "silownia-ruch",
+      "type": "fixed",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T16"
+      ],
+      "rawMerchants": [
+        "SIŁOWNIA RUCH UL. MOCNA 10 KRAKÓW"
+      ],
+      "occurrences": 1,
+      "sumMinor": 12900,
+      "medianMinor": 12900,
+      "firstMonth": "2026-08"
+    },
+    {
+      "key": "sportowo",
+      "type": "frequent",
+      "resolvedBy": "user-merge",
+      "traps": [
+        "T01"
+      ],
+      "rawMerchants": [
+        "SPORTOWO SP. Z O.O. ul. Biegowa 7 Gdynia",
+        "sportowo.pl UL. BIEGOWA 7 GDYNIA"
+      ],
+      "occurrences": 8,
+      "sumMinor": 131628,
+      "medianMinor": 14195,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "stacja-drogowskaz",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [],
+      "rawMerchants": [
+        "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW"
+      ],
+      "occurrences": 15,
+      "sumMinor": 313642,
+      "medianMinor": 22789,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "urzad-skarbowy",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T09"
+      ],
+      "rawMerchants": [
+        "URZĄD SKARBOWY W PRZYKŁADOWIE"
+      ],
+      "occurrences": 12,
+      "sumMinor": 875500,
+      "medianMinor": 70350,
+      "firstMonth": "2025-09"
+    },
+    {
+      "key": "zoologiczny-pazurek",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [],
+      "rawMerchants": [
+        "SKLEP ZOOLOGICZNY PAZUREK UL. PSIA 6 KRAKÓW"
+      ],
+      "occurrences": 8,
+      "sumMinor": 52229,
+      "medianMinor": 5926,
+      "firstMonth": "2025-10"
+    },
+    {
+      "key": "zus",
+      "type": "frequent",
+      "resolvedBy": "normalization",
+      "traps": [
+        "T09"
+      ],
+      "rawMerchants": [
+        "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH"
+      ],
+      "occurrences": 12,
+      "sumMinor": 2001511,
+      "medianMinor": 155415,
+      "firstMonth": "2025-09"
+    }
+  ]
+}

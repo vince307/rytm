@@ -1,0 +1,2 @@
+# Syntetyczne wyciągi bankowe są cp1250 + LF bajt w bajt (scripts/fixture-ing.mjs); bez konwersji końców linii.
+test/fixtures/**/*.csv -text

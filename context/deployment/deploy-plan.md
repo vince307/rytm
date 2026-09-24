@@ -52,7 +52,7 @@ Commits `4b27098` (swap) and `aaad9c9` (framework preset), then this file.
 - **Production alias**: `https://rytm-phi.vercel.app` (also `rytm-kamilps-projects.vercel.app`). `rytm.vercel.app` belongs to a different account — do not use it.
 - Raw deployment URLs (`rytm-<hash>-kamilps-projects.vercel.app`) sit behind Vercel Authentication and answer **302 to SSO**, not the app — verify against the alias, never the deployment URL.
 - First production deploy: `vercel deploy --prod --yes` from this machine on 2026-09-18 (human gate). Every later production deploy comes from the `deploy` job.
-- **Supabase** hosted project `rytm` (`psqbtvooufapkatpkxlw`, Postgres 17, `eu-central-1`). First migration `20260921120000_delete_own_account.sql` applied on 2026-09-22 (details in the 2026-09-22 section). It went in through `psql`, **not** `supabase db push`; since 2026-09-23 the project is `supabase link`ed on the owner's machine and `supabase migration list` shows `20260921120000` as applied remotely, so the migration ledger exists and the next `db push` applies only new files (impl-review F2). Auth uses the new-style **publishable** key.
+- **Supabase** hosted project `rytm` (`psqbtvooufapkatpkxlw`, Postgres 17, `eu-central-1`). First migration `20260921120000_delete_own_account.sql` applied on 2026-09-22 (details in the 2026-09-22 section). It went in through `psql`, **not** `supabase db push`; since 2026-09-23 the project is `supabase link`ed on the owner's machine and `supabase migration list` shows `20260921120000` as applied remotely, so the migration ledger exists and the next `db push` applies only new files (impl-review F2). Second migration `20260923165530_domain_imports_transactions.sql` (F-01: `imports`, `transactions`) applied with `npx supabase db push` by the owner on 2026-09-23 — the first migration shipped through the ledger. Auth uses the new-style **publishable** key.
 - **GitHub** `vince307/rytm` (private), default branch `main`, remote `origin`.
 
 ## Secrets inventory
@@ -140,6 +140,15 @@ Recommendation (not a blocker): authenticate an owned domain in Brevo (DKIM/DMAR
 - Guard checked without destroying anything: invoking it with no `auth.uid()` raises `delete_own_account requires an authenticated user`, and `auth.users` still holds 2 rows. `anon` through `POST /rest/v1/rpc/delete_own_account` → **401**.
 - Production alias `https://rytm-phi.vercel.app`: `/settings` → **302 `/login`**, `/login` → 200, `?deleted=1` renders "Konto zostało usunięte.", and the old `copyExtra.stub` placeholder is gone.
 - **Still open**: the full delete cycle on production with a disposable account (plan row 3.4). Production has e-mail confirmations on, so it needs a real inbox and stays with the owner.
+
+## Verification results (2026-09-24) — F-01 domain schema (`domain-schema-rls`)
+
+- `npx supabase db push --dry-run` listed only `20260923165530_domain_imports_transactions.sql`; the owner then ran `npx supabase db push` (human step, per the operating model). `npx supabase migration list` shows `20260921120000` and `20260923165530` both local and remote.
+- Hosted schema checked with `npx supabase db dump --linked --schema public` (dump deleted afterwards): RLS enabled on `imports` and `transactions`; six policies — `select` / `insert` / `delete` per table, role `authenticated` only, each `(select auth.uid()) = user_id`; no `update` policy; `imports_no_overlap` exclusion constraint; `user_id` → `auth.users` `on delete cascade` on both tables plus `(import_id, user_id)` → `imports` `on delete cascade`. Grants: `anon` none; `authenticated` `SELECT, INSERT, DELETE, UPDATE, MAINTAIN` — no `TRUNCATE` / `TRIGGER` / `REFERENCES` (revoked in the migration because `TRUNCATE` bypasses RLS). `MAINTAIN` (Postgres 17 default) is not reachable through PostgREST and was left as is.
+- Commits `10929f3` (schema + pgTAP + CI step) and `d8ad8bb` (typed client + docs) pushed to `main`. GitHub Actions run `35908863964`: the first attempt and two reruns on 2026-09-23 failed in `smoke` → "Start local Supabase" with `toomanyrequests` from ghcr.io and public.ecr.aws (registry rate limit on shared runner IPs, not the change); the rerun on 2026-09-24 was green end to end — `Run database tests` 25/25, smoke green, `deploy` shipped `d8ad8bb`.
+- Production alias `https://rytm-phi.vercel.app`: `/` → 200, `/settings` → **302 `/login`**. The app does not read the new tables yet (S-01).
+- If registry rate limits recur in CI: rerun failed jobs after a while; if it becomes frequent, cache Docker images between runs and pin the Supabase CLI version in `ci.yml` (today `version: latest`).
+- Plan row 3.4 closed 2026-09-24 by the owner: the production delete cycle on a disposable account (confirmed signup → `/settings` → password + `USUŃ`) ends on `/login?deleted=1` with the new cascades in place.
 
 ## Manual steps still open
 

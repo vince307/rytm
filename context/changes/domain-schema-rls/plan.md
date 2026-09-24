@@ -288,23 +288,23 @@ Tabele są nowe i puste na produkcji — brak migracji danych. Wycofanie przed p
 
 #### Automated
 
-- [x] 2.1 `npm run db:types` odtwarza `src/db/database.types.ts` bez różnic
-- [x] 2.2 `npm run lint`, `npx astro check` i `npm run build` przechodzą
-- [x] 2.3 `npm run smoke` 41/41 PASS
+- [x] 2.1 `npm run db:types` odtwarza `src/db/database.types.ts` bez różnic — d8ad8bb
+- [x] 2.2 `npm run lint`, `npx astro check` i `npm run build` przechodzą — d8ad8bb
+- [x] 2.3 `npm run smoke` 41/41 PASS — d8ad8bb
 
 #### Manual
 
-- [x] 2.4 `CLAUDE.md` i roadmapa opisują stan po zmianie
+- [x] 2.4 `CLAUDE.md` i roadmapa opisują stan po zmianie — d8ad8bb
 
 ### Phase 3: Wdrożenie na hostowaną bazę
 
 #### Automated
 
-- [ ] 3.1 GitHub Actions `ci` → `smoke` (z `supabase test db`) → `deploy` zielone na `main`
+- [x] 3.1 GitHub Actions `ci` → `smoke` (z `supabase test db`) → `deploy` zielone na `main`
 
 #### Manual
 
-- [ ] 3.2 `npx supabase migration list` pokazuje nową migrację po obu stronach
-- [ ] 3.3 Hostowana baza: RLS i polityki select/insert/delete dla authenticated na obu tabelach
-- [ ] 3.4 Produkcyjne usunięcie jednorazowego konta nadal kończy się `/login?deleted=1`
-- [ ] 3.5 `deploy-plan.md` opisuje stan po wdrożeniu
+- [x] 3.2 `npx supabase migration list` pokazuje nową migrację po obu stronach
+- [x] 3.3 Hostowana baza: RLS i polityki select/insert/delete dla authenticated na obu tabelach
+- [x] 3.4 Produkcyjne usunięcie jednorazowego konta nadal kończy się `/login?deleted=1`
+- [x] 3.5 `deploy-plan.md` opisuje stan po wdrożeniu

@@ -4,7 +4,8 @@
 -- Test account for the first local run and for the smoke test (scripts/smoke.mjs):
 --   test@rytm.local / Rytm-Test-Passw0rd!
 -- The fixed UUID lets future domain seeds (imports, patterns) reference this user.
--- Domain data (FR-014 synthetic CSV) arrives with the first migration; this file stays auth-only until then.
+-- Domain data is not seeded: the synthetic ING statements live in test/fixtures/ing/ (scripts/fixture-ing.mjs);
+-- rows reach the database only through a real import (S-01) and the demo account (S-09).
 
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,

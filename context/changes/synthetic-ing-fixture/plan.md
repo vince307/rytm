@@ -293,6 +293,18 @@ Brak zmian schematu i danych w bazie.
 - Wyjątek fixture: `.gitignore:15-17`
 - CI: `.github/workflows/ci.yml` (job `ci`)
 
+## Deviations (implementation, 2026-09-24)
+
+Po lokalnym porównaniu **struktury** fixture z prawdziwym eksportem ING (wyłącznie maski, etykiety, udziały — żadnych wartości) użytkownik zatwierdził dopasowanie kontraktu do rzeczywistości. Bloki faz powyżej opisują pierwotne założenia; obowiązujący kontrakt formatu to `context/foundation/import-formats.md` (sekcja ING) i `test/fixtures/ing/README.md`.
+
+- **Końce linii: LF, nie CRLF.** Prawdziwy plik ma LF. Kryterium 1.3 i punkt 2 `fixture:check` zweryfikowano dla LF (brak `\r`); `.gitattributes` trzyma CSV fixture bajt w bajt (`-text`).
+- **Cudzysłowy mieszane per pole** zamiast „21 pól w `"…"`": daty, `Nr rachunku`, `Nr transakcji`, kwota, waluta i puste pola bez `"`.
+- **Preambuła o zmiennej długości** (17 + n linii, n = liczba rachunków), nagłówek w linii 18 + n (w fixture: 20), nie stała linia 21; `rows[].line` w `expected.json` liczone od tego (pierwszy wiersz danych: 21).
+- **Pola:** `Nr transakcji` = `'<18 cyfr>'` bez spacji; `Nr rachunku` pusty dla większości TR.BLIK; spacja na początku i końcu `Dane kontrahenta`, na początku `Tytułu`; `Szczegóły` z dwiema spacjami na końcu; stopka `"…księgowego";` bez kropki.
+- **Nowa pułapka T19**: niezeskejpowany `"` w nazwie kontrahenta (ING nie podwaja cudzysłowów). Czytnik: `"` zamyka pole tylko przed `;` lub końcem linii.
+- **Dodatki w `expected.json`:** `patterns[].rawMerchants`, `accounts[].preambleName`, `files[].overlapsWith`; seria T04 z URL-em w `Tytule` ma `resolvedBy: normalization`.
+- **README generowany** przez generator (więc objęty porównaniem bajtów).
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.

@@ -18,7 +18,7 @@ Nie ma parsera ani runnera testów jednostkowych. `.gitignore` już przepuszcza 
 
 | Decision | Choice | Why (1 sentence) |
 | --- | --- | --- |
-| Forma fixture | Generator Node bez zależności + commitowane pliki | Pułapka to jedna deklaracja, a regeneracja dowodzi determinizmu; cp1250/CRLF/apostrofy nie psują się w edytorze. |
+| Forma fixture | Generator Node bez zależności + commitowane pliki | Pułapka to jedna deklaracja, a regeneracja dowodzi determinizmu; cp1250/LF/apostrofy nie psują się w edytorze. |
 | Kodowanie cp1250 | Własna tablica znaków PL, bez `iconv-lite` | Wystarcza ~21 znaków, a znak spoza tablicy przerywa generowanie. |
 | Klucz odpowiedzi | `expected.json` per wiersz i per wzorzec (typ, `resolvedBy`) | S-01/S-03 dostają gotowe asercje, a jakość normalizacji staje się liczbą. |
 | Zakres plików | Główny 12 mies. + 3 pliki błędów | Wystarcza na trend (S-07), medianę D5 i ścieżki odrzucenia z S-01. |

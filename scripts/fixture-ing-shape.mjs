@@ -10,7 +10,7 @@ import { COLUMN_NAMES, DATE, FOOTER, decodeCp1250, parseLine, toMinor } from "./
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const FIXTURE_DIR = path.join(ROOT, "test/fixtures/ing");
-const dir = path.resolve(process.argv[2] ?? path.join(ROOT, "data"));
+const dir = path.resolve(process.argv[2] || path.join(ROOT, "data"));
 const LABELS = new Set([
   "Lista transakcji",
   "Dane Użytkownika:",
@@ -261,7 +261,18 @@ const sides = [
     .filter(([, f]) => f.expect === "ok")
     .map(([name], i) => ({ label: `fixture ${i + 1}`, bytes: readFileSync(path.join(FIXTURE_DIR, name)) })),
   // Real files are labelled by position only: the file name carries a document number and a date.
-  ...realFiles.sort().map((name, i) => ({ label: `real ${i + 1}`, bytes: readFileSync(path.join(dir, name)) })),
+  ...realFiles.sort().map((name, i) => {
+    const label = `real ${i + 1}`;
+    try {
+      return { label, bytes: readFileSync(path.join(dir, name)) };
+    } catch (e) {
+      // Node's own I/O error carries the full path; report only the side label and the error code.
+      console.error(
+        `fixture:shape: cannot read ${label} (${e instanceof Error && "code" in e ? String(e.code) : "error"})`,
+      );
+      process.exit(1);
+    }
+  }),
 ];
 let shapes;
 try {

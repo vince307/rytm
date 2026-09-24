@@ -1,2 +1,2 @@
-# Syntetyczne wyciągi bankowe są cp1250 + LF bajt w bajt (scripts/fixture-ing.mjs); bez konwersji końców linii.
-test/fixtures/**/*.csv -text
+# Fixture ING (CSV cp1250 + LF, expected.json, README) jest porównywany bajt w bajt z generatorem (scripts/fixture-ing.mjs); bez konwersji końców linii.
+test/fixtures/ing/** -text

@@ -8,7 +8,7 @@ Kształt plików pochodzi z `context/foundation/import-formats.md` i ze struktur
 eksportem (tylko maski pól, cudzysłowy i liczniki — bez wartości):
 
 - cp1250 bez BOM, końce linii LF, separator `;`, 21 pól w wierszu danych i nagłówku (pola 15–20 puste);
-- preambuła o zmiennej długości (18 linii + 1 na rachunek): nagłówek banku, `Dokument nr …`, `Wygenerowany dnia: …`,
+- preambuła o zmiennej długości (17 linii + 1 na rachunek; nagłówek w linii 18 + n): nagłówek banku, `Dokument nr …`, `Wygenerowany dnia: …`,
   `Dane Użytkownika:`, `Wybrane rachunki:` (`"<nazwa> (PLN)";;"<numer>";`), `Zakres dat:` / `Liczba transakcji:`,
   `Suma uznań (N):` / `Suma obciążeń (N):` (kwoty bez znaku, bez cudzysłowu); przy 2 rachunkach nagłówek kolumn
   od `"Data transakcji"` jest w linii 20 — parser ma go szukać, nie liczyć linii;

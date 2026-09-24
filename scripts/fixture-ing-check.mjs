@@ -159,7 +159,7 @@ function readStatement(name, bytes, errors) {
     } else sums[kind] = { count: Number(m[1]), minor: toMinor(cell(at, 6).value) };
   }
 
-  // Header: searched, not counted; expected right after the preamble (18 lines + one per account).
+  // Header: searched, not counted; expected on line 18 + n (preamble = 17 lines + one per account).
   const headerAt = parsed.findIndex((f) => f[0]?.quoted && f[0].value === "Data transakcji");
   if (headerAt !== -1) {
     if (headerAt + 1 !== 18 + accounts.length) {

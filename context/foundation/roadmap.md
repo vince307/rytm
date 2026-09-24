@@ -42,7 +42,7 @@ Pieniądze cicho uciekają z konta, a kategoryzacja banku nie odpowiada na pytan
 | ID   | Change ID                    | Outcome (user can …)                                                                                        | Prerequisites | PRD refs                               | Status   |
 | ---- | ---------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------- | -------------------------------------- | -------- |
 | F-01 | domain-schema-rls            | (foundation) pierwsza migracja: importy i transakcje z RLS per konto i kaskadą                              | —             | FR-002, FR-019, NFR izolacja           | done     |
-| F-02 | synthetic-ing-fixture        | (foundation) syntetyczny wyciąg ING z pułapkami jako fixture testów i seed demo                             | —             | FR-014, NFR prywatność                 | ready    |
+| F-02 | synthetic-ing-fixture        | (foundation) syntetyczny wyciąg ING z pułapkami jako fixture testów i seed demo                             | —             | FR-014, NFR prywatność                 | done     |
 | S-01 | ing-csv-import               | wgrać CSV z ING (jeden rachunek, obciążenia), zobaczyć wynik importu; nakładający się zakres jest odrzucony | F-01, F-02    | US-01, FR-003, FR-005, FR-002          | proposed |
 | S-02 | undo-import                  | zobaczyć listę importów i cofnąć błędny import wraz z jego transakcjami                                     | S-01          | US-02, FR-004                          | proposed |
 | S-03 | merchant-patterns            | zobaczyć listę wzorców: sprzedawca, typ, liczba wystąpień, suma, kwota dla stałych                          | S-01, F-02    | US-01, FR-006, FR-007                  | proposed |
@@ -103,7 +103,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Które kształty opisów z prawdziwego wyciągu (lokalnie) trzeba odwzorować, żeby fixture nie był „ładnym demo, zepsutym produktem”? — Owner: user. Block: no.
 - **Risk:** Cel `quality` i guardrail prywatności: bez fixture każdy test importu musiałby biec na prawdziwym pliku, którego nie wolno commitować; fixture zbudowany z kształtów (nie danych) prawdziwego wyciągu jest jedynym legalnym materiałem CI.
-- **Status:** ready
+- **Status:** done
 
 ## Slices
 
@@ -265,3 +265,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 - **S-08: Użytkownik może zobaczyć swoje konto (e-mail, zmiana hasła, nota o przetwarzaniu danych) i samodzielnie usunąć konto po potwierdzeniu; usunięcie kasuje wszystkie jego dane bez śladu, a ponowne logowanie tym hasłem jest niemożliwe.** — Archived 2026-09-23 → `context/archive/2026-09-21-settings-account/`. Lesson: —.
 - **F-01: (foundation) pierwsza migracja istnieje i jest zastosowana lokalnie i na hostowanej bazie: tabele importów i transakcji należą do konta (RLS per operację, per rolę) i kasują się kaskadowo z kontem; ustalona jest ścieżka „migracja lokalnie → `db push` na produkcję”.** — Archived 2026-09-24 → `context/archive/2026-09-23-domain-schema-rls/`. Lesson: —.
+- **F-02: (foundation) w repozytorium istnieje syntetyczny plik CSV w formacie ING (zgodny z `import-formats.md`) z realistycznymi pułapkami: warianty opisów tego samego sprzedawcy, pośrednicy (PayPal/Allegro/BLIK przez operatorów), subskrypcja z podwyżką, nowy wzorzec, wiele rachunków, uznania i zwroty do pominięcia; służy jako fixture testów parsera i wykrywania oraz jako materiał seedu demo.** — Archived 2026-09-24 → `context/archive/2026-09-24-synthetic-ing-fixture/`. Lesson: —.

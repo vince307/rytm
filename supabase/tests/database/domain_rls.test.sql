@@ -7,7 +7,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(25);
+select plan(28);
 
 -- Setup as postgres: account A with one import + transaction, account B with the same (for FR-019).
 -- Fixed UUIDs, distinct from the seed user 11111111-….
@@ -53,6 +53,19 @@ select throws_ok(
   '23503', null, 'B cannot attach a transaction to an import of A (composite FK)'
 );
 
+-- Two users may hold the same bank account (joint account): the overlap and dedupe keys are per user.
+select lives_ok(
+  $$insert into public.imports (id, source, account_number, account_name, period_start, period_end)
+    values ('b0000000-0000-4000-8000-000000000002', 'ing', '11105010000000000000000001', 'Wspólne', '2026-01-01', '2026-01-31')$$,
+  'B may import the account number A imported, over the same range'
+);
+
+select lives_ok(
+  $$insert into public.transactions (import_id, account_number, occurred_on, amount_minor, bank_tx_id, counterparty)
+    values ('b0000000-0000-4000-8000-000000000002', '11105010000000000000000001', '2026-01-10', 11685, 'TXA1', 'Sklep A')$$,
+  'B may store the bank transaction id A stored for that account number'
+);
+
 with d as (delete from public.transactions where user_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa' returning 1)
 select is(count(*), 0::bigint, 'B deletes no transactions of A') from d;
 
@@ -65,11 +78,15 @@ select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaa
 select is((select count(*) from public.imports), 1::bigint, 'A sees exactly its own import');
 select is((select count(*) from public.transactions), 1::bigint, 'A sees exactly its own transaction');
 
-with u as (update public.imports set account_name = 'Zmienione' returning 1)
-select is(count(*), 0::bigint, 'A cannot update its imports') from u;
+select throws_ok(
+  $$update public.imports set account_name = 'Zmienione'$$,
+  '42501', null, 'A cannot update its imports'
+);
 
-with u as (update public.transactions set title = 'Zmienione' returning 1)
-select is(count(*), 0::bigint, 'A cannot update its transactions') from u;
+select throws_ok(
+  $$update public.transactions set title = 'Zmienione'$$,
+  '42501', null, 'A cannot update its transactions'
+);
 
 -- FR-005: overlapping range of the same account is rejected, another account in the same range is accepted.
 select throws_ok(
@@ -89,6 +106,12 @@ select throws_ok(
   $$insert into public.transactions (import_id, account_number, occurred_on, amount_minor, bank_tx_id, counterparty)
     values ('a0000000-0000-4000-8000-000000000001', '11105010000000000000000001', '2026-01-12', 200, 'TXA1', 'Sklep A')$$,
   '23505', null, 'duplicate (account_number, bank_tx_id) is rejected'
+);
+
+select throws_ok(
+  $$insert into public.transactions (import_id, account_number, occurred_on, amount_minor, counterparty)
+    values ('a0000000-0000-4000-8000-000000000001', '99105010000000000000000009', '2026-01-12', 200, 'Inny rachunek')$$,
+  '23503', null, 'a transaction must carry the account number of its import'
 );
 
 select lives_ok(
@@ -120,8 +143,8 @@ reset role;
 
 select is((select count(*) from public.imports where user_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'), 0::bigint, 'account deletion removes all imports of A');
 select is((select count(*) from public.transactions where user_id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'), 0::bigint, 'account deletion removes all transactions of A');
-select is((select count(*) from public.imports where user_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'), 1::bigint, 'imports of B survive deletion of A');
-select is((select count(*) from public.transactions where user_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'), 1::bigint, 'transactions of B survive deletion of A');
+select is((select count(*) from public.imports where user_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'), 2::bigint, 'imports of B survive deletion of A');
+select is((select count(*) from public.transactions where user_id = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'), 2::bigint, 'transactions of B survive deletion of A');
 
 select * from finish();
 

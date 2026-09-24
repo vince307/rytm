@@ -80,11 +80,11 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: "transactions_import_id_user_id_fkey";
-            columns: ["import_id", "user_id"];
+            foreignKeyName: "transactions_import_account_fkey";
+            columns: ["import_id", "user_id", "account_number"];
             isOneToOne: false;
             referencedRelation: "imports";
-            referencedColumns: ["id", "user_id"];
+            referencedColumns: ["id", "user_id", "account_number"];
           },
         ];
       };

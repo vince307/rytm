@@ -36,7 +36,8 @@ jobs:
           cache: npm
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned to the CLI used locally (impl-review F5): `latest` drifted and pulled new images on every release.
+          version: 2.117.0
       - run: npm ci
       - name: Start local Supabase
         run: |

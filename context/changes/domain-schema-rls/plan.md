@@ -150,6 +150,8 @@ Kod aplikacji widzi nowe tabele z typami; dokumentacja i roadmapa odpowiadają t
 
 **Contract**: wynik `npx supabase gen types typescript --local --schema public`; plik nie jest edytowany ręcznie (komentarz w nagłówku, jeśli generator go nie dodaje — dopisany przez skrypt, nie ręcznie). Skrypt `db:types` w `package.json` z tym poleceniem przekierowanym do pliku.
 
+> Addendum (impl-review F3, 2026-09-24): wdrożony skrypt używa `supabase gen types typescript --db-url postgresql://postgres:postgres@127.0.0.1:54322/postgres --schema public` zamiast `--local` — na maszynie właściciela `--local` padał na uwierzytelnieniu hasłem w kontenerze pg-meta. URL to udokumentowany domyślny adres lokalnej Supabase (nie sekret). Powrót do `--local` jest bezpieczny, gdy zacznie działać.
+
 #### 2. Typowany klient
 
 **File**: `src/lib/supabase.ts`

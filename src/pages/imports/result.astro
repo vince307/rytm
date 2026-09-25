@@ -5,6 +5,7 @@
 import { z } from "zod";
 import AppLayout from "@/layouts/AppLayout.astro";
 import Icon from "@/components/Icon.astro";
+import InlineAlert from "@/components/app/InlineAlert.astro";
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
 import { createClient } from "@/lib/supabase";
@@ -27,7 +28,14 @@ const { data: imported } = await supabase
 if (!imported) {
   return Astro.redirect("/imports");
 }
-const { count } = await supabase.from("transactions").select("id", { count: "exact", head: true }).eq("import_id", id);
+const { count, error: countError } = await supabase
+  .from("transactions")
+  .select("id", { count: "exact", head: true })
+  .eq("import_id", id);
+if (countError) {
+  // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
+  console.error("import result count failed", countError.code, countError.message);
+}
 const n = count ?? 0;
 
 const title = x.resultTitle.replace("{n}", String(n)).replace("{debits}", plural(n, x.debitForms));
@@ -40,14 +48,23 @@ const lead = `${x.accountLabel.replace("{name}", imported.account_name)} · ${fo
       <Icon name="success" size={28} />
     </div>
     <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{x.resultEyebrow}</div>
-    <h1 class="my-3 text-[44px] tracking-[-0.07em] max-[559px]:text-[36px]">{title}</h1>
-    <p class="leading-[1.6] text-muted">{lead}</p>
-    <div class="my-[35px] flex justify-center gap-[45px] max-[559px]:gap-[22px]">
-      <div>
-        <strong class="block text-[29px] tracking-[-0.06em]">{n}</strong>
-        <span class="mt-[3px] block text-xs text-muted">{plural(n, x.transactionForms)}</span>
+    {countError ? (
+      // The import exists but its count could not be read — never claim "0 debits" for it.
+      <div class="my-[35px] text-left">
+        <InlineAlert kind="error">{copy.components.error}</InlineAlert>
       </div>
-    </div>
+    ) : (
+      <>
+        <h1 class="my-3 text-[44px] tracking-[-0.07em] max-[559px]:text-[36px]">{title}</h1>
+        <p class="leading-[1.6] text-muted">{lead}</p>
+        <div class="my-[35px] flex justify-center gap-[45px] max-[559px]:gap-[22px]">
+          <div>
+            <strong class="block text-[29px] tracking-[-0.06em]">{n}</strong>
+            <span class="mt-[3px] block text-xs text-muted">{plural(n, x.transactionForms)}</span>
+          </div>
+        </div>
+      </>
+    )}
     <div class="flex items-center justify-center gap-3 max-[559px]:flex-col max-[559px]:items-stretch">
       <a href="/patterns" class:list={buttonVariants({ variant: "primary" })}>
         {x.toPatterns} <span aria-hidden="true">↗</span>

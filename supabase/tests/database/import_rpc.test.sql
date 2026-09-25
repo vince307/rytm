@@ -7,7 +7,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(14);
+select plan(16);
 
 -- Setup as postgres: accounts A and B, no domain rows yet (everything below goes through the RPC).
 -- Fixed UUIDs, distinct from the seed user 11111111-….
@@ -78,6 +78,16 @@ select throws_ok(
   '22023', null, 'an empty transaction array is rejected'
 );
 
+select throws_ok(
+  $$select public.import_ing_statement(
+      '55105010000000000000000005', 'Konto A3', '2026-03-01', '2026-03-31',
+      (select jsonb_agg(jsonb_build_object(
+          'occurred_on', '2026-03-10', 'amount_minor', 100, 'bank_tx_id', null,
+          'counterparty', 'X', 'title', '', 'details', null))
+         from generate_series(1, 5001)))$$,
+  '22023', null, 'more than 5000 transactions are rejected'
+);
+
 -- Atomicity after the import row is written: a failing transaction insert rolls the import back too.
 select throws_ok(
   $$select public.import_ing_statement(
@@ -91,6 +101,16 @@ select is(
   (select count(*) from public.imports where account_number = '55105010000000000000000005'),
   0::bigint,
   'the failed transaction insert leaves no import row behind'
+);
+
+-- An authenticated role without a user id in the JWT is rejected before any insert.
+select set_config('request.jwt.claims', '{"role":"authenticated"}', true);
+
+select throws_ok(
+  $$select public.import_ing_statement(
+      '77105010000000000000000007', 'Bez uzytkownika', '2026-01-01', '2026-01-31',
+      '[{"occurred_on":"2026-01-10","amount_minor":100,"bank_tx_id":null,"counterparty":"X","title":"","details":null}]'::jsonb)$$,
+  '22023', null, 'a call without auth.uid() is rejected'
 );
 
 -- FR-002: account B sees nothing that A imported.

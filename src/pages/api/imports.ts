@@ -21,9 +21,10 @@ export const POST: APIRoute = async (context) => {
     return context.redirect("/login");
   }
 
-  const raw = (await context.request.formData()).get("payload");
   let json: unknown;
   try {
+    // formData() throws on a body that is not a form (e.g. application/json) — that is an invalid payload too.
+    const raw = (await context.request.formData()).get("payload");
     json = typeof raw === "string" ? JSON.parse(raw) : undefined;
   } catch {
     json = undefined;

@@ -6,7 +6,11 @@ import { z } from "zod";
 
 /** Largest file the wizard accepts (checked in the browser; the file itself never reaches the server). */
 export const MAX_FILE_BYTES = 5 * 1024 * 1024;
-/** Largest number of debits in one import — bounds the RPC and the request body (~1 MB). */
+/**
+ * Largest number of debits in one import — bounds the RPC and the request body. The wizard posts multipart,
+ * so the JSON travels unescaped: ~1–2 MB for 5000 real ING rows. Vercel rejects function bodies over 4.5 MB
+ * with its own 413 page, which only a payload near every TEXT_MAX limit could reach.
+ */
 export const MAX_DEBITS = 5000;
 
 const TEXT_MAX = 500;

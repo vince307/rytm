@@ -15,6 +15,8 @@ interface SubmitButtonProps {
   showArrow?: boolean;
   /** Extra gate on top of the form status — e.g. a confirmation word that is not typed yet. */
   disabled?: boolean;
+  /** Pending state tracked by the caller — useFormStatus() stays false for a native POST to a URL action. */
+  pending?: boolean;
 }
 
 export function SubmitButton({
@@ -24,8 +26,9 @@ export function SubmitButton({
   size = "full",
   showArrow = true,
   disabled = false,
+  pending: pendingProp = false,
 }: SubmitButtonProps) {
-  const { pending } = useFormStatus();
+  const pending = useFormStatus().pending || pendingProp;
   return (
     <Button type="submit" variant={variant} size={size} disabled={disabled || pending}>
       {pending ? pendingText : children}

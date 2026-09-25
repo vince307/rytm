@@ -1,5 +1,6 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
+import InlineAlert from "@/components/app/InlineAlert.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
 import Panel from "@/components/app/Panel.astro";
 import ViewEmpty from "@/components/app/ViewEmpty.astro";
@@ -37,7 +38,13 @@ const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] wh
 ---
 
 <AppLayout title={x.title} active="imports">
-  {rows.length === 0 ? (
+  {error ? (
+    // A failed read must not look like "no imports yet" — show the kit's generic error instead of the empty state.
+    <>
+      <PageTitle eyebrow={x.eyebrow} title={x.title} lead={x.lead} />
+      <InlineAlert kind="error">{copy.components.error}</InlineAlert>
+    </>
+  ) : rows.length === 0 ? (
     <>
       <PageTitle eyebrow={x.eyebrow} title={e.imports.title} lead={e.imports.lead} />
       <ViewEmpty icon="import" title={e.cta} body={copyExtra.emptyViews.body} cta={e.button} href="/imports/new" />

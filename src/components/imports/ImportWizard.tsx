@@ -12,7 +12,7 @@ import { Stepper } from "@/components/app/Stepper";
 import type { IconName, copy, copyExtra } from "@/content/copy";
 import { buildImportPayload, parseIngStatement } from "@/lib/import/ing";
 import type { IngParseResult, IngStatement } from "@/lib/import/ing";
-import { MAX_DEBITS, MAX_FILE_BYTES } from "@/lib/import/schema";
+import { MAX_DEBITS, MAX_FILE_BYTES, importPayloadSchema } from "@/lib/import/schema";
 import { formatAccountTail, formatRangeLong, formatRangeShort, plural } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -139,6 +139,9 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
   const [fileError, setFileError] = useState<FileError | null>(null);
   const [pageError, setPageError] = useState<WizardServerError | null>(serverError ?? null);
   const [account, setAccount] = useState("");
+  // A native POST to a URL never sets useFormStatus().pending, so the lock against a double submit is ours;
+  // a second POST would land on imports_no_overlap and report a successful import as an overlap.
+  const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const firstRender = useRef(true);
@@ -154,10 +157,13 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
 
   const statement = loaded?.statement;
   const chosen = statement?.accounts.find((a) => a.number === account);
-  const payload = useMemo(
-    () => (step === 3 && statement && chosen ? JSON.stringify(buildImportPayload(statement, chosen.number)) : ""),
-    [step, statement, chosen],
-  );
+  // The endpoint validates with the same schema; checking here keeps a file that breaks it (e.g. a bank
+  // transaction number that is not 18 digits) from reaching a ready step 3 and failing only after the POST.
+  const { payload, payloadValid } = useMemo(() => {
+    if (step !== 3 || !statement || !chosen) return { payload: "", payloadValid: false };
+    const built = buildImportPayload(statement, chosen.number);
+    return { payload: JSON.stringify(built), payloadValid: importPayloadSchema.safeParse(built).success };
+  }, [step, statement, chosen]);
 
   async function handleFile(file: File | undefined) {
     if (!file) return;
@@ -226,6 +232,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
       pageError?.kind === "overlap" ? (
         overlapMessage(pageError.from, pageError.to)
       ) : pageError?.kind === "invalid" ? (
+        // DESIGN-GAP: G27 — the kit has no message for a payload the server rejected; `unknownFormat` stands in.
         <Headline text={errors.unknownFormat} />
       ) : pageError?.kind === "failed" ? (
         labels.genericError
@@ -373,6 +380,9 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
   ) : chosen.debits > MAX_DEBITS ? (
     // DESIGN-GAP: G27 — the kit has no message for "too many debits in one import"; `unknownFormat` stands in.
     <Headline text={errors.unknownFormat} />
+  ) : !payloadValid ? (
+    // DESIGN-GAP: G27 — the kit has no message for "file inconsistent with the import contract"; `unknownFormat` stands in.
+    <Headline text={errors.unknownFormat} />
   ) : null;
 
   return (
@@ -412,19 +422,32 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
           </>
         ) : (
           // DESIGN-GAP: G25 — the kit's step 3 has no "range is free → confirm" state; placeholder button.
-          <form method="POST" action="/api/imports">
+          <form
+            method="POST"
+            action="/api/imports"
+            // multipart sends the JSON as-is; url-encoding would triple its punctuation and grow Polish letters ×6.
+            encType="multipart/form-data"
+            onSubmit={(event) => {
+              if (submitting) {
+                event.preventDefault();
+                return;
+              }
+              setSubmitting(true);
+            }}
+          >
             <input type="hidden" name="payload" value={payload} />
             <div className={flowActions}>
               <Button
                 type="button"
                 variant="ghost"
+                disabled={submitting}
                 onClick={() => {
                   setStep(2);
                 }}
               >
                 {x.stepBack}
               </Button>
-              <SubmitButton size="default" pendingText={x.importing}>
+              <SubmitButton size="default" pendingText={x.importing} pending={submitting}>
                 {fill(x.confirm, { n: chosen.debits, debits: plural(chosen.debits, x.debitForms) })}
               </SubmitButton>
             </div>

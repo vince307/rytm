@@ -1,7 +1,7 @@
 ---
 change_id: ing-csv-import
 title: Ing csv import
-status: implementing
+status: implemented
 created: 2026-09-24
 updated: 2026-09-25
 archived_at: null

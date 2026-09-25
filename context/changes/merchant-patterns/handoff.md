@@ -1,18 +1,19 @@
 # Handoff — `merchant-patterns` (slice S-03)
 
-Written by the `new` step (`/10x-new merchant-patterns`). The change folder and `change.md` exist with every S-03 roadmap
-claim checked against the repo; nothing is implemented. The one thing the next agent must not get wrong: **the operator
-domain (D3) is NOT extracted at import** — `transactions.counterparty` holds the raw ING `Dane kontrahenta`; S-03 must
-derive the merchant from `counterparty` + `title` itself (reference: `rawMerchant()` in `scripts/fixture-ing.mjs`).
+Written by the `research` step (`/10x-research merchant-patterns`). `research.md` is written and `change.md` moved
+`new → preparing`; nothing is implemented. The one thing the next agent must not get wrong: **the oracle is a
+partition, not key strings** — `expected.json` pattern keys are hand-authored slugs (`zus`, `przelew-wlasny-vat`);
+S-03 must reproduce the grouping of the 206 imported rows (31 groups: T01 `sportowo` stays split until S-05), and
+aggregating in TS over a plain select silently truncates at `max_rows = 1000`.
 
 ## 1. State
 
 | Item | Value |
 |---|---|
-| Branch | `feat/merchant-patterns`, cut from `main` at `d11f3ef` (pulled, up to date with `origin/main`) |
-| Commits | 2 on top of `d11f3ef` (`d11f3ef..HEAD`), both `docs(merchant-patterns): change identity (autonomous run)` — the second (retry 2/2) adds `## Autonomous decisions` to `change.md` |
+| Branch | `feat/merchant-patterns`, cut from `main` at `d11f3ef` |
+| Commits | 3 on top of `d11f3ef` after this step (`d11f3ef..HEAD`): 2 × `change identity`, 1 × `docs(merchant-patterns): research` |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `new` |
+| `change.md` status | `preparing` (set by `metadata-guard.mjs mark-researched`) |
 | `## Progress` rows remaining | n/a — no `plan.md` yet |
 | Working tree | clean apart from the maintainer's `.gitignore` and `.claude/skills/10x-autonomous-run/` (never staged) |
 
@@ -20,7 +21,8 @@ derive the merchant from `counterparty` + `title` itself (reference: `rawMerchan
 
 | Path | What it is |
 |---|---|
-| `context/changes/merchant-patterns/change.md` | Change identity: outcome, roadmap-claim verification table (corrections), design-kit views and `content.json` keys bound, expected DESIGN-GAPs (badge-label gap now confirmed), `## Autonomous decisions` |
+| `context/changes/merchant-patterns/research.md` | Research: schema/RPCs, `src/lib` gaps, oracle analysis (partition, merges, types), kit binding, shared components, 10 open plan choices |
+| `context/changes/merchant-patterns/change.md` | Frontmatter only: `status: preparing`, `updated: 2026-09-25` (via metadata guard) |
 | `context/changes/merchant-patterns/handoff.md` | This handoff |
 
 ## 3. Verification
@@ -28,29 +30,37 @@ derive the merchant from `counterparty` + `title` itself (reference: `rawMerchan
 | Command | Result |
 |---|---|
 | `git branch --show-current` | `feat/merchant-patterns` (observed before writing) |
-| kebab-case + uniqueness of `merchant-patterns` in `context/changes/`, `context/archive/` | OK (no collision) |
-| `grep -c '^## Autonomous decisions' change.md` | 1 (retry 2/2 fix) — observed |
-| `content.json` `components` / `patterns` read | no `stały`/`częsty` badge key — gap confirmed, observed |
-| `python3` read of `test/fixtures/ing/expected.json` | 30 patterns (24 normalization / 4 import / 1 user-merge / 1 user-exclude), 206 imported rows — observed |
-| lint / astro check / vitest / build / pgTAP / smoke | not run — docs-only step, no code touched; baseline on `main` per run log (inherited, unverified here): lint 0, astro check 0/0/0, vitest 32/32, pgTAP 44/44, smoke 46/46 |
+| `python3` over `test/fixtures/ing/expected.json` | 206 imported rows (main file only), 32 distinct `rawMerchant`, 30 patterns, 0 imported rows without pattern, no raw merchant in 2 patterns; merges = T03 + T01 only; 7 fixed / 23 frequent — observed |
+| `grep max_rows supabase/config.toml` | `max_rows = 1000` — observed |
+| `grep -c transactions supabase/seed.sql` | 0 — seed has no transactions, observed |
+| `grep` for `merchant`, `NumberFormat`, `zł`, `amount_minor` in `src/` | no merchant logic, no money formatter — observed |
+| `metadata-guard.mjs inspect` → `mark-researched` | `changed: true`, status `preparing` — observed |
+| lint / astro check / vitest / build / pgTAP / smoke | not run — docs-only step, no code touched. Run baseline (inherited, unverified here): lint 0, astro check 0/0/0, vitest 32/32, pgTAP 44/44, smoke 46/46 |
 
 ## 4. Next command
 
-`/10x-research merchant-patterns`
+`/10x-plan merchant-patterns`
 
 ## 5. Open
 
-- **Storage decision** (roadmap claims a new merchants/patterns table): derived-on-read over `transactions` vs stored table — resolve in research/plan; see `change.md` table. Reversal pressure comes from S-05 (durable decisions need a table keyed by merchant).
-- **Test oracle**: `expected.json` `patterns[]` merges T01 (`sportowo`) and excludes nothing; S-03 must expect T01 as two patterns (user-merge is S-05) and T08 (`przelew-konto-osobiste`) visible.
-- **DESIGN-GAP candidates** (to be registered at plan/implement in `context/foundation/design-kit.md`, next id after K16 / G27): fixed-amount column („kwota dla stałych”, FR-007) absent from `patterns.columns`; `stały`/`częsty` badge copy only in `app.js` (confirmed absent from `content.json` `components`); row link to detail (S-04) not yet available; table-foot copy only in `app.js`.
-- **G26** (`src/pages/imports/result.astro`, frontmatter comment): S-03 could restore `importFlow.result` + pattern stat — plan decides.
-- Open Question 2 (operator list) — start list `PayPro, PayU, Cashbill, Autopay, ING Pay` (`OPERATORS` in `scripts/fixture-ing.mjs`); where the app's list lives is a plan decision.
+Plan must decide (details in `research.md` § Open Questions):
+
+- **Storage**: derived-on-read (no migration) vs a patterns table; evidence favors derived keyed by a deterministic merchant key. Risk carried to S-05: changing normalization re-keys merchants.
+- **Aggregation site** vs `max_rows = 1000` (`supabase/config.toml`): SQL view/RPC (+ pgTAP), explicit paging, or hybrid (SQL groups by raw fields, TS normalizes). `transactions` has no update grant (`20260924122144_transactions_import_account_fk.sql`), so no stored merchant column without a new grant.
+- **Normalization rule set** minimum proven by the fixture: collapse, rule 7/D3 (port `rawMerchant` + `OPERATORS` from `scripts/fixture-ing.mjs`), strip URL scheme/`www.`, cut address at `UL.`/`AL.`, legal forms, store numbers (T03), doubled name (T02); must not merge T06 vs T08.
+- **T01 auto-merge or not** (changes oracle: 31 vs 30 groups; generator edit, never hand-edit `expected.json`).
+- **Fixed amount** = median (`medianMinor`) vs last amount — DESIGN-GAP, no kit column/key.
+- DESIGN-GAP candidates (next ids **K17 / G28** in `context/foundation/design-kit.md`): fixed-amount column; `stały`/`częsty` badge copy (`copyExtra`); row link to detail (S-04); Próg/Ponad progiem columns; table foot + „Pokaż więcej”; badge background hex (`.rytm-badge--*` in `src/styles/brand.css`) vs token-only rule.
+- Missing shared components: Badge, table (inline in `src/pages/imports/index.astro` `cell`/`head`), merchant mark, search/sort (React island). Money formatter missing in `src/lib/format.ts`.
+- `scripts/smoke.mjs` check "patterns renders empty view" must stay green for 0-transaction users.
+- Screenshot gate needs the fixture imported for `test@rytm.local` (seed has none).
+- Real-data risk: every one-off debit becomes a 1× „stały” pattern (oracle `silownia-ruch`) — roadmap Unknown, owner user.
 
 ## 6. Autonomous decisions
 
-- **Did not STOP after creating `change.md`** (skill says display next step and wait). Chosen: continue to verification + commit per the run's contract. Rejected: waiting for a human. Why: no human in the loop. Would change: a maintainer message pausing the run.
-- **Next step = `/10x-research`, not the skill's default `/10x-plan`.** Why: three unresolved grounding questions (D3 not done at import, derived vs stored patterns, oracle adaptation for S-05-only resolutions) need codebase research before a plan. Rejected `/10x-frame`: the framing (FR-007 list) is not suspect. Would change: if the orchestrator's fixed chain skips research, `/10x-plan` can read `change.md` directly.
-- **Title in Polish** (`Lista wykrytych wzorców sprzedawców (S-03)`), matching the repo's Polish commit/log language. Would change: a maintainer preference for English titles.
-- **Did not pre-decide the storage model**; recorded the roadmap's "own migration" claim as open rather than correct/incorrect. Why: it is a design trade-off, not a fact check. Would change: research showing S-04/S-05 need per-pattern ids now (then a table is warranted in S-03).
-- **Did not register DESIGN-GAP rows yet** — listed as candidates only. Why: `new` writes identity, not kit edits; gap ids should be assigned when the plan fixes what the view renders. Would change: the contract requiring gaps at `new`.
-- **Retry 2/2: kept the existing folder and added a second commit** rather than amending the first. Why: the previous attempt's `change.md` lacked `## Autonomous decisions`; a new commit keeps history append-only (no rewrite). Rejected: `git commit --amend`. Would change: the orchestrator requiring exactly one commit per docs step (then squash at Ship).
+- **Scoped the research myself instead of AskUserQuestion.** Chosen: the four questions in `research.md` § Research Question, taken from `change.md` "Next" line + roadmap `### S-03` + the step brief (schema/RPCs, `src/lib`, kit views, shared components). Rejected: widening to S-04/S-05 design. Why: no human; one slice per change. Would change: a maintainer message narrowing or widening scope.
+- **Worked locally instead of delegating to 2–4 sub-agents.** Why: this session has no Agent/Task tool; all areas were small enough to read directly, and the brief warns about a research step that died waiting on agents. Would change: an available sub-agent tool and a larger codebase.
+- **Anchored on symbols, not `file:line`** (skill format asks for lines). Why: run contract rule overrides. Would change: contract change.
+- **Recommended, not decided, the storage model** (derived-on-read favored). Why: research answers facts; plan owns the trade-off. Would change: evidence that S-04/S-05 need row ids before merchant keys exist.
+- **Stated the S-03 oracle as 31 groups** (T01 split). Why: `expected.json` marks T01 `user-merge` (S-05) and change.md scoped merges/excludes out. Would change: the plan choosing auto-merge (then 30, generator `resolvedBy` flipped).
+- **Status `complete`** on `research.md`. Why: every scoped question has observed evidence; remaining items are product/design choices, not gaps. Would change: finding a consumer this search missed (searched `src/`, `supabase/`, `scripts/`, `test/unit/`, `context/archive/*/plan.md`).

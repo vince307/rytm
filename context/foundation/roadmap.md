@@ -3,7 +3,7 @@ project: Rytm
 version: 1
 status: draft
 created: 2026-09-21
-updated: 2026-09-24
+updated: 2026-09-25
 prd_version: 1
 main_goal: quality
 top_blocker: none
@@ -43,7 +43,7 @@ Pieniądze cicho uciekają z konta, a kategoryzacja banku nie odpowiada na pytan
 | ---- | ---------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------- | -------------------------------------- | -------- |
 | F-01 | domain-schema-rls            | (foundation) pierwsza migracja: importy i transakcje z RLS per konto i kaskadą                              | —             | FR-002, FR-019, NFR izolacja           | done     |
 | F-02 | synthetic-ing-fixture        | (foundation) syntetyczny wyciąg ING z pułapkami jako fixture testów i seed demo                             | —             | FR-014, NFR prywatność                 | done     |
-| S-01 | ing-csv-import               | wgrać CSV z ING (jeden rachunek, obciążenia), zobaczyć wynik importu; nakładający się zakres jest odrzucony | F-01, F-02    | US-01, FR-003, FR-005, FR-002          | in-progress |
+| S-01 | ing-csv-import               | wgrać CSV z ING (jeden rachunek, obciążenia), zobaczyć wynik importu; nakładający się zakres jest odrzucony | F-01, F-02    | US-01, FR-003, FR-005, FR-002          | done     |
 | S-02 | undo-import                  | zobaczyć listę importów i cofnąć błędny import wraz z jego transakcjami                                     | S-01          | US-02, FR-004                          | proposed |
 | S-03 | merchant-patterns            | zobaczyć listę wzorców: sprzedawca, typ, liczba wystąpień, suma, kwota dla stałych                          | S-01, F-02    | US-01, FR-006, FR-007                  | proposed |
 | S-04 | pattern-threshold-over-limit | otworzyć wzorzec, zobaczyć jego transakcje, ustawić próg i zobaczyć „ponad próg” z sumą miesiąca            | S-03          | US-01, FR-008, FR-010, FR-011          | proposed |
@@ -118,7 +118,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Czy parsowanie kilkunastu miesięcy mieści się w budżecie czasu żądania na Vercelu bez pracy w tle (ryzyko z `infrastructure.md`)? — Owner: user. Block: no (mierzone na fixture w trakcie planowania).
 - **Risk:** Pierwszy wycinek pionowy: integruje upload, parser, tabele i kit importu (`/imports/new`, kroki 1–3, błędy formatu) od razu; odrzucanie zakresów zamiast deduplikacji spełnia guardrail „import nie dubluje” przez konstrukcję.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-02: Cofnięcie błędnego importu
 
@@ -266,3 +266,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **S-08: Użytkownik może zobaczyć swoje konto (e-mail, zmiana hasła, nota o przetwarzaniu danych) i samodzielnie usunąć konto po potwierdzeniu; usunięcie kasuje wszystkie jego dane bez śladu, a ponowne logowanie tym hasłem jest niemożliwe.** — Archived 2026-09-23 → `context/archive/2026-09-21-settings-account/`. Lesson: —.
 - **F-01: (foundation) pierwsza migracja istnieje i jest zastosowana lokalnie i na hostowanej bazie: tabele importów i transakcji należą do konta (RLS per operację, per rolę) i kasują się kaskadowo z kontem; ustalona jest ścieżka „migracja lokalnie → `db push` na produkcję”.** — Archived 2026-09-24 → `context/archive/2026-09-23-domain-schema-rls/`. Lesson: —.
 - **F-02: (foundation) w repozytorium istnieje syntetyczny plik CSV w formacie ING (zgodny z `import-formats.md`) z realistycznymi pułapkami: warianty opisów tego samego sprzedawcy, pośrednicy (PayPal/Allegro/BLIK przez operatorów), subskrypcja z podwyżką, nowy wzorzec, wiele rachunków, uznania i zwroty do pominięcia; służy jako fixture testów parsera i wykrywania oraz jako materiał seedu demo.** — Archived 2026-09-24 → `context/archive/2026-09-24-synthetic-ing-fixture/`. Lesson: —.
+- **S-01: Użytkownik może wgrać plik CSV z ING (wybierając jeden rachunek, tylko obciążenia), zobaczyć wynik importu (liczba transakcji, zakres dat) i wejść na listę wzorców; plik, którego zakres dat zachodzi na istniejący import, jest odrzucony z komunikatem; użytkownik widzi wyłącznie własne importy.** — Archived 2026-09-25 → `context/archive/2026-09-24-ing-csv-import/`. Lesson: —.

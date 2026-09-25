@@ -339,14 +339,14 @@ Nowa migracja dodaje tylko funkcję; tabele bez zmian. Produkcja: `npx supabase 
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej bazie: `npx supabase db reset`
-- [x] 1.2 Testy bazy przechodzą, w tym nowy plik: `npx supabase test db`
-- [x] 1.3 Typy zawierają `import_ing_statement`: `npm run db:types && grep -q import_ing_statement src/db/database.types.ts`
-- [x] 1.4 Lint przechodzi: `npm run lint`
+- [x] 1.1 Migracja stosuje się na czystej bazie: `npx supabase db reset` — 0025ea2
+- [x] 1.2 Testy bazy przechodzą, w tym nowy plik: `npx supabase test db` — 0025ea2
+- [x] 1.3 Typy zawierają `import_ing_statement`: `npm run db:types && grep -q import_ing_statement src/db/database.types.ts` — 0025ea2
+- [x] 1.4 Lint przechodzi: `npm run lint` — 0025ea2
 
 #### Manual
 
-- [x] 1.5 Nagłówek migracji i komentarz funkcji jasno opisują atomowość, granty i FR-005 per rachunek
+- [x] 1.5 Nagłówek migracji i komentarz funkcji jasno opisują atomowość, granty i FR-005 per rachunek — 0025ea2
 
 ### Phase 2: Parser ING i testy jednostkowe
 

@@ -1,33 +1,51 @@
 ---
+// New import (S-01) — steps 1–3 run in the ImportWizard island (prototype app.js:57–61). The page hands it the
+// caller's own import ranges (RLS, FR-002) for the step-3 overlap check and the error of a rejected POST.
+import { z } from "zod";
 import AppLayout from "@/layouts/AppLayout.astro";
-import PageTitle from "@/components/app/PageTitle.astro";
-import Panel from "@/components/app/Panel.astro";
-import Stepper from "@/components/app/Stepper.astro";
-import Icon from "@/components/Icon.astro";
-import { buttonVariants } from "@/components/ui/button";
+import ImportWizard from "@/components/imports/ImportWizard";
+import type { ExistingImport, WizardServerError } from "@/components/imports/ImportWizard";
 import { copy, copyExtra } from "@/content/copy";
+import { createClient } from "@/lib/supabase";
 
 const f = copy.importFlow;
-const x = copyExtra.imports;
 
-// Inert in slice 1: the import backend does not exist yet. Enabled by the import slice.
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const { data, error } = supabase
+  ? await supabase.from("imports").select("account_number, period_start, period_end")
+  : { data: null, error: null };
+if (error) {
+  // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
+  console.error("imports ranges failed", error.code, error.message);
+}
+const existing: ExistingImport[] = (data ?? []).map((i) => ({
+  accountNumber: i.account_number,
+  periodStart: i.period_start,
+  periodEnd: i.period_end,
+}));
+
+// ?error= from POST /api/imports; overlap carries the colliding range unless the endpoint could not read it.
+const params = Astro.url.searchParams;
+const kind = z.enum(["overlap", "invalid", "failed"]).safeParse(params.get("error"));
+const isoDate = (value: string | null) => {
+  const parsed = z.iso.date().safeParse(value);
+  return parsed.success ? parsed.data : undefined;
+};
+const serverError: WizardServerError | undefined = kind.success
+  ? { kind: kind.data, from: isoDate(params.get("from")), to: isoDate(params.get("to")) }
+  : undefined;
 ---
 
 <AppLayout title={f.title} active="imports">
-  <PageTitle eyebrow={x.newEyebrow} title={f.title} lead={x.newLead}>
-    <a href="/imports" class="inline-flex items-center gap-1.5 text-[13px] font-extrabold text-ink no-underline">
-      <Icon name="arrow-left" size={15} /> {x.back}
-    </a>
-  </PageTitle>
-  <Stepper steps={f.steps} current={1} />
-  <Panel class="flex min-h-[360px] flex-col items-center justify-center border-dashed border-muted text-center">
-    <div class="grid size-[60px] place-items-center rounded-[13px] bg-ink text-paper">
-      <Icon name="upload" size={28} />
-    </div>
-    <h2 class="mt-[22px] mb-2 text-[23px] tracking-[-0.04em]">{x.dropTitle}</h2>
-    <p class="mb-[22px] text-[13px] text-muted">{f.supported}</p>
-    <button type="button" class:list={buttonVariants({ variant: "primary" })} disabled>
-      {x.choose}
-    </button>
-  </Panel>
+  <ImportWizard
+    client:load
+    labels={{
+      flow: { title: f.title, steps: f.steps, supported: f.supported, oneAccount: f.oneAccount },
+      imports: copyExtra.imports,
+      errors: copy.importErrors,
+      genericError: copy.components.error,
+    }}
+    existing={existing}
+    serverError={serverError}
+  />
 </AppLayout>

@@ -71,6 +71,45 @@ export const copyExtra = {
     dropTitle: "Upuść plik CSV tutaj",
     choose: "Wybierz plik",
     newImport: "+ Nowy import",
+    // Imports table (prototype imports(), app.js:56) — column headers and the account cell.
+    table: { importedOn: "Data importu", account: "Rachunek", range: "Zakres dat", debits: "Obciążenia" },
+    accountLabel: "ING · {name}",
+    // Result screen (prototype importResult(), app.js:63).
+    resultEyebrow: "Import gotowy",
+    toPatterns: "Zobacz wzorce",
+    toOverview: "Przejdź do przeglądu",
+    transactionForms: ["transakcja", "transakcje", "transakcji"],
+    // DESIGN-GAP: G26 — result screen before patterns exist (S-03): the kit h1 `importFlow.result`
+    // („Wzorce są już widoczne.”) and the pattern stats do not apply yet; placeholder h1 from the
+    // prototype lead („Dodaliśmy 64 obciążenia…”).
+    resultTitle: "Dodaliśmy {n} {debits}.",
+    debitForms: ["obciążenie", "obciążenia", "obciążeń"],
+    // Import wizard (prototype importsNew/uploadReady/importAccount/importSummary, app.js:57–61).
+    formatRecognised: "rozpoznano format ING",
+    next: "Dalej",
+    stepBack: "Wstecz",
+    stepEyebrow: "Nowy import · krok {n} z 3",
+    accountTitle: "Wybierz rachunek.",
+    // The prototype spells the count as a word („trzy rachunki”); the app interpolates the number.
+    accountLead: "Ten plik zawiera {n} {accounts}. Domyślnie zaznaczyliśmy ten z największą liczbą transakcji.",
+    accountForms: ["rachunek", "rachunki", "rachunków"],
+    selected: "wybrane",
+    bankName: "ING Bank Śląski",
+    summaryTitle: "Sprawdź przed importem.",
+    summary: {
+      account: "Rachunek",
+      range: "Zakres dat",
+      debits: "Obciążenia do importu",
+      skipped: "Pominięte wpływy / zwroty",
+    },
+    overlapTail: "Wybierz inny plik albo wróć do importów.",
+    // DESIGN-GAP: K16 — `importErrors.overlap` has the date baked in („…import: 1 marca – 31 maja 2026.”);
+    // the app interpolates the real range after this prefix (prototype importSummary, app.js:61).
+    overlapPrefix: "Ten zakres nachodzi na istniejący import:",
+    // DESIGN-GAP: G25 — step 3 has no "range is free → confirm" state in the kit; placeholder button from the
+    // pre-K8 prototype („Importuj 64 obciążenia”), plural forms in `debitForms`.
+    confirm: "Importuj {n} {debits}",
+    importing: "Importowanie…",
   },
   patterns: { eyebrow: "Wzorce wydatków" },
   fixed: { eyebrow: "Koszty stałe", lead: "Rytm porównuje miesiące kalendarzowe i pokazuje różnice." },

@@ -1,0 +1,12 @@
+---
+change_id: ing-csv-import
+title: Ing csv import
+status: implementing
+created: 2026-09-24
+updated: 2026-09-24
+archived_at: null
+---
+
+## Notes
+
+<!-- Free-form notes for this change: links, ad-hoc context, decisions that don't belong in research/frame/plan. -->

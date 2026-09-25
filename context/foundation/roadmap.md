@@ -43,7 +43,7 @@ Pieniądze cicho uciekają z konta, a kategoryzacja banku nie odpowiada na pytan
 | ---- | ---------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------- | -------------------------------------- | -------- |
 | F-01 | domain-schema-rls            | (foundation) pierwsza migracja: importy i transakcje z RLS per konto i kaskadą                              | —             | FR-002, FR-019, NFR izolacja           | done     |
 | F-02 | synthetic-ing-fixture        | (foundation) syntetyczny wyciąg ING z pułapkami jako fixture testów i seed demo                             | —             | FR-014, NFR prywatność                 | done     |
-| S-01 | ing-csv-import               | wgrać CSV z ING (jeden rachunek, obciążenia), zobaczyć wynik importu; nakładający się zakres jest odrzucony | F-01, F-02    | US-01, FR-003, FR-005, FR-002          | proposed |
+| S-01 | ing-csv-import               | wgrać CSV z ING (jeden rachunek, obciążenia), zobaczyć wynik importu; nakładający się zakres jest odrzucony | F-01, F-02    | US-01, FR-003, FR-005, FR-002          | in-progress |
 | S-02 | undo-import                  | zobaczyć listę importów i cofnąć błędny import wraz z jego transakcjami                                     | S-01          | US-02, FR-004                          | proposed |
 | S-03 | merchant-patterns            | zobaczyć listę wzorców: sprzedawca, typ, liczba wystąpień, suma, kwota dla stałych                          | S-01, F-02    | US-01, FR-006, FR-007                  | proposed |
 | S-04 | pattern-threshold-over-limit | otworzyć wzorzec, zobaczyć jego transakcje, ustawić próg i zobaczyć „ponad próg” z sumą miesiąca            | S-03          | US-01, FR-008, FR-010, FR-011          | proposed |
@@ -118,7 +118,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Czy parsowanie kilkunastu miesięcy mieści się w budżecie czasu żądania na Vercelu bez pracy w tle (ryzyko z `infrastructure.md`)? — Owner: user. Block: no (mierzone na fixture w trakcie planowania).
 - **Risk:** Pierwszy wycinek pionowy: integruje upload, parser, tabele i kit importu (`/imports/new`, kroki 1–3, błędy formatu) od razu; odrzucanie zakresów zamiast deduplikacji spełnia guardrail „import nie dubluje” przez konstrukcję.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-02: Cofnięcie błędnego importu
 

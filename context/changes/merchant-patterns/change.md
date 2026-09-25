@@ -53,10 +53,38 @@ DESIGN-GAPs expected (register in `context/foundation/design-kit.md` when planne
 
 - **Kwota dla stałych** — FR-007 requires it, but the kit table's columns are Sprzedawca/Typ/Wystąpienia/Suma/Próg/Ponad
   progiem; no amount column and no key for it.
-- **Type badge labels** — prototype renders `stały` / `częsty` from `data.patterns[].type` in `app.js`; check whether
-  `content.json` has them (e.g. `components`) before registering a gap.
+- **Type badge labels** — prototype renders `stały` / `częsty` from `data.patterns[].type` in `app.js`; checked:
+  `content.json` `components` holds only `excluded`/`new`/`changed`/`back`, and `mobileNav.fixed` = „Stałe” is a nav
+  label, not a badge — **confirmed gap** (copy goes to `copyExtra`, K-row).
 - **Row link target** — kit rows link to `#/patterns/:id` (detail, S-04); without detail the link would 404.
 - **Table foot** „5 wzorców · wszystkie miesiące” and „Pokaż więcej” live only in `app.js`, not `content.json`.
 
 Next: `/10x-research merchant-patterns` — normalization rules (FR-006, D3, T02/T03), storage decision (derived vs
 table), and the fixture-oracle test design need grounding before a plan.
+
+## Autonomous decisions
+
+Made by the `new` step of run `2026-09-25-roadmap-all` in place of asking a human.
+
+- **Did not STOP after `change.md`** (the 10x-new skill says display the next step and wait). Chosen: continue to
+  verification, handoff and commit. Rejected: waiting. Why: the run has no human in the loop (agent contract, rule 1).
+  Would change: a maintainer message pausing the run.
+- **Folder already existed (uniqueness check would error).** Chosen: work inside the existing
+  `context/changes/merchant-patterns/` — it was written by this same run's earlier attempt (commit
+  `docs(merchant-patterns): change identity (autonomous run)`), not by an unrelated change. Rejected: a new id
+  (e.g. `merchant-patterns-2`), which would split the slice. Would change: the folder belonging to a different slice
+  or to an archived change.
+- **Next step = `/10x-research`, not the skill's default `/10x-plan`.** Why: three grounding questions — D3 domain
+  extraction absent at import, derived-vs-stored patterns, adapting the `expected.json` oracle to S-03 (no user
+  merge/exclude) — need codebase research. Rejected `/10x-frame`: the FR-007 framing is not suspect. Would change: the
+  orchestrator's fixed chain skipping research (then `/10x-plan` reads this file directly).
+- **Title in Polish**, matching the repo's Polish log. Would change: a maintainer preference for English titles.
+- **Storage model left open** (roadmap claims an own migration). Why: a design trade-off, not a fact check; a pure
+  derivation over `transactions` satisfies FR-007 + determinism and survives S-02 undo. Rejected: correcting the
+  roadmap to "no table" now. Would change: research showing S-04/S-05 need stable per-pattern ids already in S-03.
+- **DESIGN-GAPs listed as candidates, not registered** in `context/foundation/design-kit.md`. Why: gap ids should be
+  assigned when the plan fixes what the view renders; `new` writes identity only. Would change: the contract
+  requiring gap rows at `new`.
+- **Scope = `/patterns` table only** (one view + global tokens). Rejected: `/home` „Co wraca najczęściej”, pattern
+  detail, excluded section. Why: CLAUDE.md "one view"; those belong to S-04/S-05. Would change: the roadmap moving
+  the home widget into S-03's outcome.

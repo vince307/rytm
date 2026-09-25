@@ -131,6 +131,9 @@ const steps = [
     () => request(importResultPath),
     { status: 200, contains: "Dodaliśmy 2 obciążenia." },
   ],
+  ["patterns lists imported merchants", () => request("/patterns"), { status: 200, contains: "Kawiarnia smoke" }],
+  // The rendered badge text node — a bare "stały" would also match the island's serialized copy props.
+  ["patterns proposes a type", () => request("/patterns"), { status: 200, contains: ">stały<" }],
   [
     "import of an overlapping range is rejected",
     () => request("/api/imports", { method: "POST", form: { payload: importPayload } }),

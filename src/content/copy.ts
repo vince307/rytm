@@ -111,7 +111,17 @@ export const copyExtra = {
     confirm: "Importuj {n} {debits}",
     importing: "Importowanie…",
   },
-  patterns: { eyebrow: "Wzorce wydatków" },
+  patterns: {
+    eyebrow: "Wzorce wydatków",
+    // DESIGN-GAP: K11 — strings of prototype patterns() / patternRows() / badge() absent from content.json.
+    upload: "+ Wgraj CSV",
+    typeLabels: { fixed: "stały", frequent: "częsty" },
+    sortPrefix: "Sortuj: ",
+    footer: "{n} {patterns} · wszystkie miesiące",
+    patternForms: ["wzorzec", "wzorce", "wzorców"],
+    // DESIGN-GAP: K17 — the kit table has no "kwota dla stałych" column (FR-007); placeholder header.
+    amountColumn: "Kwota",
+  },
   fixed: { eyebrow: "Koszty stałe", lead: "Rytm porównuje miesiące kalendarzowe i pokazuje różnice." },
   settings: {
     eyebrow: "Ustawienia / konto",

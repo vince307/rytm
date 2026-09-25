@@ -482,24 +482,24 @@ Recorded by `/10x-plan-review` (`reviews/plan-review.md`, OBSERVATIONs F5–F7);
 
 #### Automated
 
-- [x] 2.1 `npm test` green (baseline after Phase 1 + new loader/format cases)
-- [x] 2.2 `npm run lint` 0 errors; `npx astro check` 0/0/0
-- [x] 2.3 `npm run build` passes
-- [x] 2.4 Deliberate break: `collectPages` stopping on a short page makes the capped-fake case fail, restored → green
+- [x] 2.1 `npm test` green (baseline after Phase 1 + new loader/format cases) — dc3c6d6
+- [x] 2.2 `npm run lint` 0 errors; `npx astro check` 0/0/0 — dc3c6d6
+- [x] 2.3 `npm run build` passes — dc3c6d6
+- [x] 2.4 Deliberate break: `collectPages` stopping on a short page makes the capped-fake case fail, restored → green — dc3c6d6
 
 ### Phase 3: `/patterns` view bound to the kit
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` 0 errors; `npx astro check` 0/0/0
-- [ ] 3.2 `npm test` green (no regression from Phase 2)
-- [ ] 3.3 `npm run fixture:check` OK
-- [ ] 3.4 `npm run build` passes
-- [ ] 3.5 `npx supabase db reset && npx supabase test db` — pgTAP at baseline (44/44 on `main`), delta 0 (no schema change)
-- [ ] 3.6 `BASE_URL=http://localhost:4398 npm run smoke` — baseline (46 on `main`) + 2 new steps, all PASS
-- [ ] 3.7 `grep -rnE "#[0-9a-fA-F]{3,6}\b|\[#" src/components/patterns src/components/app/Badge.tsx` finds no raw colors
+- [x] 3.1 `npm run lint` 0 errors; `npx astro check` 0/0/0
+- [x] 3.2 `npm test` green (no regression from Phase 2)
+- [x] 3.3 `npm run fixture:check` OK
+- [x] 3.4 `npm run build` passes
+- [x] 3.5 `npx supabase db reset && npx supabase test db` — pgTAP at baseline (44/44 on `main`), delta 0 (no schema change)
+- [x] 3.6 `BASE_URL=http://localhost:4398 npm run smoke` — baseline (46 on `main`) + 2 new steps, all PASS
+- [x] 3.7 `grep -rnE "#[0-9a-fA-F]{3,6}\b|\[#" src/components/patterns src/components/app/Badge.tsx` finds no raw colors
 
 #### Manual
 
 - [ ] 3.8 Screenshots (Visual step): `lista`, `lista-mobile`, `wyszukiwanie`, `sortowanie-nazwa`, `pusty`, `brak-wyników`; `błąd` code-reviewed only
-- [ ] 3.9 On the fixture: 31 rows, `KINOTEKA` `stały` 52,99 zł, `MINIMARKET PRZYSTANEK` 8×, `sportowo.pl` and `SPORTOWO` as two rows, no operator-named row except `AUTOPAY`
+- [x] 3.9 On the fixture: 31 rows, `KINOTEKA` `stały` 52,99 zł, `MINIMARKET PRZYSTANEK` 8×, `sportowo.pl` and `SPORTOWO` as two rows, no operator-named row except `AUTOPAY`

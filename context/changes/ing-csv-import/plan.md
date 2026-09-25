@@ -352,13 +352,13 @@ Nowa migracja dodaje tylko funkcję; tabele bez zmian. Produkcja: `npx supabase 
 
 #### Automated
 
-- [ ] 2.1 Testy jednostkowe przechodzą: `npm test`
-- [ ] 2.2 Bramka fixture nadal przechodzi: `npm run fixture:check`
-- [ ] 2.3 Lint i typy przechodzą: `npm run lint && npx astro check`
+- [x] 2.1 Testy jednostkowe przechodzą: `npm test`
+- [x] 2.2 Bramka fixture nadal przechodzi: `npm run fixture:check`
+- [x] 2.3 Lint i typy przechodzą: `npm run lint && npx astro check`
 
 #### Manual
 
-- [ ] 2.4 Parser nie importuje modułów Node (przegląd importów w `src/lib/import/ing.ts`)
+- [x] 2.4 Parser nie importuje modułów Node (przegląd importów w `src/lib/import/ing.ts`)
 
 ### Phase 3: Endpoint, wynik i lista importów
 

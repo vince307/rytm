@@ -16,6 +16,7 @@
 - `npm run lint:fix` — auto-fix lint issues
 - `npm run format` — Prettier (includes prettier-plugin-astro + prettier-plugin-tailwindcss)
 - `npm run smoke` — dependency-free auth-flow smoke test (`scripts/smoke.mjs`) against a running server, `BASE_URL` env (default `http://localhost:4321`). Run after dependency upgrades; CI runs it against `astro dev` with a local Supabase.
+- `npm test` — Vitest unit tests in `test/unit/` (ING parser against `test/fixtures/ing/expected.json`, import payload schema, formatting); config `vitest.config.ts` via Astro's `getViteConfig`, so the `@/*` alias works. CI runs it in the `ci` job after `fixture:check`.
 - `npx supabase test db` — pgTAP database tests in `supabase/tests/database/` (RLS isolation, cascade, constraints) against the local Supabase; CI runs it in the `smoke` job before the smoke test.
 - `npm run db:types` — regenerate `src/db/database.types.ts` (typed `Database` for the Supabase client, row aliases in `src/types.ts`) from the local Supabase; run after every migration, never edit the file by hand.
 

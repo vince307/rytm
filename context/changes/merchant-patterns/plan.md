@@ -325,11 +325,14 @@ the **visible** rows + `plural()` + " · wszystkie miesiące". Head/cell classes
 **File**: `src/pages/patterns.astro`
 
 **Intent**: Three states like `imports/index.astro`: error → `PageTitle` + `InlineAlert kind="error"`
-`copy.components.error`; zero patterns → current empty view unchanged; otherwise `PageTitle` (eyebrow
+`copy.components.error` (also when `createClient` returns `null` — unconfigured env; unlike `imports/index.astro`,
+which renders that as empty, a missing client here is an error, because the slice rule is "never the empty state on
+a failed read"); zero patterns → current empty view unchanged; otherwise `PageTitle` (eyebrow
 `copyExtra.patterns.eyebrow`, `copy.patterns.title`, lead `copy.patterns.description`, primary link "+ Wgraj CSV" →
 `/imports/new` via `buttonVariants({ variant: "primary" })`) + `PatternsTable`.
 
-**Contract**: calls `loadPatterns(createClient(Astro.request.headers, Astro.cookies))`; logs errors server-side with
+**Contract**: `const supabase = createClient(Astro.request.headers, Astro.cookies)`; `null` → error state without
+calling the loader; otherwise `loadPatterns(supabase)` (its parameter stays a non-null `SupabaseClient<Database>`); logs errors server-side with
 the existing `eslint-disable-next-line no-console` pattern; maps `MerchantPattern` → `PatternListItem`.
 
 #### 5. Copy and design-kit register
@@ -348,7 +351,10 @@ the existing `eslint-disable-next-line no-console` pattern; maps `MerchantPatter
   "Kwota" = median of the fixed pattern, `—` for frequent; author delivers column + key); **G28** (patterns list
   before thresholds/detail/exclusion: columns Próg / Ponad progiem, row link + arrow to `#/patterns/:id`,
   status badges, excluded section and "Pokaż więcej" omitted until S-04/S-05/S-06; placeholder = the S-03 table);
-  K11 row notes the new `copyExtra.patterns` strings; both added to "Do rundy 3". `DESIGN-GAP: K17` / `G28`
+  **K18** (the kit has no copy for a failed read of a list: `components.error` „Błąd — sprawdź plik CSV.” points
+  at a CSV the user did not touch; placeholder = that key, as `imports/index.astro` already does; author delivers a
+  generic read-error line) with a `DESIGN-GAP: K18` comment at the error branch of `patterns.astro`;
+  K11 row notes the new `copyExtra.patterns` strings; all three added to "Do rundy 3". `DESIGN-GAP: K17` / `G28`
   comments at the omission points in `PatternsTable.tsx`.
 
 #### 6. Smoke
@@ -358,8 +364,11 @@ the existing `eslint-disable-next-line no-console` pattern; maps `MerchantPatter
 **Intent**: Prove the list path against the real server + DB for the smoke user's 2-debit import.
 
 **Contract**: after "import result renders the debit count": `patterns lists imported merchants` → `/patterns`
-200 contains `Kawiarnia smoke`; `patterns proposes a type` → 200 contains `stały` (each smoke merchant has one
-occurrence → `fixed` per D5). "patterns renders empty view" (seeded user) unchanged.
+200 contains `Kawiarnia smoke`; `patterns proposes a type` → 200 contains `>stały<` (each smoke merchant has one
+occurrence → `fixed` per D5). Match the **rendered** badge text node, never the bare word: the island's
+`typeLabels` copy is serialized into the `<astro-island props="…">` attribute, so a bare `stały` would pass even with
+no fixed row rendered. "patterns renders empty view" (seeded user) unchanged — it requires the seeded user to have
+**no** transactions (see the Visual-step account note under Manual Verification).
 
 ### Success Criteria:
 
@@ -375,8 +384,10 @@ occurrence → `fixed` per D5). "patterns renders empty view" (seeded user) unch
 
 #### Manual Verification:
 
-- Screenshots (Visual step; `test@rytm.local` with the main fixture CSV imported via `/imports/new` on
-  `astro dev --port 4398`): `lista` (1440 px, default sort suma), `lista-mobile` (375 px), `wyszukiwanie`
+- Screenshots (Visual step; a **freshly registered local account** — local signup needs no confirmation — with the
+  main fixture CSV imported via `/imports/new` on `astro dev --port 4398`; never import into the seeded
+  `test@rytm.local`, whose zero transactions the smoke step "patterns renders empty view" depends on — if it happens,
+  `npx supabase db reset` before the next smoke run; `pusty` uses the seeded user): `lista` (1440 px, default sort suma), `lista-mobile` (375 px), `wyszukiwanie`
   (term `kin` → `KINO ŚWIATŁO`, `KINOTEKA`, foot "2 wzorce"), `sortowanie-nazwa`, `pusty` (user with no imports),
   `brak-wyników` (term with no match: empty body, foot "0 wzorców"); `błąd` is code-reviewed only (no safe way to
   force a read error locally)
@@ -404,7 +415,7 @@ automated criteria.
 ### Manual Testing Steps:
 
 1. `npx supabase start`, `ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398 --ignore-lock`.
-2. Sign in as `test@rytm.local`, import `test/fixtures/ing/Lista_transakcji_nr_0000123456_010926.csv` (main
+2. Register a fresh local account (not `test@rytm.local` — see Phase 3 Manual Verification), import `test/fixtures/ing/Lista_transakcji_nr_0000123456_010926.csv` (main
    account), open `/patterns`: 31 rows, foot "31 wzorców · wszystkie miesiące".
 3. Type `kin`, switch sort to `nazwa`, resize to 375 px.
 4. Kill the dev server (`lsof -ti :4398 | xargs kill`).
@@ -430,6 +441,23 @@ mapping step in that slice.
 - Read-view pattern: `src/pages/imports/index.astro`; oracle test pattern: `test/unit/ing-parser.test.ts`
 - Kit: `design/rytm-os/prototype/app.js` (`patterns`, `patternRows`, `bindInteractions`, `money`, `badge`),
   `design/rytm-os/prototype/styles.css`, `design/rytm-os/react-kit/docs/content.json` (`patterns`)
+
+## Known risks
+
+Recorded by `/10x-plan-review` (`reviews/plan-review.md`, OBSERVATIONs F5–F7); none blocks implementation.
+
+- **Merchant mark casing** (F5): the kit's `patternRows()` renders `p.name[0]` as-is; the plan's "first letter/digit,
+  upper-cased" is a small unregistered deviation (visible only for lower-case names such as `kawa-testowa.pl`). The
+  implementer either follows the kit literally or registers the upper-casing in the G28 row — not both silently.
+- **Offset paging under concurrent deletes** (F6): `collectPages` advances by offset; an import deleted in another
+  tab mid-read (S-02 undo) shifts later pages and can skip rows without an error. Negligible at `data_volume: small`;
+  keyset paging (`.gt("id", lastId).order("id").limit(PAGE_SIZE)`, stop on an empty page) removes the class and the
+  per-page `count: "exact"`. Revisit if S-02 lands before this ships or a skipped row is ever observed.
+- **Real-statement over-merge / split** (F7): rule 4's bare `SA` token and rule 5's "≥ 3-digit token" cut can merge
+  distinct real merchants (`PIZZA 365` → `PIZZA`); long legal forms (`SPÓŁKA Z OGRANICZONĄ …`), card processors and
+  unlisted operators can split them. The oracle cannot see these; the roadmap Unknown (owner user) and S-05 user
+  merges are the correction path. The roadmap `### S-03` Risk line still says S-03 adds a migration — the plan
+  deliberately does not (handoff § 6); the archive step should correct the roadmap text.
 
 ## Progress
 

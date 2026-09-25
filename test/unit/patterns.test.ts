@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { buildImportPayload, parseIngStatement } from "@/lib/import/ing";
 import { d5Type, derivePatterns, median } from "@/lib/patterns/derive";
+import { collectPages, PAGE_SIZE } from "@/lib/patterns/load";
 import { merchantKey, normalizeMerchant, rawMerchant } from "@/lib/patterns/merchant";
 import type { PatternSource } from "@/types";
 
@@ -206,5 +207,39 @@ describe("D5", () => {
 
   it("treats a single occurrence as fixed", () => {
     expect(d5Type([12345])).toBe("fixed");
+  });
+});
+
+describe("collectPages", () => {
+  // A fake server that caps every response at `cap` rows, like PostgREST's max_rows.
+  function cappedFetch(total: number, cap: number, failOnCall?: number) {
+    const all = Array.from({ length: total }, (_, i) => i);
+    const calls: [number, number][] = [];
+    const fetchPage = (from: number, to: number) => {
+      calls.push([from, to]);
+      if (calls.length === failOnCall) return Promise.resolve({ rows: [], count: null, error: new Error("boom") });
+      return Promise.resolve({ rows: all.slice(from, Math.min(to + 1, from + cap)), count: total, error: null });
+    };
+    return { fetchPage, calls };
+  }
+
+  it("reads every row when the server caps pages below the requested size", async () => {
+    const { fetchPage, calls } = cappedFetch(7, 3);
+    expect(await collectPages(fetchPage)).toEqual({ rows: [0, 1, 2, 3, 4, 5, 6] });
+    expect(calls[0]).toEqual([0, PAGE_SIZE - 1]);
+    expect(calls.map(([from]) => from)).toEqual([0, 3, 6]);
+  });
+
+  it("fails as a whole when a later page errors", async () => {
+    const { fetchPage } = cappedFetch(7, 3, 2);
+    const result = await collectPages(fetchPage);
+    expect(result).toHaveProperty("error");
+    expect(result).not.toHaveProperty("rows");
+  });
+
+  it("returns an empty list after one call when there are no rows", async () => {
+    const { fetchPage, calls } = cappedFetch(0, 3);
+    expect(await collectPages(fetchPage)).toEqual({ rows: [] });
+    expect(calls).toHaveLength(1);
   });
 });

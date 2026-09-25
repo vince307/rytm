@@ -57,3 +57,10 @@ export function formatRangeLong(start: string, end: string): string {
 export function formatAccountTail(number: string): string {
   return `•• ${number.replace(/\s+/g, "").slice(-4)}`;
 }
+
+const money = new Intl.NumberFormat("pl-PL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/** `52,99 zł` — grosze as złoty, the kit's `money()` (prototype/app.js). pl-PL does not group 4 digits. */
+export function formatMoney(minor: number): string {
+  return `${money.format(minor / 100)} zł`;
+}

@@ -352,26 +352,26 @@ Nowa migracja dodaje tylko funkcję; tabele bez zmian. Produkcja: `npx supabase 
 
 #### Automated
 
-- [x] 2.1 Testy jednostkowe przechodzą: `npm test`
-- [x] 2.2 Bramka fixture nadal przechodzi: `npm run fixture:check`
-- [x] 2.3 Lint i typy przechodzą: `npm run lint && npx astro check`
+- [x] 2.1 Testy jednostkowe przechodzą: `npm test` — 1749384
+- [x] 2.2 Bramka fixture nadal przechodzi: `npm run fixture:check` — 1749384
+- [x] 2.3 Lint i typy przechodzą: `npm run lint && npx astro check` — 1749384
 
 #### Manual
 
-- [x] 2.4 Parser nie importuje modułów Node (przegląd importów w `src/lib/import/ing.ts`)
+- [x] 2.4 Parser nie importuje modułów Node (przegląd importów w `src/lib/import/ing.ts`) — 1749384
 
 ### Phase 3: Endpoint, wynik i lista importów
 
 #### Automated
 
-- [ ] 3.1 Smoke przechodzi na lokalnej bazie: `npm run dev` + `npm run smoke`
-- [ ] 3.2 Lint, typy i build: `npm run lint && npx astro check && npm run build`
-- [ ] 3.3 Testy jednostkowe i bazy nadal przechodzą: `npm test && npx supabase test db`
+- [x] 3.1 Smoke przechodzi na lokalnej bazie: `npm run dev` + `npm run smoke`
+- [x] 3.2 Lint, typy i build: `npm run lint && npx astro check && npm run build`
+- [x] 3.3 Testy jednostkowe i bazy nadal przechodzą: `npm test && npx supabase test db`
 
 #### Manual
 
-- [ ] 3.4 `/imports/result?id=<cudze id>` (drugie konto) przekierowuje na `/imports`
-- [ ] 3.5 `/imports` drugiego konta nie pokazuje importów pierwszego (FR-002)
+- [x] 3.4 `/imports/result?id=<cudze id>` (drugie konto) przekierowuje na `/imports`
+- [x] 3.5 `/imports` drugiego konta nie pokazuje importów pierwszego (FR-002)
 
 ### Phase 4: Kreator importu i luki kitu
 

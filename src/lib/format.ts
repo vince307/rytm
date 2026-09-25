@@ -3,6 +3,18 @@ export function formatMonthYear(date = new Date()): string {
   return new Intl.DateTimeFormat("pl-PL", { month: "long", year: "numeric", timeZone: "Europe/Warsaw" }).format(date);
 }
 
+const shortDate = new Intl.DateTimeFormat("pl-PL", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  timeZone: "Europe/Warsaw",
+});
+
+/** `28.05.2026` — a timestamp (e.g. imports.created_at) as a Warsaw calendar date. */
+export function formatDate(timestamp: string): string {
+  return shortDate.format(new Date(timestamp));
+}
+
 const pluralRules = new Intl.PluralRules("pl-PL");
 
 /** Polish noun form for `n`: `[one, few, many]`, e.g. `["transakcja", "transakcje", "transakcji"]`. */

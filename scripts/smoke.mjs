@@ -1,5 +1,6 @@
 // Smoke test: proves the built app, the Vercel adapter and the Supabase auth flow still work together,
-// including the account contract (password change, self-service deletion) which also cleans up the smoke user.
+// including the account contract (password change, self-service deletion) which also cleans up the smoke user,
+// and the import write path (POST /api/imports: saved, overlap, invalid payload, anonymous).
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
@@ -8,6 +9,33 @@ const password = "Smoke-Test-Passw0rd!";
 const password2 = "Smoke-Test-Passw0rd-2!";
 // Seeded by supabase/seed.sql on every `supabase start` / `db reset` (local and CI).
 const seeded = { email: "test@rytm.local", password: "Rytm-Test-Passw0rd!" };
+// Small synthetic import (2 debits) for the POST /api/imports steps; the smoke user is deleted later, which
+// cascades the import away.
+const importPayload = JSON.stringify({
+  accountNumber: "11111100000000000000000099",
+  accountName: "Konto smoke",
+  periodStart: "2026-05-01",
+  periodEnd: "2026-05-31",
+  transactions: [
+    {
+      occurredOn: "2026-05-04",
+      amountMinor: 1299,
+      bankTxId: "000000000000000001",
+      counterparty: "Sklep smoke",
+      title: "Zakup",
+      details: "",
+    },
+    {
+      occurredOn: "2026-05-20",
+      amountMinor: 4550,
+      bankTxId: "000000000000000002",
+      counterparty: "Kawiarnia smoke",
+      title: "Płatność kartą",
+      details: "",
+    },
+  ],
+});
+let importResultPath = "/imports/result";
 const jar = new Map();
 
 function cookieHeader() {
@@ -90,6 +118,30 @@ const steps = [
   ],
   ["settings renders account e-mail", () => request("/settings"), { status: 200, contains: email }],
   [
+    "import is saved and shows its result",
+    async () => {
+      const response = await request("/api/imports", { method: "POST", form: { payload: importPayload } });
+      importResultPath = response.location;
+      return response;
+    },
+    { status: 302, location: "/imports/result?id=" },
+  ],
+  [
+    "import result renders the debit count",
+    () => request(importResultPath),
+    { status: 200, contains: "Dodaliśmy 2 obciążenia." },
+  ],
+  [
+    "import of an overlapping range is rejected",
+    () => request("/api/imports", { method: "POST", form: { payload: importPayload } }),
+    { status: 302, location: "/imports/new?error=overlap&from=" },
+  ],
+  [
+    "import with an invalid payload is rejected",
+    () => request("/api/imports", { method: "POST", form: { payload: "not-json" } }),
+    { status: 302, location: "/imports/new?error=invalid" },
+  ],
+  [
     "password change rejects wrong current password",
     () =>
       request("/api/auth/password", {
@@ -141,6 +193,11 @@ const steps = [
   ],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   ["home redirects after signout", () => request("/home"), { status: 302, location: "/login" }],
+  [
+    "import without a session goes to login",
+    () => request("/api/imports", { method: "POST", form: { payload: importPayload } }),
+    { status: 302, location: "/login" },
+  ],
   [
     "signup with a taken e-mail says occupied",
     () => request("/api/auth/signup", { method: "POST", form: { email, password } }),

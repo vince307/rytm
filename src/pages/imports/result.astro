@@ -1,0 +1,60 @@
+---
+// Result of a saved import (FR-003) — prototype importResult() / .result-state (app.js:63).
+// DESIGN-GAP: G26 — before patterns exist (S-03) the kit h1 `importFlow.result` and the pattern /
+// fixed-cost stats are left out: one stat (transactions) and a placeholder h1 from copyExtra.
+import { z } from "zod";
+import AppLayout from "@/layouts/AppLayout.astro";
+import Icon from "@/components/Icon.astro";
+import { buttonVariants } from "@/components/ui/button";
+import { copy, copyExtra } from "@/content/copy";
+import { createClient } from "@/lib/supabase";
+import { formatRangeLong, plural } from "@/lib/format";
+
+const x = copyExtra.imports;
+
+// Read through RLS: someone else's or a missing id finds no row and goes back to the list.
+const parsedId = z.uuid().safeParse(Astro.url.searchParams.get("id"));
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+if (!supabase || !parsedId.success) {
+  return Astro.redirect("/imports");
+}
+const id = parsedId.data;
+const { data: imported } = await supabase
+  .from("imports")
+  .select("account_name, period_start, period_end")
+  .eq("id", id)
+  .maybeSingle();
+if (!imported) {
+  return Astro.redirect("/imports");
+}
+const { count } = await supabase.from("transactions").select("id", { count: "exact", head: true }).eq("import_id", id);
+const n = count ?? 0;
+
+const title = x.resultTitle.replace("{n}", String(n)).replace("{debits}", plural(n, x.debitForms));
+const lead = `${x.accountLabel.replace("{name}", imported.account_name)} · ${formatRangeLong(imported.period_start, imported.period_end)}`;
+---
+
+<AppLayout title={copy.importFlow.title} active="imports">
+  <section class="mx-auto my-[70px] max-w-[650px] text-center max-[559px]:my-[35px]">
+    <div class="mx-auto mb-6 grid size-[62px] place-items-center rounded-full bg-green/15 text-green">
+      <Icon name="success" size={28} />
+    </div>
+    <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{x.resultEyebrow}</div>
+    <h1 class="my-3 text-[44px] tracking-[-0.07em] max-[559px]:text-[36px]">{title}</h1>
+    <p class="leading-[1.6] text-muted">{lead}</p>
+    <div class="my-[35px] flex justify-center gap-[45px] max-[559px]:gap-[22px]">
+      <div>
+        <strong class="block text-[29px] tracking-[-0.06em]">{n}</strong>
+        <span class="mt-[3px] block text-xs text-muted">{plural(n, x.transactionForms)}</span>
+      </div>
+    </div>
+    <div class="flex items-center justify-center gap-3 max-[559px]:flex-col max-[559px]:items-stretch">
+      <a href="/patterns" class:list={buttonVariants({ variant: "primary" })}>
+        {x.toPatterns} <span aria-hidden="true">↗</span>
+      </a>
+      <a href="/home" class:list={buttonVariants({ variant: "ghost" })}>
+        {x.toOverview}
+      </a>
+    </div>
+  </section>
+</AppLayout>

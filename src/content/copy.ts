@@ -71,6 +71,19 @@ export const copyExtra = {
     dropTitle: "Upuść plik CSV tutaj",
     choose: "Wybierz plik",
     newImport: "+ Nowy import",
+    // Imports table (prototype imports(), app.js:56) — column headers and the account cell.
+    table: { importedOn: "Data importu", account: "Rachunek", range: "Zakres dat", debits: "Obciążenia" },
+    accountLabel: "ING · {name}",
+    // Result screen (prototype importResult(), app.js:63).
+    resultEyebrow: "Import gotowy",
+    toPatterns: "Zobacz wzorce",
+    toOverview: "Przejdź do przeglądu",
+    transactionForms: ["transakcja", "transakcje", "transakcji"],
+    // DESIGN-GAP: G26 — result screen before patterns exist (S-03): the kit h1 `importFlow.result`
+    // („Wzorce są już widoczne.”) and the pattern stats do not apply yet; placeholder h1 from the
+    // prototype lead („Dodaliśmy 64 obciążenia…”).
+    resultTitle: "Dodaliśmy {n} {debits}.",
+    debitForms: ["obciążenie", "obciążenia", "obciążeń"],
   },
   patterns: { eyebrow: "Wzorce wydatków" },
   fixed: { eyebrow: "Koszty stałe", lead: "Rytm porównuje miesiące kalendarzowe i pokazuje różnice." },

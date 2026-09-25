@@ -1,13 +1,78 @@
 ---
 import AppLayout from "@/layouts/AppLayout.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
+import Panel from "@/components/app/Panel.astro";
 import ViewEmpty from "@/components/app/ViewEmpty.astro";
+import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
+import { createClient } from "@/lib/supabase";
+import { formatDate, formatRangeShort } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 const e = copy.emptyViews;
+const x = copyExtra.imports;
+
+// The caller's own imports only (RLS, FR-002), newest first, each with its number of saved debits.
+// Read-only list (prototype imports(), app.js:56) — the "Usuń import" column arrives with S-02.
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const { data, error } = supabase
+  ? await supabase
+      .from("imports")
+      .select("id, account_name, period_start, period_end, created_at, transactions(count)")
+      .order("created_at", { ascending: false })
+  : { data: null, error: null };
+if (error) {
+  // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
+  console.error("imports list failed", error.code, error.message);
+}
+const rows = (data ?? []).map((i) => ({
+  id: i.id,
+  importedOn: formatDate(i.created_at),
+  account: x.accountLabel.replace("{name}", i.account_name),
+  range: formatRangeShort(i.period_start, i.period_end),
+  debits: i.transactions[0]?.count ?? 0,
+}));
+const cell = "border-b border-line px-[17px] py-4 align-middle";
+const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] whitespace-nowrap text-muted uppercase");
 ---
 
-<AppLayout title={copyExtra.imports.title} active="imports">
-  <PageTitle eyebrow={copyExtra.imports.eyebrow} title={e.imports.title} lead={e.imports.lead} />
-  <ViewEmpty icon="import" title={e.cta} body={copyExtra.emptyViews.body} cta={e.button} href="/imports/new" />
+<AppLayout title={x.title} active="imports">
+  {rows.length === 0 ? (
+    <>
+      <PageTitle eyebrow={x.eyebrow} title={e.imports.title} lead={e.imports.lead} />
+      <ViewEmpty icon="import" title={e.cta} body={copyExtra.emptyViews.body} cta={e.button} href="/imports/new" />
+    </>
+  ) : (
+    <>
+      <PageTitle eyebrow={x.eyebrow} title={x.title} lead={x.lead}>
+        <a href="/imports/new" class:list={buttonVariants({ variant: "primary" })}>
+          {x.newImport}
+        </a>
+      </PageTitle>
+      <Panel class="p-0 max-[559px]:p-0">
+        <div class="overflow-auto max-[559px]:-mr-px">
+          <table class="w-full border-collapse text-[13px]">
+            <thead>
+              <tr>
+                <th class:list={head}>{x.table.importedOn}</th>
+                <th class:list={head}>{x.table.account}</th>
+                <th class:list={head}>{x.table.range}</th>
+                <th class:list={head}>{x.table.debits}</th>
+              </tr>
+            </thead>
+            <tbody class="[&>tr:last-child>td]:border-b-0">
+              {rows.map((r) => (
+                <tr>
+                  <td class:list={cell}>{r.importedOn}</td>
+                  <td class:list={cell}>{r.account}</td>
+                  <td class:list={cell}>{r.range}</td>
+                  <td class:list={cell}>{r.debits}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Panel>
+    </>
+  )}
 </AppLayout>

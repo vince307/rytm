@@ -491,15 +491,15 @@ Recorded by `/10x-plan-review` (`reviews/plan-review.md`, OBSERVATIONs F5–F7);
 
 #### Automated
 
-- [x] 3.1 `npm run lint` 0 errors; `npx astro check` 0/0/0
-- [x] 3.2 `npm test` green (no regression from Phase 2)
-- [x] 3.3 `npm run fixture:check` OK
-- [x] 3.4 `npm run build` passes
-- [x] 3.5 `npx supabase db reset && npx supabase test db` — pgTAP at baseline (44/44 on `main`), delta 0 (no schema change)
-- [x] 3.6 `BASE_URL=http://localhost:4398 npm run smoke` — baseline (46 on `main`) + 2 new steps, all PASS
-- [x] 3.7 `grep -rnE "#[0-9a-fA-F]{3,6}\b|\[#" src/components/patterns src/components/app/Badge.tsx` finds no raw colors
+- [x] 3.1 `npm run lint` 0 errors; `npx astro check` 0/0/0 — 23e700d
+- [x] 3.2 `npm test` green (no regression from Phase 2) — 23e700d
+- [x] 3.3 `npm run fixture:check` OK — 23e700d
+- [x] 3.4 `npm run build` passes — 23e700d
+- [x] 3.5 `npx supabase db reset && npx supabase test db` — pgTAP at baseline (44/44 on `main`), delta 0 (no schema change) — 23e700d
+- [x] 3.6 `BASE_URL=http://localhost:4398 npm run smoke` — baseline (46 on `main`) + 2 new steps, all PASS — 23e700d
+- [x] 3.7 `grep -rnE "#[0-9a-fA-F]{3,6}\b|\[#" src/components/patterns src/components/app/Badge.tsx` finds no raw colors — 23e700d
 
 #### Manual
 
 - [ ] 3.8 Screenshots (Visual step): `lista`, `lista-mobile`, `wyszukiwanie`, `sortowanie-nazwa`, `pusty`, `brak-wyników`; `błąd` code-reviewed only
-- [x] 3.9 On the fixture: 31 rows, `KINOTEKA` `stały` 52,99 zł, `MINIMARKET PRZYSTANEK` 8×, `sportowo.pl` and `SPORTOWO` as two rows, no operator-named row except `AUTOPAY`
+- [x] 3.9 On the fixture: 31 rows, `KINOTEKA` `stały` 52,99 zł, `MINIMARKET PRZYSTANEK` 8×, `sportowo.pl` and `SPORTOWO` as two rows, no operator-named row except `AUTOPAY` — 23e700d

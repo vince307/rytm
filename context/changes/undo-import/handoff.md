@@ -10,7 +10,7 @@ proofs, not a new list and (expectedly) not a migration.**
 | Item | Value |
 | --- | --- |
 | Branch | `feat/undo-import`, cut from `main` at `d11f3ef` (pulled, up to date with `origin/main`) |
-| Commits | 1 on the branch: `docs(undo-import): change identity (autonomous run)` |
+| Commits | 2 on the branch (`d11f3ef..HEAD`), both `docs(undo-import): change identity (autonomous run)` — the second (retry) adds `## Autonomous decisions` to `change.md` |
 | Pushed / PR / merged | no / none / no |
 | `change.md` status | `new` |
 | `## Progress` rows remaining | n/a — no `plan.md` yet |
@@ -20,7 +20,7 @@ proofs, not a new list and (expectedly) not a migration.**
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/undo-import/change.md` | Change identity; Notes hold the roadmap-claim corrections table, the design-kit binding (prototype views + `content.json` keys) and expected DESIGN-GAPs |
+| `context/changes/undo-import/change.md` | Change identity (retry: added `## Autonomous decisions`); Notes hold the roadmap-claim corrections table, the design-kit binding (prototype views + `content.json` keys) and expected DESIGN-GAPs |
 | `context/changes/undo-import/handoff.md` | This file |
 
 ## 3. Verification
@@ -46,6 +46,8 @@ No deliberate break — nothing executable was changed.
 - Roadmap `### S-02` **Status** is still `proposed` — the orchestrator/archive step owns that edit.
 
 ## 6. Autonomous decisions
+
+0. **Retry 2/2**: the verifier reported `change.md` lacked `## Autonomous decisions`; chose to add the section (mirroring these decisions) in a second commit rather than amend. Why: contract forbids rewriting history loosely; a new commit is auditable. What would change it: the orchestrator requiring one commit per step.
 
 1. **Did not STOP after creating `change.md`** (the skill says print the next-step prompt and wait). Chose: continue to the run's commit and handoff. Rejected: waiting for a human. Why: the agent contract forbids a human in the loop. What would change it: the orchestrator running this step interactively.
 2. **Title in Polish** („Cofnięcie błędnego importu”, from the roadmap heading) instead of the skill's humanised id „Undo import”. Why: the repo's context docs and commit log are Polish, and the roadmap heading is the canonical name. What would change it: a repo convention requiring English titles in `change.md`.

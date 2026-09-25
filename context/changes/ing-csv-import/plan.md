@@ -364,28 +364,28 @@ Nowa migracja dodaje tylko funkcję; tabele bez zmian. Produkcja: `npx supabase 
 
 #### Automated
 
-- [x] 3.1 Smoke przechodzi na lokalnej bazie: `npm run dev` + `npm run smoke`
-- [x] 3.2 Lint, typy i build: `npm run lint && npx astro check && npm run build`
-- [x] 3.3 Testy jednostkowe i bazy nadal przechodzą: `npm test && npx supabase test db`
+- [x] 3.1 Smoke przechodzi na lokalnej bazie: `npm run dev` + `npm run smoke` — ef18b34
+- [x] 3.2 Lint, typy i build: `npm run lint && npx astro check && npm run build` — ef18b34
+- [x] 3.3 Testy jednostkowe i bazy nadal przechodzą: `npm test && npx supabase test db` — ef18b34
 
 #### Manual
 
-- [x] 3.4 `/imports/result?id=<cudze id>` (drugie konto) przekierowuje na `/imports`
-- [x] 3.5 `/imports` drugiego konta nie pokazuje importów pierwszego (FR-002)
+- [x] 3.4 `/imports/result?id=<cudze id>` (drugie konto) przekierowuje na `/imports` — ef18b34
+- [x] 3.5 `/imports` drugiego konta nie pokazuje importów pierwszego (FR-002) — ef18b34
 
 ### Phase 4: Kreator importu i luki kitu
 
 #### Automated
 
-- [ ] 4.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
-- [ ] 4.2 Testy jednostkowe, bazy i smoke nadal przechodzą: `npm test && npx supabase test db && npm run smoke`
-- [ ] 4.3 Luki są zarejestrowane: `grep -c "DESIGN-GAP: G2[5-7]\|DESIGN-GAP: K16" -r src` > 0 oraz wiersze G25–G27 i K16 w `context/foundation/design-kit.md`
+- [x] 4.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
+- [x] 4.2 Testy jednostkowe, bazy i smoke nadal przechodzą: `npm test && npx supabase test db && npm run smoke`
+- [x] 4.3 Luki są zarejestrowane: `grep -c "DESIGN-GAP: G2[5-7]\|DESIGN-GAP: K16" -r src` > 0 oraz wiersze G25–G27 i K16 w `context/foundation/design-kit.md`
 
 #### Manual
 
-- [ ] 4.4 Pełny przepływ na pliku głównym fixture (rachunek główny): krok 1 → 2 → 3 → wynik „206”, lista pokazuje import z zakresem 01.09.2025–31.08.2026
-- [ ] 4.5 Plik `-overlap` na tym samym koncie → krok 3 pokazuje blokujący błąd z zakresem „1 września 2025 – 31 sierpnia 2026”, bez przycisku importu
-- [ ] 4.6 Pliki `-no-header` i `-currency` → właściwe alerty w kroku 1; „Wybierz inny plik” otwiera wybór pliku
-- [ ] 4.7 Rachunek VAT z pliku głównego importuje się osobno (4 obciążenia), mimo tego samego zakresu
-- [ ] 4.8 Bramka wizualna: zrzuty każdego stanu (krok 1: pusty, plik gotowy, 3 błędy formatu, błąd serwera; krok 2; krok 3: gotowy, nakładanie, brak obciążeń; wynik; lista) w 1280 px i 375 px porównane z prototypem kitu — bez poziomego przewijania, kolory tylko z tokenów
-- [ ] 4.9 Od wyboru pliku do kroku 2 i od potwierdzenia do wyniku mija ułamek sekundy do kilku sekund dla pliku głównego (NFR czasu)
+- [x] 4.4 Pełny przepływ na pliku głównym fixture (rachunek główny): krok 1 → 2 → 3 → wynik „206”, lista pokazuje import z zakresem 01.09.2025–31.08.2026
+- [x] 4.5 Plik `-overlap` na tym samym koncie → krok 3 pokazuje blokujący błąd z zakresem „1 września 2025 – 31 sierpnia 2026”, bez przycisku importu
+- [x] 4.6 Pliki `-no-header` i `-currency` → właściwe alerty w kroku 1; „Wybierz inny plik” otwiera wybór pliku
+- [x] 4.7 Rachunek VAT z pliku głównego importuje się osobno (4 obciążenia), mimo tego samego zakresu
+- [x] 4.8 Bramka wizualna: zrzuty każdego stanu (krok 1: pusty, plik gotowy, 3 błędy formatu, błąd serwera; krok 2; krok 3: gotowy, nakładanie, brak obciążeń; wynik; lista) w 1280 px i 375 px porównane z prototypem kitu — bez poziomego przewijania, kolory tylko z tokenów
+- [x] 4.9 Od wyboru pliku do kroku 2 i od potwierdzenia do wyniku mija ułamek sekundy do kilku sekund dla pliku głównego (NFR czasu)

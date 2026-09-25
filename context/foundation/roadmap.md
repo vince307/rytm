@@ -45,7 +45,7 @@ Pieniądze cicho uciekają z konta, a kategoryzacja banku nie odpowiada na pytan
 | F-02 | synthetic-ing-fixture        | (foundation) syntetyczny wyciąg ING z pułapkami jako fixture testów i seed demo                             | —             | FR-014, NFR prywatność                 | done     |
 | S-01 | ing-csv-import               | wgrać CSV z ING (jeden rachunek, obciążenia), zobaczyć wynik importu; nakładający się zakres jest odrzucony | F-01, F-02    | US-01, FR-003, FR-005, FR-002          | done     |
 | S-02 | undo-import                  | zobaczyć listę importów i cofnąć błędny import wraz z jego transakcjami                                     | S-01          | US-02, FR-004                          | proposed |
-| S-03 | merchant-patterns            | zobaczyć listę wzorców: sprzedawca, typ, liczba wystąpień, suma, kwota dla stałych                          | S-01, F-02    | US-01, FR-006, FR-007                  | proposed |
+| S-03 | merchant-patterns            | zobaczyć listę wzorców: sprzedawca, typ, liczba wystąpień, suma, kwota dla stałych                          | S-01, F-02    | US-01, FR-006, FR-007                  | planning |
 | S-04 | pattern-threshold-over-limit | otworzyć wzorzec, zobaczyć jego transakcje, ustawić próg i zobaczyć „ponad próg” z sumą miesiąca            | S-03          | US-01, FR-008, FR-010, FR-011          | proposed |
 | S-05 | durable-pattern-decisions    | scalić, wykluczyć, zmienić typ i nazwę wzorca, a decyzje przetrwają kolejny import                          | S-03          | US-03, FR-009                          | proposed |
 | S-06 | fixed-cost-changes           | zobaczyć, które wzorce stałe zmieniły kwotę i które są nowe względem poprzedniego miesiąca                  | S-03          | US-04, FR-012                          | proposed |
@@ -143,7 +143,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Jaka jakość grupowania wychodzi na prawdziwym wyciągu (nie na fixture)? — Owner: user. Block: no (sprawdzane lokalnie po implementacji; błędy naprawia S-05).
 - **Risk:** Rdzeń produktu („cały projekt ukryty w jednej linii” FR-006); sekwencjonowane zaraz po imporcie, żeby największa niewiadoma wyszła przed budową progów, a F-02 daje mierzalny wynik zamiast wrażenia; S-03 dodaje własną migrację tabeli sprzedawców/wzorców (F-01 tworzy tylko importy i transakcje), z tą samą regułą RLS i kaskady.
-- **Status:** proposed
+- **Status:** planning
 
 ### S-04: Próg na wzorcu i „ponad próg”
 

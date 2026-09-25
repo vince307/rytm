@@ -467,12 +467,12 @@ Recorded by `/10x-plan-review` (`reviews/plan-review.md`, OBSERVATIONs F5–F7);
 
 #### Automated
 
-- [ ] 1.1 Vitest passes with the new suite: `npm test` (baseline 32 tests / 3 files; delta +1 file, all new tests green)
-- [ ] 1.2 Lint clean: `npm run lint` (baseline 0 errors, delta 0)
-- [ ] 1.3 Types clean: `npx astro check` (baseline 0/0/0, delta 0)
-- [ ] 1.4 Fixture untouched and valid: `npm run fixture:check` OK and `git diff --quiet -- test/fixtures scripts/fixture-ing.mjs`
-- [ ] 1.5 Build passes: `npm run build`
-- [ ] 1.6 Deliberate break: removing the store-number rule makes `fixture partition` fail (32 groups), restored → green
+- [x] 1.1 Vitest passes with the new suite: `npm test` (baseline 32 tests / 3 files; delta +1 file, all new tests green)
+- [x] 1.2 Lint clean: `npm run lint` (baseline 0 errors, delta 0)
+- [x] 1.3 Types clean: `npx astro check` (baseline 0/0/0, delta 0)
+- [x] 1.4 Fixture untouched and valid: `npm run fixture:check` OK and `git diff --quiet -- test/fixtures scripts/fixture-ing.mjs`
+- [x] 1.5 Build passes: `npm run build`
+- [x] 1.6 Deliberate break: removing the store-number rule makes `fixture partition` fail (32 groups), restored → green
 
 #### Manual
 

@@ -5,13 +5,15 @@ Written by the `plan-review` step (`/10x-plan-review merchant-patterns`, deep). 
 `plan.md` `## Known risks`). Nothing is implemented. The one thing the next agent must not get wrong: **never import
 the fixture into the seeded `test@rytm.local`** — the smoke step "patterns renders empty view" needs it empty; use a
 freshly registered local account for data states, and assert the smoke type badge as `>stały<`, not the bare word.
+Retry 2/2 of this step re-verified the committed review (no content change to `plan.md` / `reviews/plan-review.md`)
+and re-committed this handoff; the "missing handoff" report came from the verifier's glob under zsh, not a missing file.
 
 ## 1. State
 
 | Item | Value |
 |---|---|
 | Branch | `feat/merchant-patterns`, cut from `main` at `d11f3ef` |
-| Commits | 5 on top of `d11f3ef` after this step (`d11f3ef..HEAD`): 2 × change identity, research, plan, `docs(merchant-patterns): plan review` |
+| Commits | 6 on top of `d11f3ef` after this step (`d11f3ef..HEAD`): 2 × change identity, research, plan, 2 × `docs(merchant-patterns): plan review` (first pass + retry handoff) |
 | Pushed / PR / merged | no / no / no |
 | `change.md` status | `plan_reviewed` |
 | `## Progress` rows remaining | 20 of 20 (`grep -c '^- \[ \]' plan.md`) — 17 automated, 3 manual; titles unchanged |
@@ -24,7 +26,7 @@ freshly registered local account for data states, and assert the smoke type badg
 | `context/changes/merchant-patterns/reviews/plan-review.md` | Plan review report (`<!-- PLAN-REVIEW-REPORT -->`), F1–F7 with decisions |
 | `context/changes/merchant-patterns/plan.md` | Fixes F1–F4 applied in Phase 3 (§4 null client → error, §5 K18 gap row, §6 smoke asserts `>stały<`, Manual Verification + Manual Testing Steps use a fresh account); new `## Known risks` (F5–F7) before `## Progress` |
 | `context/changes/merchant-patterns/change.md` | Frontmatter `status: planned → plan_reviewed` |
-| `context/changes/merchant-patterns/handoff.md` | This handoff |
+| `context/changes/merchant-patterns/handoff.md` | This handoff (retry 2/2: intro, State, Verification, decisions updated) |
 
 ## 3. Verification
 
@@ -33,7 +35,9 @@ freshly registered local account for data states, and assert the smoke type badg
 | `git branch --show-current` | `feat/merchant-patterns` — observed before writing |
 | Scratch end-to-end prototype (`node --experimental-strip-types`, copy of `src/lib/import/ing.ts` + the plan's `rawMerchant` / 7-rule `normalizeMerchant`, in `$TMPDIR`, not committed): main fixture CSV → `parseIngStatement` → `buildImportPayload(MAIN_ACCOUNT)` | 206 rows, 0 `rawMerchant` mismatches vs `expected.json`, **31 groups**, only split = `sportowo` / `sportowo.pl`, no over-merge — observed; confirms Phase 1 criterion independently of the plan step's prototype |
 | `python3` over `expected.json` | main file imported 206 rows / 6 497 147 grosze, all on `Rachunek Firmowy Główny`; `patterns[]` 30 — observed |
-| `npx vitest run` | 32/32 tests, 3 files — observed (= run baseline, delta 0; docs-only step) |
+| `npx vitest run` | 32/32 tests, 3 files — observed again in retry 2/2 (= run baseline, delta 0; docs-only step) |
+| Retry 2/2 spot-check of the committed plan | no new migration/table (RLS/cascade rule n/a; existing `transactions` RLS select policy scopes the loader); every test criterion baseline + delta; F1 `>stały<`, F2 fresh account, F3 `null` client → error, F4 K18 all present in `plan.md`; `loadPatterns` maps `id: String(row.id)` (`transactions.id` is `number` in `database.types.ts`) — observed |
+| Verifier check 3/4 under `bash -c` from repo root | `HANDOFF_OK`, six headings present — observed. Under zsh the same line prints `no matches found: context/archive/*-merchant-patterns` and aborts `ls`, so `D` is empty and every heading reads MISSING — observed; this is the cause of the retry |
 | Plan structure | 1 `## Progress`, last section; Phase 1/2/3 criteria 7/4/9 ↔ Progress 1.1–1.7 / 2.1–2.4 / 3.1–3.9; no checkboxes in phase blocks — observed |
 | `npm run lint`, `astro check`, `build`, `supabase test db`, `smoke` | not run — docs-only step, no code touched. Inherited, unverified here: lint 0, astro check 0/0/0, build OK, pgTAP 44/44, smoke 46/46 (run baseline on `main`) |
 
@@ -77,5 +81,13 @@ freshly registered local account for data states, and assert the smoke type badg
   fix. Would change: S-02 undo shipping first, or any observed skipped row.
 - **No sub-agent** for Step 3 (the skill asks for one): this step's toolset has no agent tool, so the codebase
   verification ran inline. Would change: an agent tool being available.
+- **Retry 2/2: re-verified, did not re-run the whole review.** Chosen: spot-check the committed plan against the
+  step's specific checks (RLS/cascade, no duplicate of archived slices, kit traceability, no absolute counts) and
+  re-commit the handoff. Rejected: re-invoking `/10x-plan-review` from scratch, which would rewrite a sound, committed
+  review for a verifier failure that is not about content. Why: the artifacts were already committed in the first
+  pass; the verifier's `ls -d … context/archive/*-merchant-patterns` hits zsh `NOMATCH` when no archive folder exists.
+  Rejected too: creating a dummy `context/archive/*-merchant-patterns` folder to satisfy the glob (repo pollution, and
+  `ls` would sort it first and point `D` at it). Would change: the orchestrator running its checks under `bash`
+  (or `setopt nonomatch` / `(N)` glob qualifier) — then this step needs no further action.
 - **`change.md` status set by a direct frontmatter edit** — no metadata guard exists for `plan_reviewed`. Would
   change: a guard script for this transition.

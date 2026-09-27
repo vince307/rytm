@@ -7,6 +7,16 @@ export type PatternThresholdRow = Tables<"pattern_thresholds">;
 /** D5 type proposed by the app: `fixed` = stały, `frequent` = częsty. */
 export type PatternType = "fixed" | "frequent";
 
+/** `count` / `sum` apply to `frequent` patterns, `amount` to `fixed` (FR-010). */
+export type ThresholdKind = "count" | "sum" | "amount";
+
+/** One user-set threshold on a pattern (`pattern_thresholds` row, minus identity). `value` is a plain count for
+ * `count`, grosze for `sum` / `amount`. */
+export interface Threshold {
+  kind: ThresholdKind;
+  value: number;
+}
+
 /** What pattern derivation needs from one debit (amount positive, in grosze). */
 export interface PatternSource {
   id: string;

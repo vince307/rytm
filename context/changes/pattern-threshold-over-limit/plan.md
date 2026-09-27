@@ -922,13 +922,13 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 
 #### Automated
 
-- [ ] 2.1 `npm test` — Phase 1 count + 2 files, every new case green, delta 0 failures
-- [ ] 2.2 `npm run lint` 0; `npx astro check` 0 errors (file count recorded)
-- [ ] 2.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 2.4 `npx supabase db reset && npx supabase test db` — 76 (delta 0)
-- [ ] 2.5 `BASE_URL=http://localhost:4398 npm run smoke` — 61 PASS (delta 0)
-- [ ] 2.6 Deliberate break (sum boundary `>` → `>=`) → case 5 FAILs; restored → green; meta-check recorded
-- [ ] 2.7 Deliberate break (ids compared as strings) → case 7 FAILs; restored → green; meta-check recorded
+- [x] 2.1 `npm test` — Phase 1 count + 2 files, every new case green, delta 0 failures
+- [x] 2.2 `npm run lint` 0; `npx astro check` 0 errors (file count recorded)
+- [x] 2.3 `npm run fixture:check` OK; `npm run build` passes
+- [x] 2.4 `npx supabase db reset && npx supabase test db` — 76 (delta 0)
+- [x] 2.5 `BASE_URL=http://localhost:4398 npm run smoke` — 61 PASS (delta 0)
+- [x] 2.6 Deliberate break (sum boundary `>` → `>=`) → case 5 FAILs; restored → green; meta-check recorded
+- [x] 2.7 Deliberate break (ids compared as strings) → case 7 FAILs; restored → green; meta-check recorded
 
 #### Manual
 

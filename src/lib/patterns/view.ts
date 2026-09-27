@@ -1,7 +1,7 @@
 // Pure assembly of what `/patterns` and `/patterns/<key>` render (S-04), unit-testable without a DB. Both
 // consume the same widened read (`loadPatterns`) and threshold read (`loadThresholds`); the reference month
-// (S-04 Autonomous decision 2) is computed once here and shared between the list and every detail request so
-// they never disagree.
+// (S-04 Autonomous decision 2) is always `referenceMonth(rows)` over the caller's full read — the list
+// (`listOverview`) and the detail page (`[...key].astro`) each call it on the same rows, so they never disagree.
 import {
   appliesTo,
   byOccurredThenId,
@@ -96,8 +96,8 @@ export interface PatternDetailView {
 
 /**
  * One pattern's detail: the month picker, the selected month's totals and over-limit sum, and its transactions.
- * `referenceMonth` is the value `listOverview` already computed for the same read — never recomputed here, so
- * the list and every detail request agree on "the" current month.
+ * `referenceMonth` must be `referenceMonth(rows)` over the same full read `listOverview` uses (the detail page
+ * computes it that way), so the list and every detail request agree on "the" current month.
  */
 export function patternDetail(
   pattern: MerchantPattern,

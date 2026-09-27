@@ -1,6 +1,6 @@
 ---
-// Pattern detail (S-04, read-only — the editor arrives with Phase 5). Bound to the kit `patternDetail()`
-// (prototype/app.js) minus the "Akcje" menu (S-05) and the threshold editor itself.
+// Pattern detail (S-04). Bound to the kit `patternDetail()` (prototype/app.js) minus the "Akcje" menu (S-05);
+// the threshold panel renders `ThresholdEditor`, which posts to `/api/patterns/threshold` (+ `/delete`).
 // A rest route (`[...key]`) so a key containing `/` still matches; the key is read from the raw, percent-encoded
 // pathname (`keyFromPath`), never `Astro.params` — see plan Critical Implementation Details.
 import AppLayout from "@/layouts/AppLayout.astro";

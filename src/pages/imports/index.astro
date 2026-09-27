@@ -108,7 +108,7 @@ const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] wh
                     {r.range}
                   </td>
                   <td class:list={cell}>{r.debits}</td>
-                  <td class:list={cn(cell, "text-right whitespace-nowrap")}>
+                  <td class:list={cn(cell, "whitespace-nowrap")}>
                     <DeleteImportDialog
                       client:load
                       id={r.id}

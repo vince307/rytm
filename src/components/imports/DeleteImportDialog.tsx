@@ -32,7 +32,15 @@ export default function DeleteImportDialog({ id, range, describedBy, labels }: P
           {labels.action}
         </Button>
       </DialogTrigger>
-      <DialogContent closeLabel={labels.close}>
+      <DialogContent
+        closeLabel={labels.close}
+        // Destructive dialog: open on the dialog itself (announced via its title), not on the danger button, so
+        // Enter on the trigger followed by a stray Enter cannot delete (visual gate, WAI-ARIA APG alertdialog).
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          (event.currentTarget as HTMLElement | null)?.focus();
+        }}
+      >
         <div className="text-excess-text text-xs font-extrabold tracking-[0.14em] uppercase">{labels.eyebrow}</div>
         <DialogTitle>{title}</DialogTitle>
         <DialogDescription>{labels.body}</DialogDescription>

@@ -1,19 +1,19 @@
 # Handoff — `undo-import` (slice S-02)
 
-Written by the `/10x-plan` step (2026-09-27). `plan.md` (2 code phases, 22 Progress rows) and `plan-brief.md` are on
-disk; `change.md` moved `preparing` → `planned`, roadmap S-02 → `planning`. The next agent must not get this wrong:
-**the endpoint must read the deleted row back** (`.delete().eq("id", id).select("id")`) — an RLS-filtered delete of
-a foreign/missing id returns 0 rows and no error, so an `error`-only check would report success; and **no
-migration** belongs to this slice.
+Written by the `/10x-plan-review` step (2026-09-27). Verdict **PROCEED** (skill verdict SOUND): 0 critical, 2 warnings,
+2 observations, all fixed in `plan.md`; `change.md` → `plan_reviewed`. The next agent must not get this wrong:
+**the endpoint must read the deleted row back** (`.delete().eq("id", id).select("id")`) — an RLS-filtered delete of a
+foreign/missing id returns 0 rows and no error — and the Phase 2 smoke step „imports lists the delete action” asserts
+`>Usuń import<` (text node), not the bare string that also sits in the island's props. **No migration** in this slice.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/undo-import`, cut from `main` at `d11f3ef`; `main` `4425f8c` (S-03) merged in as `9eb6dd6` |
-| Commits | this step adds 1: `docs(undo-import): plan` on top of `48ddcb5` (`docs(undo-import): research`) |
+| Commits | this step adds 1: `docs(undo-import): plan review` on top of `dcc021b` (`docs(undo-import): plan`) |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `planned` (`updated: 2026-09-27`, via `metadata-guard.mjs mark-planned`) |
+| `change.md` status | `plan_reviewed` (`updated: 2026-09-27`, direct frontmatter edit — the metadata guard has no command for it) |
 | `## Progress` rows remaining | 22 (`grep -c '^- \[ \]' plan.md`): Phase 1 — 9 automated + 2 `[reviewer]`; Phase 2 — 8 automated + 2 `[visual]` + 1 `[reviewer]` |
 | Working tree | clean apart from the maintainer's ` M .gitignore` and `?? .claude/skills/10x-autonomous-run/` (never staged) |
 
@@ -21,10 +21,9 @@ migration** belongs to this slice.
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/undo-import/plan.md` | Full plan: 2 phases, `## Autonomous decisions` (13), `## Progress` |
-| `context/changes/undo-import/plan-brief.md` | Two-page brief with the key-decision table |
-| `context/changes/undo-import/change.md` | Frontmatter `status: planned` |
-| `context/foundation/roadmap.md` | S-02 `Status` → `planning` (at-a-glance row + `### S-02` body) |
+| `context/changes/undo-import/reviews/plan-review.md` | Review report (F1–F4, all FIXED), grounding evidence, ends with the `VERDICT:` line |
+| `context/changes/undo-import/plan.md` | Edited: F9 deferral bullet in `## What We're NOT Doing`; Phase 2 §5 smoke `>Usuń import<`; Phase 1 astro-check criterion + Progress 1.2 reworded (0 errors gate, file count recorded, expected +3); new `## Known risks` before `## Progress` |
+| `context/changes/undo-import/change.md` | `status: plan_reviewed` |
 | `context/changes/undo-import/handoff.md` | This file |
 
 ## 3. Verification
@@ -32,17 +31,20 @@ migration** belongs to this slice.
 | Command | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/undo-import` (observed before writing) |
-| `metadata-guard.mjs inspect` / `mark-planned` | change.md hash matched; `{"changed":true}`, status `planned` |
-| `grep -c '^## Progress' plan.md` / `grep -c '^- \[ \]' plan.md` | 1 / 22; each phase's Success Criteria bullets map 1:1 to its Progress rows (checked by count: P1 9+2, P2 8+3) |
-| Kit strings the plan binds to | grep: „Wzorce pojawią się po pierwszym imporcie.”, „Nie masz jeszcze żadnego importu.” are `content.json` titles; dialog/toast strings only in `prototype/app.js` `modal` / `showToast` |
+| `grep -cE '^  \[' scripts/smoke.mjs` | 48 — matches the smoke baseline the plan uses |
+| grep migrations for policies/FKs/grants | `imports: authenticated delete own` + select-own policies; single `transactions_import_account_fkey … on delete cascade` (old `(import_id,user_id)` FK dropped in `20260924122144`); `revoke all … from anon` |
+| `grep` `domain_rls.test.sql` | top-level `with d as (delete … returning 1) select is(count(*), …) from d` pattern already in use — planned pgTAP shape is valid |
+| `grep` `prototype/app.js` `imports()` / `modal('deleteImport')`, `styles.css` `.text-button` | kit strings and `.text-button.danger` metrics match the plan's K19 keys and `text-danger`/`inline` variants |
+| `grep -c '^- \[ \]' plan.md` / `grep -n '^## ' plan.md` | 22 / `## Progress` is last, preceded by `## Known risks` |
 | lint / astro check / vitest / build / pgTAP / smoke | **not run** — docs step, no code touched. Baseline for implement (inherited from the contract, unverified here): lint 0 · astro check 0 errors (89 files) · vitest 72/72 (4 files) · pgTAP 44 · smoke 48 |
 
-No deliberate break — nothing executable changed. The plan names three breaks for Phase 1 (endpoint returning-select,
-cascade FK, smoke `notContains`) and one for Phase 2 (status block), each with its meta-check.
+No deliberate break — nothing executable changed. The plan's breaks (Phase 1: endpoint returning-select, cascade FK →
+`restrict`, smoke `notContains`; Phase 2: status block) were checked for feasibility: the FK break cannot be masked
+because only one FK links `transactions` to `imports`.
 
 ## 4. Next command
 
-`/10x-plan-review undo-import`
+`/10x-implement undo-import`
 
 ## 5. Open
 
@@ -52,17 +54,16 @@ cascade FK, smoke `notContains`) and one for Phase 2 (status block), each with i
   - 2.9 `[visual]` screenshots desktop 1440 + ~400 px: `default`, `dialog-open`, `success`, `error`, `not-found`, `empty-after-last-delete`, `trigger-focus` (pending code-reviewed only).
   - 2.10 `[visual]` dialog margins at ~400 px vs G24; fifth column reachable by in-panel scroll.
   - 2.11 `[reviewer]` `copyExtra.imports` K19 strings byte-equal to `prototype/app.js` `modal('deleteImport')` / `imports()`.
-- **DESIGN-GAPs planned (added in Phase 2, not yet in `context/foundation/design-kit.md`)**: K19 (delete action + dialog copy only in `app.js`, h2 month → `{range}`), K20 (toast „w prototypie” → „Import usunięty.”), G30 (result/pending states via `InlineAlert`, no Toast, placeholder error / not-found / pending copy).
-- **Carried risk**: S-03 follow-up F2 (keyset paging in `src/lib/patterns/load.ts` `collectPages`) names S-02 as trigger; plan defers it (decision 11) — a mid-read delete ends in the `/patterns` error state.
+- **DESIGN-GAPs planned (land in Phase 2)**: K19, K20, G30 — not yet in `context/foundation/design-kit.md`.
+- **Carried risks** (`plan.md` `## Known risks`): S-03 follow-up F2 (keyset paging in `src/lib/patterns/load.ts` `collectPages`) deferred though its trigger is S-02 landing — archive step should restate the trigger in `context/archive/2026-09-25-merchant-patterns/follow-ups/review-fixes.md`; S-01 follow-up F9 (shared icon — `src/components/ui/dialog.tsx`, `src/components/auth/ServerError.tsx` → `src/components/Glyph.tsx` `Glyph`) deferred, stays open in `context/archive/2026-09-24-ing-csv-import/follow-ups/review-fixes.md`.
 - **Visual account**: never import into `test@rytm.local` (smoke „patterns renders empty view” needs it empty); use a fresh local signup.
 - Invariant for S-04/S-05: persisted pattern decisions/thresholds key on `merchantKey` + `user_id`, never `import_id`.
 - No `db push` needed at ship (no migration).
 
 ## 6. Autonomous decisions
 
-1. **No interview, no complexity/phase confirmation** (the skill's `AskUserQuestion` gates). Chose: decide from research + kit + repo precedents; all 13 plan decisions recorded in `plan.md` `## Autonomous decisions`. Why: contract forbids a human. What would change it: an interactive run.
-2. **Endpoint `POST /api/imports/delete` + `InlineAlert` feedback** (plan decisions 1–3). Rejected: `DELETE` verb, RPC, new Toast. Why: native form + smoke runner + `/settings` precedent. What would change it: a shared Toast or fetch-based client pattern on `main`.
-3. **Placeholder copy** „Usunąć import {range}?”, „Import usunięty.”, error/not-found/pending lines (plan decisions 4–6), each under K19/K20/G30. What would change it: kit round 3 copy.
-4. **Gap rows and copy keys land with Phase 2 code** (plan decision 13), not in this docs commit. Why: register must not point at non-existent code. What would change it: orchestrator requiring gaps at plan time.
-5. **Roadmap synced to `planning` and committed with the plan** (the skill leaves it for implement's first commit). Why: the run commits every docs step; forward-only change. What would change it: the archive step owning all roadmap edits.
-6. **Wrote `plan-brief.md`** alongside `plan.md` (skill Step 4.5), though the run step named only `plan.md`. Why: skill output contract; plan-review may read it. What would change it: the orchestrator forbidding extra artifacts.
+1. **Triage done without `AskUserQuestion`** — all four findings LOW impact with one obvious fix; applied and marked FIXED in the report. Rejected: leaving `Decision: PENDING`. What would change it: a CRITICAL/HIGH-impact finding with two real options.
+2. **No Step-3 sub-agent** — the riskiest claims (RLS returning-select, single cascade FK, pgTAP CTE shape, smoke runner + ordering, kit strings) were verified directly. What would change it: a plan with wide blast radius across modules.
+3. **F2 keyset paging deferral upheld** (error state, never wrong totals). What would change it: an observed „patterns read ended short of count” log.
+4. **F9 shared icon deferred with reason in plan** (no new icon markup; remaining sprites in components shared beyond `/imports`). What would change it: `DeleteImportDialog` needing its own icon — then use `Glyph`.
+5. **`change.md` status set by direct edit** — guard has only `mark-planned` / `mark-researched`. What would change it: a guard command for `plan_reviewed`.

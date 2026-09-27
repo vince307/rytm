@@ -78,6 +78,12 @@ Source: `context/changes/undo-import/research.md` (live-DB probe + code reading)
 - No reopening of the dialog on error (unlike `/settings`): the page does not know which row failed; the error line
   sits above the list.
 - No bulk delete, no undo-of-delete (the kit body says re-import is the way back).
+- No shared-icon refactor (S-01 follow-up F9, trigger „S-02/S-03”, in
+  `context/archive/2026-09-24-ing-csv-import/follow-ups/review-fixes.md`): S-03 already delivered the shared
+  `src/components/Glyph.tsx`; the remaining inline sprites are in `src/components/ui/dialog.tsx` and
+  `src/components/auth/ServerError.tsx`, shared by `/settings` and the auth screens, and this slice adds no icon markup
+  of its own (the dialog's close icon comes unchanged from `dialog.tsx`). Swapping them is outside one view; F9 stays
+  open for the next island that renders its own icon (plan-review F1).
 - No new copy beyond the gap-registered placeholders listed in Phase 2.
 
 ## Implementation Approach
@@ -189,7 +195,7 @@ rejected”, in this order:
 #### Automated Verification:
 
 - `npm test` — baseline 72/72 (4 files) + 1 file, all new cases green, delta 0 failures
-- `npm run lint` 0 errors (baseline 0, delta 0); `npx astro check` 0 errors (baseline 0 / 89 files, delta +2 files)
+- `npm run lint` 0 errors (baseline 0, delta 0); `npx astro check` 0 errors (baseline 0 / 89 files, delta 0 errors; record the file count — expected +3: helper, endpoint, unit test, since `tsconfig.json` includes `**/*`)
 - `npm run fixture:check` OK and `npm run build` passes
 - `npx supabase db reset && npx supabase test db` — pgTAP baseline 44 + 10 = 54, all pass
 - `BASE_URL=http://localhost:4398 npm run smoke` — baseline 48 + 8 = 56 PASS
@@ -293,7 +299,9 @@ note „S-02: kolumna usuwania + modal”; all three appended to „Do rundy 3�
 deletion above the empty list” — GET `/imports?deleted=1` → 200 contains „Import usunięty.”; „imports is empty after
 the last delete” — GET `/imports` → 200 contains „Nie masz jeszcze żadnego importu.”, notContains „Konto smoke”.
 Before the re-import: none. After „patterns list the re-imported merchant”: „imports lists the delete action” — GET
-`/imports` → 200 contains „Usuń import”.
+`/imports` → 200 contains `>Usuń import<` (the SSR text node of the trigger — a bare „Usuń import” would also match
+the island's serialized `labels` props, the trap the existing „patterns proposes a type” step documents; plan-review
+F2).
 
 ### Success Criteria:
 
@@ -402,6 +410,16 @@ never `import_id`, so an import delete never orphans or cascades them.
     yet, and unused copy keys would fail review. What would change it: the orchestrator requiring gaps registered at
     plan time.
 
+## Known risks
+
+- **S-03 follow-up F2 (keyset paging) deferred although its trigger is „S-02 undo-import landing”** (decision 11,
+  plan-review F3). After this slice a delete in one tab while `/patterns` pages `transactions` in another ends in the
+  `/patterns` error state (`collectPages` „patterns read ended short of count”) — never wrong totals; a reload
+  recovers. The trigger line in `context/archive/2026-09-25-merchant-patterns/follow-ups/review-fixes.md` fires with
+  this merge; the archive step of S-02 should restate it as „an observed short-read log” so it does not read as
+  silently skipped.
+- **Astro check file count** is recorded, not asserted (plan-review F4) — only the error delta gates.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
@@ -411,7 +429,7 @@ never `import_id`, so an import delete never orphans or cascades them.
 #### Automated
 
 - [ ] 1.1 `npm test` — baseline 72/72 (4 files) + 1 file, all new cases green, delta 0 failures
-- [ ] 1.2 `npm run lint` 0 errors (baseline 0, delta 0); `npx astro check` 0 errors (baseline 0 / 89 files, delta +2 files)
+- [ ] 1.2 `npm run lint` 0 errors (baseline 0, delta 0); `npx astro check` 0 errors (baseline 0 / 89 files, delta 0 errors; record the file count — expected +3: helper, endpoint, unit test, since `tsconfig.json` includes `**/*`)
 - [ ] 1.3 `npm run fixture:check` OK and `npm run build` passes
 - [ ] 1.4 `npx supabase db reset && npx supabase test db` — pgTAP baseline 44 + 10 = 54, all pass
 - [ ] 1.5 `BASE_URL=http://localhost:4398 npm run smoke` — baseline 48 + 8 = 56 PASS

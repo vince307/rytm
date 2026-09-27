@@ -905,13 +905,13 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 
 #### Automated
 
-- [ ] 1.1 `npx supabase db reset && npx supabase test db` — pgTAP baseline 54 (3 files) + 22 = 76 (4 files), all pass
-- [ ] 1.2 `npm run db:types` regenerates `src/db/database.types.ts` with `pattern_thresholds`; diff shows only the new table
-- [ ] 1.3 `npm run lint` 0; `npx astro check` 0 errors (file count recorded); `npm test` 78/78 (delta 0); `npm run fixture:check` OK; `npm run build` passes
-- [ ] 1.4 `BASE_URL=http://localhost:4398 npm run smoke` — 61 PASS (delta 0)
-- [ ] 1.5 Deliberate break (update policy dropped) → assertions 5–7 FAIL; restored → green; meta-check recorded
-- [ ] 1.6 Deliberate break (FK without cascade) → assertion 20 FAILs; restored → green; meta-check recorded
-- [ ] 1.7 Migration file name matches `^[0-9]{14}_[a-z_]+\.sql$` and sorts after `20260924224014_import_ing_statement.sql`
+- [x] 1.1 `npx supabase db reset && npx supabase test db` — pgTAP baseline 54 (3 files) + 22 = 76 (4 files), all pass
+- [x] 1.2 `npm run db:types` regenerates `src/db/database.types.ts` with `pattern_thresholds`; diff shows only the new table
+- [x] 1.3 `npm run lint` 0; `npx astro check` 0 errors (file count recorded); `npm test` 78/78 (delta 0); `npm run fixture:check` OK; `npm run build` passes
+- [x] 1.4 `BASE_URL=http://localhost:4398 npm run smoke` — 61 PASS (delta 0)
+- [x] 1.5 Deliberate break (update policy dropped) → assertions 5–7 FAIL; restored → green; meta-check recorded
+- [x] 1.6 Deliberate break (FK without cascade) → assertion 20 FAILs; restored → green; meta-check recorded
+- [x] 1.7 Migration file name matches `^[0-9]{14}_[a-z_]+\.sql$` and sorts after `20260924224014_import_ing_statement.sql`
 
 #### Manual
 

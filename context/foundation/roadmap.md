@@ -46,7 +46,7 @@ Pieniądze cicho uciekają z konta, a kategoryzacja banku nie odpowiada na pytan
 | S-01 | ing-csv-import               | wgrać CSV z ING (jeden rachunek, obciążenia), zobaczyć wynik importu; nakładający się zakres jest odrzucony | F-01, F-02    | US-01, FR-003, FR-005, FR-002          | done     |
 | S-02 | undo-import                  | zobaczyć listę importów i cofnąć błędny import wraz z jego transakcjami                                     | S-01          | US-02, FR-004                          | done        |
 | S-03 | merchant-patterns            | zobaczyć listę wzorców: sprzedawca, typ, liczba wystąpień, suma, kwota dla stałych                          | S-01, F-02    | US-01, FR-006, FR-007                  | done |
-| S-04 | pattern-threshold-over-limit | otworzyć wzorzec, zobaczyć jego transakcje, ustawić próg i zobaczyć „ponad próg” z sumą miesiąca            | S-03          | US-01, FR-008, FR-010, FR-011          | planning |
+| S-04 | pattern-threshold-over-limit | otworzyć wzorzec, zobaczyć jego transakcje, ustawić próg i zobaczyć „ponad próg” z sumą miesiąca            | S-03          | US-01, FR-008, FR-010, FR-011          | in-progress |
 | S-05 | durable-pattern-decisions    | scalić, wykluczyć, zmienić typ i nazwę wzorca, a decyzje przetrwają kolejny import                          | S-03          | US-03, FR-009                          | proposed |
 | S-06 | fixed-cost-changes           | zobaczyć, które wzorce stałe zmieniły kwotę i które są nowe względem poprzedniego miesiąca                  | S-03          | US-04, FR-012                          | proposed |
 | S-07 | over-limit-trend             | zobaczyć sumę „ponad progiem” per miesiąc według dzisiejszych progów                                        | S-04          | US-05, FR-013                          | proposed |
@@ -155,7 +155,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Gwiazda przewodnia: domyka pierwsze kryterium sukcesu PRD; sekwencjonowana zaraz po S-03, bo wszystko dalej (trend, decyzje) tylko rozszerza tę regułę.
-- **Status:** planning
+- **Status:** in-progress
 
 ### S-05: Trwałe decyzje o wzorcach
 

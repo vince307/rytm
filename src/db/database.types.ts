@@ -38,6 +38,33 @@ export type Database = {
         };
         Relationships: [];
       };
+      pattern_thresholds: {
+        Row: {
+          created_at: string;
+          id: number;
+          kind: string;
+          merchant_key: string;
+          user_id: string;
+          value: number;
+        };
+        Insert: {
+          created_at?: string;
+          id?: never;
+          kind: string;
+          merchant_key: string;
+          user_id?: string;
+          value: number;
+        };
+        Update: {
+          created_at?: string;
+          id?: never;
+          kind?: string;
+          merchant_key?: string;
+          user_id?: string;
+          value?: number;
+        };
+        Relationships: [];
+      };
       transactions: {
         Row: {
           account_number: string;

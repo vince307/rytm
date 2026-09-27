@@ -2,6 +2,7 @@ import type { Tables } from "@/db/database.types";
 
 export type ImportRow = Tables<"imports">;
 export type TransactionRow = Tables<"transactions">;
+export type PatternThresholdRow = Tables<"pattern_thresholds">;
 
 /** D5 type proposed by the app: `fixed` = stały, `frequent` = częsty. */
 export type PatternType = "fixed" | "frequent";

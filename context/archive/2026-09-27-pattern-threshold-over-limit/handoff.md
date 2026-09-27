@@ -9,7 +9,7 @@ Written by the visual-gate step (2026-09-27, autonomous run `2026-09-27-s03-s02-
 | Branch | `feat/pattern-threshold-over-limit`, cut from `main` at `a6a8b18`. Confirmed with `git branch --show-current` before any edit |
 | Commits on branch | earlier steps up to `d73e39e` (impl-review handoff), then this step: `0a6973d` `fix(...): zgodność z kitem z bramki wizualnej`, `b72601a` `fix(...): tło pola progu na tokenie paper (DESIGN-GAP: G32)`, then the docs commit `docs(...): bramka wizualna` |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `impl_reviewed` (unchanged; archive step moves it) |
+| `change.md` status | `archived` (archive step 2026-09-27; folder moved to `context/archive/2026-09-27-pattern-threshold-over-limit/`, roadmap S-04 → done) |
 | `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`): 6.12 `[human]` |
 | Working tree | Clean apart from the maintainer's ` M .gitignore` and `?? .claude/skills/10x-autonomous-run/`. Neither was staged |
 
@@ -49,7 +49,7 @@ No deliberate break in this step (visual gate; the fixes are presentational and 
 
 ## 4. Next command
 
-`/10x-archive pattern-threshold-over-limit`, then Ship: push, PR, CI green, **`npx supabase db push` of `20260927200000_pattern_thresholds.sql` to the hosted project before merge**, merge, production deploy.
+Archived by the Ship step (`chore(archive): close pattern-threshold-over-limit`). Remaining Ship actions: push, PR, CI green, **`npx supabase db push` of `20260927200000_pattern_thresholds.sql` to the hosted project before merge**, merge, production deploy.
 
 ## 5. Open
 
@@ -88,5 +88,9 @@ No deliberate break in this step (visual gate; the fixes are presentational and 
 6. **Imported the fixture via `POST /api/imports` with a payload from `parseIngStatement` + `buildImportPayload`** (as the S-02 visual gate did), while the account registration and every threshold action went through the UI.
    - Why: the import wizard is not the view under test; same parser code path.
    - Would change: a requirement that the visual gate exercise the wizard too.
+7. **Archived with 6.12 `[human]` still open** (Ship step, `/10x-archive` warning: 1 pending, 0 automated / 1 manual; 11 `[reviewer]`/`[visual]` rows carry no SHA by design; all 6 phase SHAs are ancestors of HEAD, no repoint).
+   - Rejected: blocking the archive or the ship until the product owner answers.
+   - Why: 6.12 is a post-run product-owner confirmation of two recorded decisions, not a defect; it stays visible here in §5 and in the PR body.
+   - Would change: the product owner rejecting decision 1 or 2 — then a new change reopens `over-limit.ts`.
 
 ARTIFACT GAP: none.

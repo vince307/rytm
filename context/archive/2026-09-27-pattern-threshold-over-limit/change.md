@@ -1,10 +1,10 @@
 ---
 change_id: pattern-threshold-over-limit
 title: Próg na wzorcu i „ponad próg” (S-04)
-status: impl_reviewed
+status: archived
 created: 2026-09-27
 updated: 2026-09-27
-archived_at: null
+archived_at: 2026-09-27T21:58:56Z
 ---
 
 ## Notes

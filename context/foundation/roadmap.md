@@ -46,7 +46,7 @@ Pieniądze cicho uciekają z konta, a kategoryzacja banku nie odpowiada na pytan
 | S-01 | ing-csv-import               | wgrać CSV z ING (jeden rachunek, obciążenia), zobaczyć wynik importu; nakładający się zakres jest odrzucony | F-01, F-02    | US-01, FR-003, FR-005, FR-002          | done     |
 | S-02 | undo-import                  | zobaczyć listę importów i cofnąć błędny import wraz z jego transakcjami                                     | S-01          | US-02, FR-004                          | done        |
 | S-03 | merchant-patterns            | zobaczyć listę wzorców: sprzedawca, typ, liczba wystąpień, suma, kwota dla stałych                          | S-01, F-02    | US-01, FR-006, FR-007                  | done |
-| S-04 | pattern-threshold-over-limit | otworzyć wzorzec, zobaczyć jego transakcje, ustawić próg i zobaczyć „ponad próg” z sumą miesiąca            | S-03          | US-01, FR-008, FR-010, FR-011          | in-progress |
+| S-04 | pattern-threshold-over-limit | otworzyć wzorzec, zobaczyć jego transakcje, ustawić próg i zobaczyć „ponad próg” z sumą miesiąca            | S-03          | US-01, FR-008, FR-010, FR-011          | done        |
 | S-05 | durable-pattern-decisions    | scalić, wykluczyć, zmienić typ i nazwę wzorca, a decyzje przetrwają kolejny import                          | S-03          | US-03, FR-009                          | proposed |
 | S-06 | fixed-cost-changes           | zobaczyć, które wzorce stałe zmieniły kwotę i które są nowe względem poprzedniego miesiąca                  | S-03          | US-04, FR-012                          | proposed |
 | S-07 | over-limit-trend             | zobaczyć sumę „ponad progiem” per miesiąc według dzisiejszych progów                                        | S-04          | US-05, FR-013                          | proposed |
@@ -155,7 +155,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Gwiazda przewodnia: domyka pierwsze kryterium sukcesu PRD; sekwencjonowana zaraz po S-03, bo wszystko dalej (trend, decyzje) tylko rozszerza tę regułę.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-05: Trwałe decyzje o wzorcach
 
@@ -269,3 +269,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **S-01: Użytkownik może wgrać plik CSV z ING (wybierając jeden rachunek, tylko obciążenia), zobaczyć wynik importu (liczba transakcji, zakres dat) i wejść na listę wzorców; plik, którego zakres dat zachodzi na istniejący import, jest odrzucony z komunikatem; użytkownik widzi wyłącznie własne importy.** — Archived 2026-09-25 → `context/archive/2026-09-24-ing-csv-import/`. Lesson: —.
 - **S-03: Użytkownik może zobaczyć listę wykrytych wzorców: sprzedawca (znormalizowany z opisu, z domeną sprzedawcy dla płatności przez operatorów), typ stały/częsty zaproponowany przez aplikację, liczba wystąpień, suma, kwota dla stałych; każda transakcja liczy się w dokładnie jednym wzorcu.** — Archived 2026-09-27 → `context/archive/2026-09-25-merchant-patterns/`. Lesson: —.
 - **S-02: Użytkownik może zobaczyć listę importów (data, rachunek, zakres, liczba obciążeń) i usunąć błędny import wraz z jego transakcjami; po usunięciu wzorce i sumy nie zawierają jego transakcji, a ponowne wgranie tego zakresu jest przyjęte.** — Archived 2026-09-27 → `context/archive/2026-09-25-undo-import/`. Lesson: —.
+- **S-04: Użytkownik może otworzyć wzorzec, zobaczyć składające się na niego transakcje, ustawić, zmienić i usunąć próg (częsty: liczba wystąpień lub suma na miesiąc; stały: akceptowana kwota) i natychmiast zobaczyć transakcje oznaczone „ponad próg” oraz sumę „ponad progiem w tym miesiącu”.** — Archived 2026-09-27 → `context/archive/2026-09-27-pattern-threshold-over-limit/`. Lesson: —.

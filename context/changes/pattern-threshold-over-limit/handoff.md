@@ -1,144 +1,168 @@
 # Handoff — `pattern-threshold-over-limit` (slice S-04)
 
-Written by the `implement phase 3` step (2026-09-27, autonomous run `2026-09-27-s03-s02-s04`). Phase 3 (keyset
-read, widened select, thresholds read, view models) is implemented and committed, both automated criteria green.
-The next agent (Phase 4 — pattern detail view, read-only) must not get this wrong: `loadPatterns` now returns
-`{ patterns, rows }` (not just `patterns`) — the detail route needs both `rows` (to build the pattern's own
-`DatedTx`/transactions via `view.ts`'s `patternDetail`) and the thresholds map from the new `loadThresholds`
-(`src/lib/patterns/thresholds.ts`). `patternDetail`'s `referenceMonth` parameter is **not** recomputed by the
-route — it must be the same value `listOverview` (or a bare `referenceMonth(rows)` call from `over-limit.ts`)
-produces from the identical `rows`, so the list and every detail request agree on "the" current month.
+Written by the `implement phase 4` step (2026-09-27, autonomous run `2026-09-27-s03-s02-s04`). Phase 4
+(pattern detail view, read-only) is implemented and committed, both automated criteria groups green. The next
+agent (Phase 5 — threshold editor and write endpoints) must not get this wrong: the detail route
+(`src/pages/patterns/[...key].astro`) currently renders a **static note** (`copy.threshold.empty` /
+`copy.threshold.active`) inside the "Próg wzorca" `Panel` where the editor belongs — Phase 5 replaces that note
+with `<ThresholdEditor client:load .../>`, it does not add a second panel. The route already computes and holds
+everything the editor needs in scope: `pattern`, `detail.threshold` (already filtered through `appliesTo` —
+Phase 5 passes this, not the raw stored threshold, decision 3), `month`, and `key`.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/pattern-threshold-over-limit`, cut from `main` at `a6a8b18` (confirmed with `git branch --show-current` before any edit) |
-| Commits on branch | 11, in order: change identity, research, plan, plan review, `feat(...): pattern_thresholds table and its proofs (p1)` (`6e5c08c`), `chore(...): record phase 1 commit sha` (`cb100a0`), `docs(...): phase 1 handoff` (`1d722cb`), `feat(...): over-limit rule, input parsing and path helpers (p2)` (`dac4eff`), `chore(...): record phase 2 commit sha` (`cf01cd3`), `docs(...): phase 2 handoff` (`775c5b0`), `feat(...): keyset read, widened select, thresholds read and view models (p3)` (`3e45b8c`), `chore(...): record phase 3 commit sha in progress` (`609bff4`) |
+| Commits on branch | 17, in order: change identity, research, plan, plan review, `feat(...): pattern_thresholds table and its proofs (p1)` (`6e5c08c`) + sha-record + phase-1 handoff, `feat(...): over-limit rule, input parsing and path helpers (p2)` (`dac4eff`) + sha-record + phase-2 handoff, `feat(...): keyset read, widened select, thresholds read and view models (p3)` (`3e45b8c`) + sha-record + phase-3 handoff, `feat(...): pattern detail view, read-only (p4)` (`85c0bcc`), `chore(...): record phase 4 commit sha in progress` (`31ee3a2`) |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `implementing` (unchanged this phase) |
-| `## Progress` rows remaining | 36 (`grep -c '^- \[ \]' plan.md`); Phase 3's 6 automated rows (3.1–3.6) are `[x]` with `— 3e45b8c`; Phase 3's 1 `[reviewer]` row (3.7) left `[ ]` — not this step's to tick; carried unticked from before: 1.8, 1.9, 2.8 (`[reviewer]`) |
+| `change.md` status | `implementing` (unchanged this phase — two phases remain) |
+| `## Progress` rows remaining | 28 (`grep -c '^- \[ \]' plan.md`); Phase 4's 8 automated rows (4.1–4.8) are `[x]` with `— 85c0bcc`; Phase 4's 2 `[reviewer]` rows (4.9, 4.10) left `[ ]` — not this step's to tick; carried unticked from before: 1.8, 1.9, 2.8, 3.7 (all `[reviewer]`) |
 | Working tree | clean apart from the maintainer's ` M .gitignore` and `?? .claude/skills/10x-autonomous-run/` (neither staged nor committed) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `src/lib/patterns/load.ts` | Rewritten. `collectPages<T extends { id: number }>(fetchPage: (afterId: number \| null) => Promise<{ rows: T[]; error: unknown }>)` — keyset (`afterId` = previous page's last row's numeric `id`), no `count` query, stops on the first empty page (a short page is not the end), bounded by new export `MAX_PAGES = 1000`. `loadPatterns` selects `id, amount_minor, counterparty, title, occurred_on`, `.order("id").limit(PAGE_SIZE)` + `.gt("id", afterId)` after the first page; returns `{ patterns, rows }` where `rows: PatternSource[]` |
-| `src/types.ts` | `PatternSource` gains `occurredOn: string` |
-| `src/lib/patterns/over-limit.ts` | `byOccurredThenId` (the `(occurredOn, numeric id)` comparator) is now exported — `view.ts` reuses it so the sequence marks and the over-limit computation always agree on transaction order; no behaviour change |
-| `src/lib/patterns/thresholds.ts` | New. `loadThresholds(supabase) -> { thresholds: Map<string, Threshold> } \| { error }` — `select merchant_key, kind, value`, no paging (comment explains why); rows with an unreadable `kind` are skipped (unreachable given the DB check constraint) |
-| `src/lib/patterns/view.ts` | New. `listOverview(patterns, rows, thresholds) -> { referenceMonth, items: { key, threshold, overMinor }[] }` and `patternDetail(pattern, rows, threshold, refMonth, requestedMonth?) -> { months, month, threshold, sumMinor, count, overMinor, sequence, transactions }` — both pure, consume `appliesTo`/`overLimit`/`referenceMonth`/`byOccurredThenId`/`monthOf` from `over-limit.ts` |
-| `src/pages/patterns.astro` | **Unchanged** — `loadPatterns`'s new `rows` field is additive; the existing `"patterns" in result` / `result.patterns.map(...)` call site already works against the new return shape, so no edit was needed (verified by reading the file; not a no-op left unverified) |
-| `test/unit/patterns.test.ts` | Rewrote the `collectPages` describe block for keyset semantics (capped server carrying the last id in `calls`, later-page error, empty-list-one-call, mid-read row deletion not failing, `MAX_PAGES` exhaustion); `fixtureSources()` now supplies `occurredOn` |
-| `test/unit/pattern-view.test.ts` | New — 10 cases: `listOverview` (reference month across patterns, applicable threshold + its over-limit sum, mismatched-kind threshold → null/0, no stored threshold → null/0, no rows → null + all-zero); `patternDetail` (default-to-reference-month with descending `months`, `sequence` chronological vs `transactions` newest-first, requested-month-not-present falls back, reference month with zero occurrences still defaults there, requested month that *is* present is honoured, mismatched threshold renders as none, counterparty/title carried through) |
-| `context/changes/pattern-threshold-over-limit/plan.md` | Phase 3 `## Progress` rows 3.1–3.6 → `[x] … — 3e45b8c` (3.7 `[reviewer]`, untouched) |
+| `src/pages/patterns/[...key].astro` | New. The detail route: `keyFromPath(Astro.url.pathname)` (`null` → redirect `/patterns`); `Promise.all([loadPatterns, loadThresholds])` (sequential `if (supabase) {...} else {...}` assignment, not a ternary-destructured `Promise.all` tuple, to keep the two result types unambiguous); read error → back link + `InlineAlert kind="error"` `copy.components.error` + `console.error("pattern detail failed", …)`; key not found → `Astro.response.status = 404` + `InlineAlert kind="info"` `x.detailMissing`; found → `patternDetail(pattern, rows, threshold, refMonth, ?month)` and the kit layout (heading with type badge + eyebrow + lead, right-aligned month total + over-limit line, two-column grid — threshold-status panel with a static note, occurrences panel with `MonthSelect` + `SequenceMark` sequence or `x.monthEmpty`, transactions panel with date/raw-description/amount/`Badge tone="excess"`) |
+| `src/components/app/BackLink.astro` | New. Kit `.back-link` (icon `arrow-left` 15 + label). **ADAPT**: implemented `text-ink` (kit CSS's actual `.back-link` colour, and the existing "Wróć do importów" link in `ImportWizard.tsx` already uses `text-ink`), not the plan's literal `text-muted` — see Autonomous decision 1. Visible focus ring added (`buttonVariants` base), which the kit itself omits |
+| `src/components/app/SequenceMark.astro` | New. Kit `.seq` clip-path mark; `bg-excess`/`bg-muted` per `over`; `size="md"` (27px, 20px ≤559px, matching `.sequence-large .seq`) / `size="sm"` (fixed 20px, unused this phase). No literal kit hex in the file (moved the `#728393`/`#aebbc1` mention out of the comment to satisfy the phase's own "no raw colours" grep — see Autonomous decision 2) |
+| `src/components/app/field-styles.ts` | New. `field` / `control` class strings moved verbatim out of `PatternsTable.tsx` (G29 comment moved with them) |
+| `src/components/patterns/MonthSelect.tsx` | New. `<form method="get">` (no `action` — submits to the current `/patterns/<key>` path) wrapping a `<select name="month">`; `onChange` calls `event.currentTarget.form?.requestSubmit()`; `aria-label` from the `label` prop; uses `field`/`control` from `field-styles.ts` |
+| `src/components/app/Badge.tsx` | Gains tone `excess` (`bg-excess text-ink`, kit `.badge.excess`); header comment updated |
+| `src/components/patterns/PatternsTable.tsx` | `field`/`control` consts replaced by an import from `field-styles.ts`; no other change (confirmed by re-reading the diff: import line only) |
+| `src/lib/format.ts` | Gains `formatIsoDate` (`2026-05-20` → `20.05.2026`, plain string split) and `formatMonthShort` (`2026-05` → `maj 2026`, `Intl` pl-PL `month:"short"`, UTC — verified no dot in any of the 12 Polish short month forms via a throwaway `node -e`) |
+| `test/unit/format.test.ts` | +4 cases: `formatIsoDate` (1), `formatMonthShort` (3: May, January, a December that is not the same numeral as the year) |
+| `src/content/copy.ts` | `copyExtra.patterns` gains the K21 block (`detailEyebrow`, `typeLeads`, `thresholdPanel`, `thresholdActive`, `thresholdNone`, `occurrencesPanel`, `sequenceWithin`, `overBadge`, `occurrenceForms`, `sumLabel` + `monthsLocative` 12-entry table) and the G31 block (`detailMissing`, `monthEmpty`, `overInMonth`, `sequenceSummary`) |
+| `context/foundation/design-kit.md` | New row **K21** (detail/editor/list strings only in `app.js`, `sumLabel`'s baked-in month) and **G31** (states the kit doesn't define); G2 and G28 status cells gain an S-04-phase-4 note; two new numbered items (19, 20) appended to "Do rundy 3" |
+| `scripts/smoke.mjs` | +4 steps: "pattern detail renders the month total" (after "patterns list the re-imported merchant"), "pattern detail has no threshold yet", "pattern detail of an unknown key is not found" (404, body not asserted per the runner's own 200-only body policy), and "pattern detail without a session goes to login" (next to "import without a session goes to login") |
+| `context/changes/pattern-threshold-over-limit/plan.md` | Phase 4 `## Progress` rows 4.1–4.8 → `[x] … — 85c0bcc` (4.9, 4.10 `[reviewer]`, untouched) |
 | `context/changes/pattern-threshold-over-limit/handoff.md` | This file |
 
 ## 3. Verification
 
 Baseline (agent contract, post-S-02 `main` `a6a8b18`): lint 0 · astro check 0 errors (93 files) · vitest 78/78
-(5 files) · pgTAP 54 (3 files) · smoke 61 PASS. Phase 2 baseline on this branch: astro check 98 files, vitest
-123/123 (7 files), pgTAP 76/76 (4 files), smoke 61 PASS. All commands run and observed in this step, on this
+(5 files) · pgTAP 54 (3 files) · smoke 61 PASS. Phase 3 baseline on this branch: astro check 101 files, vitest
+137/137 (8 files), pgTAP 76/76 (4 files), smoke 61 PASS. All commands run and observed in this step, on this
 branch:
 
 | Command | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/pattern-threshold-over-limit` — confirmed before any edit |
-| `npm run lint` | 0 errors (delta 0) |
-| `npx astro check` | 0 errors, 101 files (Phase 2 baseline 98 files, delta +3 files — `thresholds.ts`, `view.ts`, `pattern-view.test.ts`) |
-| `npm test` | 137/137, 8 files (Phase 2 baseline 123/7 files, delta +14 tests / +1 file — all in the rewritten `collectPages` block and the new `pattern-view.test.ts`) |
+| `npm run lint` | 0 errors (delta 0) — one round of `eslint --fix` was needed for Prettier formatting of the new `.astro`/`.mjs` files; re-checked clean after |
+| `npx astro check` | 0 errors, 106 files (Phase 3 baseline 101, delta +5 — `[...key].astro`, `BackLink.astro`, `SequenceMark.astro` plus two more the checker counts) |
+| `npm test` | 141/141, 8 files (Phase 3 baseline 137/8, delta +4 tests / 0 files — the new `format.test.ts` cases) |
 | `npm run fixture:check` | OK |
 | `npm run build` | OK (`.vercel/output/` emitted) |
-| `npx supabase db reset && npx supabase test db` | PASS — 76/76 (4 files), delta 0 from Phase 2 (this phase touches no migration) |
-| `BASE_URL=http://localhost:4398 npm run smoke` | 61 PASS (delta 0) — proves `/patterns` still reads through keyset paging against a real PostgREST; port 4398 killed after, 4321 untouched; sandbox disabled only for the Docker/Supabase/dev-server commands, per contract |
+| `npx supabase db reset && npx supabase test db` | PASS — 76/76 (4 files), delta 0 (this phase touches no migration) — run twice (once before, once after the deliberate break/restore cycle), both green |
+| `BASE_URL=http://localhost:4398 npm run smoke` | 65 PASS (61 + 4, delta 0 beyond the phase's own additions) — run three times total (baseline check, under the deliberate break, and the final confirmation); port 4398 killed after each run, 4321 (maintainer's own `astro dev`, pid unchanged throughout) never touched |
+| `grep -rnE "#[0-9a-fA-F]{3,6}\b\|\[#"` over the new/changed files | empty (one hit inside a `SequenceMark.astro` comment on the first pass — reworded to describe the gap without the literal hex, see Autonomous decision 2) |
+| `grep -n "DESIGN-GAP: K21\|DESIGN-GAP: G31"` in `copy.ts` / `[...key].astro`, and K21/G31 rows in `design-kit.md` | all present |
 
-**Deliberate break (3.6 — keyset vs. offset)**: staged the phase's real files first (`git add`), then in the
-worktree only replaced `collectPages`'s keyset advance (`afterId = <last row's id>`) with offset arithmetic
-(`fetchPage(rows.length === 0 ? null : rows.length)`, ignoring the real id). Ran `npx vitest run
-test/unit/patterns.test.ts`: went red — "does not fail when a row is deleted between pages — the gap is skipped,
-not duplicated or missed" FAILed (row `{id:5}` returned twice: offset `4` after two 2-row pages coincides with a
-real id in the `[1,2,4,5]` fixture's gap, so the fake keyset-style server re-serves `5`), 38/39 other cases stayed
-green. **Meta-check**: re-ran only "reads every row when the server caps pages below the requested size" (the
-no-gap capped-server case) in isolation under the same break — it stayed green, because for a gap-free id
-sequence starting at 1, `rows.length` (offset) and the true last id are numerically identical at every page
-boundary, so offset and keyset arithmetic are indistinguishable without a gap. This is exactly the risk the
-plan's meta-check note called out: only the mid-read-delete case can tell the two schemes apart. Restored via
-`git checkout -- src/lib/patterns/load.ts` (resets to the staged, pre-break version); re-ran full `npm test` →
-137/137 green, `git diff --cached --stat` unchanged (confirmed identical insertion/deletion counts before and
-after the break/restore cycle), then re-ran `npm run lint` clean.
+**Deliberate break (4.6 — key round-trip)**: staged the phase's real files first (`git add`, confirmed via
+`git status --porcelain` that only the two maintainer paths stayed dirty), then in the worktree only replaced
+`keyFromPath`'s `return decodeURIComponent(segment);` with `return segment;` (comment marking it a deliberate
+break). Ran `npx vitest run test/unit/threshold-form.test.ts`: went red — 4 of the `patternHref`/`keyFromPath`
+round-trip cases failed (space, `/`, `%` all stayed percent-encoded instead of round-tripping). **Then re-ran the
+end-to-end path**: restarted `astro dev --port 4398` with the broken file loaded and ran the full smoke suite —
+"pattern detail renders the month total" also went red (`404` instead of `200`), confirming the break reaches the
+real route, not just the unit fallback (the plan's own meta-check note: had this smoke step stayed green, it would
+mean the Astro runtime hands a pre-decoded pathname and the `catch` fallback in `keyFromPath` was doing the work
+instead of the primary `decodeURIComponent` path — that did **not** happen here; the primary path is exercised).
+Restored via `git checkout -- src/lib/patterns/path.ts` (file was never staged this phase, so this resets it
+exactly to the committed Phase-2 version); `git diff src/lib/patterns/path.ts` confirmed empty. Re-ran `npm test`
+(141/141) and `npm run lint` (clean) after restoring, then re-ran the full gate end-to-end once more (lint, astro
+check, fixture:check, build, db reset + test db, dev + smoke) before committing — all green, as tabulated above.
 
 ## 4. Next command
 
-`/10x-implement pattern-threshold-over-limit phase 4`
+`/10x-implement pattern-threshold-over-limit phase 5`
 
 ## 5. Open
 
-- **Manual-only Progress rows, not ticked here** (leave for `/10x-impl-review`): `[reviewer]` 3.7 (no
-  `count: "exact"` remains in `load.ts`; the loop is bounded by `MAX_PAGES`; `/patterns` markup is byte-identical
-  in intent — verified true in this step: the call site file has zero diff); carried from earlier phases: 1.8,
-  1.9 (Phase 1 policy/pgTAP mapping), 2.8 (Phase 2 oracle-case traceability).
+- **Manual-only Progress rows, not ticked here** (leave for `/10x-impl-review`): `[reviewer]` 4.9 (every string
+  from `copy`/`copyExtra`; K21 byte-for-byte with `app.js`; only G31 placeholders new) and 4.10 (`PatternsTable`
+  unchanged apart from the `field-styles.ts` import — verified true in this step by re-reading the diff, but the
+  row itself is a reviewer checkbox per the step rules, so left `[ ]`); carried from earlier phases: 1.8, 1.9,
+  2.8, 3.7.
 - **Carried from plan-review, unchanged**: `[human]` Progress 6.12 (product owner confirms Autonomous decisions 1
-  and 2 against the PRD's literal wording) — this phase's `listOverview`/`patternDetail` are the view-model layer
-  that decision 6.12 would revert if answered otherwise, but they call `appliesTo`/`overLimit`/`referenceMonth`
-  unchanged from Phase 2, so nothing new is at risk here beyond what Phase 2's handoff already flagged. Known
-  risks in `plan.md` (`Astro.url.pathname` decoding, double-decode of a literal `%XX` escape, unbounded threshold
-  rows via `loadThresholds` unpaged, normalizer drift) — none triggered by Phase 3 (no route yet, no DB write);
-  `loadThresholds`'s no-paging choice is exactly the F4 plan-review finding, accepted as a Known risk, unchanged.
-- **No DESIGN-GAPs added this phase** — plan decision 22 places K21 / G31 with the code in Phases 4–6; Phase 3 has
-  no rendered strings (view.ts and thresholds.ts are pure/read-only, no copy).
-- **Next symbol to build (Phase 4)**: `src/pages/patterns/[...key].astro` (new route) using `keyFromPath`
-  (`src/lib/patterns/path.ts`, from Phase 2), `loadPatterns` + `loadThresholds` via `Promise.all`, `patternDetail`
-  (this phase); shared components `BackLink.astro`, `SequenceMark.astro`, `field-styles.ts`, `MonthSelect.tsx`
-  (all new); `Badge` gains the `excess` tone; `format.ts` gains `formatMonthShort`/`formatIsoDate`; `copy.ts` /
-  `design-kit.md` gain K21/G31 rows; `scripts/smoke.mjs` gains 4 steps — plan Phase 4.
+  and 2 against the PRD's literal wording) — Phase 4 renders `detail.overMinor`/`detail.sumMinor` computed by
+  Phase 2/3's `over-limit.ts`/`view.ts`, unchanged this phase, so nothing new is at risk here. Known risks in
+  `plan.md` (pathname decoding, double-decode of a literal `%XX`, unbounded threshold rows, normalizer drift) —
+  none newly triggered; the pathname-decoding risk was actively exercised (not just documented) by this phase's
+  4.6 break/smoke pairing, and behaves as the plan's Critical Implementation Details describe (percent-encoded
+  pathname, not pre-decoded).
+- **New DESIGN-GAPs this phase**: `K21` (`src/content/copy.ts`, `copyExtra.patterns` — verbatim `app.js` strings
+  the kit's `content.json` lacks) and `G31` (`src/content/copy.ts` same block, plus two comments in
+  `src/pages/patterns/[...key].astro` — the not-found state and the month-with-no-occurrences state). Both rows
+  added to `context/foundation/design-kit.md` (K21/G31 tables) and appended to "Do rundy 3" (items 19, 20).
+- **Next symbols to build (Phase 5)**: `src/pages/api/patterns/threshold.ts` (new, `POST`, upsert on
+  `(user_id, merchant_key)`), `src/pages/api/patterns/threshold/delete.ts` (new, `POST`, idempotent delete),
+  `src/components/patterns/ThresholdEditor.tsx` (new, replaces the static note in
+  `src/pages/patterns/[...key].astro`'s "Próg wzorca" `Panel`), plus `copyExtra.patterns` K21/G31 growth
+  (`setThreshold`, `thresholdRemoved`, `valueLabel`, `suffix`, `thresholdInvalid`, `thresholdSaveError`) and 9 new
+  smoke steps — plan Phase 5.
 
 ## 6. Autonomous decisions
 
-1. **Implemented Phase 3 directly in this context rather than delegating to a subagent.** Chosen: write
-   `load.ts`'s rewrite, the two new pure-read modules and `view.ts` myself, plus both test files. Rejected:
-   delegate-to-subagent. Why: same reasoning as Phase 2 (Autonomous decision 1) — no DB write, no UI, and the
-   view-model contract (which fields come from which of `pattern`/`rows`/`threshold`/`refMonth`) is easy to blur
-   across a round-trip summary but cheap to get right by reading the plan's exact contract once and writing
-   directly against it. Would change: a later phase large enough, or touching enough unfamiliar UI surface, that
-   in-context risks the session's budget.
-2. **Never called `AskUserQuestion`.** Chosen: decide and proceed per the step rules; recorded here instead. Why:
+1. **`BackLink.astro` uses `text-ink`, not the plan's literal `text-muted`.** Chosen: `text-ink`, matching (a) the
+   kit's own `.back-link` CSS rule in `design/rytm-os/prototype/styles.css` (`color:var(--ink)`, verified by
+   reading the file directly, not inferred), and (b) the existing "Wróć do importów" back-link in
+   `src/components/imports/ImportWizard.tsx` (`className="text-ink inline-flex items-center gap-1.5 …"`), which
+   is the only precedent for this exact UI pattern already in the codebase. Rejected: the plan's literal
+   `text-muted` wording. Why: the plan cites "kit `.back-link`" as its source for this line, but that source
+   itself says `ink`, and a sibling implementation already renders it that way — treated as a Minor
+   (styling-attribute) drafting slip rather than a considered design choice, per the "design kit is source of
+   truth" project rule, which outranks a plan's incidental wording when the two conflict. Would change: a
+   reviewer or the plan author confirming `text-muted` was in fact deliberate (e.g. to visually de-emphasise the
+   detail page's back link versus the wizard's), in which case only this one class changes.
+2. **Moved the `#728393` / `#aebbc1` hex mention out of `SequenceMark.astro`'s comment** and pointed to
+   `design-kit.md` instead. Chosen: describe the gap without embedding the literal hex. Rejected: leaving the hex
+   in the comment (the precedent in `src/components/app/Panel.astro`'s own header comment, `// Kit border
+   #d9c2a0 has no token`, does exactly this and predates this phase unflagged). Why: Phase 4's own Success
+   Criteria include an *automated* `grep -rnE "#[0-9a-fA-F]{3,6}\b|\[#"` check scoped to "new / changed
+   components and `[...key].astro`" that must return empty — `SequenceMark.astro` is new this phase, so it falls
+   inside that scope and the literal grep would otherwise fail this phase's own gate, even though the intent
+   (documenting an un-tokenized kit colour, not using it as a style value) is identical to the accepted
+   `Panel.astro` precedent. Would change: the plan's grep being scoped to exclude comments (e.g.
+   `grep -v '^\s*//'`), which would make the original wording pass too.
+3. **Implemented Phase 4 directly in this context rather than delegating to a subagent**, despite it being
+   flagged in the plan as "the largest phase" (route + 4 shared components + copy + gap rows + 4 smoke steps).
+   Chosen: write every file myself. Rejected: delegate-to-subagent (the pattern used successfully in Phases 2–3
+   for smaller, pure-logic phases). Why: this phase's correctness hinges on tight, cross-file agreement between
+   the kit's literal markup (`design/rytm-os/prototype/app.js`/`styles.css`), the exact `copy`/`copyExtra` keys,
+   and the view-model contract from Phase 3 (`patternDetail`'s field names) — reading all of that once myself and
+   writing directly against it was cheaper and less error-prone than writing a summary of it into a subagent
+   prompt and then verifying the subagent's output against the same sources anyway. Would change: a future phase
+   this size that is *not* UI/kit-fidelity-sensitive (e.g. a second pure-logic phase), where delegation's context
+   savings would dominate.
+4. **Never called `AskUserQuestion`.** Chosen: decide and proceed per the step rules; recorded here instead. Why:
    the step's rules override the skill's interactive defaults for this run. Would change: a maintainer message
    reinstating interactive gates for this run.
-3. **Split the phase into two commits** (`3e45b8c` feat, then `609bff4` chore appending the commit's own SHA),
-   mirroring Phases 1–2 (Autonomous decision 3 both times). Chosen: two commits. Rejected: leaving the SHA-suffix
-   edit uncommitted (violates the "clean apart from the two maintainer paths" contract), `--amend` (forbidden).
-   Why: the SHA can only be known after the commit exists. Would change: a revised skill/contract deferring all
-   SHA-writing to the epilogue, or accepting a dirty `plan.md` between phases.
-4. **Left `src/pages/patterns.astro` untouched** rather than adding a cosmetic destructure of `patterns` from the
-   new `{ patterns, rows }` return shape. Chosen: no edit — `"patterns" in result` and `result.patterns.map(...)`
-   already type-check and behave identically against the widened return type (the new `rows` field is additive
-   and simply unused by this page). Rejected: rewriting the same two lines as `const { patterns } = result` for
-   no behavioural difference, which would only add diff noise against the plan's own "no visible change" framing
-   for this phase. Verified, not assumed: read the file, confirmed `astro check` (0 errors) and the full smoke
-   suite (61 PASS, delta 0) exercise this exact call site against the new shape. Would change: a reviewer finding
-   the field-access style inconsistent with the rest of the codebase (none of the sibling loaders currently
-   destructure this way either, so no such inconsistency was found).
-5. **Exported `byOccurredThenId` from `over-limit.ts` instead of re-implementing the `(occurredOn, numeric id)`
-   tie-break inside `view.ts`.** Chosen: reuse. Rejected: a second, separately-hand-written comparator in
-   `view.ts` (the plan's own "Critical Implementation Details — Chronology" note treats this exact tie-break as
-   load-bearing and easy to get wrong twice, e.g. re-introducing a string comparison). Why: Phase 2's unit oracle
-   (cases 7, and the Phase 2 deliberate break 2.7) already proves this comparator's numeric-id behaviour;
-   duplicating it would need its own proof or silently rely on Phase 2's. Would change: a future phase needing a
-   different tie-break for a different purpose (none identified).
-6. **`patternDetail` takes `refMonth` as a parameter rather than recomputing `referenceMonth(rows)` internally.**
-   Chosen: caller supplies it (as the plan's prose states: "`referenceMonth` is the value `listOverview` already
-   computed for the same read"). Rejected: recomputing inside `patternDetail` (cheap, but then a detail route that
-   passes a stale or differently-filtered `rows` slice could silently disagree with the list on which month is
-   "the" current one). Why: correctness of "the list and every detail request agree" is a single-source-of-truth
-   property, not a performance one — recomputation would hide a caller bug instead of surfacing it. Would change:
-   a future requirement for a detail page to compute its own, pattern-local reference month (out of scope per
-   Autonomous decision 2, "one global reference month").
-7. **Left `plan.md` row 3.7 `[reviewer]` unticked**, per the step's explicit instruction that rows tagged
-   `[reviewer]`/`[visual]`/`[human]` are never mine to check. Would change: nothing — hard rule from the step
-   prompt, not a judgment call.
+5. **Split the phase into two commits** (`85c0bcc` feat, then `31ee3a2` chore appending the commit's own SHA),
+   mirroring Phases 1–3. Chosen: two commits. Rejected: leaving the SHA-suffix edit uncommitted (violates the
+   "clean apart from the two maintainer paths" contract), `--amend` (forbidden). Why: the SHA can only be known
+   after the commit exists. Would change: a revised skill/contract deferring all SHA-writing to the epilogue, or
+   accepting a dirty `plan.md` between phases.
+6. **Left Progress rows 4.9 and 4.10 `[reviewer]` unticked**, per the step's explicit instruction that rows
+   tagged `[reviewer]`/`[visual]`/`[human]` are never mine to check, even though I independently verified 4.10's
+   claim (re-read the `PatternsTable.tsx` diff: it is import-only) while implementing. Would change: nothing —
+   hard rule from the step prompt, not a judgment call.
+7. **Used a `let`/`if`-`else` pair instead of a ternary-destructured `Promise.all` tuple** for
+   `patternsResult`/`thresholdsResult` in `[...key].astro`. Chosen: explicit `Awaited<ReturnType<typeof
+   loadPatterns>>` typed `let`s, assigned inside an `if (supabase) {...} else {...}`. Rejected: `const [a, b] =
+   supabase ? await Promise.all([...]) : [{error}, {error}]` (the pattern I drafted first). Why: the else-branch
+   plain-array literal and the `Promise.all` tuple-typed branch do not obviously unify to the same tuple shape
+   under TypeScript's inference rules for a conditional expression destructured immediately; rather than rely on
+   that inference working out (it likely does, via per-position element-type union, but I did not want the
+   phase's `astro check` gate to be the first place that gets tested), the explicit form removes the ambiguity
+   entirely at the cost of four extra lines. Would change: nothing — this is a settled implementation choice, not
+   a reversible product decision.
 
-ARTIFACT GAP: none — `agent-contract.md`, `handoff.md` (prior, Phase 2), `plan.md`, `reviews/plan-review.md`,
-`change.md` and every file the plan's Phase 3 section names (`src/lib/patterns/load.ts`, `src/types.ts`,
-`src/pages/patterns.astro`, `test/unit/patterns.test.ts`, plus Phase 2's `over-limit.ts` for the comparator reuse)
-were present and readable.
+ARTIFACT GAP: none — `agent-contract.md`, `handoff.md` (prior, Phase 3), `plan.md`, `reviews/plan-review.md`,
+`change.md`, and every file the plan's Phase 4 section names or that Phase 4 depends on from earlier phases
+(`src/lib/patterns/view.ts`, `over-limit.ts`, `thresholds.ts`, `load.ts`, `path.ts`, `src/types.ts`,
+`src/content/copy.ts`, `context/foundation/design-kit.md`, `design/rytm-os/prototype/app.js` and `styles.css`,
+`scripts/smoke.mjs`, `src/middleware.ts`, `src/pages/api/imports/delete.ts` as the write-route precedent, existing
+shared components `Panel.astro`/`PageTitle.astro`/`InlineAlert.astro`/`Icon.astro`/`Glyph.tsx`/`button.tsx`/
+`SubmitButton.tsx`) were present and readable.

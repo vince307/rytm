@@ -1,0 +1,21 @@
+---
+// SequenceMark.astro — kit `.seq` clip-path mark (styles.css `sequence-track` / `sequence-large`): the repeated
+// "R" motif that marks one occurrence, `excess` (kit's amber) after the threshold. The kit's own raw colours for
+// the mark and its labels have no token (S-04 decision 20, DESIGN-GAP: G31 — see design-kit.md for the values) —
+// `muted` is the nearest. `size="md"` (default) is the kit's 27px mark, dropping to 20px at the kit's own
+// ≤559px breakpoint (`.sequence-large .seq`); `size="sm"` is a fixed 20px for a context that does not need that
+// step.
+interface Props {
+  over?: boolean;
+  size?: "sm" | "md";
+}
+
+const { over = false, size = "md" } = Astro.props;
+const dims = size === "sm" ? "size-5" : "size-[27px] max-[559px]:size-5";
+---
+
+<span
+  aria-hidden="true"
+  class:list={[dims, "shrink-0", over ? "bg-excess" : "bg-muted"]}
+  style="clip-path: polygon(0 0, 57% 0, 100% 43%, 62% 66%, 100% 100%, 55% 100%, 30% 70%, 30% 100%, 0 100%);"
+></span>

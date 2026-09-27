@@ -953,14 +953,14 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 
 #### Automated
 
-- [ ] 4.1 `npm run lint` 0; `npx astro check` 0 errors (file count recorded)
-- [ ] 4.2 `npm test` — Phase 3 count + format cases, delta 0 failures
-- [ ] 4.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 4.4 `npx supabase db reset && npx supabase test db` — 76 (delta 0)
-- [ ] 4.5 `BASE_URL=http://localhost:4398 npm run smoke` — 61 + 4 = 65 PASS
-- [ ] 4.6 Deliberate break (decode dropped in `keyFromPath`) → „pattern detail renders the month total” and the unit round-trip FAIL; restored → PASS; meta-check recorded
-- [ ] 4.7 No raw colours in new / changed components and `[...key].astro`
-- [ ] 4.8 `DESIGN-GAP: K21` / `G31` in `copy.ts` and `[...key].astro`; rows K21, G31 in `design-kit.md`
+- [x] 4.1 `npm run lint` 0; `npx astro check` 0 errors (file count recorded)
+- [x] 4.2 `npm test` — Phase 3 count + format cases, delta 0 failures
+- [x] 4.3 `npm run fixture:check` OK; `npm run build` passes
+- [x] 4.4 `npx supabase db reset && npx supabase test db` — 76 (delta 0)
+- [x] 4.5 `BASE_URL=http://localhost:4398 npm run smoke` — 61 + 4 = 65 PASS
+- [x] 4.6 Deliberate break (decode dropped in `keyFromPath`) → „pattern detail renders the month total” and the unit round-trip FAIL; restored → PASS; meta-check recorded
+- [x] 4.7 No raw colours in new / changed components and `[...key].astro`
+- [x] 4.8 `DESIGN-GAP: K21` / `G31` in `copy.ts` and `[...key].astro`; rows K21, G31 in `design-kit.md`
 
 #### Manual
 

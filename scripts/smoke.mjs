@@ -208,6 +208,17 @@ const steps = [
     { status: 302, location: "/imports/result?id=" },
   ],
   ["patterns list the re-imported merchant", () => request("/patterns"), { status: 200, contains: "Kawiarnia smoke" }],
+  [
+    "pattern detail renders the month total",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: "Suma w maju" },
+  ],
+  [
+    "pattern detail has no threshold yet",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">brak ustawionego progu<" },
+  ],
+  ["pattern detail of an unknown key is not found", () => request("/patterns/nie%20ma%20takiego"), { status: 404 }],
   ["imports lists the delete action", () => request("/imports"), { status: 200, contains: ">Usuń import<" }],
   [
     "password change rejects wrong current password",
@@ -264,6 +275,11 @@ const steps = [
   [
     "import without a session goes to login",
     () => request("/api/imports", { method: "POST", form: { payload: importPayload } }),
+    { status: 302, location: "/login" },
+  ],
+  [
+    "pattern detail without a session goes to login",
+    () => request("/patterns/kawiarnia%20smoke"),
     { status: 302, location: "/login" },
   ],
   [

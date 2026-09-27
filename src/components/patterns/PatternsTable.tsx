@@ -4,6 +4,7 @@
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/app/Badge";
+import { field, control } from "@/components/app/field-styles";
 import { Glyph } from "@/components/Glyph";
 import { formatMoney, plural } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -33,13 +34,6 @@ interface PatternsTableProps {
 
 const cell = "border-b border-line px-[17px] py-4 align-middle";
 const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] whitespace-nowrap text-muted uppercase");
-// DESIGN-GAP: G29 — the kit's .search-field / .select-field drop the control outline and define no focus style; the
-// wrapper borrows the kit's own `.field input:focus` (border ink + 3px ring ink/8, as FormField) via focus-within.
-const field =
-  "flex min-h-[43px] items-center gap-2 rounded-lg border border-line bg-paper px-3 text-muted transition-colors focus-within:border-ink focus-within:ring-[3px] focus-within:ring-ink/8 max-[559px]:w-full";
-// The native search clear button is a browser colour outside the token set and absent from the kit's plain input.
-const control =
-  "w-full min-w-0 border-0 bg-transparent text-[13px] text-ink outline-none [&::-webkit-search-cancel-button]:appearance-none";
 
 export function PatternsTable({ patterns, copy }: PatternsTableProps) {
   const [term, setTerm] = useState("");

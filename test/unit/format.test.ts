@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { formatAccountTail, formatMoney, formatRangeLong, formatRangeShort, plural } from "@/lib/format";
+import {
+  formatAccountTail,
+  formatIsoDate,
+  formatMonthShort,
+  formatMoney,
+  formatRangeLong,
+  formatRangeShort,
+  plural,
+} from "@/lib/format";
 
 const TRANSACTIONS = ["transakcja", "transakcje", "transakcji"] as const;
 
@@ -51,5 +59,21 @@ describe("formatMoney", () => {
     [1234567, "12\u00a0345,67 zł"],
   ])("%i → %s", (minor, text) => {
     expect(formatMoney(minor)).toBe(text);
+  });
+});
+
+describe("formatIsoDate", () => {
+  it("splits the ISO date with no time zone", () => {
+    expect(formatIsoDate("2026-05-20")).toBe("20.05.2026");
+  });
+});
+
+describe("formatMonthShort", () => {
+  it.each([
+    ["2026-05", "maj 2026"],
+    ["2026-01", "sty 2026"],
+    ["2025-12", "gru 2025"],
+  ])("%s → %s", (yearMonth, text) => {
+    expect(formatMonthShort(yearMonth)).toBe(text);
   });
 });

@@ -138,6 +138,42 @@ export const copyExtra = {
     patternForms: ["wzorzec", "wzorce", "wzorców"],
     // DESIGN-GAP: K17 — the kit table has no "kwota dla stałych" column (FR-007); placeholder header.
     amountColumn: "Kwota",
+    // DESIGN-GAP: K21 — detail / threshold-editor / list strings the prototype renders that content.json still
+    // lacks (round 3); taken verbatim from app.js patternDetail() / thresholdEditor() / patternRows() / showToast().
+    detailEyebrow: " wzorzec",
+    typeLeads: {
+      fixed: "Sprzedawca o stałej, powtarzalnej kwocie.",
+      frequent: "Sprzedawca, który wraca niezależnie od kwoty.",
+    },
+    thresholdPanel: "Próg wzorca",
+    thresholdActive: "aktywny",
+    thresholdNone: "brak ustawionego progu",
+    occurrencesPanel: "Wystąpienia w miesiącu",
+    sequenceWithin: "W ramach progu",
+    overBadge: "ponad próg",
+    occurrenceForms: ["wystąpienie", "wystąpienia", "wystąpień"],
+    // `patternDetail.sumLabel` bakes the month in ("Suma w maju"); `{month}` + `monthsLocative` generalise it —
+    // May reproduces the kit string byte for byte.
+    sumLabel: "Suma w {month}",
+    monthsLocative: [
+      "styczniu",
+      "lutym",
+      "marcu",
+      "kwietniu",
+      "maju",
+      "czerwcu",
+      "lipcu",
+      "sierpniu",
+      "wrześniu",
+      "październiku",
+      "listopadzie",
+      "grudniu",
+    ],
+    // DESIGN-GAP: G31 — states/pieces of the pattern detail and threshold editor the kit does not define.
+    detailMissing: "Nie znaleziono tego wzorca — mógł zniknąć po usunięciu importu.",
+    monthEmpty: "Brak wystąpień w tym miesiącu.",
+    overInMonth: "Ponad progiem w {month}",
+    sequenceSummary: "{n} {occurrences}, {over} ponad próg",
   },
   fixed: { eyebrow: "Koszty stałe", lead: "Rytm porównuje miesiące kalendarzowe i pokazuje różnice." },
   settings: {

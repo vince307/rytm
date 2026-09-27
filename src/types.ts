@@ -17,12 +17,14 @@ export interface Threshold {
   value: number;
 }
 
-/** What pattern derivation needs from one debit (amount positive, in grosze). */
+/** What pattern derivation needs from one debit (amount positive, in grosze). `occurredOn` (`YYYY-MM-DD`) is
+ * unused by `derivePatterns` itself but carried through the read for the over-limit rule and view models (S-04). */
 export interface PatternSource {
   id: string;
   amountMinor: number;
   counterparty: string;
   title: string;
+  occurredOn: string;
 }
 
 /** A merchant pattern derived on read from the user's transactions (S-03). */

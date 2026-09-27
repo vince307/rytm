@@ -33,7 +33,10 @@ export function referenceMonth(rows: readonly { occurredOn: string }[]): string 
   return latest;
 }
 
-const byOccurredThenId = (a: DatedTx, b: DatedTx): number => {
+/** Chronological order (S-04 decision 17): `(occurredOn, id)` ascending, `id` compared numerically — never as a
+ * string, where `"10" < "9"`. Exported so `view.ts` orders a month's transactions the same way `overLimit` does
+ * (the sequence marks and the over amounts must agree on which transaction is "first"). */
+export const byOccurredThenId = (a: DatedTx, b: DatedTx): number => {
   if (a.occurredOn !== b.occurredOn) return a.occurredOn < b.occurredOn ? -1 : 1;
   const ai = BigInt(a.id);
   const bi = BigInt(b.id);

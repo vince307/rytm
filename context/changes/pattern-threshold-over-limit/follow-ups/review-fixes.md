@@ -43,3 +43,13 @@ Queued by `/10x-impl-review` (2026-09-27, `reviews/impl-review.md`). None of the
 - **Where**: `src/components/patterns/ThresholdEditor.tsx`, the `saving` state (it is never reset).
 - **Fix**: reset `saving` on `pageshow` when `event.persisted` is true.
 - Trigger: the visual step (or a user) reproduces a disabled „Zapisywanie…” button after going Back.
+
+## F11 — App-wide `rounded-lg` (14px) vs the kit's 8px fields (OBSERVATION, visual gate 2026-09-27)
+
+- **Where**: `src/styles/global.css` `--radius` (14px → `rounded-lg`), used by `src/components/app/field-styles.ts`
+  `field` (so `/patterns` toolbar and `MonthSelect`), `src/components/auth/FormField.tsx`. The kit uses 8px for
+  `.field input`, `.search-field`, `.select-field`, `.input-suffix`, `.threshold-option` (measured 2026-09-27).
+- **Done here**: only `ThresholdEditor` (this slice's own component) moved to `rounded-[8px]` in `0a6973d`.
+- **Fix**: a named radius token for fields (8px) and a sweep of the field components, with screenshots of every view
+  that renders them.
+- Trigger: the next UI change to a view with a form field, or a design-kit round that names field radii.

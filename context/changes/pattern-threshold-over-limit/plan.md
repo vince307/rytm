@@ -999,8 +999,8 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 
 #### Manual
 
-- [ ] 6.8 [visual] Screenshots desktop 1440 px + mobile ~400 px: `list-with-thresholds`, `detail-default`, `editor-count`, `editor-sum`, `editor-amount`, `over-limit-marked`, `no-threshold`, `empty-month`, `saved`, `removed`, `error-value`, `error-read`, `not-found`, `month-other`, `link-focus`
-- [ ] 6.9 [visual] At ~400 px the detail stacks without horizontal page scroll; table scrolls inside its panel with the arrow column reachable
-- [ ] 6.10 [visual] Dotted key (`kawa-testowa.pl`) and a key with spaces / diacritics open their detail from the list link
+- [x] 6.8 [visual] Screenshots desktop 1440 px + mobile ~400 px: `list-with-thresholds`, `detail-default`, `editor-count`, `editor-sum`, `editor-amount`, `over-limit-marked`, `no-threshold`, `empty-month`, `saved`, `removed`, `error-value`, `error-read`, `not-found`, `month-other`, `link-focus` — visual gate 2026-09-27 (`screenshots/`, `reviews/visual-review.md`)
+- [x] 6.9 [visual] At ~400 px the detail stacks without horizontal page scroll; table scrolls inside its panel with the arrow column reachable — visual gate 2026-09-27
+- [x] 6.10 [visual] Dotted key (`kawa-testowa.pl`) and a key with spaces / diacritics open their detail from the list link — visual gate 2026-09-27
 - [x] 6.11 [reviewer] K21 strings byte-for-byte with `app.js`; only G31 placeholders new; `design-kit.md` rows describe every placeholder — impl-review 2026-09-27
 - [ ] 6.12 [human] Product owner confirms decisions 1 (excess part, against US-01 AC) and 2 (reference month = latest month in data)

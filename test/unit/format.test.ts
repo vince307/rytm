@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatAccountTail, formatRangeLong, formatRangeShort, plural } from "@/lib/format";
+import { formatAccountTail, formatMoney, formatRangeLong, formatRangeShort, plural } from "@/lib/format";
 
 const TRANSACTIONS = ["transakcja", "transakcje", "transakcji"] as const;
 
@@ -41,5 +41,15 @@ describe("formatAccountTail", () => {
   it("keeps the last four digits", () => {
     expect(formatAccountTail("11111100000000000000004821")).toBe("•• 4821");
     expect(formatAccountTail("11 1111 0000 0000 0000 0000 4821")).toBe("•• 4821");
+  });
+});
+
+describe("formatMoney", () => {
+  it.each([
+    [5299, "52,99 zł"],
+    [150000, "1500,00 zł"],
+    [1234567, "12\u00a0345,67 zł"],
+  ])("%i → %s", (minor, text) => {
+    expect(formatMoney(minor)).toBe(text);
   });
 });

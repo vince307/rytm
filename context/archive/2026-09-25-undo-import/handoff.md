@@ -88,3 +88,12 @@ keyboard probe before/after is the red/green: initial focus moved from the submi
    change it: a visual row for the wizard itself (it is S-01's view).
 5. **Captured `trigger-focus` on both viewports and an extra `dialog-focus-close-desktop`** as evidence for the
    keyboard path. What would change it: nothing — additive.
+
+## 7. Archive step (2026-09-27, ship agent)
+
+- `/10x-archive` warned: 4 Progress rows (1.10, 1.11, 2.9, 2.10/2.11) carry their SHA as `— <step> (<sha>)` instead of a
+  bare ` — <sha>` suffix. **Chosen**: Continue archiving. Rejected: Resume implementation / Cancel. Why: every row is
+  ticked, both phases are covered by `reviews/impl-review.md` (Reviewed phases: 1, 2), all SHAs are ancestors of HEAD;
+  the warning is format only. What would change it: a pending row or a missing SHA.
+- Follow-ups restated in `follow-ups/review-fixes.md` (`9da6508`), including S-03 F2 (trigger fired) — the S-03 archive
+  is read-only, so it is restated here rather than ticked there.

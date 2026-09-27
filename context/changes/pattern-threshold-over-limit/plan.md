@@ -915,8 +915,8 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 
 #### Manual
 
-- [ ] 1.8 [reviewer] Policies per operation and role, update `using` + `with check`, no `import_id`, cascade FK, no `revoke update`
-- [ ] 1.9 [reviewer] pgTAP assertions mapped to RLS / upsert / survival / cascade proofs; handoff records which break proved which
+- [x] 1.8 [reviewer] Policies per operation and role, update `using` + `with check`, no `import_id`, cascade FK, no `revoke update` — impl-review 2026-09-27
+- [x] 1.9 [reviewer] pgTAP assertions mapped to RLS / upsert / survival / cascade proofs; handoff records which break proved which — impl-review 2026-09-27
 
 ### Phase 2: Over-limit rule, input parsing and path helpers (pure, with unit oracle)
 
@@ -932,7 +932,7 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 
 #### Manual
 
-- [ ] 2.8 [reviewer] Each oracle case traceable to PRD „Wynik” / US-01 or an Autonomous decision; none copies prototype marks
+- [x] 2.8 [reviewer] Each oracle case traceable to PRD „Wynik” / US-01 or an Autonomous decision; none copies prototype marks — impl-review 2026-09-27
 
 ### Phase 3: Keyset read, widened select, thresholds read and view models
 
@@ -947,7 +947,7 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 
 #### Manual
 
-- [ ] 3.7 [reviewer] No `count: "exact"` in `load.ts`; loop bounded by `MAX_PAGES`; `/patterns` changed only at the call site
+- [x] 3.7 [reviewer] No `count: "exact"` in `load.ts`; loop bounded by `MAX_PAGES`; `/patterns` changed only at the call site — impl-review 2026-09-27
 
 ### Phase 4: Pattern detail view (read-only)
 
@@ -964,8 +964,8 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 
 #### Manual
 
-- [ ] 4.9 [reviewer] Every string from `copy` / `copyExtra`; K21 byte-for-byte with `app.js`; only G31 placeholders new
-- [ ] 4.10 [reviewer] `PatternsTable` unchanged apart from the `field-styles.ts` import
+- [x] 4.9 [reviewer] Every string from `copy` / `copyExtra`; K21 byte-for-byte with `app.js`; only G31 placeholders new — impl-review 2026-09-27
+- [x] 4.10 [reviewer] `PatternsTable` unchanged apart from the `field-styles.ts` import — impl-review 2026-09-27
 
 ### Phase 5: Threshold editor and write endpoints
 
@@ -982,8 +982,8 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 
 #### Manual
 
-- [ ] 5.9 [reviewer] Endpoints mirror `api/imports/delete.ts`; no write without zod + `parseThresholdValue`; no client `user_id`
-- [ ] 5.10 [reviewer] Keyboard: kind switch `aria-pressed`, „Usuń próg” submits only the delete form, pending text on save
+- [x] 5.9 [reviewer] Endpoints mirror `api/imports/delete.ts`; no write without zod + `parseThresholdValue`; no client `user_id` — impl-review 2026-09-27
+- [x] 5.10 [reviewer] Keyboard: kind switch `aria-pressed`, „Usuń próg” submits only the delete form, pending text on save — impl-review 2026-09-27
 
 ### Phase 6: `/patterns` columns and row link
 
@@ -1002,5 +1002,5 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 - [ ] 6.8 [visual] Screenshots desktop 1440 px + mobile ~400 px: `list-with-thresholds`, `detail-default`, `editor-count`, `editor-sum`, `editor-amount`, `over-limit-marked`, `no-threshold`, `empty-month`, `saved`, `removed`, `error-value`, `error-read`, `not-found`, `month-other`, `link-focus`
 - [ ] 6.9 [visual] At ~400 px the detail stacks without horizontal page scroll; table scrolls inside its panel with the arrow column reachable
 - [ ] 6.10 [visual] Dotted key (`kawa-testowa.pl`) and a key with spaces / diacritics open their detail from the list link
-- [ ] 6.11 [reviewer] K21 strings byte-for-byte with `app.js`; only G31 placeholders new; `design-kit.md` rows describe every placeholder
+- [x] 6.11 [reviewer] K21 strings byte-for-byte with `app.js`; only G31 placeholders new; `design-kit.md` rows describe every placeholder — impl-review 2026-09-27
 - [ ] 6.12 [human] Product owner confirms decisions 1 (excess part, against US-01 AC) and 2 (reference month = latest month in data)

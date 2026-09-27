@@ -110,6 +110,23 @@ export const copyExtra = {
     // pre-K8 prototype („Importuj 64 obciążenia”), plural forms in `debitForms`.
     confirm: "Importuj {n} {debits}",
     importing: "Importowanie…",
+    // Delete action + dialog (S-02, prototype imports() / modal('deleteImport'), app.js) — verbatim from app.js.
+    // DESIGN-GAP: K19 — content.json has no key for the delete action, the dialog copy or its close label; the
+    // kit h2 hardcodes the month („Usunąć import z maja?”), so the app interpolates the real range instead.
+    deleteAction: "Usuń import",
+    deleteDialogEyebrow: "Cofnij import",
+    deleteDialogTitle: "Usunąć import {range}?",
+    deleteDialogBody:
+      "Wzorce wykryte w tym imporcie zostaną przeliczone. Tę decyzję można cofnąć przez ponowny import.",
+    close: "Zamknij",
+    // DESIGN-GAP: K20 — the kit toast „Import usunięty w prototypie.” names the prototype; the shippable line
+    // drops „w prototypie” and, since the flow is a server redirect, is shown by InlineAlert, not a toast.
+    deleted: "Import usunięty.",
+    // DESIGN-GAP: G30 — result states of import deletion the kit does not define (toast has no repo counterpart
+    // and the flow is a server redirect → InlineAlert above the list): pending, failure and not-found copy.
+    deleting: "Usuwanie…",
+    deleteError: "Nie udało się usunąć importu. Spróbuj ponownie.",
+    deleteMissing: "Nie znaleziono tego importu — mógł zostać już usunięty.",
   },
   patterns: {
     eyebrow: "Wzorce wydatków",

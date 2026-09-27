@@ -263,6 +263,13 @@ const steps = [
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: ">5,50 zł<" },
   ],
+  ["patterns list shows the threshold", () => request("/patterns"), { status: 200, contains: ">40,00 zł<" }],
+  ["patterns list shows the over-limit sum", () => request("/patterns"), { status: 200, contains: ">5,50 zł<" }],
+  [
+    "patterns list links the pattern detail",
+    () => request("/patterns"),
+    { status: 200, contains: 'href="/patterns/kawiarnia%20smoke"' },
+  ],
   [
     "threshold is removed",
     () => request("/api/patterns/threshold/delete", { method: "POST", form: { key: "kawiarnia smoke" } }),

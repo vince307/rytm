@@ -160,6 +160,9 @@ export const copyExtra = {
     occurrencesPanel: "Wystąpienia w miesiącu",
     sequenceWithin: "W ramach progu",
     overBadge: "ponad próg",
+    // patternRows()'s Próg-cell format for a `count` threshold and the arrow cell's aria-label; verbatim.
+    thresholdCount: "{n} × / miesiąc",
+    openPattern: "Otwórz wzorzec",
     occurrenceForms: ["wystąpienie", "wystąpienia", "wystąpień"],
     // `patternDetail.sumLabel` bakes the month in ("Suma w maju"); `{month}` + `monthsLocative` generalise it —
     // May reproduces the kit string byte for byte.
@@ -186,6 +189,9 @@ export const copyExtra = {
     thresholdInvalid:
       "Podaj wartość większą od zera — liczbę całkowitą lub kwotę z najwyżej dwoma miejscami po przecinku.",
     thresholdSaveError: "Nie udało się zapisać progu. Spróbuj ponownie.",
+    // Próg-cell format for a `sum` threshold — the kit's patternRows() never renders one (its five sample
+    // patterns hold only count/amount thresholds), so this is a placeholder generalising the `count` format.
+    thresholdSum: "{amount} / miesiąc",
   },
   fixed: { eyebrow: "Koszty stałe", lead: "Rytm porównuje miesiące kalendarzowe i pokazuje różnice." },
   settings: {

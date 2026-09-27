@@ -989,13 +989,13 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 
 #### Automated
 
-- [ ] 6.1 `npm run lint` 0; `npx astro check` 0 errors (file count recorded)
-- [ ] 6.2 `npm test` — Phase 5 count, delta 0 failures
-- [ ] 6.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 6.4 `npx supabase db reset && npx supabase test db` — 76 (+22 over the S-02 baseline)
-- [ ] 6.5 `BASE_URL=http://localhost:4398 npm run smoke` — 74 + 3 = 77 PASS (+16 over the S-02 baseline 61)
-- [ ] 6.6 Deliberate break (Próg cell always „—”) → „patterns list shows the threshold” FAILs; restored → PASS; meta-check recorded
-- [ ] 6.7 No raw colours in `PatternsTable.tsx`; `DESIGN-GAP: G28` updated; K21 / G31 comments on the table keys
+- [x] 6.1 `npm run lint` 0; `npx astro check` 0 errors (file count recorded)
+- [x] 6.2 `npm test` — Phase 5 count, delta 0 failures
+- [x] 6.3 `npm run fixture:check` OK; `npm run build` passes
+- [x] 6.4 `npx supabase db reset && npx supabase test db` — 76 (+22 over the S-02 baseline)
+- [x] 6.5 `BASE_URL=http://localhost:4398 npm run smoke` — 74 + 3 = 77 PASS (+16 over the S-02 baseline 61)
+- [x] 6.6 Deliberate break (Próg cell always „—”) → „patterns list shows the threshold” FAILs; restored → PASS; meta-check recorded
+- [x] 6.7 No raw colours in `PatternsTable.tsx`; `DESIGN-GAP: G28` updated; K21 / G31 comments on the table keys
 
 #### Manual
 

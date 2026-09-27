@@ -41,5 +41,10 @@ export interface MerchantPattern {
   transactionIds: string[];
 }
 
-/** The slim list item sent to the patterns island. */
-export type PatternListItem = Omit<MerchantPattern, "transactionIds" | "medianMinor">;
+/** The slim list item sent to the patterns island. `threshold` is only set when its `kind` applies to `type`
+ * (S-04 decision 3); `overMinor` is the reference month's over-limit sum (S-04 decision 10 — no month label on
+ * the list), 0 when there is no applicable threshold or nothing is over. */
+export type PatternListItem = Omit<MerchantPattern, "transactionIds" | "medianMinor"> & {
+  threshold: Threshold | null;
+  overMinor: number;
+};

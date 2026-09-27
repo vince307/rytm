@@ -142,7 +142,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:**
   - Jaka jakość grupowania wychodzi na prawdziwym wyciągu (nie na fixture)? — Owner: user. Block: no (sprawdzane lokalnie po implementacji; błędy naprawia S-05).
-- **Risk:** Rdzeń produktu („cały projekt ukryty w jednej linii” FR-006); sekwencjonowane zaraz po imporcie, żeby największa niewiadoma wyszła przed budową progów, a F-02 daje mierzalny wynik zamiast wrażenia; S-03 dodaje własną migrację tabeli sprzedawców/wzorców (F-01 tworzy tylko importy i transakcje), z tą samą regułą RLS i kaskady.
+- **Risk:** Rdzeń produktu („cały projekt ukryty w jednej linii” FR-006); sekwencjonowane zaraz po imporcie, żeby największa niewiadoma wyszła przed budową progów, a F-02 daje mierzalny wynik zamiast wrażenia; S-03 ostatecznie nie dodał migracji — wzorce są wyliczane deterministycznie z transakcji w `src/lib/patterns/` (tożsamość wzorca = `merchantKey`); tabela trwałych decyzji o wzorcach dochodzi w S-04/S-05, z tą samą regułą RLS i kaskady.
 - **Status:** done
 
 ### S-04: Próg na wzorcu i „ponad próg”

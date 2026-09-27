@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
-import { deleteImportRedirect, deleteImportSchema } from "@/lib/import/delete";
+import { DELETE_IMPORT_MISSING, deleteImportRedirect, deleteImportSchema } from "@/lib/import/delete";
 
 export const prerender = false;
 
@@ -23,11 +23,11 @@ export const POST: APIRoute = async (context) => {
   try {
     form = Object.fromEntries(await context.request.formData());
   } catch {
-    return context.redirect("/imports?error=missing");
+    return context.redirect(DELETE_IMPORT_MISSING);
   }
   const parsed = deleteImportSchema.safeParse(form);
   if (!parsed.success) {
-    return context.redirect("/imports?error=missing");
+    return context.redirect(DELETE_IMPORT_MISSING);
   }
 
   const result = await supabase.from("imports").delete().eq("id", parsed.data.id).select("id");

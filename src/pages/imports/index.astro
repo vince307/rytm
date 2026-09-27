@@ -38,8 +38,16 @@ const rows = (data ?? []).map((i) => ({
 
 // Status after a delete redirect (POST /api/imports/delete) — DESIGN-GAP: G30, InlineAlert above the list/empty
 // view (the kit shows a toast; the flow is a server redirect, precedent /settings and /login `deleted`).
-const deleted = Astro.url.searchParams.has("deleted");
+// One status for all three states (read error, empty, table) — e.g. a second "missing" after the last delete
+// must still say so above the empty view.
 const deleteErrorParam = Astro.url.searchParams.get("error");
+const status: { kind: "success" | "error"; text: string } | null = Astro.url.searchParams.has("deleted")
+  ? { kind: "success", text: x.deleted }
+  : deleteErrorParam === "missing"
+    ? { kind: "error", text: x.deleteMissing }
+    : deleteErrorParam === "delete"
+      ? { kind: "error", text: x.deleteError }
+      : null;
 
 const cell = "border-b border-line px-[17px] py-4 align-middle";
 const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] whitespace-nowrap text-muted uppercase");
@@ -50,14 +58,19 @@ const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] wh
     // A failed read must not look like "no imports yet" — show the kit's generic error instead of the empty state.
     <>
       <PageTitle eyebrow={x.eyebrow} title={x.title} lead={x.lead} />
+      {status && (
+        <div class="mb-[15px]">
+          <InlineAlert kind={status.kind}>{status.text}</InlineAlert>
+        </div>
+      )}
       <InlineAlert kind="error">{copy.components.error}</InlineAlert>
     </>
   ) : rows.length === 0 ? (
     <>
       <PageTitle eyebrow={x.eyebrow} title={e.imports.title} lead={e.imports.lead} />
-      {deleted && (
+      {status && (
         <div class="mb-[15px]">
-          <InlineAlert kind="success">{x.deleted}</InlineAlert>
+          <InlineAlert kind={status.kind}>{status.text}</InlineAlert>
         </div>
       )}
       <ViewEmpty icon="import" title={e.cta} body={copyExtra.emptyViews.body} cta={e.button} href="/imports/new" />
@@ -69,19 +82,9 @@ const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] wh
           {x.newImport}
         </a>
       </PageTitle>
-      {deleted && (
+      {status && (
         <div class="mb-[15px]">
-          <InlineAlert kind="success">{x.deleted}</InlineAlert>
-        </div>
-      )}
-      {deleteErrorParam === "missing" && (
-        <div class="mb-[15px]">
-          <InlineAlert kind="error">{x.deleteMissing}</InlineAlert>
-        </div>
-      )}
-      {deleteErrorParam === "delete" && (
-        <div class="mb-[15px]">
-          <InlineAlert kind="error">{x.deleteError}</InlineAlert>
+          <InlineAlert kind={status.kind}>{status.text}</InlineAlert>
         </div>
       )}
       <Panel class="p-0 max-[559px]:p-0">

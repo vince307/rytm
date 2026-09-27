@@ -184,6 +184,11 @@ const steps = [
     { status: 200, contains: "Nie masz jeszcze żadnego importu.", notContains: "Konto smoke" },
   ],
   [
+    "imports shows the not-found line above the empty list",
+    () => request("/imports?error=missing"),
+    { status: 200, contains: "Nie znaleziono tego importu" },
+  ],
+  [
     "patterns drop the deleted import",
     () => request("/patterns"),
     { status: 200, contains: "Wzorce pojawią się po pierwszym imporcie.", notContains: "Kawiarnia smoke" },

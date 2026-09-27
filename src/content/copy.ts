@@ -138,6 +138,60 @@ export const copyExtra = {
     patternForms: ["wzorzec", "wzorce", "wzorców"],
     // DESIGN-GAP: K17 — the kit table has no "kwota dla stałych" column (FR-007); placeholder header.
     amountColumn: "Kwota",
+    // DESIGN-GAP: K21 — detail / threshold-editor / list strings the prototype renders that content.json still
+    // lacks (round 3); taken verbatim from app.js patternDetail() / thresholdEditor() / patternRows() / showToast().
+    detailEyebrow: " wzorzec",
+    typeLeads: {
+      fixed: "Sprzedawca o stałej, powtarzalnej kwocie.",
+      frequent: "Sprzedawca, który wraca niezależnie od kwoty.",
+    },
+    thresholdPanel: "Próg wzorca",
+    thresholdActive: "aktywny",
+    thresholdNone: "brak ustawionego progu",
+    // thresholdEditor()'s save button when no threshold is set yet; content.json's threshold.save ("Zapisz
+    // próg") covers only the change path.
+    setThreshold: "Ustaw próg",
+    // thresholdEditor()'s onclick toast for removal (showToast('Próg usunięty.','info')).
+    thresholdRemoved: "Próg usunięty.",
+    // thresholdEditor()'s field label and input-suffix text; content.json's threshold object holds only the
+    // button/note copy, not these.
+    valueLabel: { amount: "Kwota", count: "Liczba wystąpień" },
+    suffix: { money: "zł", count: "×" },
+    occurrencesPanel: "Wystąpienia w miesiącu",
+    sequenceWithin: "W ramach progu",
+    overBadge: "ponad próg",
+    // patternRows()'s Próg-cell format for a `count` threshold and the arrow cell's aria-label; verbatim.
+    thresholdCount: "{n} × / miesiąc",
+    openPattern: "Otwórz wzorzec",
+    occurrenceForms: ["wystąpienie", "wystąpienia", "wystąpień"],
+    // `patternDetail.sumLabel` bakes the month in ("Suma w maju"); `{month}` + `monthsLocative` generalise it —
+    // May reproduces the kit string byte for byte.
+    sumLabel: "Suma w {month}",
+    monthsLocative: [
+      "styczniu",
+      "lutym",
+      "marcu",
+      "kwietniu",
+      "maju",
+      "czerwcu",
+      "lipcu",
+      "sierpniu",
+      "wrześniu",
+      "październiku",
+      "listopadzie",
+      "grudniu",
+    ],
+    // DESIGN-GAP: G31 — states/pieces of the pattern detail and threshold editor the kit does not define.
+    detailMissing: "Nie znaleziono tego wzorca — mógł zniknąć po usunięciu importu.",
+    monthEmpty: "Brak wystąpień w tym miesiącu.",
+    overInMonth: "Ponad progiem w {month}",
+    sequenceSummary: "{n} {occurrences}, {over} ponad próg",
+    thresholdInvalid:
+      "Podaj wartość większą od zera — liczbę całkowitą lub kwotę z najwyżej dwoma miejscami po przecinku.",
+    thresholdSaveError: "Nie udało się zapisać progu. Spróbuj ponownie.",
+    // Próg-cell format for a `sum` threshold — the kit's patternRows() never renders one (its five sample
+    // patterns hold only count/amount thresholds), so this is a placeholder generalising the `count` format.
+    thresholdSum: "{amount} / miesiąc",
   },
   fixed: { eyebrow: "Koszty stałe", lead: "Rytm porównuje miesiące kalendarzowe i pokazuje różnice." },
   settings: {

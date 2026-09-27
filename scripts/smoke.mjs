@@ -208,6 +208,79 @@ const steps = [
     { status: 302, location: "/imports/result?id=" },
   ],
   ["patterns list the re-imported merchant", () => request("/patterns"), { status: 200, contains: "Kawiarnia smoke" }],
+  [
+    "pattern detail renders the month total",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: "Suma w maju" },
+  ],
+  [
+    "pattern detail has no threshold yet",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">brak ustawionego progu<" },
+  ],
+  [
+    "threshold with a zero value is rejected",
+    () =>
+      request("/api/patterns/threshold", {
+        method: "POST",
+        form: { key: "kawiarnia smoke", kind: "amount", value: "0" },
+      }),
+    { status: 302, location: "/patterns/kawiarnia%20smoke?error=value" },
+  ],
+  [
+    "threshold is saved",
+    () =>
+      request("/api/patterns/threshold", {
+        method: "POST",
+        form: { key: "kawiarnia smoke", kind: "amount", value: "30" },
+      }),
+    { status: 302, location: "/patterns/kawiarnia%20smoke?saved=1" },
+  ],
+  [
+    // Same key + kind, changed value: proves the upsert's onConflict path through real PostgREST, not just the
+    // pgTAP SQL statement — steps 5 and the Phase 6 list steps then read ">5,50 zł<", which a non-updated 30 zł
+    // threshold would render as ">15,50 zł<" (plan review F1).
+    "threshold is changed",
+    () =>
+      request("/api/patterns/threshold", {
+        method: "POST",
+        form: { key: "kawiarnia smoke", kind: "amount", value: "40" },
+      }),
+    { status: 302, location: "/patterns/kawiarnia%20smoke?saved=1" },
+  ],
+  [
+    "pattern detail confirms the saved threshold",
+    () => request("/patterns/kawiarnia%20smoke?saved=1"),
+    { status: 200, contains: "Sukces — próg zapisany." },
+  ],
+  [
+    "pattern detail marks the over-limit transaction",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">ponad próg<" },
+  ],
+  [
+    "pattern detail shows the over-limit sum",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">5,50 zł<" },
+  ],
+  ["patterns list shows the threshold", () => request("/patterns"), { status: 200, contains: ">40,00 zł<" }],
+  ["patterns list shows the over-limit sum", () => request("/patterns"), { status: 200, contains: ">5,50 zł<" }],
+  [
+    "patterns list links the pattern detail",
+    () => request("/patterns"),
+    { status: 200, contains: 'href="/patterns/kawiarnia%20smoke"' },
+  ],
+  [
+    "threshold is removed",
+    () => request("/api/patterns/threshold/delete", { method: "POST", form: { key: "kawiarnia smoke" } }),
+    { status: 302, location: "/patterns/kawiarnia%20smoke?removed=1" },
+  ],
+  [
+    "pattern detail drops the over-limit mark after removal",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">brak ustawionego progu<", notContains: ">ponad próg<" },
+  ],
+  ["pattern detail of an unknown key is not found", () => request("/patterns/nie%20ma%20takiego"), { status: 404 }],
   ["imports lists the delete action", () => request("/imports"), { status: 200, contains: ">Usuń import<" }],
   [
     "password change rejects wrong current password",
@@ -264,6 +337,20 @@ const steps = [
   [
     "import without a session goes to login",
     () => request("/api/imports", { method: "POST", form: { payload: importPayload } }),
+    { status: 302, location: "/login" },
+  ],
+  [
+    "pattern detail without a session goes to login",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 302, location: "/login" },
+  ],
+  [
+    "threshold save without a session goes to login",
+    () =>
+      request("/api/patterns/threshold", {
+        method: "POST",
+        form: { key: "kawiarnia smoke", kind: "amount", value: "40" },
+      }),
     { status: 302, location: "/login" },
   ],
   [

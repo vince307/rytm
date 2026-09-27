@@ -7,40 +7,60 @@ import { PatternsTable, type PatternsTableCopy } from "@/components/patterns/Pat
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
 import { loadPatterns } from "@/lib/patterns/load";
+import { loadThresholds } from "@/lib/patterns/thresholds";
 import { createClient } from "@/lib/supabase";
-import type { PatternListItem } from "@/types";
+import { listOverview } from "@/lib/patterns/view";
+import type { PatternListItem, Threshold } from "@/types";
 
 const e = copy.emptyViews;
 const x = copyExtra.patterns;
 
 // Patterns are derived on read from the caller's own debits (RLS, FR-006/FR-007) — prototype patterns() (app.js).
 // A failed read — including an unconfigured Supabase client — never shows the empty state or a partial list.
+// Thresholds are read alongside (same RLS-scoped read shape) so the list's Próg / Ponad progiem columns (S-04)
+// never wait on a second round trip; either read failing fails the whole list, same as before S-04.
 const supabase = createClient(Astro.request.headers, Astro.cookies);
-const result = supabase ? await loadPatterns(supabase) : { error: new Error("Supabase is not configured") };
+const [patternsResult, thresholdsResult] = supabase
+  ? await Promise.all([loadPatterns(supabase), loadThresholds(supabase)])
+  : [{ error: new Error("Supabase is not configured") }, { error: new Error("Supabase is not configured") }];
+const result: { error: unknown } | { patterns: PatternListItem[] } = (() => {
+  if ("error" in patternsResult) return { error: patternsResult.error };
+  if ("error" in thresholdsResult) return { error: thresholdsResult.error };
+  const thresholds: ReadonlyMap<string, Threshold> = thresholdsResult.thresholds;
+  const overview = listOverview(patternsResult.patterns, patternsResult.rows, thresholds);
+  const overviewByKey = new Map(overview.items.map((item) => [item.key, item]));
+  const patterns: PatternListItem[] = patternsResult.patterns.map((p) => {
+    const item = overviewByKey.get(p.key);
+    return {
+      key: p.key,
+      name: p.name,
+      type: p.type,
+      occurrences: p.occurrences,
+      sumMinor: p.sumMinor,
+      fixedAmountMinor: p.fixedAmountMinor,
+      threshold: item?.threshold ?? null,
+      overMinor: item?.overMinor ?? 0,
+    };
+  });
+  return { patterns };
+})();
 if ("error" in result) {
   // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
   console.error("patterns list failed", result.error);
 }
-const items: PatternListItem[] =
-  "patterns" in result
-    ? result.patterns.map((p) => ({
-        key: p.key,
-        name: p.name,
-        type: p.type,
-        occurrences: p.occurrences,
-        sumMinor: p.sumMinor,
-        fixedAmountMinor: p.fixedAmountMinor,
-      }))
-    : [];
+const items: PatternListItem[] = "patterns" in result ? result.patterns : [];
 const tableCopy: PatternsTableCopy = {
   searchPlaceholder: copy.patterns.searchPlaceholder,
   sortOptions: copy.patterns.sortOptions,
   sortPrefix: x.sortPrefix,
-  columns: copy.patterns.columns.slice(0, 4),
+  columns: copy.patterns.columns,
   amountColumn: x.amountColumn,
   typeLabels: x.typeLabels,
   footer: x.footer,
   patternForms: x.patternForms,
+  thresholdCount: x.thresholdCount,
+  thresholdSum: x.thresholdSum,
+  openPattern: x.openPattern,
 };
 ---
 

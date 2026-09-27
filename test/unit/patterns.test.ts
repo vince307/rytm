@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { buildImportPayload, parseIngStatement } from "@/lib/import/ing";
 import { d5Type, derivePatterns, median } from "@/lib/patterns/derive";
-import { collectPages, PAGE_SIZE } from "@/lib/patterns/load";
+import { collectPages, MAX_PAGES } from "@/lib/patterns/load";
 import { merchantKey, normalizeMerchant, rawMerchant } from "@/lib/patterns/merchant";
 import type { PatternSource } from "@/types";
 
@@ -44,6 +44,7 @@ function fixtureSources(): PatternSource[] {
     amountMinor: t.amountMinor,
     counterparty: t.counterparty,
     title: t.title,
+    occurredOn: t.occurredOn,
   }));
 }
 
@@ -211,45 +212,56 @@ describe("D5", () => {
 });
 
 describe("collectPages", () => {
-  // A fake server that caps every response at `cap` rows, like PostgREST's max_rows.
-  function cappedFetch(total: number, cap: number, failOnCall?: number) {
-    const all = Array.from({ length: total }, (_, i) => i);
-    const calls: [number, number][] = [];
-    const fetchPage = (from: number, to: number) => {
-      calls.push([from, to]);
-      if (calls.length === failOnCall) return Promise.resolve({ rows: [], count: null, error: new Error("boom") });
-      return Promise.resolve({ rows: all.slice(from, Math.min(to + 1, from + cap)), count: total, error: null });
+  // A fake server that caps every response at `cap` rows, like PostgREST's max_rows, and pages by keyset (`id`
+  // strictly greater than `afterId`) — not offset — so a row missing from the middle of `all` is simply skipped,
+  // never duplicated or mistaken for the end.
+  function cappedFetch(ids: readonly number[], cap: number, failOnCall?: number) {
+    const calls: (number | null)[] = [];
+    const fetchPage = (afterId: number | null) => {
+      calls.push(afterId);
+      if (calls.length === failOnCall) return Promise.resolve({ rows: [], error: new Error("boom") });
+      const rest = afterId === null ? ids : ids.filter((id) => id > afterId);
+      return Promise.resolve({ rows: rest.slice(0, cap).map((id) => ({ id })), error: null });
     };
     return { fetchPage, calls };
   }
 
-  it("reads every row when the server caps pages below the requested size", async () => {
-    const { fetchPage, calls } = cappedFetch(7, 3);
-    expect(await collectPages(fetchPage)).toEqual({ rows: [0, 1, 2, 3, 4, 5, 6] });
-    expect(calls[0]).toEqual([0, PAGE_SIZE - 1]);
-    expect(calls.map(([from]) => from)).toEqual([0, 3, 6]);
+  it("reads every row when the server caps pages below the requested size, calls carrying the last id", async () => {
+    const { fetchPage, calls } = cappedFetch([1, 2, 3, 4, 5, 6, 7], 3);
+    expect(await collectPages(fetchPage)).toEqual({ rows: [1, 2, 3, 4, 5, 6, 7].map((id) => ({ id })) });
+    // A short page (below `cap`) is not treated as the end — the loop still asks once more and only stops on the
+    // empty page that follows.
+    expect(calls).toEqual([null, 3, 6, 7]);
   });
 
   it("fails as a whole when a later page errors", async () => {
-    const { fetchPage } = cappedFetch(7, 3, 2);
+    const { fetchPage } = cappedFetch([1, 2, 3, 4, 5, 6, 7], 3, 2);
     const result = await collectPages(fetchPage);
     expect(result).toHaveProperty("error");
     expect(result).not.toHaveProperty("rows");
   });
 
-  it("fails instead of returning a partial list when pages end short of the count", async () => {
-    // 7 rows counted on the first page, then 2 rows deleted mid-read: the offset skips past the end.
-    const all = [0, 1, 2, 3, 4];
-    const fetchPage = (from: number, to: number) =>
-      Promise.resolve({ rows: all.slice(from, Math.min(to + 1, from + 3)), count: from === 0 ? 7 : 5, error: null });
-    const result = await collectPages(fetchPage);
-    expect(result).toHaveProperty("error");
-    expect(result).not.toHaveProperty("rows");
-  });
-
-  it("returns an empty list after one call when there are no rows", async () => {
-    const { fetchPage, calls } = cappedFetch(0, 3);
+  it("returns an empty list after exactly one call when there are no rows", async () => {
+    const { fetchPage, calls } = cappedFetch([], 3);
     expect(await collectPages(fetchPage)).toEqual({ rows: [] });
     expect(calls).toHaveLength(1);
+  });
+
+  it("does not fail when a row is deleted between pages — the gap is skipped, not duplicated or missed", async () => {
+    // id 3 is gone by the time the second page (afterId 2) is fetched: a keyset read simply never returns it,
+    // unlike an offset read, which would skip id 4 instead (shifted left to fill id 3's slot).
+    const { fetchPage } = cappedFetch([1, 2, 4, 5], 2);
+    expect(await collectPages(fetchPage)).toEqual({ rows: [1, 2, 4, 5].map((id) => ({ id })) });
+  });
+
+  it("stops with an error after MAX_PAGES when the fetch never returns an empty page", async () => {
+    const fetchPage = (afterId: number | null) => Promise.resolve({ rows: [{ id: (afterId ?? 0) + 1 }], error: null });
+    const result = await collectPages(fetchPage);
+    expect(result).toHaveProperty("error");
+    expect(result).not.toHaveProperty("rows");
+  });
+
+  it("MAX_PAGES is at least large enough to page through max_rows-sized pages of real data", () => {
+    expect(MAX_PAGES).toBeGreaterThanOrEqual(1000);
   });
 });

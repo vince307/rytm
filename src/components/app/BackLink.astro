@@ -1,0 +1,23 @@
+---
+// BackLink.astro — prototype .back-link (styles.css): icon `arrow-left` (15px) + label. The kit's own
+// `.back-link` colour is `ink` (verified in `prototype/styles.css`), matching the existing "Wróć do importów"
+// link (`ImportWizard.tsx`) — `text-ink`, not the plan draft's `text-muted` (S-04 faza 4 ADAPT: kept consistent
+// with the kit source and the sibling implementation rather than the plan's wording). The kit defines no
+// visible-focus rule for it; this borrows `buttonVariants`' own focus ring (G29 precedent).
+import Icon from "@/components/Icon.astro";
+
+interface Props {
+  href: string;
+  label: string;
+}
+
+const { href, label } = Astro.props;
+---
+
+<a
+  href={href}
+  class="text-ink inline-flex items-center gap-1.5 rounded-sm text-[13px] font-extrabold no-underline outline-none focus-visible:ring-[3px] focus-visible:ring-ink/15"
+>
+  <Icon name="arrow-left" size={15} />
+  {label}
+</a>

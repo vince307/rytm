@@ -39,6 +39,20 @@ export function formatRangeShort(start: string, end: string): string {
   return `${from}–${e.day}.${e.month}.${e.year}`;
 }
 
+/** `20.05.2026` — an ISO calendar date (e.g. transactions.occurred_on) with no time zone, plain string split. */
+export function formatIsoDate(iso: string): string {
+  const { year, month, day } = parts(iso);
+  return `${day}.${month}.${year}`;
+}
+
+const monthShort = new Intl.DateTimeFormat("pl-PL", { month: "short", year: "numeric", timeZone: "UTC" });
+
+/** `2026-05` → `maj 2026` — the pattern detail month select's option label (kit `patternDetail`, S-04). */
+export function formatMonthShort(yearMonth: string): string {
+  const [year, month] = yearMonth.split("-");
+  return monthShort.format(Date.UTC(Number(year), Number(month) - 1, 1));
+}
+
 const dayMonth = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "long", timeZone: "UTC" });
 const longDate = (iso: string) => {
   const { year, month, day } = parts(iso);

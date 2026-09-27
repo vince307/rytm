@@ -3,7 +3,7 @@ project: Rytm
 version: 1
 status: draft
 created: 2026-09-21
-updated: 2026-09-25
+updated: 2026-09-27
 prd_version: 1
 main_goal: quality
 top_blocker: none
@@ -45,7 +45,7 @@ Pieniądze cicho uciekają z konta, a kategoryzacja banku nie odpowiada na pytan
 | F-02 | synthetic-ing-fixture        | (foundation) syntetyczny wyciąg ING z pułapkami jako fixture testów i seed demo                             | —             | FR-014, NFR prywatność                 | done     |
 | S-01 | ing-csv-import               | wgrać CSV z ING (jeden rachunek, obciążenia), zobaczyć wynik importu; nakładający się zakres jest odrzucony | F-01, F-02    | US-01, FR-003, FR-005, FR-002          | done     |
 | S-02 | undo-import                  | zobaczyć listę importów i cofnąć błędny import wraz z jego transakcjami                                     | S-01          | US-02, FR-004                          | proposed |
-| S-03 | merchant-patterns            | zobaczyć listę wzorców: sprzedawca, typ, liczba wystąpień, suma, kwota dla stałych                          | S-01, F-02    | US-01, FR-006, FR-007                  | proposed |
+| S-03 | merchant-patterns            | zobaczyć listę wzorców: sprzedawca, typ, liczba wystąpień, suma, kwota dla stałych                          | S-01, F-02    | US-01, FR-006, FR-007                  | done |
 | S-04 | pattern-threshold-over-limit | otworzyć wzorzec, zobaczyć jego transakcje, ustawić próg i zobaczyć „ponad próg” z sumą miesiąca            | S-03          | US-01, FR-008, FR-010, FR-011          | proposed |
 | S-05 | durable-pattern-decisions    | scalić, wykluczyć, zmienić typ i nazwę wzorca, a decyzje przetrwają kolejny import                          | S-03          | US-03, FR-009                          | proposed |
 | S-06 | fixed-cost-changes           | zobaczyć, które wzorce stałe zmieniły kwotę i które są nowe względem poprzedniego miesiąca                  | S-03          | US-04, FR-012                          | proposed |
@@ -142,8 +142,8 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:**
   - Jaka jakość grupowania wychodzi na prawdziwym wyciągu (nie na fixture)? — Owner: user. Block: no (sprawdzane lokalnie po implementacji; błędy naprawia S-05).
-- **Risk:** Rdzeń produktu („cały projekt ukryty w jednej linii” FR-006); sekwencjonowane zaraz po imporcie, żeby największa niewiadoma wyszła przed budową progów, a F-02 daje mierzalny wynik zamiast wrażenia; S-03 dodaje własną migrację tabeli sprzedawców/wzorców (F-01 tworzy tylko importy i transakcje), z tą samą regułą RLS i kaskady.
-- **Status:** proposed
+- **Risk:** Rdzeń produktu („cały projekt ukryty w jednej linii” FR-006); sekwencjonowane zaraz po imporcie, żeby największa niewiadoma wyszła przed budową progów, a F-02 daje mierzalny wynik zamiast wrażenia; S-03 ostatecznie nie dodał migracji — wzorce są wyliczane deterministycznie z transakcji w `src/lib/patterns/` (tożsamość wzorca = `merchantKey`); tabela trwałych decyzji o wzorcach dochodzi w S-04/S-05, z tą samą regułą RLS i kaskady.
+- **Status:** done
 
 ### S-04: Próg na wzorcu i „ponad próg”
 
@@ -267,3 +267,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **F-01: (foundation) pierwsza migracja istnieje i jest zastosowana lokalnie i na hostowanej bazie: tabele importów i transakcji należą do konta (RLS per operację, per rolę) i kasują się kaskadowo z kontem; ustalona jest ścieżka „migracja lokalnie → `db push` na produkcję”.** — Archived 2026-09-24 → `context/archive/2026-09-23-domain-schema-rls/`. Lesson: —.
 - **F-02: (foundation) w repozytorium istnieje syntetyczny plik CSV w formacie ING (zgodny z `import-formats.md`) z realistycznymi pułapkami: warianty opisów tego samego sprzedawcy, pośrednicy (PayPal/Allegro/BLIK przez operatorów), subskrypcja z podwyżką, nowy wzorzec, wiele rachunków, uznania i zwroty do pominięcia; służy jako fixture testów parsera i wykrywania oraz jako materiał seedu demo.** — Archived 2026-09-24 → `context/archive/2026-09-24-synthetic-ing-fixture/`. Lesson: —.
 - **S-01: Użytkownik może wgrać plik CSV z ING (wybierając jeden rachunek, tylko obciążenia), zobaczyć wynik importu (liczba transakcji, zakres dat) i wejść na listę wzorców; plik, którego zakres dat zachodzi na istniejący import, jest odrzucony z komunikatem; użytkownik widzi wyłącznie własne importy.** — Archived 2026-09-25 → `context/archive/2026-09-24-ing-csv-import/`. Lesson: —.
+- **S-03: Użytkownik może zobaczyć listę wykrytych wzorców: sprzedawca (znormalizowany z opisu, z domeną sprzedawcy dla płatności przez operatorów), typ stały/częsty zaproponowany przez aplikację, liczba wystąpień, suma, kwota dla stałych; każda transakcja liczy się w dokładnie jednym wzorcu.** — Archived 2026-09-27 → `context/archive/2026-09-25-merchant-patterns/`. Lesson: —.

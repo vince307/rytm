@@ -9,7 +9,8 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { ServerError } from "@/components/auth/ServerError";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { Stepper } from "@/components/app/Stepper";
-import type { IconName, copy, copyExtra } from "@/content/copy";
+import { Glyph } from "@/components/Glyph";
+import type { copy, copyExtra } from "@/content/copy";
 import { buildImportPayload, parseIngStatement } from "@/lib/import/ing";
 import type { IngParseResult, IngStatement } from "@/lib/import/ing";
 import { MAX_DEBITS, MAX_FILE_BYTES, importPayloadSchema } from "@/lib/import/schema";
@@ -73,20 +74,6 @@ async function readStatement(file: File): Promise<{ statement: IngStatement } | 
   if (!result.ok) return { error: result.error === "wrong-currency" ? "wrongCurrency" : "unknownFormat" };
   if (result.statement.accounts.every((a) => a.debits === 0)) return { error: "empty" };
   return { statement: result.statement };
-}
-
-function Glyph({ name, size = 16, className }: { name: IconName; size?: number; className?: string }) {
-  return (
-    <svg
-      className={cn("rytm-icon inline-block shrink-0 align-[-0.18em]", className)}
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
-      <use href={`/rytm/icons/ui/ui.svg#${name}`} />
-    </svg>
-  );
 }
 
 /** Kit error copy leads with a bold sentence („<strong>Nieznany format pliku.</strong> Obsługujemy: …”). */

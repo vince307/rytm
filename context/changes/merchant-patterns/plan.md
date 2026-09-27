@@ -501,5 +501,5 @@ Recorded by `/10x-plan-review` (`reviews/plan-review.md`, OBSERVATIONs F5–F7);
 
 #### Manual
 
-- [ ] 3.8 Screenshots (Visual step): `lista`, `lista-mobile`, `wyszukiwanie`, `sortowanie-nazwa`, `pusty`, `brak-wyników`; `błąd` code-reviewed only
+- [x] 3.8 Screenshots (Visual step): `lista`, `lista-mobile`, `wyszukiwanie`, `sortowanie-nazwa`, `pusty`, `brak-wyników`; `błąd` code-reviewed only
 - [x] 3.9 On the fixture: 31 rows, `KINOTEKA` `stały` 52,99 zł, `MINIMARKET PRZYSTANEK` 8×, `sportowo.pl` and `SPORTOWO` as two rows, no operator-named row except `AUTOPAY` — 23e700d

@@ -1,97 +1,88 @@
 # Handoff — `merchant-patterns` (slice S-03)
 
-Written by the `impl-review` step (`/10x-impl-review merchant-patterns`, full plan, phases 1–3). Verdict APPROVED,
-`MERGE: CLEAR`; one WARNING fixed in code (`collectPages`), one deferred to `follow-ups/review-fixes.md`; `change.md`
-is `impl_reviewed`. The slice has UI (`/patterns`). The one thing the next agent must not get wrong: **never import
-the fixture into the seeded `test@rytm.local`** — smoke step "patterns renders empty view" needs it empty; use a fresh
-local account for the `lista` screenshots (the review step ran `npx supabase db reset`, so earlier fixture accounts
-are gone).
+Written by the visual-gate step (screenshots of `/patterns` vs `design/rytm-os/prototype/views/patterns.html`). Verdict
+`VISUAL: PASS`; two real discrepancies fixed in `PatternsTable` (invisible toolbar focus, non-token native search clear
+button) and registered as gap G29; all Progress rows ticked. The one thing the next agent must not get wrong: the
+archive step must still correct the roadmap `### S-03` Risk line (it promises a migration this slice never added).
 
 ## 1. State
 
-| Item                         | Value                                                                                                                                                                     |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Branch                       | `feat/merchant-patterns`, cut from `main` at `d11f3ef`                                                                                                                    |
-| Commits                      | 13 on top of `d11f3ef` (`d11f3ef..HEAD`): previous 11 + `5935e11` `fix(merchant-patterns): poprawki z przeglądu implementacji` + this step's `docs(merchant-patterns): …` |
-| Pushed / PR / merged         | no / no / no                                                                                                                                                              |
-| `change.md` status           | `impl_reviewed` (updated 2026-09-27)                                                                                                                                      |
-| `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`) — 3.8 screenshots (Visual step)                                                                                                          |
-| Working tree                 | clean apart from the maintainer's ` M .gitignore` and `?? .claude/skills/10x-autonomous-run/` (never staged)                                                              |
+| Item                         | Value                                                                                                                                                           |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Branch                       | `feat/merchant-patterns`, cut from `main` at `d11f3ef`                                                                                                          |
+| Commits                      | 15 on top of `d11f3ef` (`d11f3ef..HEAD`): previous 13 + `fix(merchant-patterns): widoczny fokus pól paska wzorców` + `docs(merchant-patterns): bramka wizualna` |
+| Pushed / PR / merged         | no / no / no                                                                                                                                                    |
+| `change.md` status           | `impl_reviewed` (unchanged; archive sets the next status)                                                                                                       |
+| `## Progress` rows remaining | 0 (`grep -c '^- \[ \]' plan.md`) — 3.8 ticked by this step                                                                                                      |
+| Working tree                 | clean apart from the maintainer's ` M .gitignore` and `?? .claude/skills/10x-autonomous-run/` (never staged)                                                    |
 
 ## 2. Artifacts
 
-| Path                                                           | What it is                                                                                            |
-| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `context/changes/merchant-patterns/reviews/impl-review.md`     | review report (APPROVED; F1–F8; gate arithmetic; reviewer breaks); ends with the `MERGE:` line        |
-| `context/changes/merchant-patterns/follow-ups/review-fixes.md` | deferred items: F2 keyset paging, F3 tests, F5/F6/F7 tidy                                             |
-| `src/lib/patterns/load.ts`                                     | `collectPages`: an empty page before the first page's `count` is reached now returns `{ error }` (F1) |
-| `test/unit/patterns.test.ts`                                   | `collectPages` case `fails instead of returning a partial list when pages end short of the count`     |
-| `context/changes/merchant-patterns/plan.md`                    | Progress 1.7 ticked (reviewer read of `normalizeMerchant`)                                            |
-| `context/changes/merchant-patterns/change.md`                  | `status: impl_reviewed`, `updated: 2026-09-27`                                                        |
-| `context/changes/merchant-patterns/handoff.md`                 | this file                                                                                             |
+| Path                                                         | What it is                                                                                                                 |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `context/changes/merchant-patterns/reviews/visual-review.md` | visual review: states, checks, fixes, observations; ends with the `VISUAL:` line                                           |
+| `context/changes/merchant-patterns/screenshots/README.md`    | state table (desktop 1440 / mobile 375 / kit) and how they were captured                                                   |
+| `context/changes/merchant-patterns/screenshots/*.png`        | 18 PNGs: 12 app states, 2 focus frames, 6 kit frames                                                                       |
+| `src/components/patterns/PatternsTable.tsx`                  | `field`: `focus-within` border `ink` + 3 px ring `ink/8`; `control`: native search cancel button hidden; `DESIGN-GAP: G29` |
+| `context/foundation/design-kit.md`                           | gap row G29 (focus state of the toolbar fields)                                                                            |
+| `context/changes/merchant-patterns/plan.md`                  | Progress 3.8 ticked                                                                                                        |
+| `context/changes/merchant-patterns/handoff.md`               | this file                                                                                                                  |
 
 ## 3. Verification
 
-All observed in this step, on this branch. Baseline = `main` at `d11f3ef` (`agent-contract.md`).
+All observed in this step, on this branch, after the fix. Baseline = `main` at `d11f3ef` (`agent-contract.md`).
 
-| Command                                                                                             | Result                                                                                           |
-| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `npm run lint`                                                                                      | 0 errors / 0 warnings (baseline 0, delta 0) — before and after the fix                           |
-| `npx astro check`                                                                                   | 0/0/0, 89 files (baseline 82, +7 new source/test files)                                          |
-| `npm run fixture:check` + `git diff --quiet d11f3ef..HEAD -- test/fixtures scripts/fixture-ing.mjs` | OK, fixture untouched                                                                            |
-| `npm test`                                                                                          | 71/71 before fix → 72/72 after, 4 files (baseline 32/3: +39 implement, +1 review = +40; +1 file) |
-| `npm run build`                                                                                     | Complete, before and after the fix                                                               |
-| `npx supabase db reset && npx supabase test db`                                                     | 44/44, 2 files, PASS (baseline 44, delta 0 — no schema change)                                   |
-| `BASE_URL=http://localhost:4398 npm run smoke`                                                      | 48 PASS / 0 FAIL before and after the fix (baseline 46, +2); :4398 killed after, :4321 untouched |
+| Command                                        | Result                                                                                                           |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `npm run lint`                                 | 0 errors / 0 warnings (baseline 0, Δ0)                                                                           |
+| `npx astro check`                              | 0/0/0, 89 files (baseline 82, +7 — same as impl-review)                                                          |
+| `npm run fixture:check`                        | OK                                                                                                               |
+| `npm test`                                     | 72/72, 4 files (baseline 32/3, +40 / +1 — same as impl-review)                                                   |
+| `npm run build`                                | Complete                                                                                                         |
+| `BASE_URL=http://localhost:4398 npm run smoke` | 48 PASS / 0 FAIL (baseline 46, +2); run twice (second to count); :4398 killed after                              |
+| `npx supabase test db`                         | not run — no schema or DB change in this step (impl-review: 44/44)                                               |
+| Focus check (Playwright, after fix)            | focused search / select wrapper border `rgb(32, 47, 64)` (`ink`) + 3 px ring; before: `outline: none`, no shadow |
 
-Deliberate breaks (reviewer's own):
-
-- `normalizeMerchant` without rule 6 (`dropDoubledPrefix`) → 1 red (`PIEKARNIA KŁOSEK PIEKARNIA KŁOSEK ŁÓDŹ` case),
-  restored via `git checkout --` → green. Meta-check: `fixture partition` stayed green because the fixture only has
-  the doubled T02 form — rule 6 affects the display name, not the partition; recorded as F3.
-- F1 fix reverted (`git stash` of `load.ts`) → the new partial-list case red; restored → 72/72. Meta-check: the fake
-  reports `count` 7 then serves 5 rows, the exact concurrent-delete shape; only the new check turns it green.
+No deliberate break: the fix is CSS only and there is no screenshot test to turn red; the before/after evidence is the
+measured computed style and the re-captured frames. Servers :4397 (kit static), :4398, :4399 killed; :4321 untouched.
 
 ## 4. Next command
 
-Visual gate for `merchant-patterns`: screenshots of `/patterns` against `design/rytm-os/prototype/views/patterns.html` → `context/changes/merchant-patterns/screenshots/` + `reviews/visual-review.md` (dev server on :4399)
+`/10x-archive merchant-patterns`, then ship (push, PR, CI, merge per the Ship step).
 
 ## 5. Open
 
-- Manual Progress rows (human / Visual-step checklist):
-  - [ ] 3.8 screenshots `lista` (1440 px), `lista-mobile` (375 px), `wyszukiwanie` (`kin` → `KINO ŚWIATŁO`,
-        `KINOTEKA`, foot "2 wzorce"), `sortowanie-nazwa`, `pusty` (seeded `test@rytm.local`), `brak-wyników`; `błąd`
-        code-reviewed only. For `lista`: register a fresh local account (no confirmation locally) and import
-        `test/fixtures/ing/Lista_transakcji_nr_0000123456_010926.csv` via `/imports/new` — expect 31 rows, foot
-        „31 wzorców · wszystkie miesiące”.
-- Follow-ups: `follow-ups/review-fixes.md` — F2 keyset paging in `loadPatterns` / `collectPages` (trigger: S-02
-  undo-import landing), F3 `normalizeMerchant` test cases (`S.C.A`, `http://`), F5/F6/F7 tidy (`tableCopy` slice,
-  error log shape in `patterns.astro`, `GlyphProps` size union).
-- DESIGN-GAPs (unchanged by this step): K17 (`PatternsTable` Kwota column), K18 (`patterns.astro` error branch),
-  G28 (`PatternsTable` header comment).
-- Carried risks: plan Known risks F7 (over-merge by `LEGAL_FORM` bare `SA` / `STORE_NUMBER` on real statements);
-  roadmap `### S-03` Risk line still promises a migration — the archive step should correct it.
+- Manual Progress rows: none left.
+- `DESIGN-GAP`s: G29 added (`PatternsTable` `field` / `control`); unchanged K17 (`PatternsTable` Kwota column), K18
+  (`patterns.astro` error branch), G28 (`PatternsTable` header comment).
+- Observations from `reviews/visual-review.md` (not fixed): `PageTitle` on 375 px squeezes the lead beside the button
+  (shared component, kit `.dash-title` does the same); `brak-wyników` has no message beyond „0 wzorców” (needs kit copy).
+- Follow-ups: `follow-ups/review-fixes.md` — F2 keyset paging in `loadPatterns` / `collectPages`, F3
+  `normalizeMerchant` cases, F5/F6/F7 tidy.
+- Carried risks: plan Known risks F7 (over-merge on real statements); roadmap `### S-03` Risk line still promises a
+  migration — archive step corrects it.
+- Local DB: a throwaway account `visual-patterns-<timestamp>@rytm.local` with the fixture import remains in local
+  Supabase (local only; gone on the next `npx supabase db reset`). `test@rytm.local` was not imported into.
 - S-04 / S-05 input: pattern identity = `merchantKey` (`src/lib/patterns/merchant.ts`).
 
 ## 6. Autonomous decisions
 
-- **Triage without AskUserQuestion** (contract rule 1): every finding decided in place, recorded in the report's
-  `Decision:` fields. Would change: a maintainer pausing the run to triage.
-- **F1 fixed in code (WARNING, cheap and local)**: empty page before `count` → `{ error }` in `collectPages`.
-  Rejected: full keyset rewrite now (changes the plan's pinned paging contract and tests; deferred as F2). Why: turns
-  a silent partial list — a FR-007 violation — into the page's existing error state for ~4 lines. Would change: the
-  maintainer preferring stale-but-complete reads over an error when an import is deleted mid-read.
-- **F2 deferred to follow-ups, not fixed**: no defect with PostgREST today, `data_volume: small`. Would change:
-  S-02 shipping first, or a `patterns read ended short of count` log appearing.
-- **F3–F8 recorded only (OBSERVATIONs)**. Would change: the contract requiring observations to be fixed.
-- **Ticked Progress 1.7** after reading `normalizeMerchant` against the plan's rule list (rules 1→7 in order, regex
-  verbatim, no unnamed rule). Would change: a human reviewer disagreeing that rule 6 is "justified by the fixture"
-  when it only changes the display name (F3).
-- **Did not re-verify 3.9 visually**; accepted implement's HTTP evidence, corroborated by the 2 green smoke steps.
-  Would change: the Visual step finding different fixture values.
-- **Fix commit uses the CRITICAL message** `fix(merchant-patterns): poprawki z przeglądu implementacji` for a WARNING
-  fix — the step rules name no other message. Would change: a message convention for warning fixes.
-- **Overall verdict APPROVED** (two dimensions WARNING, ≤ 2 warnings, one fixed). Would change: the contract counting
-  observations toward NEEDS ATTENTION.
-- **Next command written as prose, not a slash command**: no `/10x-visual` skill exists; the run's pipeline names the
-  step "Visual gate". Would change: a dedicated visual skill being added.
+- **Playwright instead of Claude-in-Chrome.** The Chrome tool demanded a human choice between two connected browsers
+  (contract forbids `AskUserQuestion`; picking one myself could act in the maintainer's live browser). Rejected:
+  selecting a browser unilaterally. Used the Playwright library from the `npx` cache with system Chrome
+  (`channel: "chrome"`, no browser download), which reached every authenticated state. Would change: one browser
+  connected, or the orchestrator naming a `deviceId`.
+- **Mobile at 375 px, not 400 px.** Plan row 3.8 names 375 px; headless allows it without the iframe trick. Would
+  change: the contract requiring 400 px frames.
+- **Visible focus fixed with the kit's `.field input:focus` pattern + gap G29**, not left as an observation. Why: WCAG
+  2.4.7 failure on the view's only controls; the pattern already exists in the kit and in `FormField`, so nothing is
+  invented. Rejected: leaving the kit's `outline:0` verbatim. Would change: the kit author delivering a different focus
+  state for toolbar fields.
+- **Native search clear button hidden** rather than switching to `type="text"`: keeps the `searchbox` role; the blue
+  cancel glyph is a non-token colour absent from the kit's plain input. Would change: the kit adding a clear control.
+- **`PageTitle` narrow lead on mobile not fixed**: shared across views; one-view scope. Would change: a restyle of the
+  shared header being in scope.
+- **Fix committed separately** as `fix(merchant-patterns): widoczny fokus pól paska wzorców`, docs as
+  `docs(merchant-patterns): bramka wizualna`. Would change: a single-commit convention for the visual step.
+- **`VISUAL: PASS`** (not GAPS): every named state captured; the remaining differences are pre-registered gaps
+  (G28, K17) scheduled for S-04–S-06. Would change: counting registered-but-unfilled gaps as open visual gaps.

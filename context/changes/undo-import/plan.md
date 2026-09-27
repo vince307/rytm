@@ -458,6 +458,6 @@ never `import_id`, so an import delete never orphans or cascades them.
 
 #### Manual
 
-- [ ] 2.9 [visual] Screenshots desktop 1440 px + mobile ~400 px: `default`, `dialog-open`, `success`, `error`, `not-found`, `empty-after-last-delete`, `trigger-focus`; pending code-reviewed only
-- [ ] 2.10 [visual] At ~400 px the dialog margins are no worse than G24 and the fifth column is reachable by scrolling inside the panel
+- [x] 2.9 [visual] Screenshots desktop 1440 px + mobile ~400 px: `default`, `dialog-open`, `success`, `error`, `not-found`, `empty-after-last-delete`, `trigger-focus`; pending code-reviewed only — visual gate (8013681)
+- [x] 2.10 [visual] At ~400 px the dialog margins are no worse than G24 and the fifth column is reachable by scrolling inside the panel — visual gate (8013681)
 - [x] 2.11 [reviewer] `copyExtra.imports` K19 strings match `prototype/app.js` byte for byte; only K20/G30 placeholders are new — impl-review (2058011)

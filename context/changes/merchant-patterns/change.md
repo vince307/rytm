@@ -1,9 +1,9 @@
 ---
 change_id: merchant-patterns
 title: Lista wykrytych wzorców sprzedawców (S-03)
-status: implemented
+status: impl_reviewed
 created: 2026-09-25
-updated: 2026-09-25
+updated: 2026-09-27
 archived_at: null
 ---
 

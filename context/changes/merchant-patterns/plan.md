@@ -476,7 +476,7 @@ Recorded by `/10x-plan-review` (`reviews/plan-review.md`, OBSERVATIONs F5–F7);
 
 #### Manual
 
-- [ ] 1.7 Reviewer reads `normalizeMerchant` against the rule list above and finds no rule the fixture does not justify or the plan does not name
+- [x] 1.7 Reviewer reads `normalizeMerchant` against the rule list above and finds no rule the fixture does not justify or the plan does not name
 
 ### Phase 2: Reading the user's patterns
 

@@ -938,12 +938,12 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 
 #### Automated
 
-- [ ] 3.1 `npm test` — Phase 2 count + 1 file; keyset `collectPages` and view cases green; F-02 fixture cases unchanged and green
-- [ ] 3.2 `npm run lint` 0; `npx astro check` 0 errors (file count recorded)
-- [ ] 3.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 3.4 `npx supabase db reset && npx supabase test db` — 76 (delta 0)
-- [ ] 3.5 `BASE_URL=http://localhost:4398 npm run smoke` — 61 PASS (delta 0)
-- [ ] 3.6 Deliberate break (offset arithmetic back in `collectPages`) → „deleted between pages” case FAILs; restored → green; meta-check recorded
+- [x] 3.1 `npm test` — Phase 2 count + 1 file; keyset `collectPages` and view cases green; F-02 fixture cases unchanged and green — 3e45b8c
+- [x] 3.2 `npm run lint` 0; `npx astro check` 0 errors (file count recorded) — 3e45b8c
+- [x] 3.3 `npm run fixture:check` OK; `npm run build` passes — 3e45b8c
+- [x] 3.4 `npx supabase db reset && npx supabase test db` — 76 (delta 0) — 3e45b8c
+- [x] 3.5 `BASE_URL=http://localhost:4398 npm run smoke` — 61 PASS (delta 0) — 3e45b8c
+- [x] 3.6 Deliberate break (offset arithmetic back in `collectPages`) → „deleted between pages” case FAILs; restored → green; meta-check recorded — 3e45b8c
 
 #### Manual
 

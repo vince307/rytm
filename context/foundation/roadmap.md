@@ -44,7 +44,7 @@ Pieniądze cicho uciekają z konta, a kategoryzacja banku nie odpowiada na pytan
 | F-01 | domain-schema-rls            | (foundation) pierwsza migracja: importy i transakcje z RLS per konto i kaskadą                              | —             | FR-002, FR-019, NFR izolacja           | done     |
 | F-02 | synthetic-ing-fixture        | (foundation) syntetyczny wyciąg ING z pułapkami jako fixture testów i seed demo                             | —             | FR-014, NFR prywatność                 | done     |
 | S-01 | ing-csv-import               | wgrać CSV z ING (jeden rachunek, obciążenia), zobaczyć wynik importu; nakładający się zakres jest odrzucony | F-01, F-02    | US-01, FR-003, FR-005, FR-002          | done     |
-| S-02 | undo-import                  | zobaczyć listę importów i cofnąć błędny import wraz z jego transakcjami                                     | S-01          | US-02, FR-004                          | planning |
+| S-02 | undo-import                  | zobaczyć listę importów i cofnąć błędny import wraz z jego transakcjami                                     | S-01          | US-02, FR-004                          | in-progress |
 | S-03 | merchant-patterns            | zobaczyć listę wzorców: sprzedawca, typ, liczba wystąpień, suma, kwota dla stałych                          | S-01, F-02    | US-01, FR-006, FR-007                  | done |
 | S-04 | pattern-threshold-over-limit | otworzyć wzorzec, zobaczyć jego transakcje, ustawić próg i zobaczyć „ponad próg” z sumą miesiąca            | S-03          | US-01, FR-008, FR-010, FR-011          | proposed |
 | S-05 | durable-pattern-decisions    | scalić, wykluczyć, zmienić typ i nazwę wzorca, a decyzje przetrwają kolejny import                          | S-03          | US-03, FR-009                          | proposed |
@@ -130,7 +130,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Zamyka US-02 zaraz po imporcie, zanim powstaną progi i decyzje; założenie PRD (decyzje i progi przypisane do sprzedawcy, nie do importu) zostaje sprawdzone dopiero w S-05.
-- **Status:** planning
+- **Status:** in-progress
 
 ### S-03: Lista wzorców sprzedawców
 

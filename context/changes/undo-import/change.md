@@ -1,7 +1,7 @@
 ---
 change_id: undo-import
 title: Cofnięcie błędnego importu
-status: plan_reviewed
+status: implemented
 created: 2026-09-25
 updated: 2026-09-27
 archived_at: null

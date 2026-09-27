@@ -447,14 +447,14 @@ never `import_id`, so an import delete never orphans or cascades them.
 
 #### Automated
 
-- [x] 2.1 `npm run lint` 0 errors; `npx astro check` 0 errors (Phase 1 files + 1, delta 0 errors)
-- [x] 2.2 `npm test` green (Phase 1 count, delta 0)
-- [x] 2.3 `npm run fixture:check` OK; `npm run build` passes
-- [x] 2.4 `npx supabase db reset && npx supabase test db` — 54, delta 0 from Phase 1
-- [x] 2.5 `BASE_URL=http://localhost:4398 npm run smoke` — Phase 1 (56) + 4 = 60 PASS
-- [x] 2.6 Deliberate break: status block removed from `imports/index.astro` → „imports shows the deletion above the empty list” and „imports shows the not-found line” FAIL; restored → PASS; meta-check recorded
-- [x] 2.7 No raw colors: `grep -rnE "#[0-9a-fA-F]{3,6}\b|\[#"` over `DeleteImportDialog.tsx`, `button.tsx`, `imports/index.astro` is empty
-- [x] 2.8 `DESIGN-GAP: K19` / `K20` / `G30` comments present in code and rows K19, K20, G30 in `design-kit.md`
+- [x] 2.1 `npm run lint` 0 errors; `npx astro check` 0 errors (Phase 1 files + 1, delta 0 errors) — 2b6ff9a
+- [x] 2.2 `npm test` green (Phase 1 count, delta 0) — 2b6ff9a
+- [x] 2.3 `npm run fixture:check` OK; `npm run build` passes — 2b6ff9a
+- [x] 2.4 `npx supabase db reset && npx supabase test db` — 54, delta 0 from Phase 1 — 2b6ff9a
+- [x] 2.5 `BASE_URL=http://localhost:4398 npm run smoke` — Phase 1 (56) + 4 = 60 PASS — 2b6ff9a
+- [x] 2.6 Deliberate break: status block removed from `imports/index.astro` → „imports shows the deletion above the empty list” and „imports shows the not-found line” FAIL; restored → PASS; meta-check recorded — 2b6ff9a
+- [x] 2.7 No raw colors: `grep -rnE "#[0-9a-fA-F]{3,6}\b|\[#"` over `DeleteImportDialog.tsx`, `button.tsx`, `imports/index.astro` is empty — 2b6ff9a
+- [x] 2.8 `DESIGN-GAP: K19` / `K20` / `G30` comments present in code and rows K19, K20, G30 in `design-kit.md` — 2b6ff9a
 
 #### Manual
 

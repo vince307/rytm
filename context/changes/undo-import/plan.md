@@ -428,15 +428,15 @@ never `import_id`, so an import delete never orphans or cascades them.
 
 #### Automated
 
-- [x] 1.1 `npm test` — baseline 72/72 (4 files) + 1 file, all new cases green, delta 0 failures
-- [x] 1.2 `npm run lint` 0 errors (baseline 0, delta 0); `npx astro check` 0 errors (baseline 0 / 89 files, delta 0 errors; record the file count — expected +3: helper, endpoint, unit test, since `tsconfig.json` includes `**/*`)
-- [x] 1.3 `npm run fixture:check` OK and `npm run build` passes
-- [x] 1.4 `npx supabase db reset && npx supabase test db` — pgTAP baseline 44 + 10 = 54, all pass
-- [x] 1.5 `BASE_URL=http://localhost:4398 npm run smoke` — baseline 48 + 8 = 56 PASS
-- [x] 1.6 Deliberate break (endpoint): drop `.select("id")`, redirect `deleted=1` when `error` is null → smoke „import delete of an unknown id is not found” and unit `[] → missing` FAIL; restored → green; meta-check recorded
-- [x] 1.7 Deliberate break (cascade, scratch pgTAP edit): FK replaced with `on delete restrict` → assertion 1/2 red; restored → green; meta-check recorded
-- [x] 1.8 Deliberate break (smoke runner): step „patterns drop the deleted import” with `notContains` „Wzorce” → FAIL; restored → PASS
-- [x] 1.9 `git diff --stat main -- supabase/migrations` is empty (no migration)
+- [x] 1.1 `npm test` — baseline 72/72 (4 files) + 1 file, all new cases green, delta 0 failures — 06bd1e1
+- [x] 1.2 `npm run lint` 0 errors (baseline 0, delta 0); `npx astro check` 0 errors (baseline 0 / 89 files, delta 0 errors; record the file count — expected +3: helper, endpoint, unit test, since `tsconfig.json` includes `**/*`) — 06bd1e1
+- [x] 1.3 `npm run fixture:check` OK and `npm run build` passes — 06bd1e1
+- [x] 1.4 `npx supabase db reset && npx supabase test db` — pgTAP baseline 44 + 10 = 54, all pass — 06bd1e1
+- [x] 1.5 `BASE_URL=http://localhost:4398 npm run smoke` — baseline 48 + 8 = 56 PASS — 06bd1e1
+- [x] 1.6 Deliberate break (endpoint): drop `.select("id")`, redirect `deleted=1` when `error` is null → smoke „import delete of an unknown id is not found” and unit `[] → missing` FAIL; restored → green; meta-check recorded — 06bd1e1
+- [x] 1.7 Deliberate break (cascade, scratch pgTAP edit): FK replaced with `on delete restrict` → assertion 1/2 red; restored → green; meta-check recorded — 06bd1e1
+- [x] 1.8 Deliberate break (smoke runner): step „patterns drop the deleted import” with `notContains` „Wzorce” → FAIL; restored → PASS — 06bd1e1
+- [x] 1.9 `git diff --stat main -- supabase/migrations` is empty (no migration) — 06bd1e1
 
 #### Manual
 
@@ -447,14 +447,14 @@ never `import_id`, so an import delete never orphans or cascades them.
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` 0 errors; `npx astro check` 0 errors (Phase 1 files + 1, delta 0 errors)
-- [ ] 2.2 `npm test` green (Phase 1 count, delta 0)
-- [ ] 2.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 2.4 `npx supabase db reset && npx supabase test db` — 54, delta 0 from Phase 1
-- [ ] 2.5 `BASE_URL=http://localhost:4398 npm run smoke` — Phase 1 (56) + 4 = 60 PASS
-- [ ] 2.6 Deliberate break: status block removed from `imports/index.astro` → „imports shows the deletion above the empty list” and „imports shows the not-found line” FAIL; restored → PASS; meta-check recorded
-- [ ] 2.7 No raw colors: `grep -rnE "#[0-9a-fA-F]{3,6}\b|\[#"` over `DeleteImportDialog.tsx`, `button.tsx`, `imports/index.astro` is empty
-- [ ] 2.8 `DESIGN-GAP: K19` / `K20` / `G30` comments present in code and rows K19, K20, G30 in `design-kit.md`
+- [x] 2.1 `npm run lint` 0 errors; `npx astro check` 0 errors (Phase 1 files + 1, delta 0 errors)
+- [x] 2.2 `npm test` green (Phase 1 count, delta 0)
+- [x] 2.3 `npm run fixture:check` OK; `npm run build` passes
+- [x] 2.4 `npx supabase db reset && npx supabase test db` — 54, delta 0 from Phase 1
+- [x] 2.5 `BASE_URL=http://localhost:4398 npm run smoke` — Phase 1 (56) + 4 = 60 PASS
+- [x] 2.6 Deliberate break: status block removed from `imports/index.astro` → „imports shows the deletion above the empty list” and „imports shows the not-found line” FAIL; restored → PASS; meta-check recorded
+- [x] 2.7 No raw colors: `grep -rnE "#[0-9a-fA-F]{3,6}\b|\[#"` over `DeleteImportDialog.tsx`, `button.tsx`, `imports/index.astro` is empty
+- [x] 2.8 `DESIGN-GAP: K19` / `K20` / `G30` comments present in code and rows K19, K20, G30 in `design-kit.md`
 
 #### Manual
 

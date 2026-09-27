@@ -160,6 +160,11 @@ const steps = [
     { status: 302, location: "/imports?error=missing" },
   ],
   [
+    "imports shows the not-found line",
+    () => request("/imports?error=missing"),
+    { status: 200, contains: "Nie znaleziono tego importu" },
+  ],
+  [
     "import is deleted",
     () =>
       request("/api/imports/delete", {
@@ -167,6 +172,16 @@ const steps = [
         form: { id: new URLSearchParams(importResultPath.split("?")[1]).get("id") },
       }),
     { status: 302, location: "/imports?deleted=1" },
+  ],
+  [
+    "imports shows the deletion above the empty list",
+    () => request("/imports?deleted=1"),
+    { status: 200, contains: "Import usunięty." },
+  ],
+  [
+    "imports is empty after the last delete",
+    () => request("/imports"),
+    { status: 200, contains: "Nie masz jeszcze żadnego importu.", notContains: "Konto smoke" },
   ],
   [
     "patterns drop the deleted import",
@@ -188,6 +203,7 @@ const steps = [
     { status: 302, location: "/imports/result?id=" },
   ],
   ["patterns list the re-imported merchant", () => request("/patterns"), { status: 200, contains: "Kawiarnia smoke" }],
+  ["imports lists the delete action", () => request("/imports"), { status: 200, contains: ">Usuń import<" }],
   [
     "password change rejects wrong current password",
     () =>

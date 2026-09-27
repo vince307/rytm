@@ -1,19 +1,20 @@
 # Handoff — `undo-import` (slice S-02)
 
-Written by the `/10x-new` **refresh** step (2026-09-27), after S-03 `merchant-patterns` merged into `feat/undo-import`.
-`change.md` (status `new`) re-verifies every S-02 roadmap claim against the repo now. The next agent must not get this
-wrong: **the import list already ships (S-01), the DB already cascades import → transactions under RLS, and since S-03
-`/patterns` derives patterns and sums from `transactions` on read — so "wzorce i sumy nie zawierają jego transakcji" is
-now a required observable proof (smoke), not something satisfied by construction.**
+Written by the `/10x-research` step (2026-09-27). `research.md` answers the S-02 questions with source + live-DB evidence;
+`change.md` moved `new` → `preparing`. The next agent must not get this wrong: **no migration is needed** — the live local DB
+already has `imports: authenticated delete own` and the single cascade FK `transactions_import_account_fkey`, and an
+own delete followed by a re-import of the same range/`bank_tx_id`s was observed to work; an RLS-filtered delete of a
+foreign/missing id returns **0 rows and no error**, so the endpoint must use a returning `.select()` (or count) to
+tell "deleted" from "not found".
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
-| Branch | `feat/undo-import`, cut from `main` at `d11f3ef`; current `main` (`4425f8c`, S-03) merged in as `9eb6dd6` by the orchestrator |
-| Commits | this step adds 1: `docs(undo-import): odświeżenie tożsamości zmiany po S-03` on top of `9eb6dd6` |
+| Branch | `feat/undo-import`, cut from `main` at `d11f3ef`; `main` `4425f8c` (S-03) merged in as `9eb6dd6` |
+| Commits | this step adds 1: `docs(undo-import): research` on top of `7c82bf2` |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `new` (`updated: 2026-09-27`) |
+| `change.md` status | `preparing` (`updated: 2026-09-27`, via `metadata-guard.mjs mark-researched`) |
 | `## Progress` rows remaining | n/a — no `plan.md` yet |
 | Working tree | clean apart from the maintainer's ` M .gitignore` and `?? .claude/skills/10x-autonomous-run/` (never staged) |
 
@@ -21,7 +22,8 @@ now a required observable proof (smoke), not something satisfied by construction
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/undo-import/change.md` | Refreshed identity: claims table re-checked at `9eb6dd6`, design-kit binding (+ `/patterns` empty view), expected DESIGN-GAPs (gap 3 dropped), `## Autonomous decisions` 1–12 (6 superseded by 9) |
+| `context/changes/undo-import/research.md` | Research: endpoint/page patterns, RLS+cascade in migrations and live DB (probe), pgTAP/smoke structure and slot, `/patterns` derivation, kit dialog/toast/danger patterns, shared components, 5 DESIGN-GAP candidates, endpoint and feedback options |
+| `context/changes/undo-import/change.md` | Frontmatter only: `status: preparing` |
 | `context/changes/undo-import/handoff.md` | This file |
 
 ## 3. Verification
@@ -29,31 +31,32 @@ now a required observable proof (smoke), not something satisfied by construction
 | Command | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/undo-import` (observed before writing) |
-| `git diff --stat d11f3ef..HEAD -- src supabase scripts design test` | S-03 touched `src/lib/patterns/*`, `src/pages/patterns.astro`, `src/components/{Glyph,app/Badge,patterns/PatternsTable,imports/ImportWizard}.tsx`, `copy.ts`, `format.ts`, `types.ts`, `scripts/smoke.mjs`, `test/unit/*`; **no `supabase/` and no `design/` change** |
-| `ls supabase/migrations` | 4 migrations, same as at `d11f3ef` — no pattern table |
-| Repo facts in `change.md` | observed by reading: `src/lib/patterns/load.ts` (`loadPatterns`, `collectPages`), `src/pages/patterns.astro`, `src/pages/imports/{index,result}.astro`, `src/pages/api/imports.ts` (only `POST`), `supabase/tests/database/*.sql` (no own-delete cascade test), `scripts/smoke.mjs` (patterns steps), `src/content/copy.ts` `copyExtra.imports` (no delete keys), `design-kit.md` new rows K17/K18/G28/G29, `prototype/app.js` `modal('deleteImport')` (unchanged) |
-| lint / astro check / vitest / build / pgTAP / smoke | **not run** — docs-only step, no code touched. Run-start baseline inherited, unverified here: lint 0 · astro check 0 · vitest 32/32 (pre-S-03; S-03 added `test/unit/patterns.test.ts`, so research/plan must re-measure) · pgTAP 44 · smoke 46 (pre-S-03; S-03 added 2 steps) |
+| `npm test` | 72/72 passed, 4 files (baseline after S-03: 72 — delta 0) |
+| live DB catalog (`docker exec supabase_db_rytm psql`: `pg_policies`, `pg_constraint`, grants, `schema_migrations`) | 6 policies incl. both `… delete own`; `authenticated` has DELETE/INSERT/SELECT; one FK into `imports` (`transactions_import_account_fkey`, `confdeltype=c`); 4 migrations applied |
+| live DB probe in `BEGIN … ROLLBACK` | stranger delete 0 rows; owner delete 1 import → 0 of 206 transactions visible; `import_ing_statement` same range + same rows → 206 again; after rollback 1 import / 206 tx (unchanged) |
+| `grep plan( supabase/tests/database/*.sql` | 28 + 16 = 44 (static; `supabase test db` not run) |
+| `scripts/smoke.mjs` `steps` | 48 entries (static count; smoke not run) |
+| lint / astro check / build / pgTAP run / smoke run | **not run** — research step, no code touched; baseline after S-03 inherited, unverified here: lint 0 · astro check 0 (89 files) · pgTAP 44 · smoke 48 |
 
-No deliberate break — nothing executable was changed.
+No deliberate break — nothing executable was changed. The probe is itself the evidence that the cascade frees range and `bank_tx_id`s (meta-check: it ran as `authenticated` with RLS on, so it proves the policy path the app will use, not superuser behaviour).
 
 ## 4. Next command
 
-`/10x-research undo-import`
+`/10x-plan undo-import`
 
 ## 5. Open
 
-- **Expected DESIGN-GAPs** (see `change.md` → "Design-kit binding"; rows go to `context/foundation/design-kit.md` in plan/implement): delete/dialog/toast copy only in `prototype/app.js` `modal('deleteImport')`; dialog h2 hardcodes „z maja” (range placeholder, precedent K16 / `formatRangeLong`); no delete-failure / pending state; no toast in `src/components/`. The "przeliczone" body copy is **no longer a gap** (true after S-03).
-- **Proofs missing today**: pgTAP own import delete → transactions gone → same range and `bank_tx_id`s re-insertable via `import_ing_statement`; smoke in `scripts/smoke.mjs`: import → delete → `/patterns` without „Kawiarnia smoke” (empty view) → re-import 302 → merchant back.
-- **Concurrency note for research**: `collectPages` in `src/lib/patterns/load.ts` already turns an import deleted mid-read into an error state; confirm nothing else pages `transactions`.
-- **Invariant for S-04/S-05**: persisted pattern decisions/thresholds key on `merchantKey` + `user_id`, never `import_id`; patterns stay derived.
+- **Plan choices** (research recommends, does not decide): endpoint `POST` in new `src/pages/api/imports/delete.ts` (form field `id`, `z.uuid()`, copy `src/pages/api/auth/delete.ts` `POST` + `src/pages/api/imports.ts` `POST` guard/logging) vs `DELETE` verb (unreachable from a native form/smoke); feedback via redirect `/imports?deleted=1` / `?error=delete` + `InlineAlert` (precedent `src/pages/settings.astro`, `src/pages/login.astro` `deleted`) vs a new shared Toast (none exists in `src/components`).
+- **DESIGN-GAP candidates** (rows after K18/G29 in `context/foundation/design-kit.md`): (1) dialog/action copy only in `prototype/app.js` `modal('deleteImport')` → `copyExtra.imports`; (2) h2 „Usunąć import z maja?” hardcoded month → range placeholder (K16/`formatRangeLong` precedent); (3) **new**: toast text „Import usunięty w prototypie.” is prototype narration, not shippable; (4) no delete-failure copy / pending state; (5) no toast component.
+- **Proofs to add**: pgTAP own delete → cascade → re-import (extend `supabase/tests/database/import_rpc.test.sql` or new file); smoke after step „import with an invalid payload is rejected”: delete (id from `importResultPath`) → `/patterns` contains „Wzorce pojawią się po pierwszym imporcie.” and not „Kawiarnia smoke” (runner has no negative-contains — extend `steps` expectation shape) → re-post `importPayload` 302 → merchant back.
+- `DeleteAccountDialog` uses `SubmitButton` without `pending`; `useFormStatus` stays false on a native POST — a new dialog wanting a pending state must pass `pending` itself.
+- Invariant for S-04/S-05: persisted pattern decisions/thresholds key on `merchantKey` + `user_id`, never `import_id`.
 - Roadmap `### S-02` **Status** still `proposed` — archive step owns it.
-- Test-count baselines (vitest, smoke) moved with S-03; re-measure on this branch.
 
 ## 6. Autonomous decisions
 
-1. **Refreshed `change.md` in place instead of rerunning `/10x-new` creation.** Rejected: re-creating the folder (skill would refuse/overwrite). Why: the step is a refresh and decisions 1–8 must stay auditable. What would change it: the orchestrator requesting a fresh identity file.
-2. **"Wzorce i sumy" half moved from "by construction" to an observable smoke proof** (change.md decision 9, supersedes 6). Rejected: pgTAP-only or new unit test. Why: `/patterns` derives from `transactions` on read; the delete path does not touch `derivePatterns`. What would change it: patterns becoming materialised in a table.
-3. **Dropped expected gap 3** (body copy promising recalculation). Why: now true after S-03. What would change it: S-04/S-05 persisted per-pattern state that a delete would not recalculate.
-4. **Did not STOP for a human** after writing `change.md`; continued to handoff + commit. Why: agent contract forbids a human in the loop. What would change it: an interactive run.
-5. **Left endpoint shape and toast-vs-`InlineAlert` open** for research. Why: S-03 set no precedent. What would change it: a shared toast or `DELETE` route landing on `main` first.
-6. **Next step `/10x-research`, not `/10x-plan`.** Why: the open choices above plus re-measured baselines. What would change it: the orchestrator skipping research when scope is settled.
+1. **Research question derived from `change.md` + orchestrator's coverage list**, no interview. Rejected: STOP for scope. Why: contract forbids a human. What would change it: an interactive run.
+2. **Live-DB probe inside a rolled-back transaction**, not `supabase db reset` + `test db`. Why: answers "does re-import work" without wiping local data. What would change it: orchestrator requiring a clean-DB pgTAP run at research time.
+3. **Recommendations left as options for `/10x-plan`** (POST form endpoint, InlineAlert feedback). Why: research does not approve design. What would change it: a shared Toast or DELETE-route precedent landing on `main`.
+4. **Toast text „w prototypie” registered as a gap**, not reused verbatim. Why: prototype narration. What would change it: kit author confirming the string.
+5. **Ran `npm test` only** among the gate suites. Why: cheap and it re-measures the moved vitest baseline the previous handoff flagged; other suites unaffected by a docs step. What would change it: code changes in this step.

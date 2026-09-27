@@ -440,8 +440,8 @@ never `import_id`, so an import delete never orphans or cascades them.
 
 #### Manual
 
-- [ ] 1.10 [reviewer] `src/pages/api/imports/delete.ts` guard/parse/log mirror `src/pages/api/auth/delete.ts`; no path deletes without the returning select
-- [ ] 1.11 [reviewer] pgTAP assertions 6/8 read as RLS proofs and 1–5 as the owner cascade proof; handoff records which break proved which
+- [x] 1.10 [reviewer] `src/pages/api/imports/delete.ts` guard/parse/log mirror `src/pages/api/auth/delete.ts`; no path deletes without the returning select — impl-review (2058011)
+- [x] 1.11 [reviewer] pgTAP assertions 6/8 read as RLS proofs and 1–5 as the owner cascade proof; handoff records which break proved which — impl-review (2058011)
 
 ### Phase 2: `/imports` delete action bound to the kit
 
@@ -460,4 +460,4 @@ never `import_id`, so an import delete never orphans or cascades them.
 
 - [ ] 2.9 [visual] Screenshots desktop 1440 px + mobile ~400 px: `default`, `dialog-open`, `success`, `error`, `not-found`, `empty-after-last-delete`, `trigger-focus`; pending code-reviewed only
 - [ ] 2.10 [visual] At ~400 px the dialog margins are no worse than G24 and the fifth column is reachable by scrolling inside the panel
-- [ ] 2.11 [reviewer] `copyExtra.imports` K19 strings match `prototype/app.js` byte for byte; only K20/G30 placeholders are new
+- [x] 2.11 [reviewer] `copyExtra.imports` K19 strings match `prototype/app.js` byte for byte; only K20/G30 placeholders are new — impl-review (2058011)

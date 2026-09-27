@@ -1,29 +1,30 @@
 # Handoff — `undo-import` (slice S-02)
 
-Written by the `/10x-research` step (2026-09-27). `research.md` answers the S-02 questions with source + live-DB evidence;
-`change.md` moved `new` → `preparing`. The next agent must not get this wrong: **no migration is needed** — the live local DB
-already has `imports: authenticated delete own` and the single cascade FK `transactions_import_account_fkey`, and an
-own delete followed by a re-import of the same range/`bank_tx_id`s was observed to work; an RLS-filtered delete of a
-foreign/missing id returns **0 rows and no error**, so the endpoint must use a returning `.select()` (or count) to
-tell "deleted" from "not found".
+Written by the `/10x-plan` step (2026-09-27). `plan.md` (2 code phases, 22 Progress rows) and `plan-brief.md` are on
+disk; `change.md` moved `preparing` → `planned`, roadmap S-02 → `planning`. The next agent must not get this wrong:
+**the endpoint must read the deleted row back** (`.delete().eq("id", id).select("id")`) — an RLS-filtered delete of
+a foreign/missing id returns 0 rows and no error, so an `error`-only check would report success; and **no
+migration** belongs to this slice.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/undo-import`, cut from `main` at `d11f3ef`; `main` `4425f8c` (S-03) merged in as `9eb6dd6` |
-| Commits | this step adds 1: `docs(undo-import): research` on top of `7c82bf2` |
+| Commits | this step adds 1: `docs(undo-import): plan` on top of `48ddcb5` (`docs(undo-import): research`) |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `preparing` (`updated: 2026-09-27`, via `metadata-guard.mjs mark-researched`) |
-| `## Progress` rows remaining | n/a — no `plan.md` yet |
+| `change.md` status | `planned` (`updated: 2026-09-27`, via `metadata-guard.mjs mark-planned`) |
+| `## Progress` rows remaining | 22 (`grep -c '^- \[ \]' plan.md`): Phase 1 — 9 automated + 2 `[reviewer]`; Phase 2 — 8 automated + 2 `[visual]` + 1 `[reviewer]` |
 | Working tree | clean apart from the maintainer's ` M .gitignore` and `?? .claude/skills/10x-autonomous-run/` (never staged) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/undo-import/research.md` | Research: endpoint/page patterns, RLS+cascade in migrations and live DB (probe), pgTAP/smoke structure and slot, `/patterns` derivation, kit dialog/toast/danger patterns, shared components, 5 DESIGN-GAP candidates, endpoint and feedback options |
-| `context/changes/undo-import/change.md` | Frontmatter only: `status: preparing` |
+| `context/changes/undo-import/plan.md` | Full plan: 2 phases, `## Autonomous decisions` (13), `## Progress` |
+| `context/changes/undo-import/plan-brief.md` | Two-page brief with the key-decision table |
+| `context/changes/undo-import/change.md` | Frontmatter `status: planned` |
+| `context/foundation/roadmap.md` | S-02 `Status` → `planning` (at-a-glance row + `### S-02` body) |
 | `context/changes/undo-import/handoff.md` | This file |
 
 ## 3. Verification
@@ -31,32 +32,37 @@ tell "deleted" from "not found".
 | Command | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/undo-import` (observed before writing) |
-| `npm test` | 72/72 passed, 4 files (baseline after S-03: 72 — delta 0) |
-| live DB catalog (`docker exec supabase_db_rytm psql`: `pg_policies`, `pg_constraint`, grants, `schema_migrations`) | 6 policies incl. both `… delete own`; `authenticated` has DELETE/INSERT/SELECT; one FK into `imports` (`transactions_import_account_fkey`, `confdeltype=c`); 4 migrations applied |
-| live DB probe in `BEGIN … ROLLBACK` | stranger delete 0 rows; owner delete 1 import → 0 of 206 transactions visible; `import_ing_statement` same range + same rows → 206 again; after rollback 1 import / 206 tx (unchanged) |
-| `grep plan( supabase/tests/database/*.sql` | 28 + 16 = 44 (static; `supabase test db` not run) |
-| `scripts/smoke.mjs` `steps` | 48 entries (static count; smoke not run) |
-| lint / astro check / build / pgTAP run / smoke run | **not run** — research step, no code touched; baseline after S-03 inherited, unverified here: lint 0 · astro check 0 (89 files) · pgTAP 44 · smoke 48 |
+| `metadata-guard.mjs inspect` / `mark-planned` | change.md hash matched; `{"changed":true}`, status `planned` |
+| `grep -c '^## Progress' plan.md` / `grep -c '^- \[ \]' plan.md` | 1 / 22; each phase's Success Criteria bullets map 1:1 to its Progress rows (checked by count: P1 9+2, P2 8+3) |
+| Kit strings the plan binds to | grep: „Wzorce pojawią się po pierwszym imporcie.”, „Nie masz jeszcze żadnego importu.” are `content.json` titles; dialog/toast strings only in `prototype/app.js` `modal` / `showToast` |
+| lint / astro check / vitest / build / pgTAP / smoke | **not run** — docs step, no code touched. Baseline for implement (inherited from the contract, unverified here): lint 0 · astro check 0 errors (89 files) · vitest 72/72 (4 files) · pgTAP 44 · smoke 48 |
 
-No deliberate break — nothing executable was changed. The probe is itself the evidence that the cascade frees range and `bank_tx_id`s (meta-check: it ran as `authenticated` with RLS on, so it proves the policy path the app will use, not superuser behaviour).
+No deliberate break — nothing executable changed. The plan names three breaks for Phase 1 (endpoint returning-select,
+cascade FK, smoke `notContains`) and one for Phase 2 (status block), each with its meta-check.
 
 ## 4. Next command
 
-`/10x-plan undo-import`
+`/10x-plan-review undo-import`
 
 ## 5. Open
 
-- **Plan choices** (research recommends, does not decide): endpoint `POST` in new `src/pages/api/imports/delete.ts` (form field `id`, `z.uuid()`, copy `src/pages/api/auth/delete.ts` `POST` + `src/pages/api/imports.ts` `POST` guard/logging) vs `DELETE` verb (unreachable from a native form/smoke); feedback via redirect `/imports?deleted=1` / `?error=delete` + `InlineAlert` (precedent `src/pages/settings.astro`, `src/pages/login.astro` `deleted`) vs a new shared Toast (none exists in `src/components`).
-- **DESIGN-GAP candidates** (rows after K18/G29 in `context/foundation/design-kit.md`): (1) dialog/action copy only in `prototype/app.js` `modal('deleteImport')` → `copyExtra.imports`; (2) h2 „Usunąć import z maja?” hardcoded month → range placeholder (K16/`formatRangeLong` precedent); (3) **new**: toast text „Import usunięty w prototypie.” is prototype narration, not shippable; (4) no delete-failure copy / pending state; (5) no toast component.
-- **Proofs to add**: pgTAP own delete → cascade → re-import (extend `supabase/tests/database/import_rpc.test.sql` or new file); smoke after step „import with an invalid payload is rejected”: delete (id from `importResultPath`) → `/patterns` contains „Wzorce pojawią się po pierwszym imporcie.” and not „Kawiarnia smoke” (runner has no negative-contains — extend `steps` expectation shape) → re-post `importPayload` 302 → merchant back.
-- `DeleteAccountDialog` uses `SubmitButton` without `pending`; `useFormStatus` stays false on a native POST — a new dialog wanting a pending state must pass `pending` itself.
+- **Manual-only Progress rows** (human/reviewer checklist):
+  - 1.10 `[reviewer]` `src/pages/api/imports/delete.ts` `POST` mirrors `src/pages/api/auth/delete.ts` `POST`; no delete without the returning select.
+  - 1.11 `[reviewer]` pgTAP `import_delete.test.sql` assertions 6/8 = RLS proofs, 1–5 = owner cascade proof.
+  - 2.9 `[visual]` screenshots desktop 1440 + ~400 px: `default`, `dialog-open`, `success`, `error`, `not-found`, `empty-after-last-delete`, `trigger-focus` (pending code-reviewed only).
+  - 2.10 `[visual]` dialog margins at ~400 px vs G24; fifth column reachable by in-panel scroll.
+  - 2.11 `[reviewer]` `copyExtra.imports` K19 strings byte-equal to `prototype/app.js` `modal('deleteImport')` / `imports()`.
+- **DESIGN-GAPs planned (added in Phase 2, not yet in `context/foundation/design-kit.md`)**: K19 (delete action + dialog copy only in `app.js`, h2 month → `{range}`), K20 (toast „w prototypie” → „Import usunięty.”), G30 (result/pending states via `InlineAlert`, no Toast, placeholder error / not-found / pending copy).
+- **Carried risk**: S-03 follow-up F2 (keyset paging in `src/lib/patterns/load.ts` `collectPages`) names S-02 as trigger; plan defers it (decision 11) — a mid-read delete ends in the `/patterns` error state.
+- **Visual account**: never import into `test@rytm.local` (smoke „patterns renders empty view” needs it empty); use a fresh local signup.
 - Invariant for S-04/S-05: persisted pattern decisions/thresholds key on `merchantKey` + `user_id`, never `import_id`.
-- Roadmap `### S-02` **Status** still `proposed` — archive step owns it.
+- No `db push` needed at ship (no migration).
 
 ## 6. Autonomous decisions
 
-1. **Research question derived from `change.md` + orchestrator's coverage list**, no interview. Rejected: STOP for scope. Why: contract forbids a human. What would change it: an interactive run.
-2. **Live-DB probe inside a rolled-back transaction**, not `supabase db reset` + `test db`. Why: answers "does re-import work" without wiping local data. What would change it: orchestrator requiring a clean-DB pgTAP run at research time.
-3. **Recommendations left as options for `/10x-plan`** (POST form endpoint, InlineAlert feedback). Why: research does not approve design. What would change it: a shared Toast or DELETE-route precedent landing on `main`.
-4. **Toast text „w prototypie” registered as a gap**, not reused verbatim. Why: prototype narration. What would change it: kit author confirming the string.
-5. **Ran `npm test` only** among the gate suites. Why: cheap and it re-measures the moved vitest baseline the previous handoff flagged; other suites unaffected by a docs step. What would change it: code changes in this step.
+1. **No interview, no complexity/phase confirmation** (the skill's `AskUserQuestion` gates). Chose: decide from research + kit + repo precedents; all 13 plan decisions recorded in `plan.md` `## Autonomous decisions`. Why: contract forbids a human. What would change it: an interactive run.
+2. **Endpoint `POST /api/imports/delete` + `InlineAlert` feedback** (plan decisions 1–3). Rejected: `DELETE` verb, RPC, new Toast. Why: native form + smoke runner + `/settings` precedent. What would change it: a shared Toast or fetch-based client pattern on `main`.
+3. **Placeholder copy** „Usunąć import {range}?”, „Import usunięty.”, error/not-found/pending lines (plan decisions 4–6), each under K19/K20/G30. What would change it: kit round 3 copy.
+4. **Gap rows and copy keys land with Phase 2 code** (plan decision 13), not in this docs commit. Why: register must not point at non-existent code. What would change it: orchestrator requiring gaps at plan time.
+5. **Roadmap synced to `planning` and committed with the plan** (the skill leaves it for implement's first commit). Why: the run commits every docs step; forward-only change. What would change it: the archive step owning all roadmap edits.
+6. **Wrote `plan-brief.md`** alongside `plan.md` (skill Step 4.5), though the run step named only `plan.md`. Why: skill output contract; plan-review may read it. What would change it: the orchestrator forbidding extra artifacts.

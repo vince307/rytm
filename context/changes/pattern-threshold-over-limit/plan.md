@@ -971,14 +971,14 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 
 #### Automated
 
-- [ ] 5.1 `npm run lint` 0; `npx astro check` 0 errors (file count recorded)
-- [ ] 5.2 `npm test` — Phase 4 count, delta 0 failures
-- [ ] 5.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 5.4 `npx supabase db reset && npx supabase test db` — 76 (delta 0)
-- [ ] 5.5 `BASE_URL=http://localhost:4398 npm run smoke` — 65 + 9 = 74 PASS
-- [ ] 5.6 Deliberate break (`Number()` instead of `parseThresholdValue`) → „threshold with a zero value is rejected” FAILs; restored → PASS; meta-check recorded
-- [ ] 5.7 Deliberate break (detail passes `threshold: null`) → over mark / over sum steps FAIL, saved line PASSes; restored → PASS; meta-check recorded
-- [ ] 5.8 No raw colours in `ThresholdEditor.tsx` / changed page; `DESIGN-GAP` comments for the new keys
+- [x] 5.1 `npm run lint` 0; `npx astro check` 0 errors (file count recorded) — 109 files (Phase 4 106 + 3: `threshold.ts`, `threshold/delete.ts`, `ThresholdEditor.tsx`)
+- [x] 5.2 `npm test` — Phase 4 count, delta 0 failures — 141/141, 8 files (delta 0)
+- [x] 5.3 `npm run fixture:check` OK; `npm run build` passes
+- [x] 5.4 `npx supabase db reset && npx supabase test db` — 76 (delta 0)
+- [x] 5.5 `BASE_URL=http://localhost:4398 npm run smoke` — 65 + 9 = 74 PASS
+- [x] 5.6 Deliberate break (`Number()` instead of `parseThresholdValue`) → „threshold with a zero value is rejected” FAILs; restored → PASS; meta-check recorded
+- [x] 5.7 Deliberate break (detail passes `threshold: null`) → over mark / over sum steps FAIL, saved line PASSes; restored → PASS; meta-check recorded
+- [x] 5.8 No raw colours in `ThresholdEditor.tsx` / changed page; `DESIGN-GAP` comments for the new keys
 
 #### Manual
 

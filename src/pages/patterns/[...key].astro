@@ -10,6 +10,7 @@ import Panel from "@/components/app/Panel.astro";
 import SequenceMark from "@/components/app/SequenceMark.astro";
 import { Badge } from "@/components/app/Badge";
 import { MonthSelect } from "@/components/patterns/MonthSelect";
+import { ThresholdEditor, type ThresholdEditorCopy } from "@/components/patterns/ThresholdEditor";
 import { copy, copyExtra } from "@/content/copy";
 import { formatIsoDate, formatMoney, formatMonthShort, plural } from "@/lib/format";
 import { loadPatterns } from "@/lib/patterns/load";
@@ -86,6 +87,32 @@ const sequenceSummary = detail
       .replace("{occurrences}", plural(detail.count, x.occurrenceForms))
       .replace("{over}", String(overCount))
   : "";
+
+const editorCopy: ThresholdEditorCopy = {
+  acceptedAmount: copy.threshold.acceptedAmount,
+  countPerMonth: copy.threshold.countPerMonth,
+  sumPerMonth: copy.threshold.sumPerMonth,
+  valueLabel: x.valueLabel,
+  suffix: x.suffix,
+  empty: copy.threshold.empty,
+  active: copy.threshold.active,
+  setThreshold: x.setThreshold,
+  save: copy.threshold.save,
+  remove: copy.threshold.remove,
+  saving: copyExtra.auth.saving,
+};
+
+// Result lines above the editor (S-04 decision 15: redirect + InlineAlert, no Toast component).
+const params = Astro.url.searchParams;
+const resultAlert = params.get("saved")
+  ? { kind: "success" as const, message: copy.components.success }
+  : params.get("removed")
+    ? { kind: "success" as const, message: x.thresholdRemoved }
+    : params.get("error") === "value"
+      ? { kind: "error" as const, message: x.thresholdInvalid }
+      : params.get("error") === "save"
+        ? { kind: "error" as const, message: x.thresholdSaveError }
+        : null;
 ---
 
 <AppLayout title={pattern ? pattern.name : copy.patterns.title} active="patterns">
@@ -127,10 +154,19 @@ const sequenceSummary = detail
             <h2 class="m-0 text-[17px] tracking-[-0.03em]">{x.thresholdPanel}</h2>
             <span class="text-xs text-muted">{detail.threshold ? x.thresholdActive : x.thresholdNone}</span>
           </div>
-          {/* Phase 5 replaces this note with the threshold editor. */}
-          <p class="text-[13px] leading-[1.55] text-muted">
-            {detail.threshold ? copy.threshold.active : copy.threshold.empty}
-          </p>
+          {resultAlert && (
+            <div class="mb-4">
+              <InlineAlert kind={resultAlert.kind}>{resultAlert.message}</InlineAlert>
+            </div>
+          )}
+          <ThresholdEditor
+            client:load
+            patternKey={key}
+            type={pattern.type}
+            threshold={detail.threshold}
+            month={month}
+            copy={editorCopy}
+          />
         </Panel>
         <Panel>
           <div class="mb-5 flex items-start justify-between gap-3">

@@ -148,6 +148,15 @@ export const copyExtra = {
     thresholdPanel: "Próg wzorca",
     thresholdActive: "aktywny",
     thresholdNone: "brak ustawionego progu",
+    // thresholdEditor()'s save button when no threshold is set yet; content.json's threshold.save ("Zapisz
+    // próg") covers only the change path.
+    setThreshold: "Ustaw próg",
+    // thresholdEditor()'s onclick toast for removal (showToast('Próg usunięty.','info')).
+    thresholdRemoved: "Próg usunięty.",
+    // thresholdEditor()'s field label and input-suffix text; content.json's threshold object holds only the
+    // button/note copy, not these.
+    valueLabel: { amount: "Kwota", count: "Liczba wystąpień" },
+    suffix: { money: "zł", count: "×" },
     occurrencesPanel: "Wystąpienia w miesiącu",
     sequenceWithin: "W ramach progu",
     overBadge: "ponad próg",
@@ -174,6 +183,9 @@ export const copyExtra = {
     monthEmpty: "Brak wystąpień w tym miesiącu.",
     overInMonth: "Ponad progiem w {month}",
     sequenceSummary: "{n} {occurrences}, {over} ponad próg",
+    thresholdInvalid:
+      "Podaj wartość większą od zera — liczbę całkowitą lub kwotę z najwyżej dwoma miejscami po przecinku.",
+    thresholdSaveError: "Nie udało się zapisać progu. Spróbuj ponownie.",
   },
   fixed: { eyebrow: "Koszty stałe", lead: "Rytm porównuje miesiące kalendarzowe i pokazuje różnice." },
   settings: {

@@ -237,6 +237,16 @@ describe("collectPages", () => {
     expect(result).not.toHaveProperty("rows");
   });
 
+  it("fails instead of returning a partial list when pages end short of the count", async () => {
+    // 7 rows counted on the first page, then 2 rows deleted mid-read: the offset skips past the end.
+    const all = [0, 1, 2, 3, 4];
+    const fetchPage = (from: number, to: number) =>
+      Promise.resolve({ rows: all.slice(from, Math.min(to + 1, from + 3)), count: from === 0 ? 7 : 5, error: null });
+    const result = await collectPages(fetchPage);
+    expect(result).toHaveProperty("error");
+    expect(result).not.toHaveProperty("rows");
+  });
+
   it("returns an empty list after one call when there are no rows", async () => {
     const { fetchPage, calls } = cappedFetch(0, 3);
     expect(await collectPages(fetchPage)).toEqual({ rows: [] });

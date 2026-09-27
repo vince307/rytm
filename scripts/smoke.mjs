@@ -1,6 +1,7 @@
 // Smoke test: proves the built app, the Vercel adapter and the Supabase auth flow still work together,
 // including the account contract (password change, self-service deletion) which also cleans up the smoke user,
-// and the import write path (POST /api/imports: saved, overlap, invalid payload, anonymous).
+// the import write path (POST /api/imports: saved, overlap, invalid payload, anonymous) and the import delete
+// path (POST /api/imports/delete: not-found, own delete, patterns dropping the import, re-import accepted).
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
@@ -145,6 +146,49 @@ const steps = [
     { status: 302, location: "/imports/new?error=invalid" },
   ],
   [
+    "import delete of an unknown id is not found",
+    () =>
+      request("/api/imports/delete", {
+        method: "POST",
+        form: { id: "00000000-0000-4000-8000-000000000000" },
+      }),
+    { status: 302, location: "/imports?error=missing" },
+  ],
+  [
+    "import delete of a malformed id is not found",
+    () => request("/api/imports/delete", { method: "POST", form: { id: "not-a-uuid" } }),
+    { status: 302, location: "/imports?error=missing" },
+  ],
+  [
+    "import is deleted",
+    () =>
+      request("/api/imports/delete", {
+        method: "POST",
+        form: { id: new URLSearchParams(importResultPath.split("?")[1]).get("id") },
+      }),
+    { status: 302, location: "/imports?deleted=1" },
+  ],
+  [
+    "patterns drop the deleted import",
+    () => request("/patterns"),
+    { status: 200, contains: "Wzorce pojawią się po pierwszym imporcie.", notContains: "Kawiarnia smoke" },
+  ],
+  [
+    "deleted import result goes back to the list",
+    () => request(importResultPath),
+    { status: 302, location: "/imports" },
+  ],
+  [
+    "same range is imported again after delete",
+    async () => {
+      const response = await request("/api/imports", { method: "POST", form: { payload: importPayload } });
+      importResultPath = response.location;
+      return response;
+    },
+    { status: 302, location: "/imports/result?id=" },
+  ],
+  ["patterns list the re-imported merchant", () => request("/patterns"), { status: 200, contains: "Kawiarnia smoke" }],
+  [
     "password change rejects wrong current password",
     () =>
       request("/api/auth/password", {
@@ -199,6 +243,15 @@ const steps = [
   [
     "import without a session goes to login",
     () => request("/api/imports", { method: "POST", form: { payload: importPayload } }),
+    { status: 302, location: "/login" },
+  ],
+  [
+    "import delete without a session goes to login",
+    () =>
+      request("/api/imports/delete", {
+        method: "POST",
+        form: { id: "00000000-0000-4000-8000-000000000000" },
+      }),
     { status: 302, location: "/login" },
   ],
   [
@@ -267,11 +320,16 @@ for (const [name, run, expected] of steps) {
   const ok =
     actual.status === expected.status &&
     (expected.location === undefined || actual.location.startsWith(expected.location)) &&
-    (expected.contains === undefined || actual.body.includes(expected.contains));
+    (expected.contains === undefined || actual.body.includes(expected.contains)) &&
+    (expected.notContains === undefined || !actual.body.includes(expected.notContains));
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
-    console.log(`      expected ${expected.status} ${expected.location ?? ""} ${expected.contains ?? ""}`);
+    console.log(
+      `      expected ${expected.status} ${expected.location ?? ""} ${expected.contains ?? ""} ${
+        expected.notContains ? `notContains:${expected.notContains}` : ""
+      }`,
+    );
   }
 }
 

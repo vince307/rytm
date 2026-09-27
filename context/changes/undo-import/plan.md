@@ -428,15 +428,15 @@ never `import_id`, so an import delete never orphans or cascades them.
 
 #### Automated
 
-- [ ] 1.1 `npm test` — baseline 72/72 (4 files) + 1 file, all new cases green, delta 0 failures
-- [ ] 1.2 `npm run lint` 0 errors (baseline 0, delta 0); `npx astro check` 0 errors (baseline 0 / 89 files, delta 0 errors; record the file count — expected +3: helper, endpoint, unit test, since `tsconfig.json` includes `**/*`)
-- [ ] 1.3 `npm run fixture:check` OK and `npm run build` passes
-- [ ] 1.4 `npx supabase db reset && npx supabase test db` — pgTAP baseline 44 + 10 = 54, all pass
-- [ ] 1.5 `BASE_URL=http://localhost:4398 npm run smoke` — baseline 48 + 8 = 56 PASS
-- [ ] 1.6 Deliberate break (endpoint): drop `.select("id")`, redirect `deleted=1` when `error` is null → smoke „import delete of an unknown id is not found” and unit `[] → missing` FAIL; restored → green; meta-check recorded
-- [ ] 1.7 Deliberate break (cascade, scratch pgTAP edit): FK replaced with `on delete restrict` → assertion 1/2 red; restored → green; meta-check recorded
-- [ ] 1.8 Deliberate break (smoke runner): step „patterns drop the deleted import” with `notContains` „Wzorce” → FAIL; restored → PASS
-- [ ] 1.9 `git diff --stat main -- supabase/migrations` is empty (no migration)
+- [x] 1.1 `npm test` — baseline 72/72 (4 files) + 1 file, all new cases green, delta 0 failures
+- [x] 1.2 `npm run lint` 0 errors (baseline 0, delta 0); `npx astro check` 0 errors (baseline 0 / 89 files, delta 0 errors; record the file count — expected +3: helper, endpoint, unit test, since `tsconfig.json` includes `**/*`)
+- [x] 1.3 `npm run fixture:check` OK and `npm run build` passes
+- [x] 1.4 `npx supabase db reset && npx supabase test db` — pgTAP baseline 44 + 10 = 54, all pass
+- [x] 1.5 `BASE_URL=http://localhost:4398 npm run smoke` — baseline 48 + 8 = 56 PASS
+- [x] 1.6 Deliberate break (endpoint): drop `.select("id")`, redirect `deleted=1` when `error` is null → smoke „import delete of an unknown id is not found” and unit `[] → missing` FAIL; restored → green; meta-check recorded
+- [x] 1.7 Deliberate break (cascade, scratch pgTAP edit): FK replaced with `on delete restrict` → assertion 1/2 red; restored → green; meta-check recorded
+- [x] 1.8 Deliberate break (smoke runner): step „patterns drop the deleted import” with `notContains` „Wzorce” → FAIL; restored → PASS
+- [x] 1.9 `git diff --stat main -- supabase/migrations` is empty (no migration)
 
 #### Manual
 

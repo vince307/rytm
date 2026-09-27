@@ -131,7 +131,8 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
                     <a
                       href={patternHref(p.key)}
                       className={cn(
-                        "text-ink flex items-center gap-2.5 rounded-sm font-extrabold whitespace-nowrap no-underline",
+                        // kit `.merchant` does not forbid wrapping: a long name wraps so the arrow column fits at 1440 px
+                        "text-ink flex items-center gap-2.5 rounded-sm font-extrabold no-underline",
                         focusRing,
                       )}
                     >

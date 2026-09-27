@@ -34,7 +34,8 @@ interface ThresholdEditorProps {
   copy: ThresholdEditorCopy;
 }
 
-const switchBase = "rounded-lg border px-[11px] py-[9px] text-xs font-bold";
+// Kit `.threshold-option`: radius 8px, inherited (400) weight — not the app-wide `rounded-lg` (14px) / bold.
+const switchBase = "rounded-[8px] border px-[11px] py-[9px] text-xs";
 const switchActive = "border-ink bg-ink text-paper";
 const switchIdle = "border-line text-muted";
 
@@ -95,7 +96,8 @@ export function ThresholdEditor({ patternKey, type, threshold, month, copy }: Th
         <div className="grid gap-[7px]">
           <label className="grid gap-[7px] text-xs font-bold">
             <span>{valueLabel}</span>
-            <div className="border-line bg-paper focus-within:border-ink focus-within:ring-ink/8 flex items-center overflow-hidden rounded-lg border focus-within:ring-[3px]">
+            {/* kit `.input-suffix`: white box (`--white`, as FormField), radius 8px; the suffix `b` keeps its bolder weight */}
+            <div className="border-line focus-within:border-ink focus-within:ring-ink/8 flex items-center overflow-hidden rounded-[8px] border bg-white focus-within:ring-[3px]">
               {/* keyed on the active kind so switching frequent/sum resets the field to that kind's own stored value */}
               <input
                 key={activeKind}
@@ -105,7 +107,7 @@ export function ThresholdEditor({ patternKey, type, threshold, month, copy }: Th
                 defaultValue={defaultValue}
                 className="text-ink min-w-0 flex-1 border-0 bg-transparent p-[13px] text-lg outline-none"
               />
-              <b className="text-muted px-[13px] text-[13px] font-normal">{suffix}</b>
+              <b className="text-muted px-[13px] text-[13px]">{suffix}</b>
             </div>
           </label>
         </div>

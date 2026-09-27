@@ -200,13 +200,14 @@ const resultAlert = params.get("saved")
         </div>
         <div>
           {detail.transactions.map((t) => (
-            <div class="flex items-center justify-between border-b border-line py-[14px] last:border-b-0">
-              <div>
+            <div class="flex items-center justify-between gap-3 border-b border-line py-[14px] last:border-b-0">
+              <div class="min-w-0">
                 <div class="text-[13px] font-bold">{formatIsoDate(t.occurredOn)}</div>
                 <div class="mt-[3px] text-[11px] text-muted">{rawDescription(t)}</div>
               </div>
-              <div class="flex items-center gap-3">
-                <strong class="text-[14px]">{formatMoney(t.amountMinor)}</strong>
+              {/* a real raw description is far longer than the kit's "WOLT*WARSAW": the amount never wraps */}
+              <div class="flex shrink-0 items-center gap-3">
+                <strong class="text-[14px] whitespace-nowrap">{formatMoney(t.amountMinor)}</strong>
                 {t.overMinor > 0 && <Badge tone="excess">{x.overBadge}</Badge>}
               </div>
             </div>

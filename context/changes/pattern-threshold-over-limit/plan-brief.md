@@ -79,4 +79,4 @@ status param.
 - Setting „4 × / miesiąc” on a frequent pattern marks the 5th+ transactions of each month and sums them; an accepted
   amount marks only the part above it.
 - Thresholds persist per merchant, survive an import delete, and vanish with the account (pgTAP).
-- Gate: pgTAP 54 → 76, smoke 61 → 76, vitest +3 files, lint/check 0 — with deliberate breaks recorded per phase.
+- Gate: pgTAP 54 → 76, smoke 61 → 77, vitest +3 files, lint/check 0 — with deliberate breaks recorded per phase.

@@ -1,19 +1,18 @@
 # Handoff — `pattern-threshold-over-limit` (slice S-04)
 
-Written by the `plan` step (2026-09-27, autonomous run `2026-09-27-s03-s02-s04`). `plan.md` (6 code phases, 56
-Progress rows) and `plan-brief.md` are on disk; `change.md` is `planned`, roadmap S-04 is `planning`. The next agent
-must not get this wrong: the plan **decides against PRD US-01 AC's literal text** (over amount = excess part for sum /
-fixed kinds) and reads „w tym miesiącu” as the **latest month in the user's data**, not the wall clock — review those
-two against PRD Business Logic „Wynik”, not against the prototype's hard-coded marks.
+Written by the `plan-review` step (2026-09-27, autonomous run `2026-09-27-s03-s02-s04`). The plan is reviewed
+(VERDICT: PROCEED, `reviews/plan-review.md`); `change.md` is `plan_reviewed`. The next agent must not get this
+wrong: Phase 1 is a **mutable** table — four per-operation policies including UPDATE with `using` + `with check`, and
+**no** `revoke update` (do not copy it from `20260924122144_transactions_import_account_fk.sql`).
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/pattern-threshold-over-limit`, cut from `main` at `a6a8b18` (confirmed with `git branch --show-current`) |
-| Commits on branch | 3: change identity, research, `docs(pattern-threshold-over-limit): plan` (this step) |
+| Commits on branch | 4: change identity, research, plan, `docs(pattern-threshold-over-limit): plan review` (this step) |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `planned` (`metadata-guard.mjs mark-planned`) |
+| `change.md` status | `plan_reviewed` |
 | `## Progress` rows remaining | 56 (`grep -c '^- \[ \]' plan.md`); 0 done |
 | Working tree | clean apart from the maintainer's ` M .gitignore` and `?? .claude/skills/10x-autonomous-run/` (never staged) |
 
@@ -21,10 +20,10 @@ two against PRD Business Logic „Wynik”, not against the prototype's hard-cod
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/pattern-threshold-over-limit/plan.md` | Full plan: current state, 6 phases (Intent / Contract, success criteria as baseline + delta, deliberate breaks with meta-checks), testing strategy, 23 autonomous decisions, known risks, `## Progress` |
-| `context/changes/pattern-threshold-over-limit/plan-brief.md` | Two-page brief: key decisions table, phases at a glance, risks |
-| `context/changes/pattern-threshold-over-limit/change.md` | Frontmatter `status: preparing` → `planned` |
-| `context/foundation/roadmap.md` | S-04 status `proposed` → `planning` (At-a-glance row + body) |
+| `context/changes/pattern-threshold-over-limit/reviews/plan-review.md` | Plan review: grounding, 5 findings (1 warning, 4 observations), triage, ends with `VERDICT: PROCEED — …` |
+| `context/changes/pattern-threshold-over-limit/plan.md` | Triage edits: Phase 5 smoke step 2a „threshold is changed” (saves 30 then 40) and re-counted smoke totals (Phase 5 → 74, Phase 6 → 77, +16); verified Astro pathname decoding in Critical Implementation Details; Phase 3 types wording; Known risks (double decode of literal `%XX`, unbounded threshold rows); Autonomous decision 24 |
+| `context/changes/pattern-threshold-over-limit/plan-brief.md` | Smoke gate total 61 → 77 |
+| `context/changes/pattern-threshold-over-limit/change.md` | `status: planned` → `plan_reviewed` |
 | `context/changes/pattern-threshold-over-limit/handoff.md` | This file |
 
 ## 3. Verification
@@ -32,60 +31,51 @@ two against PRD Business Logic „Wynik”, not against the prototype's hard-cod
 Docs-only step; no code or schema touched. Baseline (agent contract, `main` `a6a8b18`, inherited, unverified here):
 lint 0 · astro check 0 errors (93 files) · vitest 78/78 (5 files) · pgTAP 54 (3 files) · smoke 61 PASS.
 
-| Command | Result |
+| Command / check | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/pattern-threshold-over-limit` |
-| `grep -c '^- \[ \]' plan.md` | 56 — each phase's Success Criteria bullets map 1:1 to its Progress rows (P1 7+2, P2 7+1, P3 6+1, P4 8+2, P5 8+2, P6 7+5) |
-| `metadata-guard.mjs inspect` / `mark-planned` | change.md hash matched; `changed: true`, status `planned` |
-| Source re-checks | `load.ts` `collectPages`/`loadPatterns`, `derive.ts`, `merchant.ts`, `types.ts`, `patterns.astro`, `PatternsTable.tsx`, `Badge.tsx`, `button.tsx`, `SubmitButton.tsx`, migrations, `smoke.mjs` steps, kit `app.js` `patternDetail`/`thresholdEditor`/`patternRows`, `content.json` keys, `styles.css` rules — read in this step |
+| `grep -c '^- \[ \]' plan.md` | 56; Progress ↔ phase success criteria 1:1 in all 6 phases |
+| Code grounding (subagent + direct reads) | `load.ts` `collectPages` / `loadPatterns` shapes and all importers; `transactions.occurred_on` / `id bigint` (typed `number`); `smoke.mjs` `request` (manual redirects, `Origin` header, body only on 200, shared cookie jar — anonymous steps must follow signout); `d5Type` one occurrence → `fixed`; migration policy / grant style; `delete_own_account`; `PROTECTED_ROUTES` (pages only, not `/api/patterns`); kit copy keys; K21 / G31 free; `formatMoney` uses a plain space |
+| Astro 7.3.2 routing (`node_modules/astro/dist/core/util/pathname.js` `validateAndDecodePathname`, `core/fetch/fetch-state.js`) | pathname `decodeURI`d until stable then re-encoded by the URL setter → `Astro.url.pathname` keeps `%20`, `%2F`; plan's `keyFromPath` approach correct |
 | Suites (lint, check, test, build, smoke, pgTAP) | not run — no code or schema change in this step |
 
-Planned gate end state: pgTAP 54 → 76 (+22, new file), smoke 61 → 76 (+15), vitest +3 files, lint / check 0.
+Planned gate end state (after review): pgTAP 54 → 76 (+22, new file), smoke 61 → 77 (+16), vitest +3 files, lint /
+check 0.
 
 ## 4. Next command
 
-`/10x-plan-review pattern-threshold-over-limit`
+`/10x-implement pattern-threshold-over-limit phase 1`
 
 ## 5. Open
 
-- **Product calls to review** (plan `## Autonomous decisions` 1, 2): excess part vs US-01 AC; reference month = latest
-  month in data. Both reversible in one module (`src/lib/patterns/over-limit.ts` `overLimit` / `referenceMonth`).
-  Progress row 6.12 `[human]` asks the product owner to confirm.
-- **Route risk**: `src/pages/patterns/[...key].astro` reads the key from `Astro.url.pathname` via `keyFromPath`
-  (`src/lib/patterns/path.ts`); if the runtime pre-decodes, the Phase 4 deliberate break says so (record in handoff).
-- **Migration**: `supabase/migrations/20260927200000_pattern_thresholds.sql` — first mutable table (UPDATE policy,
-  no `revoke update`); Ship step runs `npx supabase db push` before merge.
+- **Product calls** (plan decisions 1, 2; review F5 upheld both): excess part vs US-01 AC; reference month = latest
+  month in data. Reversible in `src/lib/patterns/over-limit.ts` `overLimit` / `referenceMonth`. Progress 6.12
+  `[human]`.
+- **Route**: `src/pages/patterns/[...key].astro` + `src/lib/patterns/path.ts` `keyFromPath`. Phase 4 break 4.6 is
+  expected to go red (the runtime re-encodes the pathname). Literal `%XX` keys double-decode (Known risks).
+- **Migration**: `supabase/migrations/20260927200000_pattern_thresholds.sql`; Ship step runs `npx supabase db push`
+  before merge.
+- **Smoke**: anonymous steps (4.4 detail, 5.8 save) must sit after „signout clears session” (runner has one cookie
+  jar). Step 2a „threshold is changed” proves the upsert update path through PostgREST.
 - **Manual-only Progress rows** (human checklist):
-  - [reviewer] 1.8 policies / FK shape; 1.9 pgTAP proof mapping; 2.8 oracle traceability; 3.7 keyset loop bounded, no count;
-    4.9 copy byte-for-byte + G31-only placeholders; 4.10 `PatternsTable` unchanged but import; 5.9 endpoints mirror
-    `api/imports/delete.ts`; 5.10 keyboard on the editor; 6.11 K21 / G31 register.
-  - [visual] 6.8 screenshots desktop 1440 + ~400 px: `list-with-thresholds`, `detail-default`, `editor-count`,
-    `editor-sum`, `editor-amount`, `over-limit-marked`, `no-threshold`, `empty-month`, `saved`, `removed`,
-    `error-value`, `error-read`, `not-found`, `month-other`, `link-focus`; 6.9 ~400 px stacking / table scroll;
-    6.10 dotted and spaced/diacritic keys open from the list.
+  - [reviewer] 1.8, 1.9, 2.8, 3.7, 4.9, 4.10, 5.9, 5.10, 6.11.
+  - [visual] 6.8 screenshots (15 states, 1440 + ~400 px), 6.9 narrow stacking, 6.10 dotted / spaced / diacritic keys.
   - [human] 6.12 product owner confirms decisions 1 and 2.
-- **DESIGN-GAPs to add in code phases** (not yet in `context/foundation/design-kit.md`): **K21** (detail / editor / list
-  strings only in `app.js`, month-baked `sumLabel`), **G31** (not-found, empty month, over-limit sum on the detail,
-  validation / save errors, sum-kind field, mismatched kind, sequence colours, list month label); G28 / G2 status notes.
-- **Follow-ups**: S-03 F2 keyset paging is **closed by Phase 3**; F5 `text` button variant **used by Phase 5**
-  (`context/archive/2026-09-25-undo-import/follow-ups/review-fixes.md`). New follow-up candidate: move
-  `src/pages/how-it-works.astro` `rClip` and `src/components/imports/ImportWizard.tsx` back link onto the new shared
-  `SequenceMark` / `BackLink`.
+- **DESIGN-GAPs to add in code phases**: K21, G31 (+ G28 / G2 status notes) — none added yet.
+- **Follow-ups**: S-03 F2 keyset paging closed by Phase 3; F5 `text` button variant used by Phase 5
+  (`context/archive/2026-09-25-undo-import/follow-ups/review-fixes.md`). Candidate: move `how-it-works.astro` `rClip`
+  and `ImportWizard.tsx` back link onto `SequenceMark` / `BackLink`. Known risk: `loadThresholds` unpaged (F4).
 
 ## 6. Autonomous decisions
 
-All 23 are in `plan.md` `## Autonomous decisions` (chosen, rejected, why, what would change the answer). The ones
-that matter most:
-
-1. **Excess part for sum / fixed, full amount for count — against PRD US-01 AC's literal text**, following Business
-   Logic „Wynik”. Would change: product owner declaring US-01 AC normative.
-2. **Reference month = latest month in the user's transactions** (departs from the literal „bieżący miesiąc”). Would
-   change: regular monthly imports / product choice of the wall clock.
-3. **Type flip: keep row, ignore mismatched kind.** Would change: S-05 user-pinned types needing a reset.
-4. **Rest route + raw-path key decode.** Would change: a slug column.
-5. **Keyset paging in scope, `count` dropped.** Would change: evidence of missed rows under `gt("id")`.
-6. **Six small code phases, no deploy phase; gap rows land with the code.** Would change: a phase not independently
-   green, or the orchestrator requiring gaps at plan time.
-7. **Step-level**: no `AskUserQuestion` (contract rule 1) — the skill's complexity / budget / structure confirmations
-   were decided here (complexity HIGH, 0 questions: research + contract settled every input). Would change: a
-   maintainer message in the run folder.
+1. **Verdict PROCEED, not RETHINK.** Why: approach verified against code and PRD; only one warning, fixed in the plan.
+   Would change: a finding that the derived-pattern / JS-grouping model cannot support per-pattern thresholds.
+2. **Decisions 1 and 2 not overturned.** Rejected: full flagged amounts (US-01 AC literal); wall-clock month. Why:
+   Business Logic „Wynik” defines the over amount per kind and the AC reads consistently with it; historical imports
+   make the wall-clock month empty and non-deterministic. Would change: product owner via Progress 6.12.
+3. **F1 fixed with a smoke step, not pgTAP.** Why: the gap is PostgREST's upsert, which SQL assertions cannot reach.
+   Would change: a smoke runtime budget.
+4. **Six phases kept.** Rejected: splitting Phase 4. Why: each phase additive and independently green, sized for one
+   fresh session. Would change: an implementer hitting the context limit in Phase 4 (split shared components into 4a).
+5. **No `AskUserQuestion`**; the skill's triage prompts were decided in `reviews/plan-review.md` (Fixed F1–F3,
+   Accepted F4–F5). Would change: a maintainer message in the run folder.

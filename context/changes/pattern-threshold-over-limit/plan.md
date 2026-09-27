@@ -58,7 +58,7 @@ against the files named below.
 - Saving redirects back with „Sukces — próg zapisany.”; removing with „Próg usunięty.”; an invalid value with an
   error line; unknown key → 404 not-found state; read failure → error line.
 - Reference month = latest calendar month present in the user's transactions (`?month=YYYY-MM` selects another).
-- Verified by: pgTAP +22 (new file), vitest +3 files, smoke +15, screenshots of every named state.
+- Verified by: pgTAP +22 (new file), vitest +3 files, smoke +16, screenshots of every named state.
 
 ### Key Discoveries:
 
@@ -116,6 +116,13 @@ BASE_URL=http://localhost:4398 npm run smoke                        # then: lsof
   once with `decodeURIComponent` — `encodeURIComponent` / `decodeURIComponent` round-trip any string exactly. If the
   runtime hands an already-decoded pathname, a throwing decode falls back to the raw segment. The smoke key
   `kawiarnia smoke` (space) proves the path end-to-end.
+  *Plan review (verified in `node_modules/astro` 7.3.2):* the runtime runs `decodeURI` on the pathname until it stops
+  changing (`core/util/pathname.js` `validateAndDecodePathname`), then writes it back through the URL setter, which
+  re-encodes spaces and non-ASCII — so `Astro.url.pathname` reads `kawiarnia%20smoke`, and `%2F` / `%3F` / `%23`
+  survive (`decodeURI` never decodes reserved characters). `Astro.params.key` would be `"kawiarnia smoke"` but
+  `"a%2Fb"` for `a/b` — hence the pathname, not params. A literal `%` in a key reaches `keyFromPath` as a bare `%`
+  (the decode throws → raw fallback, correct). Only a key holding a literal `%XX` escape is double-decoded (Known
+  risks).
 - **Nested forms.** The threshold editor's save form and the „Usuń próg” delete form cannot nest; the delete form is
   a sibling `<form id=…>` and the „Usuń próg” button inside `.threshold-actions` targets it with the `form`
   attribute.
@@ -347,8 +354,9 @@ patterns, rows }` where `rows: PatternSource[]`. Header comment updated (keyset;
 
 **File**: `src/types.ts`
 
-**Contract**: `PatternSource` gains `occurredOn: string` (`YYYY-MM-DD`); `Threshold` / `ThresholdKind` exported
-(moved here from Phase 2 if Phase 2 declared them locally); `PatternListItem` unchanged in this phase.
+**Contract**: `PatternSource` gains `occurredOn: string` (`YYYY-MM-DD`); `Threshold` / `ThresholdKind` already live
+in `src/types.ts` since Phase 2 (Phase 2 declares them there, never locally); `PatternListItem` unchanged in this
+phase.
 
 #### 3. Thresholds read
 
@@ -626,7 +634,11 @@ ustawionego progu”, result via `InlineAlert` instead of the kit toast (G30 pre
 **Contract**: after „pattern detail has no threshold yet”, on key `kawiarnia smoke` (fixed, 45,50 zł):
 1. „threshold with a zero value is rejected” — POST `/api/patterns/threshold` `{ key: "kawiarnia smoke", kind:
    "amount", value: "0" }` → 302 `/patterns/kawiarnia%20smoke?error=value`.
-2. „threshold is saved” — `value: "40"` → 302 `/patterns/kawiarnia%20smoke?saved=1`.
+2. „threshold is saved” — `value: "30"` → 302 `/patterns/kawiarnia%20smoke?saved=1`.
+2a. „threshold is changed” — same key and kind, `value: "40"` → 302 `/patterns/kawiarnia%20smoke?saved=1` (the
+   `upsert … onConflict: "user_id,merchant_key"` update path through the real PostgREST — pgTAP proves only the SQL
+   statement; steps 5 and the Phase 6 list steps then read `>5,50 zł<`, which a non-updated 30 zł threshold would
+   render as `>15,50 zł<`, so they also prove the row was updated in place, not duplicated).
 3. „pattern detail confirms the saved threshold” — GET `/patterns/kawiarnia%20smoke?saved=1` → 200 contains
    „Sukces — próg zapisany.”.
 4. „pattern detail marks the over-limit transaction” — GET `/patterns/kawiarnia%20smoke` → 200 contains
@@ -647,7 +659,7 @@ Next to the anonymous steps: 8. „threshold save without a session goes to logi
 - `npm test` — Phase 4 count, delta 0 failures
 - `npm run fixture:check` OK; `npm run build` passes
 - `npx supabase db reset && npx supabase test db` — 76 (delta 0)
-- `BASE_URL=http://localhost:4398 npm run smoke` — 65 + 8 = 73 PASS
+- `BASE_URL=http://localhost:4398 npm run smoke` — 65 + 9 = 74 PASS
 - Deliberate break (app validation): in the save endpoint, send the raw string through `Number()` instead of `parseThresholdValue` → „threshold with a zero value is rejected” FAILs (the DB check rejects 0 → `?error=save`, not `?error=value`); restored → PASS. Meta-check: the DB would also refuse 0, so only the redirect difference proves the app-side validation ran
 - Deliberate break (over mark): make the detail pass `threshold: null` into `patternDetail` → steps 4–5 FAIL while step 3 still PASSes; restored → PASS. Meta-check: proves the badge/sum come from the evaluated threshold, not from the saved-line render
 - No raw colours in `ThresholdEditor.tsx` and the changed page; `DESIGN-GAP: K21` / `G31` comments present for the new keys
@@ -717,7 +729,7 @@ dostarczone”; G31 row notes the list column shows the reference month without 
 - `npm test` — Phase 5 count, delta 0 failures
 - `npm run fixture:check` OK; `npm run build` passes
 - `npx supabase db reset && npx supabase test db` — 76 (delta 0 from Phase 1; +22 over the S-02 baseline)
-- `BASE_URL=http://localhost:4398 npm run smoke` — 73 + 3 = 76 PASS (+15 over the S-02 baseline 61)
+- `BASE_URL=http://localhost:4398 npm run smoke` — 74 + 3 = 77 PASS (+16 over the S-02 baseline 61)
 - Deliberate break: render „—” in the Próg cell unconditionally → „patterns list shows the threshold” FAILs; restored → PASS. Meta-check: the island props carry the threshold as the number `4000`, never „40,00 zł”, so only the rendered cell can satisfy the step
 - No raw colours in `PatternsTable.tsx`; `DESIGN-GAP: G28` comment updated; K21 / G31 keys used by the table carry their comments
 
@@ -748,7 +760,8 @@ dostarczone”; G31 row notes the list column shows the reference month without 
 
 - pgTAP `pattern_thresholds.test.sql` (22): RLS per operation, upsert path, constraints, import-delete survival,
   account-delete cascade, anon denied.
-- Smoke (+15): detail renders, no-threshold, not-found, anonymous detail; zero value rejected, save, saved line,
+- Smoke (+16): detail renders, no-threshold, not-found, anonymous detail; zero value rejected, save, change (upsert
+  conflict path through PostgREST), saved line,
   over mark, over sum, list threshold, list over sum, list link, remove, mark gone, anonymous save.
 
 ### Manual Testing Steps:
@@ -861,13 +874,26 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
     register must not point at code that does not exist. Would change: the orchestrator requiring gaps at plan time.
 23. **Value bounds**: count 1–999; money 0,01 – 1 000 000 zł; DB check `value > 0 and value <= 100000000`. Would
     change: real data exceeding them.
+24. **Plan review (2026-09-27) upheld decisions 1–3 against the PRD** and added one smoke step („threshold is
+    changed”, Phase 5) so the FR-010 „zmienić” path is proven through PostgREST, not only in SQL. Decision 1 follows
+    PRD Business Logic „Wynik”, which defines the „nadwyżka” amount explicitly per kind; US-01 AC's „suma kwot
+    transakcji oznaczonych” is compatible if „kwota” is read as the flagged over amount, and identical for the count
+    example it illustrates. Decision 2: PRD „Gdzie użytkownik spotyka regułę” says „w bieżącym miesiącu oraz … w
+    poprzednich miesiącach” without pinning the clock; for historical CSV imports the latest data month is the only
+    non-empty, deterministic reading. Would change: the product owner answering `[human]` row 6.12 otherwise.
 
 ## Known risks
 
 - **`Astro.url.pathname` decoding** is asserted by smoke only for a space; `%` and `/` keys are covered by unit tests
   of `keyFromPath` and the `[visual]` dotted-key row, not end-to-end.
-- **Double decode** for a key containing a literal `%xx` sequence if a runtime pre-decodes the pathname; not seen in
-  the fixture (keys come from bank descriptions).
+- **Double decode** for a key containing a literal `%XX` escape (e.g. `abc%41`): Astro 7.3.2 repeatedly
+  `decodeURI`s the pathname before routing (plan review, `validateAndDecodePathname`), so such a key opens a
+  different or missing pattern (404 not-found state). Not seen in the fixture (keys come from bank descriptions); a
+  slug / id column would remove it (decision 4).
+- **Unbounded threshold rows**: the save endpoint accepts any `key` (no pattern-existence check, decision 7), so a
+  user can craft POSTs that store thresholds for keys they do not have; `loadThresholds` does not page, so beyond the
+  PostgREST `max_rows` cap rows would be silently dropped. Self-inflicted only (RLS scopes rows to the caller); fix
+  with keyset paging in `loadThresholds` if ever observed.
 - **Normalizer drift** orphans stored thresholds (no re-key migration exists).
 - **Astro check file count** is recorded, not asserted — only the error delta gates.
 
@@ -949,7 +975,7 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 - [ ] 5.2 `npm test` — Phase 4 count, delta 0 failures
 - [ ] 5.3 `npm run fixture:check` OK; `npm run build` passes
 - [ ] 5.4 `npx supabase db reset && npx supabase test db` — 76 (delta 0)
-- [ ] 5.5 `BASE_URL=http://localhost:4398 npm run smoke` — 65 + 8 = 73 PASS
+- [ ] 5.5 `BASE_URL=http://localhost:4398 npm run smoke` — 65 + 9 = 74 PASS
 - [ ] 5.6 Deliberate break (`Number()` instead of `parseThresholdValue`) → „threshold with a zero value is rejected” FAILs; restored → PASS; meta-check recorded
 - [ ] 5.7 Deliberate break (detail passes `threshold: null`) → over mark / over sum steps FAIL, saved line PASSes; restored → PASS; meta-check recorded
 - [ ] 5.8 No raw colours in `ThresholdEditor.tsx` / changed page; `DESIGN-GAP` comments for the new keys
@@ -967,7 +993,7 @@ Made by the plan step of run `2026-09-27-s03-s02-s04` in place of asking a human
 - [ ] 6.2 `npm test` — Phase 5 count, delta 0 failures
 - [ ] 6.3 `npm run fixture:check` OK; `npm run build` passes
 - [ ] 6.4 `npx supabase db reset && npx supabase test db` — 76 (+22 over the S-02 baseline)
-- [ ] 6.5 `BASE_URL=http://localhost:4398 npm run smoke` — 73 + 3 = 76 PASS (+15 over the S-02 baseline 61)
+- [ ] 6.5 `BASE_URL=http://localhost:4398 npm run smoke` — 74 + 3 = 77 PASS (+16 over the S-02 baseline 61)
 - [ ] 6.6 Deliberate break (Próg cell always „—”) → „patterns list shows the threshold” FAILs; restored → PASS; meta-check recorded
 - [ ] 6.7 No raw colours in `PatternsTable.tsx`; `DESIGN-GAP: G28` updated; K21 / G31 comments on the table keys
 

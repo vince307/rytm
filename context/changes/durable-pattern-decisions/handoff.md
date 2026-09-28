@@ -10,8 +10,8 @@ The visual gate step wrote this handoff on 2026-09-28, in autonomous run `2026-0
 | --- | --- |
 | Branch | `feat/durable-pattern-decisions` (confirmed with `git branch --show-current`), cut from `main` at `f252112` |
 | Commits on branch | 29 ahead of `f252112` (`git log --oneline f252112..HEAD`). This step added `c14f75a` `fix(durable-pattern-decisions): poprawki z bramki wizualnej` and `docs(durable-pattern-decisions): bramka wizualna` (this commit, with the screenshots) |
-| Pushed / PR / merged | no / none / no |
-| `change.md` status | `impl_reviewed` (unchanged; `/10x-archive` stamps it) |
+| Pushed / PR / merged | Ship step (2026-09-28): archived here (`chore(archive): close durable-pattern-decisions`), then pushed, PR opened, hosted `db push` of `20260928120000_pattern_decisions` before the merge, merged, deployed — PR/CI/merge/deploy recorded in `context/runs/2026-09-28-s05-s06-s07/run-log.md` |
+| `change.md` status | `archived` (stamped by `/10x-archive` in the ship step) |
 | `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`): `[human]` 7.9 |
 | Working tree | clean after this commit |
 | Local DB | `npx supabase db reset` run at the end, so the visual accounts are gone. pgTAP 102 PASS afterwards |
@@ -53,7 +53,7 @@ Deliberate breaks: none in this step, because the fixes are visual. What proves 
 
 ## 4. Next command
 
-`/10x-archive durable-pattern-decisions`, then ship: push, PR, CI, then `npx supabase db push` of `20260928120000_pattern_decisions` to the hosted DB before the merge, then merge and deploy.
+`none — shipped`. The next slice in run `2026-09-28-s05-s06-s07` is S-06 `fixed-cost-changes` (`/10x-new fixed-cost-changes` from a freshly pulled `main`).
 
 ## 5. Open
 
@@ -74,6 +74,9 @@ No new DESIGN-GAP ids.
 Carried risks: normalizer drift (`normalizeMerchant`), and the circular import between `load.ts` and `decisions.ts` / `thresholds.ts` (`collectPages`), which is harmless.
 
 ## 6. Autonomous decisions
+
+- **Ship step: archived with the `[human]` row 7.9 still open.** `/10x-archive` warned `1 Progress items still pending (0 automated, 1 manual)` plus SHA-less `[reviewer]`/`[visual]` rows (evidence rows, no own commit — a soft signal). Chosen: Continue archiving. Why: 7.9 is a product-owner confirmation, a post-run checklist item, not a code gap; the run's contract says open `[human]` rows do not block. SHA repointing: none — the PR is merged with a merge commit (`--merge`), so every Progress SHA stays in `main`'s history. Rejected: Resume implementation (nothing to implement). Would change: the owner rejecting decision 9, which reopens exclusion semantics in S-07, not here.
+- **Trigger restated for S-07** (roadmap `## Backlog Handoff`, PR body): monthly sums must skip `pattern.excluded` (decision 9), and F6 (an excluded pattern merged as a source re-enters the analysis) becomes visible in S-07's monthly totals.
 
 - **Playwright captured the PNG set; Claude-in-Chrome was used for bfcache only.**
   - Why: Chrome screenshots are viewport-only JPEGs, the window cannot go below ~587 px (mobile needs the iframe workaround), and 44 app shots plus 14 kit frames with measurements are reproducible from a script. Real headed Chrome was the right tool for bfcache, which headless Chrome did not restore in the S-04 gate.

@@ -700,14 +700,14 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [ ] 4.1 `npm run lint` 0; `npx astro check` 0 errors (count recorded)
-- [ ] 4.2 `npm test` — Phase 3 count, 0 failures (final: 190 + the S-06 cases, 12 files)
-- [ ] 4.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 4.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0, 5 files)
-- [ ] 4.5 `BASE_URL=http://localhost:4398 npm run smoke` — 117 + 4 = 121 PASS (+10 over the baseline 111)
-- [ ] 4.6 Deliberate break (message ignores `hasComparison`) → „fixed without a previous month says so” FAILs, „fixed compares with the previous month” PASSes; restored → PASS; meta-check recorded
-- [ ] 4.7 Deliberate break (`!excluded` filter dropped) → „fixed hides an excluded pattern” FAILs; restored → PASS; meta-check recorded
-- [ ] 4.8 Seam-sweep greps: no „Further tones”; no raw colours in `src/components/fixed`, `fixed.astro`, `Badge.tsx`; `DESIGN-GAP: G34` / `K23` only in `copy.ts`, `fixed.astro`, `Badge.tsx`
+- [x] 4.1 `npm run lint` 0; `npx astro check` 0 errors (count recorded) — 124 files, 0 errors, delta 0 — c48c4a4
+- [x] 4.2 `npm test` — Phase 3 count, 0 failures (final: 190 + the S-06 cases, 12 files) — 213 passed, 12 files, delta 0 — c48c4a4
+- [x] 4.3 `npm run fixture:check` OK; `npm run build` passes — c48c4a4
+- [x] 4.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0, 5 files) — c48c4a4
+- [x] 4.5 `BASE_URL=http://localhost:4398 npm run smoke` — 117 + 4 = 121 PASS (+10 over the baseline 111) — 121/121 PASS — c48c4a4
+- [x] 4.6 Deliberate break (message ignores `hasComparison`) → „fixed without a previous month says so” FAILs, „fixed compares with the previous month” PASSes; restored → PASS; meta-check recorded — c48c4a4
+- [x] 4.7 Deliberate break (`!excluded` filter dropped) → „fixed hides an excluded pattern” FAILs (and unit case 11); „fixed marks a new pattern” stays PASS; restored → PASS; meta-check recorded — c48c4a4
+- [x] 4.8 Seam-sweep greps: no „Further tones”; no raw colours in `src/components/fixed`, `fixed.astro`, `Badge.tsx`; `DESIGN-GAP: G34` / `K23` only in `copy.ts`, `fixed.astro`, `Badge.tsx` — c48c4a4
 
 #### Manual
 

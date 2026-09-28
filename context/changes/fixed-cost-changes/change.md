@@ -1,7 +1,7 @@
 ---
 change_id: fixed-cost-changes
 title: Zmiany kwot i nowe wzorce stałe względem poprzedniego miesiąca (S-06)
-status: implementing
+status: implemented
 created: 2026-09-28
 updated: 2026-09-28
 archived_at: null

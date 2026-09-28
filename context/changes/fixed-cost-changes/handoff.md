@@ -1,36 +1,35 @@
 # Handoff — `fixed-cost-changes` (slice S-06)
 
-Written by the `implement` step (`/10x-implement fixed-cost-changes phase 3`, autonomous run
-`2026-09-28-s05-s06-s07`). Phase 3 (`/fixed` view: „Zmieniły kwotę” and „Bez zmian” sections) is implemented, gated
-and committed. The one thing the next agent must not get wrong: **the page is a 3-way discriminated union
-(`{error} | {referenceMonth: null} | {overview}`), not a 2-way check** — `"referenceMonth" in result` (empty/no-data
-branch) must stay distinct from `"error" in result`, and the content branch only ever reads `result.overview` after
-both narrow away; the „Nowe w tym miesiącu” section (Phase 4) slots into the same `overview` object (`overview.new`
-is already computed by `fixedOverview`, just unread by the page until then).
+Written by the `implement` step (`/10x-implement fixed-cost-changes phase 4`, autonomous run
+`2026-09-28-s05-s06-s07`). Phase 4 (last phase) is implemented, gated and committed; the plan's epilogue ran
+(`change.md` → `implemented`). The one thing the next agent must not get wrong: **the `[reviewer]`/`[human]`/`[visual]`
+Progress rows are still open on purpose** — this step never ticks a row it did not itself verify, and this phase's
+own manual row (4.9) is for `/10x-impl-review`, not for this step.
 
 ## 1. State
 
 | Item | Value |
 |---|---|
 | Branch | `feat/fixed-cost-changes`, cut from `main` at `3706508` |
-| Commits | 11 on this branch: identity, research, plan, plan review, fixture (p1, `e0d8e4d`), phase-1-sha docs (`9362e4e`), phase-1 handoff (`48604cb`), `feat(fixed-cost-changes): fixedOverview — the pure change/new rule (p2)` (`d827e00`), phase-2-sha docs (`f77de29`), phase-2 handoff (`3f1d8e1`), `feat(fixed-cost-changes): /fixed view — Zmieniły kwotę i Bez zmian (p3)` (`a8e8b0c`) |
+| Commits | 13 on this branch: identity, research, plan, plan review, fixture (p1, `e0d8e4d`), phase-1-sha docs (`9362e4e`), phase-1 handoff (`48604cb`), `feat(fixed-cost-changes): fixedOverview — the pure change/new rule (p2)` (`d827e00`), phase-2-sha docs (`f77de29`), phase-2 handoff (`3f1d8e1`), `feat(fixed-cost-changes): /fixed view — Zmieniły kwotę i Bez zmian (p3)` (`a8e8b0c`), phase-3 handoff (`321d614`), `feat(fixed-cost-changes): /fixed — „Nowe w tym miesiącu” i komunikat braku porównania (p4)` (`c48c4a4`) — this step |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `implementing` (unchanged this step — no phase-boundary transition applies mid-plan) |
-| Roadmap | S-06 `in-progress` (unchanged this step) |
-| `## Progress` rows remaining | 15 (`grep -c '^- \[ \]' plan.md`): 1.8 `[reviewer]`, 2.9 `[reviewer]` (both carried, still open), Phase 3 automated (3.1–3.8) done this step, 3.9 `[reviewer]` open, Phase 4 (4.1–4.12, 12 rows) untouched |
-| Working tree | clean after the commit (`.claude/skills/10x-autonomous-run/scripts/tree-clean.sh` → `CLEAN`) |
+| `change.md` status | `implemented` (this step, epilogue — the last plan phase closed) |
+| Roadmap | S-06 `in-progress` (unchanged; `/10x-archive` flips it to `done`) |
+| `## Progress` rows remaining | 7 (`grep -c '^- \[ \]' plan.md`) — all manual-only, none of them mine: 1.8 `[reviewer]`, 2.9 `[reviewer]`, 3.9 `[reviewer]`, 4.9 `[reviewer]`, 4.10 `[human]`, 4.11/4.12 `[visual]` |
+| Working tree | dirty before this commit with exactly the epilogue edits (`plan.md` Progress ticks + `change.md` status), per `tree-clean.sh`; clean after this step's own commit lands |
 
 ## 2. Artifacts
 
 | Path | What it is |
 |---|---|
-| `src/components/fixed/FixedSection.astro` (new) | Kit `.fixed-section` (title/count header + panel-look list wrapper reusing `ExcludedPatterns.astro`'s shape, not `Panel`); `hasRows` false renders one muted empty-line `<p>` instead of the slot. `compact` prop accepted (kit parity, marks the wrapper) but the actual row-height difference lives in `FixedRow`'s own `compact` prop, since slotted rows can't be resized after the fact — documented in the header comment |
-| `src/components/fixed/FixedRow.astro` (new) | Kit `.fixed-row`, shared by all three sections. Compact branch (`ExcludedPatterns`-style: mark + name + plain amount, no meta, no slot) vs. full branch (mark + name + optional `<small>` meta + `.fixed-change` wrapper with amount and a slot for the delta / Phase-4 badge). Reuses `merchantMark` from `merchant-mark.ts` |
-| `src/pages/fixed.astro` | Real data replaces the unconditional placeholder: `createClient` → `loadPatternData` → `fixedOverview`, 3-way `result` union (error / empty / overview, see intro), `FixedSection`/`FixedRow` for "Zmieniły kwotę" (signed delta, `text-excess-text` rise / `text-green` decrease) and "Bez zmian" (compact). `deltaClass` helper and `<b>` kept on one line deliberately (comment) so prettier's 120-char wrap never splits the smoke-asserted delta text across lines (the `InlineAlert` trap named in the agent contract) |
-| `src/content/copy.ts` | `copyExtra.fixed` gains `itemForms`, `count`, `previously` (`DESIGN-GAP: K23`, verbatim from `app.js` `fixedCosts()`) and `changedEmpty`, `unchangedEmpty` (`DESIGN-GAP: G34`, placeholders) |
-| `context/foundation/design-kit.md` | New rows **K23** (row/section copy only in `app.js`) and **G34** (states the kit's `fixedCosts()` doesn't define: empty section, decrease colour, no-comparison message, error state, and the `new`/`changed` badge tone actually being amber per a later CSS rule — K9); **G5** status amended from stale `delivered · /fixed` to `S-06 (faza 3, 2026-09-28): wdrożone`; both appended to „Do rundy 3” (items 24, 25) |
-| `scripts/smoke.mjs` | 6 new steps (pre-import view, one-month no-change + unchanged-rows, changed-amount + previous-amount, anonymous redirect) reusing the existing smoke user's May/June imports — no new payload. Header comment updated. **Test-runner change**: `contains` now also accepts a string array (all must match) — needed because two Phase-3 steps prove two facts from one GET (row name + section header; previous-amount line + renamed pattern) and the plan's `[reviewer]` row would otherwise force splitting them into extra named steps that break the phase's stated smoke-count math (111+6=117) |
-| `context/changes/fixed-cost-changes/plan.md` | Progress 3.1–3.8 ticked with sha `a8e8b0c` (in the phase commit itself this time — no follow-up sha commit needed since this handoff carries the plan.md edit and the sha was already known); 3.9 (`[reviewer]`) left open |
+| `src/components/app/Badge.tsx` | New tone `new` (`bg-excess/25 text-excess-text`) added to the `BadgeProps` union and the `tones` map; header comment carries `DESIGN-GAP: G34` (the tone has no dedicated kit token — reuses `InlineAlert`'s error tint per K9) and documents `changed` as still deferred to G28 |
+| `src/pages/fixed.astro` | Third `FixedSection` ("Nowe w tym miesiącu") slotted between "Zmieniły kwotę" and "Bez zmian" (kit order): rows carry `meta={firstSeenText(row.firstOccurredOn)}` and a `<Badge tone="new">{copy.components.new}</Badge>` slot child (static SSR, no `client:` directive, same precedent as `patterns/[...key].astro`). Section `empty` = `result.overview.hasComparison ? x.newEmpty : x.noComparison`. New `firstSeenText` helper alongside the existing `countText`/`previouslyText`. Header comment rewritten — the old "Phase 4 lands X" forward-reference is gone |
+| `src/content/copy.ts` | `copyExtra.fixed` gains `firstSeen` (K23, verbatim `app.js`) and `newEmpty`/`noComparison` (G34, US-04 AC wording for the latter) |
+| `context/foundation/design-kit.md` | K9 note appended (`Badge` tone `new` mapping); K23 and G34 rows' "Faza 4" clause flipped from a forward-reference to "dostarczone"; G5 status line rewritten to "faza 4 … wdrożone w całości" (all three sections) |
+| `context/changes/fixed-cost-changes/follow-ups/review-fixes.md` (new) | Plan Phase 4 item 4: D5-flip mitigation (pin), one-off merchants crowding "Nowe", `/patterns` status badges (G28) reusing `fixedOverview`, S-07's `/home` stat card reusing `fixedOverview(...).changed` — each with a `Trigger:` line. Also records `Badge` tone `changed` as still unimplemented (not a finding, a phase-4-contract note) |
+| `scripts/smoke.mjs` | 4 new steps per plan Phase 4 §6: "fixed without a previous month says so" (after the one-month "unchanged patterns" step), "fixed hides an excluded pattern" (right after "later import keeps the exclusion", while Kawiarnia Rytm is still excluded — positive control is "Piekarnia smoke", June's one-off new pattern), "fixed marks a new pattern" and "fixed compares with the previous month" (after "fixed shows the previous amount", post-restore). Header comment updated. 121 total steps (baseline 111 + phase-3's 6 + this phase's 4) |
+| `context/changes/fixed-cost-changes/plan.md` | Progress 4.1–4.8 ticked with sha `c48c4a4`; 4.9/4.10/4.11/4.12 left open (manual-only) |
+| `context/changes/fixed-cost-changes/change.md` | `status: implemented` (epilogue) |
 | `context/changes/fixed-cost-changes/handoff.md` | This file |
 
 ## 3. Verification
@@ -38,96 +37,83 @@ is already computed by `fixedOverview`, just unread by the page until then).
 | Command | Result |
 |---|---|
 | `git branch --show-current` | `feat/fixed-cost-changes` (observed) |
-| `npm run lint` | 0 errors (observed; one `lint:fix` pass needed for two prettier attribute-wrap fixes, then clean — confirmed the fixed `<b>`/delta-class lines stayed single-line, not the risky text-wrap) |
-| `npx astro check` | 124 files, 0 errors — baseline 122/0 (phase 2), delta +2 files (`FixedSection.astro`, `FixedRow.astro`), 0 errors (observed) |
+| `npm run lint` | 0 errors (observed, before and after the deliberate-break restores) |
+| `npx astro check` | 124 files, 0 errors — baseline 124/0 (phase 3), delta 0 (observed) |
 | `npm run fixture:check` | OK (observed) |
-| `npm test` | 213 passed, 12 files — baseline 213/12 (phase 2), delta 0 (observed, twice — after writing and after the deliberate-break restores) |
+| `npm test` | 213 passed, 12 files — baseline 213/12 (phase 3), delta 0 (observed) |
 | `npm run build` | passes (observed) |
 | `npx supabase db reset && npx supabase test db` | Files=5, Tests=102, Result: PASS — baseline 102/5, delta 0 (observed, sandbox disabled) |
-| `ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398` + `npm run smoke` | 117/117 PASS — baseline 111, delta +6, matches the plan's `111 + 6 = 117` target exactly (observed three times: clean, after each deliberate-break restore; sandbox disabled; port 4398 killed after each run) |
-| Deliberate break 3.6 (delta): `formatSignedMoney(row.deltaMinor)` → `formatMoney(row.deltaMinor)` | "fixed lists a changed amount" FAILed (`>+1,50 zł<` missing — rendered `1,50 zł`, no sign); "fixed shows the previous amount" stayed PASS — meta-check confirmed the red isolates the signed formatter reaching the page, not the row rendering at all. Restored; suite green again |
-| Deliberate break 3.7 (pre-import branch): `"referenceMonth" in result ?` → `false ?` | "fixed shows the pre-import view" FAILed — as a 500 (accessing `result.overview` when `result` was actually `{referenceMonth: null}`), not a text mismatch, but still a clean FAIL against the expected 200; "fixed with one month lists no change" (a real-data step) stayed PASS — meta-check confirmed the red is specifically the removed empty-data branch, not a general breakage. Restored; suite green again |
+| `ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398` + `npm run smoke` | 121/121 PASS — baseline 117, delta +4, matches the plan's `117 + 4 = 121` target exactly (observed twice: clean and after the two deliberate-break restores; sandbox disabled; port 4398 killed after) |
+| Deliberate break 4.6 (message ignores `hasComparison`): `empty={result.overview.hasComparison ? x.newEmpty : x.noComparison}` → `empty={x.newEmpty}` | "fixed without a previous month says so" FAILed (the no-comparison string missing); "fixed compares with the previous month" stayed PASS — meta-check confirmed the red isolates the empty-message's `hasComparison` guard, not the section's rendering at all. Restored; suite green again |
+| Deliberate break 4.7 (`!excluded` filter dropped): `pattern.type !== "fixed" \|\| pattern.excluded` → `pattern.type !== "fixed"` | Unit `test/unit/fixed-overview.test.ts` case 11 FAILed (`excludedFixed` reappeared in `changed`); "fixed hides an excluded pattern" FAILed on the live page; "fixed marks a new pattern" stayed PASS — meta-check confirmed the red is specifically the exclusion filter reaching the page, not a general read failure. Restored; suite green again |
 | Post-restore re-run: lint / astro check / fixture:check / test / build / pgTAP / smoke | all green again (observed, matches the rows above) |
-| Seam checks | `grep -nE "#[0-9a-fA-F]{3,6}\b|\[#"` over `src/components/fixed/*.astro`, `src/pages/fixed.astro` — empty; `grep -n "DESIGN-GAP"` over the same files + `copy.ts` — every new key carries `K23` or `G34` (observed) |
+| Seam checks | `grep -rn "Further tones" src` — empty (removed from `Badge.tsx`); `grep -rnE "#[0-9a-fA-F]{3,6}\b\|\[#"` over `src/components/fixed`, `src/pages/fixed.astro`, `src/components/app/Badge.tsx` — empty; `grep -rn "DESIGN-GAP: G34\|DESIGN-GAP: K23" src` matches exactly `copy.ts` (×2), `fixed.astro` (×1) and `Badge.tsx` (×1) — matches plan success criteria verbatim (the `new`-tone mapping itself carries the G34 marker, added to satisfy the plan's own listed grep) |
+| Duplication check | `formatSignedMoney`, `patternTxs`, `previousMonth` each have exactly one definition, reused (no inline reimplementation next to `fixed.astro`'s usage) — observed via targeted grep, no seam found needing extraction |
 
 ## 4. Next command
 
-`/10x-implement fixed-cost-changes phase 4`
+`/10x-impl-review fixed-cost-changes`
 
 ## 5. Open
 
-- **3-way union, not 2-way** (see intro) — Phase 4 adds the "Nowe w tym miesiącu" `FixedSection` between the two
-  existing ones inside the same `overview` content branch; `overview.new` and `overview.hasComparison` are already
-  computed, just unread by `fixed.astro` until Phase 4 reads them.
-- **`FixedSection`'s `compact` prop is accepted but not consumed for styling** (documented in its own header
-  comment) — the wrapper padding is identical either way per the plan contract; row height comes from `FixedRow`'s
-  own `compact` prop, set per-row at the call site in `fixed.astro`. Not a stale prop: it exists for kit-markup
-  parity and is genuinely referenced (added to the wrapper's `class:list`), just with no corresponding CSS rule.
-- **`scripts/smoke.mjs`'s `contains` field now accepts `string | string[]`** (backward-compatible; every existing
-  entry still passes a plain string) — Phase 4's plan-listed step "fixed marks a new pattern" also needs two
-  positive `contains` values (`>pierwsze wystąpienie · 10.06.2026<` and `>nowy<`); use the array form for it rather
-  than splitting into two named steps (would break the phase's stated `117 + 4 = 121` smoke-count math).
-- **Manual-only Progress rows carried forward (human checklist, unchanged):** 1.8 `[reviewer]`, 2.9 `[reviewer]`,
-  3.9 `[reviewer]` (this phase, still open) — `/10x-impl-review`; 4.9 `[reviewer]`; 4.10 `[human]` — product owner
-  confirms plan decision 7 (D5 flip); 4.11, 4.12 `[visual]` — the Visual step.
-- **DESIGN-GAPs added this step**: K23 (`copyExtra.fixed` row/section copy) and G34 (states the kit doesn't define)
-  registered in `design-kit.md`, both also appended to „Do rundy 3” (items 24, 25); G5 status amended. **Phase 4
-  still needs**: K23 gains `firstSeen`; G34 gains `newEmpty`/`noComparison` and the `Badge` `new`-tone note; K9 note
-  ("S-06: `Badge` tone `new` → `excess`/25 + `excess-text`") per plan Phase 4 item 1/3.
-- **Phase 4 starts here**: `Badge.tsx` needs a `new` tone (`bg-excess/25 text-excess-text`, plan contract); the
-  header comment's "Further tones (`new` / `changed`) arrive with S-06" line becomes stale once that lands — the
-  seam-sweep grep `grep -rn "Further tones" src` (plan 4.8) will still find it in `fixed.astro`'s own header comment
-  too if not removed there — check both files.
-- **Smoke anchors** (Phase 4, unchanged guidance): use `>text<`; if `eslint --fix` ever wraps an element in
-  `FixedRow.astro` / `FixedSection.astro` / `fixed.astro`, switch to bare text or a short pre-computed helper (as
-  done here for the delta `<b>`) — never leave a multi-line wrap on a smoke-asserted element.
-- **Follow-ups file** (`context/changes/fixed-cost-changes/follow-ups/review-fixes.md`) still does not exist — Phase
-  4 creates it (plan item 4).
-- No new risk introduced by this phase; `Known risks` in plan.md (D5 flip, one-off merchants, astro-check count,
-  smoke text anchors, badge `new` tint) all still apply unchanged to Phase 4.
+- **Manual-only Progress rows (human checklist, unverified by any automated step):** 1.8 `[reviewer]` (Phase 1
+  fixture diff), 2.9 `[reviewer]` (`fixed.ts` purity/header), 3.9 `[reviewer]` (Phase 3 copy/colour audit), 4.9
+  `[reviewer]` (this phase's seam sweep — the automated greps in §3 already passed, but a human/reviewer pass is
+  still the row's own contract), 4.10 `[human]` (product owner must confirm plan decision 7 — the D5-flip drop-off
+  — against FR-012's literal wording), 4.11/4.12 `[visual]` (screenshot gate, ten named shots + the fixture
+  walk-through). None of these were ticked by this step.
+- **Follow-ups filed this step** (`context/changes/fixed-cost-changes/follow-ups/review-fixes.md`, new): D5 flip
+  (Trigger: 4.10 answered "must show", or product feedback), one-off merchants crowding "Nowe" (Trigger: product
+  feedback or S-07's stat card), `/patterns` status badges G28 (Trigger: next `/patterns` change), S-07 `/home`
+  stat card reusing `fixedOverview` (Trigger: S-07).
+- **`Badge` tone `changed` is still unimplemented** — only `new` shipped this phase, per the plan's own Phase 4 §1
+  contract; wiring it in belongs to the G28 follow-up (`/patterns` status badges), not this slice.
+- **DESIGN-GAPs closed this step**: K23 (`firstSeen`) and G34 (`newEmpty`/`noComparison`/`Badge` `new`-tone
+  mapping) both moved from "placeholder" to "dostarczone" in `design-kit.md`; G5 and K9 rows updated to match. No
+  new gap ids opened this phase — everything needed was already registered by Phase 3.
+- **Known risks in `plan.md`** (D5 flip, one-off merchants, astro-check count, smoke text anchors, badge `new`
+  tint) all still apply unchanged — none were resolved by code, only by the follow-ups file recording them for a
+  human/later slice.
+- **This slice's implementation work is done.** What remains before `/10x-archive` can close S-06: the reviewer
+  pass (1.8/2.9/3.9/4.9), the `[human]` product decision (4.10), and the visual gate (4.11/4.12) — none of which
+  this step is authorized to perform or tick.
 
 ## 6. Autonomous decisions
 
-- **Exec mode: implemented Phase 3 directly in this context, not delegated to a subagent.** Rejected: delegating
-  per the skill's default `AskUserQuestion` prompt (forbidden by the agent contract). Why: the phase-2 handoff
-  flagged Phase 3 (two new Astro components + the page) as the point where delegation becomes the better default,
-  but doing it directly let me verify the exact single-line-rendering risk (prettier wrap → broken `>text<` anchor)
-  firsthand while writing the components, rather than reviewing it after the fact. Would change: Phase 4, which is
-  smaller (no new component) — could go either way.
-- **`result` typed as a 3-way discriminated union (`{error}|{referenceMonth:null}|{overview}`), computed via an
-  IIFE, mirroring `patterns.astro`'s `{error}|{patterns}` pattern extended to a third case** — chosen over a plain
-  `FixedOverview | null` local (would conflate "read failed" with `overview.referenceMonth === null`, a valid
-  `FixedOverview` shape for "no rows"), and over destructuring `overview` fields into un-typed locals before the
-  template (patterns.astro's style, but this page needs the whole nested `changed`/`unchanged` arrays inline in
-  JSX, not scalar fields). Why: TypeScript narrows `"x" in union` checks reliably inside nested JSX ternaries in
-  this codebase already (patterns.astro's own precedent); `astro check` confirmed 0 errors. Would change: nothing
-  binds this differently for Phase 4's third branch (adds a `FixedSection` read from the same `result.overview`,
-  no new union member needed).
-- **`FixedSection`'s `compact` prop kept in the type per the plan's literal contract, but applied only as a
-  kit-parity wrapper class, not a styling difference** (see §5). Rejected: dropping the prop entirely (contradicts
-  the plan's explicit Props shape); rejected: threading it into a CSS-cascade `:global()` selector to actually
-  resize slotted `FixedRow`s from the section (over-engineered — `FixedRow`'s own `compact` prop, also in the plan
-  contract, already does this per-row, and duplicating the mechanism two ways would be exactly the kind of
-  duplicated-logic the Phase-4 seam sweep looks for). Would change: a future section needing genuinely different
-  compact-wrapper styling.
-- **`scripts/smoke.mjs`'s `contains` extended to accept `string | string[]`**, backward-compatible. Rejected:
-  splitting steps 3 ("fixed with one month lists unchanged patterns") and 5 ("fixed shows the previous amount")
-  each into two named steps to keep `contains` single-valued — would raise the smoke count above the plan's stated
-  `111 + 6 = 117` and drift from the plan's named step list (6 items, not 8). Why: the plan explicitly names each
-  step as proving two facts ("contains X and Y"); extending the harness is the smaller, more faithful change.
-  Would change: a reviewer preferring the step-count math over a harness change (then split the two steps and
-  update the phase's smoke-count line instead).
-- **Deliberate-break 3.7 manifested as a 500, not a text-mismatch FAIL.** Accepted as satisfying the plan's
-  "FAILs" requirement (the harness compares `status` first; 500 ≠ expected 200 is an unambiguous FAIL) rather than
-  reworking the break to avoid the runtime error. Why: forcing a text-only failure mode would have meant breaking
-  something less precisely targeted at "the pre-import branch is gone"; the 500 is in fact stronger evidence that
-  the branch was removed (the empty-state's `overview` shape has no `.changed`/`.unchanged` to read). Would change:
-  a reviewer wanting every deliberate break to fail via content mismatch specifically, never a 5xx.
-- **No `change.md` / roadmap edit this step**, same reasoning as phase 2 (no phase-boundary status transition
-  applies mid-plan). Would change: a contract rule requiring a per-phase `updated` bump on `change.md` (none
-  found).
-- **sha appended directly in this step's own `plan.md` edit, not a separate follow-up docs commit** (unlike phases
-  1–2, which used a follow-up commit because the phase commit couldn't know its own sha in advance). Why: this
-  handoff commit is written after the phase commit exists, so its sha (`a8e8b0c`) is already known when editing
-  `plan.md` — folding it into the handoff commit avoids an extra empty-diff-adjacent commit. Would change: nothing
-  binds this either way; phase-2's handoff explicitly flagged this as an open choice for Phase 3.
+- **Exec mode: implemented Phase 4 directly in this context, not delegated to a subagent.** Rejected: delegating
+  per the skill's default `AskUserQuestion` prompt (forbidden by the agent contract). Why: the phase-3 handoff
+  flagged Phase 4 as smaller (no new component) and noted it "could go either way" — direct execution let me verify
+  the Badge import path (named vs. default export) and the seam-sweep grep contract (no raw hex even in comments)
+  firsthand while writing, catching both before they became lint/grep failures. Would change: nothing — this was
+  the smaller phase as predicted, direct execution cost nothing extra.
+- **Badge.tsx's `new`-tone comment carries a literal `DESIGN-GAP: G34` marker**, moved there specifically to satisfy
+  the plan's own seam-sweep grep (`grep -rn "DESIGN-GAP: G34\|DESIGN-GAP: K23" src` must match `copy.ts`, `fixed.astro`
+  **and** `Badge.tsx`, plan review F2) — my first draft of the comment cited the kit's raw hex values (`#EFE4D1`,
+  `#e2e7ec`) for context, which broke the *other* seam-sweep grep (no raw colours in `Badge.tsx`). Rejected: leaving
+  the hex reference (documents the kit precisely but fails the plan's own gate); rejected: dropping the G34 marker
+  (fails the DESIGN-GAP grep instead). Why: the plan's two greps are both explicit success criteria (4.8); satisfying
+  both meant describing the amber-vs-grey-blue CSS override in words, not hex. Would change: a reviewer preferring
+  the seam-sweep contract be loosened to allow documentary hex in comments (would need a plan amendment, not a
+  unilateral call here).
+- **`fixedOverview`'s "Nowe" section reads `result.overview.hasComparison` directly at the call site** (`empty=
+  {result.overview.hasComparison ? x.newEmpty : x.noComparison}`) rather than destructuring `hasComparison` into a
+  local first. Rejected: a local const (would shadow nothing, purely stylistic) — the existing page already reads
+  `result.overview.changed`/`.new`/`.unchanged` inline throughout; a lone destructured local for just this one field
+  would be the inconsistent choice. Would change: nothing binds this differently.
+- **Follow-ups file authored fresh (Phase 4 §4 required it as new)**, not merged with S-05's carried-forward file
+  (`context/archive/2026-09-28-durable-pattern-decisions/follow-ups/review-fixes.md`) — different change, different
+  directory, per the standard `context/changes/<id>/follow-ups/review-fixes.md` convention every prior slice used.
+  Would change: nothing — this is the established pattern, not a judgment call.
+- **Epilogue run in the same session, no `AskUserQuestion` for the "N Progress items still pending" gate the skill
+  normally raises.** The orchestrator's own step instructions explicitly override that gate here ("run the skill's
+  epilogue → change.md status implemented, even with `[reviewer]`/`[visual]`/`[human]` rows open"). Rejected: pausing
+  per the skill's default "Pause (Recommended)" option — forbidden by the agent contract's no-`AskUserQuestion` rule
+  and explicitly superseded by this step's own instructions. Would change: nothing — this was the orchestrator's
+  explicit, unambiguous instruction for this step.
+- **Epilogue edits (`plan.md` sha ticks + `change.md` status) folded into this same handoff commit, not a separate
+  `chore(fixed-cost-changes): close out plan (epilogue)` commit** as the skill's generic epilogue ritual names.
+  Why: the agent contract's own convention for this run already commits phase code and phase-sha-plus-handoff docs
+  as two commits per phase (phases 1–2 used three: feat, sha-docs, handoff; phase 3 folded sha-docs into handoff).
+  A fourth commit type (a bare epilogue chore with no handoff content) would add a commit whose only content
+  overlaps entirely with what this handoff commit already carries. Would change: a reviewer preferring the skill's
+  literal three-commit-type epilogue ritual over the run's established two-commit-per-phase pattern.

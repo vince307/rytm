@@ -81,6 +81,25 @@ export const copyExtra = {
     // DESIGN-GAP: G35 — the kit's trend panel has no state for "no pattern has an applicable threshold at all";
     // placeholder, the author supplies the final copy.
     noThreshold: "Ustaw próg na wzorcu, a tu pojawi się suma ponad progiem.",
+    // DESIGN-GAP: K25 — the kit prints these only as `content.json` `dashboard.stats[].foot` *samples*
+    // ("+42,20 zł względem kwietnia", "2 pozycje podrożały"); the templates below reproduce them byte for byte.
+    deltaFoot: "{delta} względem {month}",
+    monthsGenitive: [
+      "stycznia",
+      "lutego",
+      "marca",
+      "kwietnia",
+      "maja",
+      "czerwca",
+      "lipca",
+      "sierpnia",
+      "września",
+      "października",
+      "listopada",
+      "grudnia",
+    ],
+    risen: "{n} {items}",
+    risenForms: ["pozycja podrożała", "pozycje podrożały", "pozycji podrożało"],
   },
   imports: {
     eyebrow: "Importy CSV",

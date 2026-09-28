@@ -1,18 +1,22 @@
 ---
 // /home — kit `dashboard()` no-name variant (`#/home-no-name`, K5) + `trendChart()` `.monthly-trend` (FR-013,
-// US-05, S-07). `loadPatternData` → `overLimitTrend(patterns, rows, thresholds)` inside a `try` (S-06 follow-up:
-// a `patternTxs` id-drift throw must not become a 500 here; `/patterns` and `/fixed` are not retrofitted — one
+// US-05, FR-012, US-04, S-07). `loadPatternData` → `overLimitTrend(patterns, rows, thresholds)` →
+// `fixedOverview(patterns, rows)` → `homeStats(trend, fixed)`, all inside one `try` (S-06 follow-up: a
+// `patternTxs` id-drift throw must not become a 500 here; `/patterns` and `/fixed` are not retrofitted — one
 // view, tracked as a follow-up). The pre-import state (`referenceMonth === null`) is unchanged from before this
-// phase. Stat cards ("Ponad progiem w tym miesiącu", "Koszty stałe") land in Phase 3; the import panel in Phase 4.
+// change. The import panel lands in Phase 4.
 import AppLayout from "@/layouts/AppLayout.astro";
 import EmptyState from "@/components/app/EmptyState.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
 import Panel from "@/components/app/Panel.astro";
+import StatCard from "@/components/home/StatCard.astro";
 import TrendChart from "@/components/home/TrendChart.astro";
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
-import { formatMoney, formatMonthAxis } from "@/lib/format";
+import { formatMoney, formatMonthAxis, formatSignedMoney, plural } from "@/lib/format";
+import { fixedOverview } from "@/lib/patterns/fixed";
+import { homeStats, type HomeStats } from "@/lib/patterns/home";
 import { loadPatternData } from "@/lib/patterns/load";
 import { overLimitTrend, trendBarHeight, type OverLimitTrend } from "@/lib/patterns/trend";
 import { createClient } from "@/lib/supabase";
@@ -24,11 +28,13 @@ const e = copy.emptyState;
 // shows the empty state or a partial view.
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 const dataResult = supabase ? await loadPatternData(supabase) : { error: new Error("Supabase is not configured") };
-const result: { error: unknown } | { referenceMonth: null } | { trend: OverLimitTrend } = (() => {
+const result: { error: unknown } | { referenceMonth: null } | { trend: OverLimitTrend; stats: HomeStats } = (() => {
   if ("error" in dataResult) return { error: dataResult.error };
   try {
     const trend = overLimitTrend(dataResult.patterns, dataResult.rows, dataResult.thresholds);
-    return trend.referenceMonth === null ? { referenceMonth: null } : { trend };
+    if (trend.referenceMonth === null) return { referenceMonth: null };
+    const fixed = fixedOverview(dataResult.patterns, dataResult.rows);
+    return { trend, stats: homeStats(trend, fixed) };
   } catch (err) {
     return { error: err };
   }
@@ -50,6 +56,15 @@ const barsFor = (trend: OverLimitTrend) => {
     height: trendBarHeight(m.overMinor, max),
   }));
 };
+
+// K25 templates — kit `content.json` `dashboard.stats[].foot` prints these only as samples; `{delta}` / `{month}`
+// and `{n}` / `{items}` generalise them (K24 `leadFor` precedent).
+const deltaFootFor = (previous: NonNullable<HomeStats["previous"]>) =>
+  h.deltaFoot
+    .replace("{delta}", formatSignedMoney(previous.deltaMinor))
+    .replace("{month}", h.monthsGenitive[Number(previous.month.split("-")[1]) - 1]);
+
+const risenFootFor = (n: number) => h.risen.replace("{n}", String(n)).replace("{items}", plural(n, h.risenForms));
 ---
 
 <AppLayout title={copy.dashboard.eyebrow} active="home">
@@ -83,6 +98,19 @@ const barsFor = (trend: OverLimitTrend) => {
           {copyExtra.patterns.upload}
         </a>
       </PageTitle>
+      <div class="mb-[15px] grid grid-cols-[1.2fr_1fr] gap-[15px] max-[899px]:grid-cols-1">
+        <StatCard
+          accent
+          label={copy.dashboard.stats[0].label}
+          value={formatMoney(result.stats.overMinor)}
+          foot={result.stats.previous ? deltaFootFor(result.stats.previous) : undefined}
+        />
+        <StatCard
+          label={copy.dashboard.stats[2].label}
+          value={formatMoney(result.stats.fixedTotalMinor)}
+          foot={risenFootFor(result.stats.fixedRisen)}
+        />
+      </div>
       <Panel>
         <div class="mb-5 flex items-start justify-between">
           <h2 class="text-[17px] tracking-[-0.03em]">{copy.trend.title}</h2>

@@ -1,21 +1,101 @@
 ---
+// /home — kit `dashboard()` no-name variant (`#/home-no-name`, K5) + `trendChart()` `.monthly-trend` (FR-013,
+// US-05, S-07). `loadPatternData` → `overLimitTrend(patterns, rows, thresholds)` inside a `try` (S-06 follow-up:
+// a `patternTxs` id-drift throw must not become a 500 here; `/patterns` and `/fixed` are not retrofitted — one
+// view, tracked as a follow-up). The pre-import state (`referenceMonth === null`) is unchanged from before this
+// phase. Stat cards ("Ponad progiem w tym miesiącu", "Koszty stałe") land in Phase 3; the import panel in Phase 4.
 import AppLayout from "@/layouts/AppLayout.astro";
-import PageTitle from "@/components/app/PageTitle.astro";
 import EmptyState from "@/components/app/EmptyState.astro";
+import InlineAlert from "@/components/app/InlineAlert.astro";
+import PageTitle from "@/components/app/PageTitle.astro";
+import Panel from "@/components/app/Panel.astro";
+import TrendChart from "@/components/home/TrendChart.astro";
+import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
+import { formatMoney, formatMonthAxis } from "@/lib/format";
+import { loadPatternData } from "@/lib/patterns/load";
+import { overLimitTrend, trendBarHeight, type OverLimitTrend } from "@/lib/patterns/trend";
+import { createClient } from "@/lib/supabase";
 
 const h = copyExtra.home;
 const e = copy.emptyState;
+
+// Same read shape as `/patterns` and `/fixed` — a failed read, including an unconfigured Supabase client, never
+// shows the empty state or a partial view.
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const dataResult = supabase ? await loadPatternData(supabase) : { error: new Error("Supabase is not configured") };
+const result: { error: unknown } | { referenceMonth: null } | { trend: OverLimitTrend } = (() => {
+  if ("error" in dataResult) return { error: dataResult.error };
+  try {
+    const trend = overLimitTrend(dataResult.patterns, dataResult.rows, dataResult.thresholds);
+    return trend.referenceMonth === null ? { referenceMonth: null } : { trend };
+  } catch (err) {
+    return { error: err };
+  }
+})();
+if ("error" in result) {
+  // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
+  console.error("home failed", result.error);
+}
+
+// K24 template — verbatim lead from `applyDashboardState` (`#/home-no-name`); `{month}` + `monthsNominative`
+// generalise the kit's baked-in "maj" (`patterns.astro` `sumLabel` precedent).
+const leadFor = (month: string) => h.lead.replace("{month}", h.monthsNominative[Number(month.split("-")[1]) - 1]);
+
+const barsFor = (trend: OverLimitTrend) => {
+  const max = Math.max(0, ...trend.months.map((m) => m.overMinor));
+  return trend.months.map((m) => ({
+    label: formatMonthAxis(m.month),
+    amount: formatMoney(m.overMinor),
+    height: trendBarHeight(m.overMinor, max),
+  }));
+};
 ---
 
 <AppLayout title={copy.dashboard.eyebrow} active="home">
-  <PageTitle eyebrow={h.emptyEyebrow} title={h.emptyTitle} lead={h.emptyLead} />
-  <EmptyState
-    title={e.title}
-    body={e.body}
-    cta={e.cta}
-    href="/imports/new"
-    illustration="/rytm/illustrations/rytm-pusty-stan-jasny.svg"
-    illustrationAlt={h.emptyIllustrationAlt}
-  />
+  {"error" in result ? (
+    <>
+      <PageTitle eyebrow={copy.dashboard.eyebrow} title={copy.dashboard.greetingNoName} />
+      {/* DESIGN-GAP: K18 — the kit has no copy for a failed read; `components.error` stands in (patterns.astro / fixed.astro precedent). */}
+      <InlineAlert kind="error">{copy.components.error}</InlineAlert>
+    </>
+  ) : "referenceMonth" in result ? (
+    <>
+      <PageTitle eyebrow={h.emptyEyebrow} title={h.emptyTitle} lead={h.emptyLead} />
+      <EmptyState
+        title={e.title}
+        body={e.body}
+        cta={e.cta}
+        href="/imports/new"
+        illustration="/rytm/illustrations/rytm-pusty-stan-jasny.svg"
+        illustrationAlt={h.emptyIllustrationAlt}
+      />
+    </>
+  ) : (
+    <>
+      {/* DESIGN-GAP: K24 — no-name lead, month generalised (see leadFor above). */}
+      <PageTitle
+        eyebrow={copy.dashboard.eyebrow}
+        title={copy.dashboard.greetingNoName}
+        lead={leadFor(result.trend.referenceMonth ?? "")}
+      >
+        <a href="/imports/new" class:list={buttonVariants({ variant: "primary" })}>
+          {copyExtra.patterns.upload}
+        </a>
+      </PageTitle>
+      <Panel>
+        <div class="mb-5 flex items-start justify-between">
+          <h2 class="text-[17px] tracking-[-0.03em]">{copy.trend.title}</h2>
+          <span class="text-xs text-muted">{copy.trend.range}</span>
+        </div>
+        <TrendChart
+          ariaLabel={copy.trend.title}
+          bars={barsFor(result.trend)}
+          legend={copy.trend.legend}
+          note={result.trend.months.length < 3 ? copy.trend.tooShort : undefined}
+          hint={!result.trend.hasThreshold ? h.noThreshold : undefined}
+        />
+      </Panel>
+    </>
+  )}
 </AppLayout>

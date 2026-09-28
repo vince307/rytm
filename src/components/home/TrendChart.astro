@@ -1,0 +1,52 @@
+---
+// TrendChart.astro — kit `trendChart()` (prototype/app.js) + `.monthly-trend` (prototype/styles.css), the `/home`
+// monthly "ponad progiem" chart (FR-013, US-05, S-07). Deliberately absent, against the kit: the current month's
+// `.tbar.hot` amber bar with its "niepełny" label, and the `trend.current` legend entry ("bieżący, niepełny
+// miesiąc") — US-05 AC 4 overrides the kit sample (the app cannot know a month is incomplete; the reference month
+// is only the latest month present in the data), DESIGN-GAP: G35. Every bar carries a visible sum (the kit's bars
+// carry only height) so a historical month's figure never needs a hover/tooltip the kit does not define.
+// Colour mapping (G35, no dedicated tokens): bar / legend dot `bg-muted/55` (kit `#9aaab3`), dashed gridline
+// `border-line` (kit `#d2d7d8`), info panel `bg-paper-soft`/`border-ink` (kit `.info-panel`, exact `paper-soft`).
+import { cn } from "@/lib/utils";
+
+interface Props {
+  bars: { label: string; amount: string; height: number }[];
+  legend: string;
+  ariaLabel: string;
+  note?: string;
+  hint?: string;
+}
+const { bars, legend, ariaLabel, note, hint } = Astro.props;
+---
+
+<div class="overflow-x-auto">
+  <ol aria-label={ariaLabel} class="relative flex gap-[13px] border-b border-line px-2.5 max-[559px]:gap-[7px]">
+    <div
+      class="pointer-events-none absolute inset-x-0 top-1/2 border-t border-dashed border-line"
+      aria-hidden="true"
+    ></div>
+    {bars.map((bar) => (
+      <li class="flex h-[200px] min-w-[44px] flex-1 flex-col items-center">
+        <span class="shrink-0 text-[10px] whitespace-nowrap text-muted">{bar.amount}</span>
+        <div class="relative w-full flex-1">
+          <i
+            class:list={cn(
+              "absolute inset-x-0 bottom-0 w-full rounded-t-[3px] bg-muted/55",
+              bar.height === 0 && "h-[2px]",
+            )}
+            style={bar.height > 0 ? `height:${bar.height}%` : undefined}
+          ></i>
+        </div>
+        <span class="mt-2 shrink-0 text-[10px] text-muted">{bar.label}</span>
+      </li>
+    ))}
+  </ol>
+</div>
+<div class="mt-[31px] flex items-center gap-[17px] text-[11px] text-muted">
+  <span>
+    <i class="mr-[5px] inline-block h-2 w-2 rounded-full bg-muted/55"></i>
+    {legend}
+  </span>
+</div>
+{note && <div class="mt-[14px] border-l-[3px] border-ink bg-paper-soft p-[13px] text-xs text-muted">{note}</div>}
+{hint && <div class="mt-[14px] border-l-[3px] border-ink bg-paper-soft p-[13px] text-xs text-muted">{hint}</div>}

@@ -60,6 +60,27 @@ export const copyExtra = {
     emptyTitle: "Zacznij od pierwszego importu.",
     emptyLead: "Rytm pokaże Ci wzorce, kiedy dostanie pierwszy wyciąg.",
     emptyIllustrationAlt: "Dokument czekający na import",
+    // DESIGN-GAP: K24 — verbatim from `prototype/app.js` `applyDashboardState` (`#/home-no-name`); the kit bakes
+    // the month into the sentence ("Twój maj w jednym spokojnym widoku."), `{month}` + `monthsNominative`
+    // generalise it (May reproduces the kit string byte for byte, `patterns.monthsLocative` precedent).
+    lead: "Twój {month} w jednym spokojnym widoku.",
+    monthsNominative: [
+      "styczeń",
+      "luty",
+      "marzec",
+      "kwiecień",
+      "maj",
+      "czerwiec",
+      "lipiec",
+      "sierpień",
+      "wrzesień",
+      "październik",
+      "listopad",
+      "grudzień",
+    ],
+    // DESIGN-GAP: G35 — the kit's trend panel has no state for "no pattern has an applicable threshold at all";
+    // placeholder, the author supplies the final copy.
+    noThreshold: "Ustaw próg na wzorcu, a tu pojawi się suma ponad progiem.",
   },
   imports: {
     eyebrow: "Importy CSV",

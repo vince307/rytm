@@ -660,7 +660,7 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Manual
 
-- [ ] 1.8 [reviewer] Generated diff limited to kinoteka's 2026-08 amount and derived totals / label; nothing hand-edited
+- [x] 1.8 [reviewer] Generated diff limited to kinoteka's 2026-08 amount and derived totals / label; nothing hand-edited — impl-review: generated diff = kinoteka 2026-08 amount, CSV preamble debit sum, expected.json row/sum/pattern sumMinor, README T11 label + derived sum; `npm run fixture:ing` regenerates byte-identical — 9d92300
 
 ### Phase 2: `fixedOverview` — the pure change / new rule
 
@@ -677,7 +677,7 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Manual
 
-- [ ] 2.9 [reviewer] `fixed.ts` pure (imports only `over-limit.ts`, `view.ts`, `@/types`); header states the rule, double-charge choice, no-comparison definition; `patternTxs` not duplicated
+- [x] 2.9 [reviewer] `fixed.ts` pure (imports only `over-limit.ts`, `view.ts`, `@/types`); header states the rule, double-charge choice, no-comparison definition; `patternTxs` not duplicated — impl-review: imports only over-limit/view/@/types; header states rule, double-charge, no-comparison; `patternTxs` single definition — 9d92300
 
 ### Phase 3: `/fixed` view — „Zmieniły kwotę” and „Bez zmian”
 
@@ -694,7 +694,7 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Manual
 
-- [ ] 3.9 [reviewer] Strings from `copy` / `copyExtra`; K23 byte-for-byte with `fixedCosts()`; only G34 placeholders new; allowed colour names only; `merchantMark` reused, no new primitive
+- [x] 3.9 [reviewer] Strings from `copy` / `copyExtra`; K23 byte-for-byte with `fixedCosts()`; only G34 placeholders new; allowed colour names only; `merchantMark` reused, no new primitive — impl-review: K23 byte-for-byte with `fixedCosts()`; only G34 placeholders new; colours ink/paper/muted/line/excess-text/green; `merchantMark` reused — 9d92300
 
 ### Phase 4: „Nowe w tym miesiącu”, no-comparison message, follow-ups and seam sweep
 
@@ -711,7 +711,7 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Manual
 
-- [ ] 4.9 [reviewer] Seam sweep: duplicated helpers / classes extracted or justified; stale comments and kit rows (G5, G28, G34, K9, K23) match the code; follow-ups file lists every item with a `Trigger:`
+- [x] 4.9 [reviewer] Seam sweep: duplicated helpers / classes extracted or justified; stale comments and kit rows (G5, G28, G34, K9, K23) match the code; follow-ups file lists every item with a `Trigger:` — impl-review: seam sweep: wrapper/mark duplication justified in comments, stale FixedRow comment + G28 row + S-07 follow-up formula fixed — 9d92300
 - [ ] 4.10 [human] Product owner confirms decision 7 (against FR-012 „niezależnie od tolerancji”): an out-of-tolerance rise flips the pattern to `frequent` and leaves `/fixed`; remedy = pin
 - [ ] 4.11 [visual] Screenshots desktop 1440 px + mobile ~400 px: `fixed-pre-import`, `fixed-overview`, `fixed-no-comparison`, `fixed-gap-month`, `fixed-decrease`, `fixed-double-charge`, `fixed-excluded`, `fixed-no-fixed`, `fixed-read-error`, `fixed-long-name`
 - [ ] 4.12 [visual] Fixture US-04 walk-through: kinoteka +4,00 zł vs 55,99 zł, silownia-ruch „nowy” 05.08.2026, lapsed patterns absent, counts match rows

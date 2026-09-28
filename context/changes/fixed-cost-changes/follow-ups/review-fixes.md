@@ -30,3 +30,13 @@ slice/change to pick up.
 - **`Badge` tone `changed` still unimplemented** — only `tone="new"` was added this phase (`bg-excess/25
   text-excess-text`); `changed` is explicitly deferred to the G28 follow-up above, per the plan's Phase 4 §1
   contract ("`changed` stays unimplemented until the `/patterns` badges").
+
+## From the implementation review (2026-09-28)
+
+- **A pattern/row drift throws past the error branch** — `view.ts` `patternTxs` throws on a `transactionIds` entry
+  missing from the read; `fixed.astro` calls `fixedOverview` (and `patterns.astro` calls `listOverview`) inside the
+  result IIFE without a `try`, so that programming error becomes a 500, not the `InlineAlert` error line. Inherited
+  shape from `/patterns`, not new in S-06. Trigger: a 500 on `/fixed` or `/patterns` in production logs, or the next
+  change touching `loadPatternData`.
+- **`FixedSection` `compact` prop only adds an unstyled `compact` class** (prototype-markup parity; row height lives in
+  `FixedRow` `compact`). Harmless. Trigger: the next `/fixed` change — drop the prop or give it meaning.

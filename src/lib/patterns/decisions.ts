@@ -1,7 +1,7 @@
 // Durable pattern decisions read (FR-009/US-03): the caller's own decisions, keyed by merchant key. RLS scopes
 // the rows to `user_id`, so no `.eq` is needed here (mirrors the transactions and threshold reads). Paged by
-// keyset like `loadPatterns` (S-04 F5 precedent) — a flood of decisions is self-inflicted (RLS-scoped), but the
-// read must not silently truncate at PostgREST's `max_rows` any more than the transactions read does.
+// keyset like the transactions read (`collectPages`, S-04 F5 precedent) — a flood of decisions is self-inflicted
+// (RLS-scoped), but the read must not silently truncate at PostgREST's `max_rows` any more than that read does.
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { collectPages, PAGE_SIZE } from "@/lib/patterns/load";

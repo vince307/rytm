@@ -437,6 +437,16 @@ const steps = [
     { status: 200, contains: ">Wykluczony z analizy<" },
   ],
   [
+    "patterns list shows the excluded section",
+    () => request("/patterns"),
+    { status: 200, contains: ">Kawiarnia Rytm<", notContains: "Wzorzec przywrócony do analizy." },
+  ],
+  [
+    "excluded pattern leaves the table",
+    () => request("/patterns"),
+    { status: 200, notContains: 'href="/patterns/kawiarnia%20smoke"' },
+  ],
+  [
     "import after the decisions is saved",
     () => request("/api/imports", { method: "POST", form: { payload: importPayloadJune } }),
     { status: 302, location: "/imports/result?id=" },
@@ -475,6 +485,11 @@ const steps = [
     "restored pattern drops the banner",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, notContains: ">Wykluczony z analizy<" },
+  ],
+  [
+    "list confirms a restore",
+    () => request("/patterns?restored=1"),
+    { status: 200, contains: "Wzorzec przywrócony do analizy." },
   ],
   [
     "merge is undone",

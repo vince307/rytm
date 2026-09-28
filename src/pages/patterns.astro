@@ -3,6 +3,7 @@ import AppLayout from "@/layouts/AppLayout.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
 import ViewEmpty from "@/components/app/ViewEmpty.astro";
+import ExcludedPatterns from "@/components/patterns/ExcludedPatterns.astro";
 import { PatternsTable, type PatternsTableCopy } from "@/components/patterns/PatternsTable";
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
@@ -30,6 +31,20 @@ if ("error" in result) {
   console.error("patterns list failed", result.error);
 }
 const items: PatternListItem[] = "patterns" in result ? result.patterns : [];
+// Excluded patterns leave the table for the "Wykluczone" section below it (S-05 Phase 7, G28); the empty state
+// (above) still keys off `items.length` — a list of only-excluded patterns is not "no patterns at all".
+const visibleItems = items.filter((p) => !p.excluded);
+const excludedItems = items.filter((p) => p.excluded).map((p) => ({ key: p.key, name: p.name }));
+
+// Decision result line above the table (Phase 7's own restore form posts `back=list`) — mirrors the detail
+// page's `decisionAlert` (Phase 6), but the only outcomes that can land here are `restored` and `error=decision`.
+const params = Astro.url.searchParams;
+const resultAlert = params.get("restored")
+  ? { kind: "success" as const, message: copy.patternActions.restored }
+  : params.get("error") === "decision"
+    ? { kind: "error" as const, message: x.decisionError }
+    : null;
+
 const tableCopy: PatternsTableCopy = {
   searchPlaceholder: copy.patterns.searchPlaceholder,
   sortOptions: copy.patterns.sortOptions,
@@ -64,7 +79,13 @@ const tableCopy: PatternsTableCopy = {
           {x.upload}
         </a>
       </PageTitle>
-      <PatternsTable client:load patterns={items} copy={tableCopy} />
+      {resultAlert && (
+        <div class="mb-[18px]">
+          <InlineAlert kind={resultAlert.kind}>{resultAlert.message}</InlineAlert>
+        </div>
+      )}
+      <PatternsTable client:load patterns={visibleItems} copy={tableCopy} />
+      <ExcludedPatterns patterns={excludedItems} />
     </>
   )}
 </AppLayout>

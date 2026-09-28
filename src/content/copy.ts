@@ -202,6 +202,8 @@ export const copyExtra = {
     excludedToast: "Wzorzec wykluczony z analizy.",
     // modal()'s close button aria-label is shared across every modal type, including patternActions.
     close: "Zamknij",
+    // `/patterns`'s "Wykluczone" toggle (prototype patterns(), excluded-toggle button text) — verbatim, S-05 faza 7.
+    excludedToggle: "Wykluczone",
     // DESIGN-GAP: G33 — the kit names no merge picker, rename field, direct-submit type/exclude, merged-variants
     // list, merge undo or result-line copy for FR-009 (the prototype only fires toasts on closeModal()); every
     // string below is a placeholder built from tokens and kit-adjacent phrasing, not a design decision.

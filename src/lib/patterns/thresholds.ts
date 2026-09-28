@@ -20,9 +20,9 @@ interface ThresholdRow {
 }
 
 /**
- * One row per pattern the caller has set a threshold on. Paged by keyset like `loadPatterns` (S-04 F5: a crafted
- * flood of thresholds is self-inflicted — RLS scopes the rows — but the read must not silently truncate at
- * PostgREST's `max_rows` any more than the transactions read does). A row whose `kind` is not one of the three is
+ * One row per pattern the caller has set a threshold on. Paged by keyset like the transactions read (`collectPages`,
+ * S-04 F5: a crafted flood of thresholds is self-inflicted — RLS scopes the rows — but the read must not silently
+ * truncate at PostgREST's `max_rows` any more than that read does). A row whose `kind` is not one of the three is
  * skipped; the DB check constraint makes that unreachable in practice, but the read stays defensive rather than
  * throwing on it.
  */

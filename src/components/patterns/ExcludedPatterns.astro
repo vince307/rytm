@@ -1,0 +1,50 @@
+---
+// ExcludedPatterns.astro — the kit's `.excluded-section` (prototype `patterns()`, app.js), without its
+// client-side toggle script: a native <details>/<summary> opens/closes with no island (S-05 Autonomous decision
+// 17). Renders nothing when there are no excluded patterns. Items are not links (kit) — each row posts "Przywróć"
+// through the shared RestoreForm (`back="list"`, Phase 6), which redirects to `/patterns?restored=1`.
+import Icon from "@/components/Icon.astro";
+import RestoreForm from "@/components/patterns/RestoreForm.astro";
+import { merchantMark } from "@/components/patterns/merchant-mark";
+import { copy, copyExtra } from "@/content/copy";
+import { plural } from "@/lib/format";
+
+interface Props {
+  patterns: { key: string; name: string }[];
+}
+
+const { patterns } = Astro.props;
+const x = copyExtra.patterns;
+---
+
+{patterns.length > 0 && (
+  <details class="group mt-4">
+    <summary class="flex cursor-pointer list-none items-center gap-2 py-[10px] text-xs font-extrabold text-muted [&::-webkit-details-marker]:hidden">
+      <Icon name="arrow" size={14} class="-rotate-90 transition-transform group-open:rotate-0" />
+      {x.excludedToggle}
+      <span class="font-normal">
+        {patterns.length} {plural(patterns.length, x.patternForms)}
+      </span>
+    </summary>
+    {/* Panel-styled (border/radius/bg as Panel.astro), but padding 0 20 (plan contract) — each row supplies its
+        own 14px vertical padding (as the kit's `.list-item`), so the two stack to Panel's usual 22px rhythm.
+        Not the shared `Panel` component: overriding its `p-[22px]` with `px-5 py-0` is order-dependent under
+        tailwind-merge (both are arbitrary-value utilities of the same property), so this stays a plain wrapper. */}
+    <div class="rounded-xl border border-line bg-paper px-5">
+      {patterns.map((p) => (
+        <div class="flex items-center justify-between gap-3 border-b border-line py-[14px] last:border-b-0">
+          <div class="flex items-center gap-[11px]">
+            <span class:list={merchantMark} aria-hidden="true">
+              {Array.from(p.name)[0]}
+            </span>
+            <div>
+              <div class="text-[13px] font-bold">{p.name}</div>
+              <div class="mt-[3px] text-[11px] text-muted">{copy.patternActions.excluded}</div>
+            </div>
+          </div>
+          <RestoreForm patternKey={p.key} back="list" />
+        </div>
+      ))}
+    </div>
+  </details>
+)}

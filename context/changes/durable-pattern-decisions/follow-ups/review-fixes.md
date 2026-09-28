@@ -80,6 +80,8 @@ carries forward with a `Trigger:` line for the next slice/change to pick up.
 - **F8 — shared `DialogContent` has no `max-h`/`overflow-y-auto`** (`src/components/ui/dialog.tsx`); with the merge
   or rename form revealed on a short mobile viewport the dialog can clip. The kit `.modal` has no scroll rule
   either (G24 geometry is exact). Trigger: the visual gate's mobile `rename-field`/`merge-picker` shots clipping.
+  Visual gate (2026-09-28): not triggered at 400×812 — `rename-field` 596 px (bottom 704), `merge-picker` 574 px;
+  still open for viewports below ~650 px high. Trigger: a dialog with more content, or a short-viewport bug report.
 - **F9 — pgTAP coverage**: `pattern_decisions.test.sql` asserts only TRUNCATE for `authenticated` and only INSERT
   for `anon`; SELECT/UPDATE/DELETE for anon and TRIGGER/REFERENCES/MAINTAIN were verified live by the review
   (all denied) but are unasserted. Assertion 21 (moving a row to another user) is guarded twice — the update

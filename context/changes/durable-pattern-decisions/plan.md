@@ -1068,8 +1068,8 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Manual
 
-- [ ] 5.8 [visual] Screenshots desktop 1440 px + mobile ~400 px: `settings-delete-dialog`, `imports-delete-dialog` — 480 px desktop, 20 px margin at 400 px, close button clear of the eyebrow
-- [ ] 5.9 [visual] bfcache back-navigation leaves neither „Usuń import” nor „Zapisz próg” stuck on its pending text
+- [x] 5.8 [visual] Screenshots desktop 1440 px + mobile ~400 px: `settings-delete-dialog`, `imports-delete-dialog` — 480 px desktop, 20 px margin at 400 px, close button clear of the eyebrow — visual gate: measured x 480 / w 480 (1440), x 20 / w 360 (400), padding 31, radius 13, close at x 923 / 343 vs eyebrow text ending at 644 / 184 (`screenshots/`, `reviews/visual-review.md`)
+- [x] 5.9 [visual] bfcache back-navigation leaves neither „Usuń import” nor „Zapisz próg” stuck on its pending text — visual gate, real Chrome (Claude-in-Chrome): both pages restored from bfcache (pre-submit `window` marker survived), threshold button idle, „Usuń import” enabled with its own label
 
 ### Phase 6: Pattern detail actions, excluded banner, merged variants
 
@@ -1086,7 +1086,7 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 #### Manual
 
 - [x] 6.8 [reviewer] Every string from `copy` / `copyExtra`; K22 byte-for-byte with `app.js`; only G33 placeholders new; no new primitives — impl-review: K22 six strings + „Wykluczone” byte-for-byte with `prototype/app.js`; other strings G33 placeholders or existing keys; only existing primitives reused
-- [x] 6.9 [reviewer] Keyboard: trigger, four actions, revealed fields and submits reachable; Esc / close work; each form posts one action — impl-review (code inspection): trigger, action buttons, `<select>`/`<input>` and submits are native focusable elements, none with `tabIndex=-1`; Radix `Dialog` handles Esc / close button / focus trap; each `<form>` carries exactly one hidden `action`
+- [x] 6.9 [reviewer] Keyboard: trigger, four actions, revealed fields and submits reachable; Esc / close work; each form posts one action — impl-review (code inspection): trigger, action buttons, `<select>`/`<input>` and submits are native focusable elements, none with `tabIndex=-1`; Radix `Dialog` handles Esc / close button / focus trap; each `<form>` carries exactly one hidden `action` — confirmed in the browser by the visual gate (focus on the dialog, Tab order, Esc → focus back on „Akcje”)
 
 ### Phase 7: Excluded section on `/patterns` and seam sweep
 
@@ -1104,5 +1104,5 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 - [x] 7.8 [reviewer] Seam sweep done by the implement step itself (orchestrator's explicit per-run assignment — see agent contract step brief, not the general [reviewer] delegation): merchant-mark classes deduplicated into `src/components/patterns/merchant-mark.ts` (shared by `PatternsTable.tsx` and `ExcludedPatterns.astro`); `Icon.astro`'s `size` union widened to include the kit's `14` rather than duplicating its SVG markup; the two stale `loadPatterns`-name comments in `decisions.ts`/`thresholds.ts` reworded to `collectPages`; kit rows G28, G33 extended with faza-7 delivery notes, K22's `copyExtra` block and the "Do rundy 3" item 22 note the new `excludedToggle` key; G4/G24 re-read and confirmed still accurate (untouched — neither concerns the excluded section); `follow-ups/review-fixes.md` written with every closed/open item carrying a `Trigger:` line — 71eaccb — impl-review re-check: `STATUS_PARAMS` duplicate and `fieldBox` were neither extracted nor justified; justification recorded (follow-up F4), stale comments in `patterns.astro` / `pattern-view.test.ts` and design-kit „Do rundy 3” item 8 fixed
 - [ ] 7.9 [human] Product owner confirms decision 9: „nie wchodzi do sumy miesięcznej” = excluded from every „ponad próg” sum and from any S-07 monthly total
-- [ ] 7.10 [visual] Screenshots desktop 1440 px + mobile ~400 px: `detail-actions-closed`, `actions-dialog`, `merge-picker`, `merge-none`, `rename-field`, `rename-error`, `merge-error`, `decision-error`, `pending`, `merged-result`, `unmerged-result`, `typed-result`, `renamed-result`, `excluded-banner`, `restored-result`, `absorbed-redirect`, `list-excluded-closed`, `list-excluded-open`, `list-restored`, `list-all-excluded`
-- [ ] 7.11 [visual] Fixture US-03 walk-through: merged `sportowo` row with combined count and sum under the new name, own transfer only in „Wykluczone”, pinned type on its row
+- [x] 7.10 [visual] Screenshots desktop 1440 px + mobile ~400 px: `detail-actions-closed`, `actions-dialog`, `merge-picker`, `merge-none`, `rename-field`, `rename-error`, `merge-error`, `decision-error`, `pending`, `merged-result`, `unmerged-result`, `typed-result`, `renamed-result`, `excluded-banner`, `restored-result`, `absorbed-redirect`, `list-excluded-closed`, `list-excluded-open`, `list-restored`, `list-all-excluded` — visual gate: all 20 captured after fixes c14f75a (action buttons full width, per-action pending, banner „Przywróć” on the row); `screenshots/README.md`
+- [x] 7.11 [visual] Fixture US-03 walk-through: merged `sportowo` row with combined count and sum under the new name, own transfer only in „Wykluczone”, pinned type on its row — visual gate: „Sportowo | częsty | 8 | 1316,28 zł” = 663,79 + 652,49 (fixture), JAN PRZYKŁADOWY only in „Wykluczone”, KAWIARNIA FILIŻANKA „stały” (`list-excluded-open-*`)

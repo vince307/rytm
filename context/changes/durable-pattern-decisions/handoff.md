@@ -1,99 +1,90 @@
 # Handoff — `durable-pattern-decisions` (slice S-05)
 
-The `/10x-impl-review` step wrote this handoff on 2026-09-28, in autonomous run `2026-09-28-s05-s06-s07`. It reviewed all 7 phases: 0 critical findings, 3 warnings (all fixed in `9de439b`) and 6 observations (recorded as follow-ups). The result is `MERGE: CLEAR`, and `change.md` is `impl_reviewed`.
+The visual gate step wrote this handoff on 2026-09-28, in autonomous run `2026-09-28-s05-s06-s07`. It captured every `[visual]` state of rows 5.8 and 7.10 at 1440 px and 400 px, checked bfcache (5.9) in real Chrome, and hand-checked the US-03 walk-through (7.11). It fixed three real discrepancies in `c14f75a`. The result is `VISUAL: PASS`.
 
-**What the next agent must not get wrong:** the next step is the **visual gate**, not another review or implement pass. Phase 5 changed the **shared** `DialogContent`, so the `/settings` and `/imports` delete dialogs must be re-shot alongside the `/patterns` views.
+**What the next agent must not get wrong:** the next step is `/10x-archive`, then ship. The hosted `npx supabase db push` IS due, because the migration `20260928120000_pattern_decisions` must reach the hosted DB before the merge.
 
 ## 1. State
 
-| Item                         | Value                                                                                                                                                                                                |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Branch                       | `feat/durable-pattern-decisions` (confirmed with `git branch --show-current`), cut from `main` at `f252112`                                                                                          |
-| Commits on branch            | 27 ahead of `f252112`. This step added `9de439b` `fix(durable-pattern-decisions): poprawki z przeglądu implementacji` and this docs commit `docs(durable-pattern-decisions): przegląd implementacji` |
-| Pushed / PR / merged         | no / none / no                                                                                                                                                                                       |
-| `change.md` status           | `impl_reviewed`                                                                                                                                                                                      |
-| `## Progress` rows remaining | 5 (`grep -c '^- \[ \]' plan.md`): `[visual]` 5.8, 5.9, 7.10, 7.11 and `[human]` 7.9                                                                                                                  |
-| Working tree                 | clean after this commit                                                                                                                                                                              |
+| Item | Value |
+| --- | --- |
+| Branch | `feat/durable-pattern-decisions` (confirmed with `git branch --show-current`), cut from `main` at `f252112` |
+| Commits on branch | 29 ahead of `f252112` (`git log --oneline f252112..HEAD`). This step added `c14f75a` `fix(durable-pattern-decisions): poprawki z bramki wizualnej` and `docs(durable-pattern-decisions): bramka wizualna` (this commit, with the screenshots) |
+| Pushed / PR / merged | no / none / no |
+| `change.md` status | `impl_reviewed` (unchanged; `/10x-archive` stamps it) |
+| `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`): `[human]` 7.9 |
+| Working tree | clean after this commit |
+| Local DB | `npx supabase db reset` run at the end, so the visual accounts are gone. pgTAP 102 PASS afterwards |
+| Dev servers | :4398 and :4399 killed (`lsof -ti :4398 -ti :4399` empty). :4321 untouched |
 
 ## 2. Artifacts
 
-| Path                                                                   | What it is                                                                                                                                                                      |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `context/changes/durable-pattern-decisions/reviews/impl-review.md`     | New. Full-plan review (phases 1–7) with the evidence, the findings F1–F9 and their decisions. Ends with `MERGE: CLEAR — …`                                                      |
-| `src/components/hooks/usePageShowReset.ts`                             | `usePageShowReset` keeps `reset` in a `useRef` and subscribes to `pageshow` once per mount, not on every render (F2). `onPersistedPageShow` is unchanged                        |
-| `src/pages/patterns.astro`                                             | Header comments corrected: "S-04 impl-review F7", and the empty state is "(below)" (F1)                                                                                         |
-| `test/unit/pattern-view.test.ts`                                       | One `listOverview` test title corrected to "S-04 impl-review F7" (F1)                                                                                                           |
-| `context/foundation/design-kit.md`                                     | „Do rundy 3” item 8 (G24) no longer asks for the modal side margin, which Phase 5 closed (F1)                                                                                   |
-| `context/changes/durable-pattern-decisions/follow-ups/review-fixes.md` | The undo-import F4 "Closed" entry is corrected: the hook is not wired into `DeleteAccountDialog`. New section "From `/10x-impl-review`" adds F4–F9, each with a `Trigger:` line |
-| `context/changes/durable-pattern-decisions/plan.md`                    | `[reviewer]` rows 1.9, 1.10, 2.9, 3.8, 4.9, 6.8 and 6.9 ticked, with evidence inline. Row 7.8 annotated with the review re-check                                                |
-| `context/changes/durable-pattern-decisions/change.md`                  | `status: impl_reviewed`                                                                                                                                                         |
-| `context/changes/durable-pattern-decisions/handoff.md`                 | This file                                                                                                                                                                       |
+| Path | What it is |
+| --- | --- |
+| `src/components/patterns/PatternActionsDialog.tsx` | Fixes from the visual gate. `actionButton` = `w-full justify-start`: the kit `.modal-actions` buttons are full width. `pending` is now the action in flight (`"merge" \| "type" \| "rename" \| "exclude" \| null`): every submit is disabled, and only the pressed one shows `copy.saving`. The header comment on `actionButton` is corrected |
+| `src/components/app/InlineAlert.astro` | Optional `bodyClass` prop, merged onto the content `<span>` with `class:list` |
+| `src/pages/patterns/[...key].astro` | The excluded banner passes `bodyClass="flex flex-1 flex-wrap items-center justify-between …"`, so „Przywróć” sits on the row's right edge (kit `.excluded-banner`) |
+| `context/changes/durable-pattern-decisions/screenshots/*.png` | 58 real PNGs: 22 states × desktop/mobile = 44 app shots, plus 14 kit frames (`kit-*`) |
+| `context/changes/durable-pattern-decisions/screenshots/README.md` | Method, accounts, the state table (state · desktop · mobile · how reached · kit), and measurements |
+| `context/changes/durable-pattern-decisions/reviews/visual-review.md` | Verdicts, the hand-checked number, keyboard, bfcache, fixes, gate, observations. Ends with `VISUAL: PASS — …` |
+| `context/changes/durable-pattern-decisions/plan.md` | `[visual]` rows 5.8, 5.9, 7.10 and 7.11 ticked with evidence. Row 6.9 annotated as confirmed in the browser |
+| `context/changes/durable-pattern-decisions/follow-ups/review-fixes.md` | F8 annotated with the gate's measurement: not triggered at 400×812 |
+| `context/changes/durable-pattern-decisions/handoff.md` | This file |
 
 ## 3. Verification
 
 Baseline (`main` `f252112`): lint 0 · astro check 0 errors (109 files) · fixture:check OK · vitest 141 (8 files) · build OK · pgTAP 76 (4 files) · smoke 77.
 
-| Command / check                                                          | Result (observed this step)                                                                                                                                                                                                                                                |
-| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run lint`                                                           | 0 errors (delta 0), before and after the fixes                                                                                                                                                                                                                             |
-| `npx astro check`                                                        | 0 errors, 120 files (+11)                                                                                                                                                                                                                                                  |
-| `npm run fixture:check`                                                  | OK                                                                                                                                                                                                                                                                         |
-| `npm test`                                                               | 190 passed, 11 files (141 + 49, +3 files), before and after the fixes                                                                                                                                                                                                      |
-| `npm run build`                                                          | Complete                                                                                                                                                                                                                                                                   |
-| `npx supabase db reset && npx supabase test db`                          | Files=5, Tests=102, PASS (76 + 26). Run at the start and again at the end, after the final `db reset`                                                                                                                                                                      |
-| smoke (`ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398 --ignore-lock`) | 111 PASS / 0 FAIL (77 + 34), before and after the fixes. Server killed afterwards                                                                                                                                                                                          |
-| Live two-account RLS probe (SQL, `BEGIN … ROLLBACK`)                     | B against A's rows: read 0, update 0, delete 0. Spoofed `user_id` insert → 42501; ownership move → 42501. anon S/I/U/D → 42501 (also via PostgREST: 401 / 42501). `delete_own_account` cascade removes only A's rows. Grants: `authenticated` has S/I/U/D, `anon` has none |
-| HTTP probes on `POST /api/patterns/decision`                             | Extra `user_id` field ignored. Foreign `Origin` → 403. Key `//evil.example/x` stays under `/patterns/`. `back=https://…` → `?error=decision`                                                                                                                               |
+| Command / check | Result (observed this step, after `c14f75a`) |
+| --- | --- |
+| `npm run lint` | 0 errors, 0 warnings (Δ0). A transient `astro/prefer-class-list-directive` warning from the first `InlineAlert` edit was fixed before the commit |
+| `npx astro check` | 0 errors, 120 files (+11) |
+| `npm run fixture:check` | OK |
+| `npm test` | 190 passed, 11 files (+49 / +3) |
+| `npm run build` | Complete |
+| smoke (`ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398 --ignore-lock`) | 111 PASS / 0 FAIL (+34). Server killed afterwards |
+| `npx supabase db reset && npx supabase test db` | Files=5, Tests=102, PASS (+26) |
+| Visual: `DialogContent` geometry (3 dialogs) | 1440: x 480, w 480, padding 31, radius 13. 400: x 20, w 360. The close button is clear of the eyebrow text |
+| Visual: keyboard | Initial focus is on the dialog, or the password input for delete-account — never a destructive action. Tab cycles inside the dialog. Esc closes and focus returns to the trigger |
+| Visual: bfcache (Claude-in-Chrome, headed) | „Zapisz próg” and „Usuń import”: back restores from bfcache (the marker survived) and neither button is stuck pending |
+| Hand check (7.11) | Sportowo 8 × / 1316,28 zł = SPORTOWO 663,79 (4) + sportowo.pl 652,49 (4); oracle `sumMinor` 131628 |
 
-Deliberate breaks:
-
-1. **Rename upsert also sends `excluded: false`** (`decision.ts` `case "rename"`).
-   - Red: 4 smoke steps went red, including "rename keeps the exclusion", while "pattern is renamed" stayed PASS.
-   - Restored → 111/111.
-   - Meta-check: this proves the partial upsert preserves the untouched column.
-2. **Update policy `with check (true)`** (`BEGIN … ROLLBACK`).
-   - The ownership move was still rejected, because the SELECT policy also guards the updated row. The move only succeeded once the select policy was relaxed as well.
-   - Meta-check: pgTAP 21 proves the combined guard, not the explicit `with check` alone. Recorded as follow-up F9.
+Deliberate breaks: none in this step, because the fixes are visual. What proves them is the before/after shots. The first captures showed content-width buttons and three „Zapisywanie…” labels, which were overwritten by the re-capture on a fresh account. The measured widths and pending labels before and after are quoted in `reviews/visual-review.md`.
 
 ## 4. Next command
 
-`visual gate for /patterns and /patterns/<key> (+ /settings, /imports dialogs re-shot for the shared DialogContent change)`
+`/10x-archive durable-pattern-decisions`, then ship: push, PR, CI, then `npx supabase db push` of `20260928120000_pattern_decisions` to the hosted DB before the merge, then merge and deploy.
 
 ## 5. Open
 
-Human / visual checklist, left unticked in `plan.md` `## Progress`:
+Human checklist, left unticked in `plan.md` `## Progress`:
 
-- [ ] 5.8 [visual] `settings-delete-dialog` and `imports-delete-dialog` at 1440 px and ~400 px: 480 px wide on desktop, a 20 px margin on mobile, and the close button clear of the eyebrow.
-- [ ] 5.9 [visual] bfcache Back after „Usuń import” / „Zapisz próg”: neither button is stuck pending. `usePageShowReset` changed in `9de439b`, so check it on screen.
-- [ ] 7.10 [visual] The full shot list from plan Phase 7.
-- [ ] 7.11 [visual] The fixture US-03 walk-through.
-- [ ] 7.9 [human] The product owner confirms decision 9.
+- [ ] 7.9 [human] The product owner confirms decision 9: „nie wchodzi do sumy miesięcznej” = excluded from every „ponad próg” sum and from any S-07 monthly total.
 
-Follow-ups, in `follow-ups/review-fixes.md` → "From `/10x-impl-review`":
+Follow-ups, in `follow-ups/review-fixes.md`: F4–F9 from `/10x-impl-review` are unchanged. F8 (`DialogContent` has no scroll) is annotated as not triggered at 400×812. The carried items are unchanged: S-04 F4 threshold endpoints, F11 field radius, `DeleteAccountDialog` bfcache, S-07 must skip `pattern.excluded`.
 
-- **F4:** `STATUS_PARAMS` and `fieldBox` duplicates, justified.
-- **F5:** the rename `defaultValue={name}` in `PatternActionsDialog` freezes the derived name.
-- **F6:** `validateMerge` allows an excluded source (Trigger: S-07).
-- **F7:** `case "unmerge"` is unscoped.
-- **F8:** `DialogContent` has no scroll on short viewports. The visual gate should look at the mobile `merge-picker` / `rename-field` shots.
-- **F9:** pgTAP gaps.
+Visual observations, not fixed (details in `reviews/visual-review.md`):
 
-The earlier carried items (S-04 F4, F11, DeleteAccountDialog bfcache, S-07 excluded sums) are unchanged.
+- The merged pattern's header month total is 0 when its last occurrence predates the reference month (S-04 decision 14).
+- The kit puts the excluded banner above the back link; the plan puts it under `.detail-top`, and the plan was kept.
+- The app modal keeps a 1 px border (416 vs 418 px buttons).
 
-Carried risks: normalizer drift (`normalizeMerchant` in `src/lib/patterns/merchant.ts`), and the circular import between `load.ts` and `decisions.ts` / `thresholds.ts` (`collectPages`), which is harmless now. No new DESIGN-GAP ids.
+No new DESIGN-GAP ids.
+
+Carried risks: normalizer drift (`normalizeMerchant`), and the circular import between `load.ts` and `decisions.ts` / `thresholds.ts` (`collectPages`), which is harmless.
 
 ## 6. Autonomous decisions
 
-- **F6 (excluded source merge) recorded, not fixed.**
-  - Why: the behaviour follows plan decision 4 ("only the root's decision applies; the absorbed key's decisions stay inert"). A fix changes that decision and the dialog UI after implementation.
-  - Rejected: adding the `source.excluded` check now.
-  - Would change: S-07 monthly totals making the re-entry visible, or product feedback.
-- **The three warnings were fixed as cheap edits in one `fix(...)` commit** rather than deferred: two comment/doc corrections and a small hook refactor with no behaviour change, re-gated green.
-  - Would change: a fix touching behaviour under the visual gate. It would then have been deferred.
-- **Row 6.9 (keyboard) ticked by code inspection**, not in a browser: native focusable controls, Radix Dialog Esc / close / focus trap, one hidden `action` per form.
-  - Would change: the visual gate finding a focus problem. It then reopens 6.9.
-- **Row 7.8 left ticked** (the implement step's per-run carve-out). Its gap (the unjustified `STATUS_PARAMS` / `fieldBox`) was closed here and the row annotated, rather than un-ticked and re-ticked.
-  - Would change: a stricter reading that `[reviewer]` rows belong only to the review. The evidence is the same either way.
-- **`MERGE: CLEAR` with `[visual]` / `[human]` rows open.**
-  - Why: they are owned by later steps (the visual gate and the post-run checklist), not success criteria of this review.
-  - Would change: the orchestrator treating any open Progress row as an unmet criterion.
+- **Playwright captured the PNG set; Claude-in-Chrome was used for bfcache only.**
+  - Why: Chrome screenshots are viewport-only JPEGs, the window cannot go below ~587 px (mobile needs the iframe workaround), and 44 app shots plus 14 kit frames with measurements are reproducible from a script. Real headed Chrome was the right tool for bfcache, which headless Chrome did not restore in the S-04 gate.
+  - Rejected: all shots through Claude-in-Chrome.
+  - Would change: a Chrome capture path that saves full-page PNGs at 400 px.
+- **The `pending` state was frozen, not held on the network.**
+  - Why: holding the POST with `page.route` blocked page evaluation and screenshots until timeout. Instead, a bubble-phase `window` `submit` listener runs `preventDefault()` after React's handler has set `pending`. The state shown is the product's own; nothing was posted.
+  - Would change: a need to show the server-side wait itself.
+- **The accidental centring of the kit banner text was not copied.** With three flex items under `space-between`, the kit centres the text. The intent (restore at the right edge) was copied, and the text stays by its icon.
+  - Would change: the design owner confirming the centred text is intended.
+- **`InlineAlert` got a `bodyClass` prop** rather than the banner duplicating the alert markup. It is one optional prop, and the other consumers are unchanged.
+  - Would change: a second layout need, which would argue for a dedicated banner component.
+- **`rename-error` was reached through `?error=name`**, because the input's `maxLength=100` stops the UI from sending an over-long name. The endpoint's own rejection is proven by smoke („long name”).
+- **Row 6.9 was left ticked and annotated as browser-confirmed.** The browser check matched the code-inspection claim.

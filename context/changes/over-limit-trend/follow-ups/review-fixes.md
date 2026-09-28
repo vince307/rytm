@@ -30,5 +30,19 @@ slice/change to pick up.
 ## From this phase's own implementation (not a review finding, recorded for completeness)
 
 - **`ImportPanel.astro` reuses the `muted/55` → kit `#9da9aa` mapping** `TrendChart.astro` already established for the
-  bar/gridline grey (G35 note) rather than introducing a second nearest-token guess for the dashed border. Same
-  reasoning, not a new decision.
+  bar/gridline grey rather than introducing a second nearest-token guess for the dashed border. Same reasoning, not a
+  new decision. (The G35 row did not name `#9da9aa` until the implementation review amended it — impl review F2.)
+
+## From the implementation review (2026-09-28, `reviews/impl-review.md`)
+
+- **Panel-title markup is inline in six places** (`<h2 class="text-[17px] tracking-[-0.03em]">` in `home.astro`,
+  `FixedSection.astro`, `patterns/[...key].astro` ×3, `settings.astro`; some with `m-0`), and `home.astro` repeats the
+  title + muted-range header row `FixedSection.astro` already has (kit `.panel-title` / `.section-label`). A shared
+  `PanelTitle.astro` in `src/components/app/` would remove it, but touches four other views — out of scope for a
+  one-view change (impl review F4). Trigger: the next change that adds a panel title, or a `/10x-ui` pass over the
+  app shell.
+- **Month-index parse in two styles**: `home.astro` `monthIndex` (`Number(ym.split("-")[1]) - 1`) and
+  `patterns/[...key].astro` (`Number(m.slice(5, 7)) - 1`) index the `copyExtra` declension tables. One
+  `monthIndex(yearMonth)` in `src/lib/format.ts` would serve both (impl review F3 — `home.astro`'s own two copies
+  were merged in the review fix). Trigger: the next change touching `patterns/[...key].astro` or adding a third
+  declension table.

@@ -17,36 +17,40 @@ interface Props {
   hint?: string;
 }
 const { bars, legend, ariaLabel, note, hint } = Astro.props;
+// Kit `.info-panel` — one class string for both the "za krótki trend" note and the "brak progu" hint (impl review).
+const infoPanel = "mt-[14px] border-l-[3px] border-ink bg-paper-soft p-[13px] text-xs text-muted";
 ---
 
 <div class="overflow-x-auto">
-  <ol aria-label={ariaLabel} class="relative flex gap-[13px] border-b border-line px-2.5 max-[559px]:gap-[7px]">
+  <div class="relative">
     <div
       class="pointer-events-none absolute inset-x-0 top-1/2 border-t border-dashed border-line"
       aria-hidden="true"
     ></div>
-    {bars.map((bar) => (
-      <li class="flex h-[200px] min-w-[44px] flex-1 flex-col items-center">
-        <span class="shrink-0 text-[10px] whitespace-nowrap text-muted">{bar.amount}</span>
-        <div class="relative w-full flex-1">
-          <i
-            class:list={cn(
-              "absolute inset-x-0 bottom-0 w-full rounded-t-[3px] bg-muted/55",
-              bar.height === 0 && "h-[2px]",
-            )}
-            style={bar.height > 0 ? `height:${bar.height}%` : undefined}
-          ></i>
-        </div>
-        <span class="mt-2 shrink-0 text-[10px] text-muted">{bar.label}</span>
-      </li>
-    ))}
-  </ol>
+    <ol aria-label={ariaLabel} class="flex gap-[13px] border-b border-line px-2.5 max-[559px]:gap-[7px]">
+      {bars.map((bar) => (
+        <li class="flex h-[200px] min-w-[44px] flex-1 flex-col items-center">
+          <span class="shrink-0 text-[10px] whitespace-nowrap text-muted">{bar.amount}</span>
+          <div class="relative w-full flex-1">
+            <i
+              class:list={cn(
+                "absolute inset-x-0 bottom-0 w-full rounded-t-[3px] bg-muted/55",
+                bar.height === 0 && "h-[2px]",
+              )}
+              style={bar.height > 0 ? `height:${bar.height}%` : undefined}
+            ></i>
+          </div>
+          <span class="mt-2 shrink-0 text-[10px] text-muted">{bar.label}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
 </div>
 <div class="mt-[31px] flex items-center gap-[17px] text-[11px] text-muted">
   <span>
-    <i class="mr-[5px] inline-block h-2 w-2 rounded-full bg-muted/55"></i>
+    <i class="mr-[5px] inline-block h-2 w-2 rounded-full bg-muted/55" aria-hidden="true"></i>
     {legend}
   </span>
 </div>
-{note && <div class="mt-[14px] border-l-[3px] border-ink bg-paper-soft p-[13px] text-xs text-muted">{note}</div>}
-{hint && <div class="mt-[14px] border-l-[3px] border-ink bg-paper-soft p-[13px] text-xs text-muted">{hint}</div>}
+{note && <div class:list={infoPanel}>{note}</div>}
+{hint && <div class:list={infoPanel}>{hint}</div>}

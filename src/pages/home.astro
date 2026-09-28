@@ -29,13 +29,16 @@ const e = copy.emptyState;
 // shows the empty state or a partial view.
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 const dataResult = supabase ? await loadPatternData(supabase) : { error: new Error("Supabase is not configured") };
-const result: { error: unknown } | { referenceMonth: null } | { trend: OverLimitTrend; stats: HomeStats } = (() => {
+// `referenceMonth` narrowed to `string` on the data branch, so the lead never needs a fallback (impl review).
+type HomeResult =
+  { error: unknown } | { referenceMonth: null } | { trend: OverLimitTrend; referenceMonth: string; stats: HomeStats };
+const result: HomeResult = (() => {
   if ("error" in dataResult) return { error: dataResult.error };
   try {
     const trend = overLimitTrend(dataResult.patterns, dataResult.rows, dataResult.thresholds);
     if (trend.referenceMonth === null) return { referenceMonth: null };
     const fixed = fixedOverview(dataResult.patterns, dataResult.rows);
-    return { trend, stats: homeStats(trend, fixed) };
+    return { trend, referenceMonth: trend.referenceMonth, stats: homeStats(trend, fixed) };
   } catch (err) {
     return { error: err };
   }
@@ -47,7 +50,10 @@ if ("error" in result) {
 
 // K24 template — verbatim lead from `applyDashboardState` (`#/home-no-name`); `{month}` + `monthsNominative`
 // generalise the kit's baked-in "maj" (`patterns.astro` `sumLabel` precedent).
-const leadFor = (month: string) => h.lead.replace("{month}", h.monthsNominative[Number(month.split("-")[1]) - 1]);
+// `2026-05` → 4 — index into the `months*` declension tables below (one parse for both K24 and K25 templates).
+const monthIndex = (yearMonth: string) => Number(yearMonth.split("-")[1]) - 1;
+
+const leadFor = (month: string) => h.lead.replace("{month}", h.monthsNominative[monthIndex(month)]);
 
 const barsFor = (trend: OverLimitTrend) => {
   const max = Math.max(0, ...trend.months.map((m) => m.overMinor));
@@ -63,7 +69,7 @@ const barsFor = (trend: OverLimitTrend) => {
 const deltaFootFor = (previous: NonNullable<HomeStats["previous"]>) =>
   h.deltaFoot
     .replace("{delta}", formatSignedMoney(previous.deltaMinor))
-    .replace("{month}", h.monthsGenitive[Number(previous.month.split("-")[1]) - 1]);
+    .replace("{month}", h.monthsGenitive[monthIndex(previous.month)]);
 
 const risenFootFor = (n: number) => h.risen.replace("{n}", String(n)).replace("{items}", plural(n, h.risenForms));
 ---
@@ -75,7 +81,7 @@ const risenFootFor = (n: number) => h.risen.replace("{n}", String(n)).replace("{
       {/* DESIGN-GAP: K18 — the kit has no copy for a failed read; `components.error` stands in (patterns.astro / fixed.astro precedent). */}
       <InlineAlert kind="error">{copy.components.error}</InlineAlert>
     </>
-  ) : "referenceMonth" in result ? (
+  ) : result.referenceMonth === null ? (
     <>
       <PageTitle eyebrow={h.emptyEyebrow} title={h.emptyTitle} lead={h.emptyLead} />
       <EmptyState
@@ -93,7 +99,7 @@ const risenFootFor = (n: number) => h.risen.replace("{n}", String(n)).replace("{
       <PageTitle
         eyebrow={copy.dashboard.eyebrow}
         title={copy.dashboard.greetingNoName}
-        lead={leadFor(result.trend.referenceMonth ?? "")}
+        lead={leadFor(result.referenceMonth)}
       >
         <a href="/imports/new" class:list={buttonVariants({ variant: "primary" })}>
           {copyExtra.patterns.upload}

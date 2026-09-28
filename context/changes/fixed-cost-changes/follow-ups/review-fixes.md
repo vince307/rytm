@@ -40,3 +40,14 @@ slice/change to pick up.
   change touching `loadPatternData`.
 - **`FixedSection` `compact` prop only adds an unstyled `compact` class** (prototype-markup parity; row height lives in
   `FixedRow` `compact`). Harmless. Trigger: the next `/fixed` change — drop the prop or give it meaning.
+
+## From the visual gate (2026-09-28)
+
+- **Panel radius 20 px vs the kit's 12 px** — the theme maps `--radius` to 14 px, so `rounded-xl` = 20 px. `Panel.astro`,
+  `ExcludedPatterns.astro`, `PatternsTable.tsx` and `FixedSection.astro` all use `rounded-xl` for the kit `.panel`
+  (`border-radius:12px`). App-wide, not S-06 — `/fixed` stays consistent with the other panels. The merchant mark
+  (`merchant-mark.ts` `merchantMark`) was fixed to 8 px in this gate (`29c4829`). Trigger: a global-token pass on
+  radii, or the next change to `Panel.astro`.
+- **`Badge` tone `new` tint** — rendered `#E7DCC9` (`bg-excess/25` over `paper`) vs the kit's `#EFE4D1`
+  (measured from pixels on `fixed-overview-desktop.png` / `kit-fixed-desktop.png`). Recorded in G34; no new token
+  (plan Known risks). Trigger: the kit author providing a `new` / `changed` token, or the G28 `changed` tone.

@@ -93,7 +93,7 @@ export const TRAPS = {
   T08: ["Powtarzalny przelew na własne konto w innym banku (D8)", "wzorzec, user-exclude"],
   T09: ["Opłaty US/ZUS, powtarzalne, zmienna kwota", "frequent"],
   T10: ["Abonament ze stałą kwotą", "fixed"],
-  T11: ["Abonament z jedną podwyżką ~12%", "jeden wzorzec fixed przy D5"],
+  T11: ["Abonament z dwiema podwyżkami (~12%, potem +4 zł)", "jeden wzorzec fixed przy D5"],
   T12: ["Sprzedawca z rozrzutem ~45%", "frequent"],
   T13: ["Zwrot BLIK (kwota dodatnia, `Zwrot transakcji BLIK … Nr zwrotu …`)", "pominięty, skipReason credit (D2)"],
   T14: ["PayPal jako pośrednik", "sprzedawca nieprzezroczysty (FR-014)"],
@@ -482,8 +482,10 @@ const TRAP_SERIES = [
     details: "TR.BLIK",
     counterparty: "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA",
     title: blik("kinoteka.pl"),
-    // Price rise 49,99 -> 55,99 (+12%) from 2026-03, mid-range.
-    entries: monthly(17, [...Array(6).fill(4999), ...Array(6).fill(5599)]),
+    // Two price rises, both inside D5 tolerance: 49,99 -> 55,99 (+12%) from 2026-03, then 55,99 -> 59,99
+    // (+4,00 zł) on 2026-08-17 (reference month, S-06's "Zmieniły kwotę" case). Median stays 5299 (max
+    // deviation 700 <= tolerance 1000).
+    entries: monthly(17, [...Array(6).fill(4999), ...Array(5).fill(5599), 5999]),
     pattern: "kinoteka",
     resolvedBy: "normalization",
     expectType: "fixed",

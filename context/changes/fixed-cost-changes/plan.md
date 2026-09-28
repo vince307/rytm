@@ -650,13 +650,13 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [ ] 1.1 `npm run fixture:ing`; generated diff only in the main CSV, `expected.json`, `README.md`; `npm run fixture:check` OK
-- [ ] 1.2 `npm test` — 190 (11 files), delta 0; `ing-parser.test.ts` and `patterns.test.ts` green (KINOTEKA 5299 unchanged)
-- [ ] 1.3 `npm run lint` 0; `npx astro check` 0 errors (120 files, delta 0); `npm run build` passes
-- [ ] 1.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0); smoke 111 PASS (delta 0)
-- [ ] 1.5 Deliberate break (generator changed without regenerating) → `fixture:check` FAILs; restored → OK; meta-check recorded
-- [ ] 1.6 Deliberate break (T11 last amount 6400) → generator `expectType` assertion throws; restored → identical regeneration; meta-check recorded
-- [ ] 1.7 `grep -rn "6497147" test src` empty
+- [x] 1.1 `npm run fixture:ing`; generated diff only in the main CSV, `expected.json`, `README.md`; `npm run fixture:check` OK
+- [x] 1.2 `npm test` — 190 (11 files), delta 0; `ing-parser.test.ts` and `patterns.test.ts` green (KINOTEKA 5299 unchanged)
+- [x] 1.3 `npm run lint` 0; `npx astro check` 0 errors (120 files, delta 0); `npm run build` passes
+- [x] 1.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0); smoke 111 PASS (delta 0)
+- [x] 1.5 Deliberate break (generator changed without regenerating) → `fixture:check` FAILs; restored → OK; meta-check recorded
+- [x] 1.6 Deliberate break (T11 last amount 6400) → generator `expectType` assertion throws; restored → identical regeneration; meta-check recorded
+- [x] 1.7 `grep -rn "6497147" test src` empty
 
 #### Manual
 

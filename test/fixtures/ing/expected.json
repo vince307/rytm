@@ -31,7 +31,7 @@
       "declaredCount": 234,
       "imported": {
         "count": 206,
-        "sumMinor": 6497147
+        "sumMinor": 6497547
       }
     },
     "Lista_transakcji_nr_0000123457_011026-overlap.csv": {
@@ -191,7 +191,7 @@
       "bankTxId": "310400000000230391",
       "account": "Rachunek Firmowy Główny",
       "occurredOn": "2026-08-17",
-      "amountMinor": -5599,
+      "amountMinor": -5999,
       "traps": [
         "T11"
       ],
@@ -3619,7 +3619,7 @@
         "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA"
       ],
       "occurrences": 12,
-      "sumMinor": 63588,
+      "sumMinor": 63988,
       "medianMinor": 5299,
       "firstMonth": "2025-09"
     },

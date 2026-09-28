@@ -7,6 +7,7 @@
 import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/auth/SubmitButton";
+import { usePageShowReset } from "@/components/hooks/usePageShowReset";
 import { formatThresholdInput } from "@/lib/patterns/threshold-form";
 import { cn } from "@/lib/utils";
 import type { PatternType, Threshold, ThresholdKind } from "@/types";
@@ -42,6 +43,10 @@ const switchIdle = "border-line text-muted";
 export function ThresholdEditor({ patternKey, type, threshold, month, copy }: ThresholdEditorProps) {
   const deleteFormId = useId();
   const [saving, setSaving] = useState(false);
+  // S-04 F8 / undo-import F4: a bfcache restore (back-navigation after the POST) must not leave the button stuck.
+  usePageShowReset(() => {
+    setSaving(false);
+  });
   // Frequent patterns can switch between count/sum before saving; fixed has exactly one kind, no toggle.
   const [frequentKind, setFrequentKind] = useState<"count" | "sum">(threshold?.kind === "sum" ? "sum" : "count");
   const activeKind: ThresholdKind = type === "fixed" ? "amount" : frequentKind;

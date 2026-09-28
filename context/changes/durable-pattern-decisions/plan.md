@@ -308,6 +308,14 @@ pass — `overMinor` 0, `sequence` all `false`, every transaction `overMinor` 0.
   non-excluded is > 0; detail keeps `threshold`, `overMinor` 0, all-`false` `sequence`, all transaction `overMinor` 0.
   Existing `MerchantPattern` literals gain `excluded: false`, `merged: []`.
 
+#### 5. List page literal (keeps this phase green)
+
+**File**: `src/pages/patterns.astro`
+
+**Contract**: `PatternListItem = Omit<MerchantPattern, …>` now requires `excluded`, so the page's hand-built
+`PatternListItem` literal (the `overviewByKey` re-merge, removed in Phase 3) gains `excluded: pattern.excluded` —
+otherwise `npx astro check` is red in this phase (plan review F2). No other change to the page.
+
 ### Success Criteria:
 
 #### Automated Verification:
@@ -485,7 +493,9 @@ source); `decisionRedirect` for every status incl. `back: "list"` and a key with
    `/patterns/kawiarnia%20smoke?error=decision`.
 2. „merge into itself is rejected” — `{ key: "sklep smoke", action: "merge", target: "sklep smoke" }` → 302
    `/patterns/sklep%20smoke?error=merge`.
-3. „pattern is merged” — `target: "kawiarnia smoke"` → 302 `/patterns/kawiarnia%20smoke?merged=1`.
+3. „pattern is merged” — `{ key: "sklep smoke", action: "merge", target: "kawiarnia smoke" }` → 302
+   `/patterns/kawiarnia%20smoke?merged=1` (merged name stays „Kawiarnia smoke”: 1 : 1 variant tie → code-point
+   smallest).
 4. „merged pattern sums its components” — GET `/patterns/kawiarnia%20smoke` → 200 contains `>58,49 zł<`.
 5. „merged pattern is re-typed by D5” — same → contains `>częsty<` (12,99 / 45,50 are outside the 10 zł tolerance).
 6. „absorbed pattern redirects to the merged one” — GET `/patterns/sklep%20smoke` → 302 `/patterns/kawiarnia%20smoke`.
@@ -630,6 +640,9 @@ name: string }[]; copy: {…} }`. Trigger: `Button variant="ghost"` with `Glyph 
 Each form: `method="POST" action="/api/patterns/decision"`, hidden `key` + `action`; submit via `SubmitButton`
 with `pending` + `copyExtra.auth.saving`, reset with `usePageShowReset`. Opening focuses the dialog (as
 `DeleteImportDialog`).
+The `copy` prop carries only the strings the dialog renders — never the result-line strings (`x.merged`,
+`x.unmerged`, …): those are asserted in smoke as bare text (plan review F1), which the island's serialized props
+would otherwise satisfy.
 
 #### 2. Restore form
 
@@ -684,8 +697,11 @@ przywrócenie wdrożone; scalanie, zmiana nazwy i typu jako placeholdery G33”)
 **File**: `scripts/smoke.mjs`
 
 **Contract**: inserted into the Phase 4 run:
-- after step 3: „merge confirms the result” — GET `/patterns/kawiarnia%20smoke?merged=1` → 200 contains `>Wzorce
-  scalone.<`; „detail offers the actions” — GET `/patterns/kawiarnia%20smoke` → contains `>Akcje<`;
+- after step 3: „merge confirms the result” — GET `/patterns/kawiarnia%20smoke?merged=1` → 200 contains the bare
+  `Wzorce scalone.` (`InlineAlert` renders its slot as `<span> text </span>` — whitespace inside the span, so a
+  `>text<` anchor never matches; existing InlineAlert smoke steps use bare text too); „detail offers the actions” —
+  GET `/patterns/kawiarnia%20smoke` → contains `>Akcje<` **and** notContains `Wzorce scalone.` (the negative control
+  proving the bare string is not in any island's props);
 - after step 4: „merged pattern lists its variant” — contains `>Cofnij scalenie<`;
 - after step 16: „excluded pattern shows the banner” — contains `>Wykluczony z analizy<`;
 - after step 23: „restored pattern drops the banner” — notContains `>Wykluczony z analizy<`.
@@ -749,7 +765,7 @@ wzorców” plus the section (G33). Result line above the table: `?restored=1` �
 
 **Contract**: K22 block gains `excludedToggle: "Wykluczone"`; G33 row extended (all-excluded list, `<details>` for the
 toggle, no „przywrócony” badge); G28 row status „S-05: sekcja wykluczonych dostarczona”. The follow-ups file records
-what S-05 closed (S-04 F5, F7, F8; undo-import F4; G24 geometry) and what stays open, each with a `Trigger:` line
+what S-05 closed (S-04 F5, F7, F8; undo-import F4; G24 geometry; S-01 F9 shared close icon — already met on `main`, `DialogContent` uses the kit sprite `#close`, recorded as closed with no code change) and what stays open, each with a `Trigger:` line
 (S-04 F4 threshold endpoints, F11 field radius incl. `DeleteAccountDialog`'s modal input, DeleteAccountDialog bfcache,
 S-07: „monthly sums must skip `pattern.excluded`”).
 
@@ -769,10 +785,13 @@ G28, G33, K22 agree with what renders); no unused export (`PatternListOverviewIt
 **File**: `scripts/smoke.mjs`
 
 **Contract**: after Phase 6's „excluded pattern shows the banner”:
-1. „patterns list shows the excluded section” — GET `/patterns` → 200 contains `>Kawiarnia Rytm<`.
+1. „patterns list shows the excluded section” — GET `/patterns` → 200 contains `>Kawiarnia Rytm<` and notContains
+   the bare `Wzorzec przywrócony do analizy.` (negative control for step 3: the string is in no island prop).
 2. „excluded pattern leaves the table” — same → notContains `href="/patterns/kawiarnia%20smoke"`.
-After „restored pattern drops the banner”: 3. „list confirms a restore” — GET `/patterns?restored=1` → contains
-`>Wzorzec przywrócony do analizy.<`.
+After „restored pattern drops the banner”: 3. „list confirms a restore” — GET `/patterns?restored=1` → contains the
+bare `Wzorzec przywrócony do analizy.` (an `InlineAlert` result line — never a `>text<` anchor, plan review F1).
+Astro text asserted with `>text<` (`>Kawiarnia Rytm<`, `>Cofnij scalenie<`, `>Wykluczony z analizy<`) must sit inline
+in its element (`<div class="item-name">{name}</div>`), not on its own line.
 
 ### Success Criteria:
 
@@ -948,6 +967,11 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 - **PostgREST partial-upsert semantics** are relied on for every decision write; proven by pgTAP 6–7 and smoke
   „rename keeps the exclusion” — a supabase-js change to `upsert` column handling would surface there.
 - **Astro check file count** is recorded, not asserted — only the error delta gates.
+- **Phase 3's derive-input break (3.7) is unguarded until Phase 4** (no decision rows exist before the endpoint);
+  accepted — Phase 4's break 4.7 re-runs it against smoke steps 4, 5, 13, 16 (plan review F4).
+- **Smoke text anchors** (plan review F1): `>text<` only for text inline in its element (React island nodes, inline
+  Astro expressions); `InlineAlert` result lines are asserted as bare text, each paired with a negative control on a
+  page without the result param, so an island's serialized props cannot satisfy them.
 
 ## Progress
 

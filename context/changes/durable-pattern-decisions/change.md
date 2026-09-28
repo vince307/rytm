@@ -1,7 +1,7 @@
 ---
 change_id: durable-pattern-decisions
 title: Trwałe decyzje o wzorcach — scalenie, wykluczenie, typ, nazwa (S-05)
-status: planned
+status: plan_reviewed
 created: 2026-09-28
 updated: 2026-09-28
 archived_at: null

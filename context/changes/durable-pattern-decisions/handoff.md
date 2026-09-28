@@ -1,30 +1,29 @@
 # Handoff — `durable-pattern-decisions` (slice S-05)
 
-Written by the `plan` step (2026-09-28, autonomous run `2026-09-28-s05-s06-s07`). `plan.md` (7 code phases, 65
-Progress rows, all open) and `plan-brief.md` are on disk; `change.md` is `planned`, roadmap S-05 is `planning`. No
-product code yet. What the next agent must not get wrong: decisions are applied **inside `derivePatterns`, before
-grouping**, only the **root's** decision applies, and every decision write is a **single-column** upsert (never a full
-decision object) — smoke „rename keeps the exclusion” is the guard.
+Written by the `plan-review` step (2026-09-28, autonomous run `2026-09-28-s05-s06-s07`). Verdict PROCEED; plan.md
+patched in place (2 CRITICAL, 1 WARNING fixed); `change.md` is `plan_reviewed`. No product code yet. What the next
+agent must not get wrong: `InlineAlert` result lines are asserted in smoke as **bare text** (its slot renders
+`<span> text </span>`), never `>text<`; and Phase 2 must also add `excluded: pattern.excluded` to the hand-built
+`PatternListItem` literal in `src/pages/patterns.astro` or `astro check` goes red.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/durable-pattern-decisions`, cut from `main` at `f252112` (confirmed with `git branch --show-current`) |
-| Commits on branch | 3 — change identity, research, `docs(durable-pattern-decisions): plan` (this step) |
+| Commits on branch | 4 — change identity, research, plan, `docs(durable-pattern-decisions): plan review` (this step) |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `planned` (`metadata-guard.mjs mark-planned`) |
-| `## Progress` rows remaining | 65 (`grep -c '^- \[ \]' plan.md`): 52 automated, 8 `[reviewer]`, 4 `[visual]`, 1 `[human]` |
+| `change.md` status | `plan_reviewed` |
+| `## Progress` rows remaining | 65 (`grep -c '^- \[ \]' plan.md`), unchanged by the review: 52 automated, 8 `[reviewer]`, 4 `[visual]`, 1 `[human]` |
 | Working tree | Clean after the commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/durable-pattern-decisions/plan.md` | Implementation plan: 7 phases, Critical Implementation Details, 23 Autonomous decisions, Known risks, `## Progress` |
-| `context/changes/durable-pattern-decisions/plan-brief.md` | Two-page brief (decisions table, phases at a glance) |
-| `context/changes/durable-pattern-decisions/change.md` | Frontmatter `status: preparing → planned` |
-| `context/foundation/roadmap.md` | S-05 status `proposed → planning` (table + body), frontmatter `updated` |
+| `context/changes/durable-pattern-decisions/reviews/plan-review.md` | Plan review: 6 findings (2 CRITICAL, 1 WARNING, 3 OBSERVATION), grounding, PRD check, `VERDICT: PROCEED` |
+| `context/changes/durable-pattern-decisions/plan.md` | Patched: Phase 2 §5 (page literal), Phase 4 smoke step 3 (explicit key), Phase 6 §1 (dialog `copy` prop scope) + §5 (bare-text result line + negative control), Phase 7 §3 (S-01 F9 closed) + §5 (bare-text restore line + negative control, inline-text rule), Known risks (+2) |
+| `context/changes/durable-pattern-decisions/change.md` | `status: planned → plan_reviewed` |
 | `context/changes/durable-pattern-decisions/handoff.md` | This file |
 
 ## 3. Verification
@@ -32,55 +31,40 @@ decision object) — smoke „rename keeps the exclusion” is the guard.
 Docs-only step; no suites run (nothing executable changed). Baseline on `main` `f252112` per the agent contract
 (inherited, unverified): lint 0 · astro check 0 (109 files) · vitest 141 (8 files) · pgTAP 76 (4 files) · smoke 77.
 
-| Command | Result |
+| Command / check | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/durable-pattern-decisions` |
-| Python check: Success Criteria bullets per phase vs `## Progress` rows | 1:1 for all 7 phases (auto/manual: 8/2, 8/1, 7/1, 8/1, 7/2, 7/2, 7/4) |
-| `metadata-guard.mjs inspect` → `mark-planned --expected-sha256 e855e529…` | `{"changed":true}`; `change.md` `status: planned` |
-| Code anchors read for the plan | `derive.ts`, `load.ts`, `thresholds.ts`, `view.ts`, `path.ts`, `threshold-form.ts`, `api/patterns/threshold{,/delete}.ts`, both pattern pages, `PatternsTable.tsx`, `dialog.tsx`, `Badge.tsx`, `DeleteImportDialog.tsx`, `Glyph.tsx` / `ICON_NAMES`, `scripts/smoke.mjs` runner, `pattern_thresholds` migration, kit `app.js` (`modal`, `patternDetail`, `patterns`, `applyPatternState`, `restorePattern`), `content.json` `patternActions`, `design-kit.md` G4 / G24 / G28 / K21 / G31–G32 |
-
-Target deltas the plan sets: pgTAP 76 → 102 (+26, 5 files); smoke 77 → 111 (+34: P4 +26, P6 +5, P7 +3); vitest 141
-+ new cases, 8 → 11 files; astro check 0 errors (count recorded per phase).
+| Grounding (paths, symbols, importers of `loadPatterns` / `loadThresholds` / `listOverview`, `MerchantPattern` literals, `DialogContent` consumers) | all present; blast radius = the two pattern pages + `test/unit/pattern-view.test.ts` literals + `patterns.astro` `PatternListItem` literal (F2) |
+| `InlineAlert.astro` compiled output (sub-agent, `@astrojs/compiler`, compact) | `<span> text </span>` → `>text<` never matches (F1) |
+| Smoke arithmetic vs `derive.ts` `d5Type` / `view.ts` `patternDetail` (reference month) | 58,49 · częsty · 5,50 · 59,99 · 7,00 · merged-name tie „Kawiarnia smoke” — all consistent |
+| Progress↔Phase | 7/7 phases, 65 rows, 1:1; no checkbox in phase blocks |
 
 ## 4. Next command
 
-`/10x-plan-review durable-pattern-decisions`
+`/10x-implement durable-pattern-decisions phase 1`
 
 ## 5. Open
 
 - Manual Progress rows (post-implement checklist): `[reviewer]` 1.9, 1.10, 2.9, 3.8, 4.9, 6.8, 6.9, 7.8;
-  `[visual]` 5.8 (`/settings` + `/imports` dialogs after the shared geometry fix), 5.9 (bfcache), 7.10 (20 named
-  states, desktop + ~400 px), 7.11 (fixture US-03 walk-through); `[human]` 7.9 — product owner confirms decision 9
-  („nie wchodzi do sumy miesięcznej” = excluded from every „ponad próg” sum and from any S-07 monthly total).
-- Gap ids reserved for implement: **K22** (app.js-only dialog/toast strings), **G33** (FR-009 flows the kit does not
-  define); **G4** status to amend, **G24** / **G28** rows updated in Phases 5 / 7.
-- Follow-ups the plan closes: S-04 F5 (`src/lib/patterns/thresholds.ts` `loadThresholds` paging, Phase 3), S-04 impl-review
-  F7 (`src/lib/patterns/view.ts` `listOverview`, Phase 3), S-04 F8 + undo-import F4 (`usePageShowReset`, Phase 5),
-  G24 dialog geometry (`src/components/ui/dialog.tsx` `DialogContent`, Phase 5). Left open (recorded in Phase 7's
-  `follow-ups/review-fixes.md`): S-04 F4 (threshold endpoints), F11 (field radius), `DeleteAccountDialog` bfcache,
-  and a new one for S-07 („monthly sums must skip `pattern.excluded`”).
-- Risk for the plan review to weigh: Phase 3's deliberate break 3.7 (empty decisions into `derivePatterns`) is
-  knowingly uncaught until Phase 4 smoke; Phase 4 step list relies on `>text<` anchors being unambiguous
-  (`>7,00 zł<` vs `>47,00 zł<`) — verified by reasoning, not run.
-- Known risk carried: normalizer drift (`src/lib/patterns/merchant.ts` `normalizeMerchant`) orphans thresholds,
-  decisions and `merged_into` values.
+  `[visual]` 5.8, 5.9, 7.10, 7.11; `[human]` 7.9 — product owner confirms plan decision 9 („nie wchodzi do sumy
+  miesięcznej” = excluded from every „ponad próg” sum and from any S-07 monthly total).
+- Gap ids reserved for implement: K22, G33; G4 / G24 / G28 rows updated in Phases 5–7 (`context/foundation/design-kit.md`).
+- Follow-ups the plan closes: S-04 F5 (`thresholds.ts` `loadThresholds`), S-04 F7 (`view.ts` `listOverview`), S-04 F8 +
+  undo-import F4 (`usePageShowReset`), G24 (`dialog.tsx` `DialogContent`), S-01 F9 (already met — recorded only).
+  Left open, re-queued in Phase 7's `follow-ups/review-fixes.md`: S-04 F4, F11 (trigger fired, deferral accepted —
+  review F5), `DeleteAccountDialog` bfcache, S-07 „monthly sums must skip `pattern.excluded`”.
+- Carried risks (plan `## Known risks`): normalizer drift (`merchant.ts` `normalizeMerchant`); Phase 3 break 3.7
+  unguarded until Phase 4's 4.7; smoke text-anchor rule.
 
 ## 6. Autonomous decisions
 
-The plan's `## Autonomous decisions` (1–23) holds the product/design choices; the ones worth a second look:
-
-- **Merge direction** (plan decision 2): the pattern on whose detail „Scal z…” runs is absorbed; the target survives.
-  Rejected: the current pattern surviving. Why: target key keeps routes/threshold and matches the oracle
-  `sportowo.pl → sportowo`. Would change: usability feedback that users expect to stay on the current pattern.
-- **Merge undo built now** (decision 10, G33 placeholder „Cofnij scalenie”), not deferred. Why: a mistaken merge
-  otherwise hides a merchant irrecoverably. Would change: the kit delivering „ustawienia wzorca”.
-- **Merge is the only write that reads** (decision 3), departing from S-04 decision 7. Would change: merge read cost.
-- **Excluded pattern keeps its threshold visible** (decision 8). Would change: review finding it confusing.
-- **Shared `DialogContent` fix in its own phase** (decision 13) with `/settings` + `/imports` re-screenshots. Would
-  change: the maintainer refusing cross-view changes (drop the geometry part, G24 stays open).
-- **Plan step-level decisions:** no question budget / AskUserQuestion (agent contract rule 1) — every open choice from
-  research `## Open Questions` 1–6 decided in the plan; skill's "do not commit" overridden by the contract (docs
-  steps commit their artifacts), so `roadmap.md` is committed here rather than with Phase 1. Would change: an
-  orchestrator instruction to leave the roadmap edit for implement.
-- **No decision against the PRD's literal text** (decision 23); the single `[human]` row covers the ambiguous
-  „suma miesięczna”. Would change: plan review reading FR-009 „zmienić typ” as requiring an automatic-type option.
+- **Triage without a human** (agent contract rule 1): CRITICAL F1 / F2 and WARNING F3 fixed in plan.md; OBSERVATIONS
+  F4 / F5 accepted, F6 recorded. Rejected: leaving F1 to implement (Phase 6 / 7 smoke would be red on correct code).
+  Would change: `InlineAlert` rendering its slot inline (then `>text<` works and the negative controls are redundant).
+- **F1 fix shape: bare text + negative control** rather than changing `InlineAlert` markup. Why: a shared component
+  change is cross-view for a smoke convenience; existing InlineAlert steps already use bare text. Would change: a
+  later slice normalising `InlineAlert` whitespace.
+- **F5: F11 deferral accepted.** Why: the app-wide field-radius token touches views outside this slice (one view +
+  global tokens); new fields use kit 8 px locally as S-04 did. Would change: the maintainer asking for the sweep now.
+- **No product decision overturned**; decision 6 (type toggle, no automatic) and decision 9 (`[human]` 7.9) checked
+  against FR-009 / US-03 and kept. Would change: the product owner reading „zmienić typ” as including „automatycznie”.

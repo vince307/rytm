@@ -1049,13 +1049,13 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [x] 5.1 `npm test` — Phase 4 count (187, 10 files) + 1 file, 0 failures — observed **190 passed, 11 files** (delta +3/+1 file, `page-show-reset.test.ts`)
-- [x] 5.2 `npm run lint` 0 errors; `npx astro check` 0 errors — observed **116** files (delta +2 — `usePageShowReset.ts`, `page-show-reset.test.ts`)
-- [x] 5.3 `npm run fixture:check` OK; `npm run build` passes — both observed OK
-- [x] 5.4 `npx supabase db reset && npx supabase test db` — observed **102** (5 files), all pass (delta 0 — no migration this phase)
-- [x] 5.5 `BASE_URL=http://localhost:4398 npm run smoke` — observed **103** PASS (delta 0)
-- [x] 5.6 Deliberate break (`onPersistedPageShow` calls `callback()` unconditionally, ignoring `event.persisted`) → `test/unit/page-show-reset.test.ts` "does not call the callback on a non-persisted pageshow" FAILs (1/190); restored → 190/190 PASS. Meta-check: the other two cases in the same file ("calls the callback once on a persisted pageshow", "stops listening after cleanup") stayed green throughout, so the red isolates the `persisted` filter, not the listener/cleanup wiring
-- [x] 5.7 No raw colours added to `dialog.tsx` — `grep -nE "#[0-9a-fA-F]{3,6}\b|\[#" src/components/ui/dialog.tsx` empty; the header comment was reworded to avoid a hex literal so the grep stays a true negative; the existing `rgba(32,47,64,…)` shadow literal is unchanged
+- [x] 5.1 `npm test` — Phase 4 count (187, 10 files) + 1 file, 0 failures — observed **190 passed, 11 files** (delta +3/+1 file, `page-show-reset.test.ts`) — f468f68
+- [x] 5.2 `npm run lint` 0 errors; `npx astro check` 0 errors — observed **116** files (delta +2 — `usePageShowReset.ts`, `page-show-reset.test.ts`) — f468f68
+- [x] 5.3 `npm run fixture:check` OK; `npm run build` passes — both observed OK — f468f68
+- [x] 5.4 `npx supabase db reset && npx supabase test db` — observed **102** (5 files), all pass (delta 0 — no migration this phase) — f468f68
+- [x] 5.5 `BASE_URL=http://localhost:4398 npm run smoke` — observed **103** PASS (delta 0) — f468f68
+- [x] 5.6 Deliberate break (`onPersistedPageShow` calls `callback()` unconditionally, ignoring `event.persisted`) → `test/unit/page-show-reset.test.ts` "does not call the callback on a non-persisted pageshow" FAILs (1/190); restored → 190/190 PASS. Meta-check: the other two cases in the same file ("calls the callback once on a persisted pageshow", "stops listening after cleanup") stayed green throughout, so the red isolates the `persisted` filter, not the listener/cleanup wiring — f468f68
+- [x] 5.7 No raw colours added to `dialog.tsx` — `grep -nE "#[0-9a-fA-F]{3,6}\b|\[#" src/components/ui/dialog.tsx` empty; the header comment was reworded to avoid a hex literal so the grep stays a true negative; the existing `rgba(32,47,64,…)` shadow literal is unchanged — f468f68
 
 #### Manual
 

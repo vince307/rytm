@@ -192,6 +192,33 @@ export const copyExtra = {
     // Próg-cell format for a `sum` threshold — the kit's patternRows() never renders one (its five sample
     // patterns hold only count/amount thresholds), so this is a placeholder generalising the `count` format.
     thresholdSum: "{amount} / miesiąc",
+    // DESIGN-GAP: K22 — the "Akcje" dialog and its result toasts exist only in prototype/app.js
+    // (modal('patternActions'), showToast() calls in modal()), not in content.json; taken verbatim.
+    actions: "Akcje",
+    actionsEyebrow: "Akcje na wzorcu",
+    actionsTitle: "Zarządzaj wzorcem.",
+    actionsLead: "Decyzje dotyczą wszystkich kolejnych miesięcy. Możesz je później odwrócić w ustawieniach wzorca.",
+    typeChanged: "Typ wzorca zmieniony.",
+    excludedToast: "Wzorzec wykluczony z analizy.",
+    // modal()'s close button aria-label is shared across every modal type, including patternActions.
+    close: "Zamknij",
+    // DESIGN-GAP: G33 — the kit names no merge picker, rename field, direct-submit type/exclude, merged-variants
+    // list, merge undo or result-line copy for FR-009 (the prototype only fires toasts on closeModal()); every
+    // string below is a placeholder built from tokens and kit-adjacent phrasing, not a design decision.
+    mergeLabel: "Scal z wzorcem",
+    mergeSubmit: "Scal",
+    mergeNone: "Brak innych wzorców do scalenia.",
+    renameLabel: "Nazwa sprzedawcy",
+    renameHint: "Pusta nazwa przywraca nazwę z wyciągu.",
+    renameSubmit: "Zapisz nazwę",
+    merged: "Wzorce scalone.",
+    unmerged: "Scalenie cofnięte.",
+    renamed: "Nazwa zmieniona.",
+    mergedLabel: "Scalone warianty",
+    unmerge: "Cofnij scalenie",
+    mergeInvalid: "Nie można scalić z tym wzorcem.",
+    nameInvalid: "Nazwa może mieć najwyżej 100 znaków.",
+    decisionError: "Nie udało się zapisać decyzji. Spróbuj ponownie.",
   },
   fixed: { eyebrow: "Koszty stałe", lead: "Rytm porównuje miesiące kalendarzowe i pokazuje różnice." },
   settings: {

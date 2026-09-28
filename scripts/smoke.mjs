@@ -340,9 +340,24 @@ const steps = [
     { status: 302, location: "/patterns/kawiarnia%20smoke?merged=1" },
   ],
   [
+    "merge confirms the result",
+    () => request("/patterns/kawiarnia%20smoke?merged=1"),
+    { status: 200, contains: "Wzorce scalone." },
+  ],
+  [
+    "detail offers the actions",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">Akcje<", notContains: "Wzorce scalone." },
+  ],
+  [
     "merged pattern sums its components",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: ">58,49 zł<" },
+  ],
+  [
+    "merged pattern lists its variant",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">Cofnij scalenie<" },
   ],
   [
     "merged pattern is re-typed by D5",
@@ -417,6 +432,11 @@ const steps = [
     { status: 200, contains: ">Kawiarnia Rytm<", notContains: ">5,50 zł<" },
   ],
   [
+    "excluded pattern shows the banner",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">Wykluczony z analizy<" },
+  ],
+  [
     "import after the decisions is saved",
     () => request("/api/imports", { method: "POST", form: { payload: importPayloadJune } }),
     { status: 302, location: "/imports/result?id=" },
@@ -450,6 +470,11 @@ const steps = [
     "restored pattern shows its over-limit again",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: ">7,00 zł<" },
+  ],
+  [
+    "restored pattern drops the banner",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, notContains: ">Wykluczony z analizy<" },
   ],
   [
     "merge is undone",

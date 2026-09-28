@@ -8,12 +8,13 @@
 // amount with its previous value, an excluded pattern staying off the list, a new pattern with its "pierwsze
 // wystąpienie" meta and "nowy" badge, and the comparison-present negative control — reusing the smoke user's
 // existing May/June imports and decisions rather than a dedicated payload (S-06 plan Key Discoveries), and
-// /home (FR-013/US-05, FR-012/US-04, S-07 Phases 2-3): pre-import (no trend), a one-month no-threshold state
-// (hint + tooShort panel), the over-limit sum after a threshold is saved, the sum dropping to 0 after removal, an
-// excluded pattern's threshold contributing nothing while the newer month still appears on the axis, every month
-// recomputing once the pattern is restored, the accent stat card's delta foot hidden with one month of data and
-// shown once a previous month exists, and the "Koszty stałe" card's total and "podrożała" count — pure GETs
-// inserted between existing steps, no new payload.
+// /home (FR-013/US-05, FR-012/US-04, S-07 Phases 2-4): pre-import (no trend, no import panel), a one-month
+// no-threshold state (hint + tooShort panel), the over-limit sum after a threshold is saved, the import panel
+// offering the next upload once data exists, the sum dropping to 0 after removal, an excluded pattern's threshold
+// contributing nothing while the newer month still appears on the axis, every month recomputing once the pattern
+// is restored, the accent stat card's delta foot hidden with one month of data and shown once a previous month
+// exists, and the "Koszty stałe" card's total and "podrożała" count — pure GETs inserted between existing steps,
+// no new payload.
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
@@ -163,7 +164,11 @@ const steps = [
     () => request("/home"),
     { status: 200, contains: "Nie masz jeszcze żadnego importu." },
   ],
-  ["home before import has no trend", () => request("/home"), { status: 200, notContains: ">Ponad progiem<" }],
+  [
+    "home before import has no trend",
+    () => request("/home"),
+    { status: 200, notContains: [">Ponad progiem<", ">Dodaj najnowszy wyciąg<"] },
+  ],
   [
     "fixed shows the pre-import view",
     () => request("/fixed"),
@@ -342,6 +347,7 @@ const steps = [
       notContains: "Ustaw próg na wzorcu, a tu pojawi się suma ponad progiem.",
     },
   ],
+  ["home offers the next import", () => request("/home"), { status: 200, contains: ">Dodaj najnowszy wyciąg<" }],
   [
     // One month of data (May only) — `homeStats.previous` is `null` (`previousMonth` April has no rows), so the
     // accent stat card renders no delta foot at all (S-07 Phase 3, plan review F1 gap rule).

@@ -1,15 +1,16 @@
 ---
-// /home — kit `dashboard()` no-name variant (`#/home-no-name`, K5) + `trendChart()` `.monthly-trend` (FR-013,
-// US-05, FR-012, US-04, S-07). `loadPatternData` → `overLimitTrend(patterns, rows, thresholds)` →
-// `fixedOverview(patterns, rows)` → `homeStats(trend, fixed)`, all inside one `try` (S-06 follow-up: a
-// `patternTxs` id-drift throw must not become a 500 here; `/patterns` and `/fixed` are not retrofitted — one
-// view, tracked as a follow-up). The pre-import state (`referenceMonth === null`) is unchanged from before this
-// change. The import panel lands in Phase 4.
+// /home — kit `dashboard()` no-name variant (`#/home-no-name`, K5) + `trendChart()` `.monthly-trend` + the
+// `.import-panel` (FR-013, US-05, FR-012, US-04, S-07). `loadPatternData` → `overLimitTrend(patterns, rows,
+// thresholds)` → `fixedOverview(patterns, rows)` → `homeStats(trend, fixed)`, all inside one `try` (S-06
+// follow-up: a `patternTxs` id-drift throw must not become a 500 here; `/patterns` and `/fixed` are not
+// retrofitted — one view, tracked as a follow-up). The pre-import state (`referenceMonth === null`) is
+// unchanged from before this change.
 import AppLayout from "@/layouts/AppLayout.astro";
 import EmptyState from "@/components/app/EmptyState.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
 import Panel from "@/components/app/Panel.astro";
+import ImportPanel from "@/components/home/ImportPanel.astro";
 import StatCard from "@/components/home/StatCard.astro";
 import TrendChart from "@/components/home/TrendChart.astro";
 import { buttonVariants } from "@/components/ui/button";
@@ -124,6 +125,12 @@ const risenFootFor = (n: number) => h.risen.replace("{n}", String(n)).replace("{
           hint={!result.trend.hasThreshold ? h.noThreshold : undefined}
         />
       </Panel>
+      <ImportPanel
+        title={copy.dashboard.importTitle}
+        body={copy.dashboard.importBody}
+        cta={copyExtra.imports.choose}
+        href="/imports/new"
+      />
     </>
   )}
 </AppLayout>

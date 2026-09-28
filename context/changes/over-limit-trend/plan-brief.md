@@ -19,8 +19,8 @@ computes every month of one pattern; `listOverview` (`/patterns`) reads only the
 
 `/home` with data shows the kit's no-name dashboard: „Dzień dobry.” + „Twój <miesiąc> w jednym spokojnym widoku.”,
 two stat cards („Ponad progiem w tym miesiącu” with a delta against the previous month; „Koszty stałe” with „N
-pozycje podrożały”), a full-width bar chart with one labelled bar per calendar month from the first to the latest
-month, and the import panel. No bar is marked „niepełny”; excluded patterns add nothing; fewer than 3 months shows
+pozycje podrożały”), a full-width bar chart with one labelled bar per month present in the data (a month without any import is
+absent, not 0), and the import panel. No bar is marked „niepełny”; excluded patterns add nothing; fewer than 3 months shows
 „Trend pojawi się po 3 miesiącach danych.”.
 
 ## Key Decisions Made
@@ -28,10 +28,10 @@ month, and the import panel. No bar is marked „niepełny”; excluded patterns
 | Decision | Choice | Why (1 sentence) | Source |
 | --- | --- | --- | --- |
 | Aggregate | New pure `overLimitTrend` summing `overLimit(...).byMonth`, guards shared with `listOverview` | Last point = Σ `/patterns` over-limit figures by construction | Research + Plan |
-| Month axis | Continuous first → reference month, zero-filled (`[human]` vs FR-013 literal) | A time series must not hide a gap month; AC „0, nie brak wartości” | Research + Plan |
+| Month axis | Months present in the data only (FR-013 literal; `[human]` 4.9) | A month without data is unknown, not „0 ponad progiem”; same gap rule as `/fixed` | Plan review F1 (overturned the plan's continuous axis) |
 | „niepełny” | Not shown (PRD US-05 AC 4 over the kit) | The app cannot know completeness | Research |
 | Chart vs Non-Goal | Bars kept, each with its visible sum (`[human]`) | „sumy per miesiąc” stay readable; kit G6 delivered the chart | Plan |
-| Stat 1 | Trend's last point + delta to the previous axis month, foot hidden with one month | Two points of one aggregate, no new rule | Research + Plan |
+| Stat 1 | Trend's last point + delta to `previousMonth(R)`, foot hidden when that month has no data | Two points of one aggregate, no new rule | Research + Plan |
 | „Koszty stałe” | Σ of `/fixed` amounts in R + rises from `fixedOverview` (`[human]` for the value) | Figures the user already sees on `/fixed` | Research + Plan |
 | Out | „Rozpoznane wydatki”, „Co wraca najczęściej” → G36; 2-column stats, full-width trend | PRD defines neither; never invent | Research |
 | Greeting / lead | No-name variant (`#/home-no-name`), month via `copyExtra` template | App stores no name (K5) | Research + Plan |
@@ -40,7 +40,7 @@ month, and the import panel. No bar is marked „niepełny”; excluded patterns
 
 ## Scope
 
-**In scope:** `overLimitTrend`, `nextMonth`, `applicableThreshold`, `formatMonthAxis`, `homeStats`; `/home` with title
+**In scope:** `overLimitTrend`, `applicableThreshold`, `formatMonthAxis`, `homeStats`; `/home` with title
 block, two stat cards, trend panel, import panel, error and pre-import branches; copy K24/K25 + placeholders G35;
 design-kit rows G35, G36, K24, K25, G6 amended; smoke +10; follow-ups file.
 
@@ -68,7 +68,8 @@ API route, no island, no stored totals.
 ## Open Risks & Assumptions
 
 - 12 value labels at ~400 px: the chart scrolls inside its panel; legibility judged in the visual step.
-- Continuous axis shows many zero bars after a long gap between imports (`[human]` 4.9).
+- Gaps between imports show only in the axis labels; the delta foot hides after a gap (`[human]` 4.9).
+- „Koszty stałe” value includes every one-off merchant D5 types `fixed` (S-06 follow-up, fired here — `[human]` 4.11).
 - „Koszty stałe” includes an own transfer typed `fixed` (fixture: `jan przykładowy` 1500 zł) — `[human]` 4.11.
 - Excluded patterns skipped in every monthly total rests on S-05 `[human]` 7.9 (working assumption).
 

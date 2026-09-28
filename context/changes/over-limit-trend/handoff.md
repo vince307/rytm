@@ -1,19 +1,19 @@
 # Handoff — `over-limit-trend` (slice S-07)
 
-Written by the `plan` step (`/10x-plan over-limit-trend`, run `2026-09-28-s05-s06-s07`). `plan.md` (4 phases, 41
-Progress rows) and `plan-brief.md` are on disk, `change.md` is `planned`, roadmap S-07 is `planning`; no product code.
-The one thing the next agent must not get wrong: the trend is `overLimitTrend` summing `overLimit(...).byMonth` under
-**exactly** `listOverview`'s guards (via the extracted `applicableThreshold` + explicit `!pattern.excluded`) over a
-continuous, zero-filled axis — its last point must equal Σ `listOverview(...).items[].overMinor`.
+Written by the `plan-review` step (`/10x-plan-review over-limit-trend`, run `2026-09-28-s05-s06-s07`). Verdict
+PROCEED; `change.md` is `plan_reviewed`; no product code yet. The one thing the next agent must not get wrong: the
+trend's month axis is **the months present in the data** (distinct `monthOf` over all rows, sorted — no `nextMonth`,
+no zero-filled calendar gaps; plan review F1 overturned the plan's continuous axis), while a month *on* the axis with
+nothing over is `0`; the last point must equal Σ `listOverview(...).items[].overMinor`.
 
 ## 1. State
 
 | Item | Value |
 |---|---|
 | Branch | `feat/over-limit-trend`, cut from `main` at `c0b0068` |
-| Commits | 3 on the branch: `8c08aef` change identity, `3fedeb7` research, `docs(over-limit-trend): plan` (this step) |
+| Commits | 4 on the branch: `8c08aef` change identity, `3fedeb7` research, `6278303` plan, `docs(over-limit-trend): plan review` (this step) |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `planned` (`metadata-guard.mjs mark-planned`) |
+| `change.md` status | `plan_reviewed` |
 | `## Progress` rows remaining | 41 (`grep -c '^- \[ \]' plan.md`) — 32 automated, 9 manual (4 `[reviewer]`, 3 `[human]`, 2 `[visual]`) |
 | Working tree | clean after the commit (files staged by explicit path) |
 
@@ -21,10 +21,10 @@ continuous, zero-filled axis — its last point must equal Σ `listOverview(...)
 
 | Path | What it is |
 |---|---|
-| `context/changes/over-limit-trend/plan.md` | Plan: 4 phases, Critical Implementation Details, fixture numbers observed at plan time, `## Autonomous decisions` (17), `## Progress` |
-| `context/changes/over-limit-trend/plan-brief.md` | Two-page brief |
-| `context/changes/over-limit-trend/change.md` | Frontmatter `status: preparing → planned` |
-| `context/foundation/roadmap.md` | S-07 status `proposed → planning` (At a glance + body) |
+| `context/changes/over-limit-trend/reviews/plan-review.md` | Review report: 1 critical, 2 warnings, 4 observations, all triaged; ends `VERDICT: PROCEED — …` |
+| `context/changes/over-limit-trend/plan.md` | Triaged: axis rule (Critical Implementation Details, Phase 1 §1 „Month step — none”, case 9, break 1.6), `homeStats.previous` rule + case 3b, smoke `notContains` array (Phase 2 §4), G35 text, visual `home-gap-month`, `[human]` 4.9 / 4.11 reworded, decision 2 rewritten, decision 18 added, Known risks +3, Phase 4 follow-up +1 |
+| `context/changes/over-limit-trend/plan-brief.md` | Synced with F1 / F3 (end state, month-axis row, stat-1 row, scope without `nextMonth`, risks) |
+| `context/changes/over-limit-trend/change.md` | Frontmatter `status: planned → plan_reviewed` |
 | `context/changes/over-limit-trend/handoff.md` | This file |
 
 ## 3. Verification
@@ -32,43 +32,45 @@ continuous, zero-filled axis — its last point must equal Σ `listOverview(...)
 | Command | Result |
 |---|---|
 | `git branch --show-current` | `feat/over-limit-trend` (observed before writing) |
-| `npm test` | 213 passed, 12 files (= baseline 213, delta 0) |
-| `npm run fixture:check` | OK |
-| Throwaway vitest (`derivePatterns` + `overLimit` + `fixedOverview` on the F-02 main CSV, file deleted after) | 206 rows, 12 months 2025-09…2026-08, ref 2026-08, 31 patterns; keys `kino światło` / `stacja paliw drogowskaz` / `pizzeria trzy sery`; byMonth numbers match research § 7 (pizzeria: 6 non-zero months, research prose said 7); fixed Σ 175298, rises 1 |
-| `node -e` Intl check | `{month:"short", year:"2-digit"}` pl-PL → „maj 26”, „paź 26” |
-| lint, astro check, build, pgTAP, smoke | **not run** — docs-only step; baseline on `main` `c0b0068` from the agent contract, inherited, unverified |
+| Grounding (`ls -l`, `grep`, reads) | 8/8 plan paths exist; symbols `overLimit` (`byMonth` every month), `appliesTo`, `previousMonth`, `referenceMonth`, `listOverview` guards, `patternTxs` (throws on drift), `indexById`, `fixedOverview` (skips `excluded` / non-`fixed`), `formatSignedMoney`, `plural`, `copy.dashboard.*`, `copy.trend.*` as the plan states; 9/9 smoke step names exist in `scripts/smoke.mjs` `steps` |
+| Smoke checker read | `notContains` is a single string (`!actual.body.includes(expected.notContains)`) → F2 |
+| Progress ↔ phases | one `## Progress`, 4 `## Phase N` ↔ 4 `### Phase N`, 41 rows (unchanged count) |
+| lint, astro check, vitest, build, pgTAP, smoke | **not run** — docs-only step; baseline on `main` `c0b0068` from the agent contract, inherited, unverified |
 | Deliberate breaks | none in this step (planned per phase in `plan.md`) |
 
 ## 4. Next command
 
-`/10x-plan-review over-limit-trend`
+`/10x-implement over-limit-trend phase 1`
 
 ## 5. Open
 
-- **Manual Progress rows (human checklist after the run):** 4.9 `[human]` continuous axis vs FR-013 literal
-  (decision 2); 4.10 `[human]` bar chart kept vs PRD Non-Goal „Wykresy inne niż lista i suma” (decision 4); 4.11
-  `[human]` „Koszty stałe” value = Σ `/fixed` amounts in R (decision 6). `[reviewer]` 1.8, 2.10, 3.10, 4.8;
-  `[visual]` 4.12 (9 states × 1440 / ~400 px), 4.13 (US-05 walk-through on the fixture).
-- **DESIGN-GAPs to add during implement:** K24 (no-name lead, `src/content/copy.ts` `copyExtra.home.lead`), G35 (trend
-  states: no „niepełny”, bar value labels, zero stub, no-threshold hint, token mapping), K25 (stat foot templates),
-  G36 (omitted „Rozpoznane wydatki” / „Co wraca najczęściej”, 2-column stats, „Koszty stałe” value); G6 amended.
-- **Follow-ups** (to `context/changes/over-limit-trend/follow-ups/review-fixes.md` in Phase 4): S-05 F6
-  (`validateMerge`), drift throw on `/patterns` / `/fixed` (`patternTxs`), G36 items, long-history bar density.
-- **Carried `[human]`:** S-05 7.9 (excluded patterns skipped in every monthly total — working assumption the trend
-  relies on), S-06 4.10 (D5 flip).
-- **Risks for plan review:** bar label legibility at ~400 px (inner scroll, `min-w-[44px]`); smoke `>text<` anchors on
-  wrapped elements (check `curl` output); `Intl` ICU output pinned by `formatMonthAxis` cases.
+- **Manual Progress rows (human checklist after the run):** 4.9 `[human]` axis = months with data only (decision 2 as
+  revised by plan review F1; reversal = continuous axis); 4.10 `[human]` bar chart vs PRD Non-Goal (decision 4);
+  4.11 `[human]` „Koszty stałe” = Σ `/fixed` amounts in R, one-off D5-`fixed` merchants included (decision 6, F3).
+  `[reviewer]` 1.8, 2.10, 3.10, 4.8; `[visual]` 4.12, 4.13.
+- **Implementer notes from the review:** Phase 1 does **not** add `nextMonth` (and does not touch
+  `test/unit/over-limit.test.ts`); Phase 2 extends the smoke checker's `notContains` to accept an array before adding
+  steps; Phase 3 `homeStats.previous` = `previousMonth(R)` only when that month is on the axis.
+- **DESIGN-GAPs to add during implement:** K24, G35 (Phase 2), K25, G36 (Phase 3); G6 amended.
+- **Follow-ups** (to `follow-ups/review-fixes.md` in Phase 4): S-05 F6, `/patterns` / `/fixed` drift throw, G36 items,
+  long-history bar density, S-06 one-off noise now also in the `/home` „Koszty stałe” value.
+- **Carried `[human]`:** S-05 7.9 (excluded skipped in every monthly total), S-06 4.10 (D5 flip).
+- **Risks:** bar label legibility at ~400 px; smoke `>text<` anchors on wrapped elements; `Intl` ICU output pinned by
+  `formatMonthAxis` cases; „Koszty stałe” noise on real data (F3).
 
 ## 6. Autonomous decisions
 
-- **No `AskUserQuestion`; complexity MEDIUM, zero questions asked** — research answered every product question with a
-  recommendation; all taken or refined here. Would change: a maintainer message.
-- **Plan decisions 1–17** are in `plan.md` `## Autonomous decisions` with reversal conditions. Worth a second look:
-  2 (continuous axis — against FR-013 literal, `[human]` 4.9), 4 (bars with visible sums — against the Non-Goal
-  literal, `[human]` 4.10), 6 („Koszty stałe” value — new figure, `[human]` 4.11), 7 (two omitted kit elements, 2-column
-  stats), 10 (no-threshold hint placeholder).
-- **Four phases, one new component each, smoke 6 / 3 / 1.** Why: the contract's size lesson (286k tokens for 2
-  components + copy + kit rows + smoke). Would change: a phase that cannot be green alone → merge with the next.
-- **Fixture numbers verified by execution, not copied from research.** Would change: a fixture regeneration.
-- **Roadmap `planning` committed with the plan** (S-06 plan commit precedent), not left for implement. Would change:
-  the orchestrator's commit rule for roadmap edits.
+- **Overturned plan decision 2 (continuous zero-filled axis → months present in the data).** Why: FR-013, the roadmap
+  outcome and the maintainer binding all say „obecnych w danych”; a zero-filled gap month states `0,00 zł ponad
+  progiem` for a month the app has no data for, biases the secondary success criterion, and contradicts S-06's gap
+  rule on the same page. Rejected: keeping it behind `[human]` 4.9 (a wrong figure is not a preference). Would change:
+  the maintainer answering 4.9 for a continuous time axis — then restore `nextMonth` and the zero-fill.
+- **Kept decision 4 (bars with visible sums) despite the Non-Goal literal.** Why: the kit (UI source of truth) draws
+  this chart and every bar shows its sum; `[human]` 4.10 names it. Would change: the maintainer reading the Non-Goal
+  as „no bars”.
+- **F3 recorded, not re-scoped.** Chosen: keep „Koszty stałe” = Σ of `/fixed` rows; add risk, follow-up, `[human]`
+  4.11 wording. Rejected: a „≥ 2 occurrences” filter (a new, invented rule) or dropping the value (decision 6's
+  rejected option). Would change: the maintainer answering 4.11 against the Σ.
+- **No sub-agent for codebase verification** (skill Step 3 suggests one): the risky claims fit in a handful of files,
+  checked directly. Would change: a plan touching many modules.
+- **No `AskUserQuestion`**; triage decided in place (contract rule 1).

@@ -6,7 +6,7 @@ Turn `/home` from a static placeholder into the kit's dashboard (`dashboard()` i
 with transactions: a monthly „Ponad progiem” trend over every month of the user's data, computed on read from
 **today's** thresholds (FR-013, US-05), the stat „Ponad progiem w tym miesiącu” with its change against the previous
 month, the „Koszty stałe” card built from S-06's `fixedOverview`, and the „Dodaj najnowszy wyciąg” import panel. The
-trend is one new pure aggregate over the shipped `overLimit` rule — the same guards as `listOverview`, so its last
+trend is one new pure aggregate over the shipped `overLimit` rule, over the months present in the data — the same guards as `listOverview`, so its last
 point equals the sum of the over-limit figures `/patterns` shows. The pre-import view stays. No migration.
 
 ## Current State Analysis
@@ -76,14 +76,15 @@ Source: `context/changes/over-limit-trend/research.md`, re-checked here against 
 - `/home` for an account with transactions shows eyebrow „Przegląd miesiąca”, h1 „Dzień dobry.”, lead „Twój <miesiąc>
   w jednym spokojnym widoku.” (reference month, nominative) and `+ Wgraj CSV`; then two stat cards — accent „Ponad
   progiem w tym miesiącu” = the reference month's over-limit sum with foot „<±delta> względem <poprzedniego miesiąca>”
-  (hidden with one month of data), and „Koszty stałe” = Σ of the amounts `/fixed` lists for the reference month with
+  (hidden when the calendar month before R has no data — one month of data, or a gap month; plan review F1), and „Koszty stałe” = Σ of the amounts `/fixed` lists for the reference month with
   foot „N pozycje podrożały”; then the full-width panel „Ponad progiem · miesięcznie · wszystkie dane” with one bar per
-  calendar month from the earliest month in the data to the reference month, each bar labelled with its sum and its
+  month present in the data (≥ 1 debit — FR-013 literal, plan review F1), ascending, each bar labelled with its sum and its
   month („maj 26”), a month with nothing over showing `0,00 zł` and no bar height, the legend „suma ponad progiem”, the
   „Trend pojawi się po 3 miesiącach danych.” panel under fewer than 3 months and a hint when no pattern has an
   applicable threshold; then the „Dodaj najnowszy wyciąg” panel.
 - Changing or removing a threshold changes every month on the next request; an excluded pattern adds nothing to any
-  month; no bar is marked „niepełny”. The trend's reference-month value equals Σ of `/patterns` over-limit figures.
+  month; no bar is marked „niepełny”; a calendar month without any imported debit is not on the axis (never a
+  false `0,00 zł`). The trend's reference-month value equals Σ of `/patterns` over-limit figures.
 - An account with no transactions keeps today's pre-import view; a failed read — or a drift throw inside the assembly —
   shows the error line, never a 500.
 - On the synthetic fixture with `kino światło` count 1: bars `paź 25` 49,13 zł, `maj 26` 133,47 zł, `cze 26` 41,24 zł,
@@ -93,7 +94,7 @@ Source: `context/changes/over-limit-trend/research.md`, re-checked here against 
 
 ### Key Discoveries:
 
-- `overLimit` already yields every month; the whole domain change is a sum over `byMonth` plus a zero-filled axis —
+- `overLimit` already yields every month; the whole domain change is a sum over `byMonth` over the months present in the data —
   no new rule, no stored totals (FR-013 „według dzisiejszych progów” holds by construction).
 - The smoke user's existing steps already reach every trend state: no import, one month without / with / after removal
   of a threshold, two months with the threshold pattern excluded, and two months with historical May + current June —
@@ -137,12 +138,13 @@ BASE_URL=http://localhost:4398 npm run smoke                        # then: lsof
 
 ## Critical Implementation Details
 
-- **The aggregate, exactly.** R = `referenceMonth(rows)` over the full read. Axis = every calendar month from the
-  earliest `monthOf(occurredOn)` over **all** rows (excluded patterns' rows included — the axis is „months in the
-  data”, independent of thresholds) up to R, ascending, stepped with `nextMonth`. For each pattern:
+- **The aggregate, exactly.** R = `referenceMonth(rows)` over the full read. Axis = the distinct
+  `monthOf(occurredOn)` over **all** rows (excluded patterns' rows included — the axis is „months present in the
+  data”, FR-013 literal, independent of thresholds), sorted ascending; its last entry is R. A calendar month with no
+  row is **not** on the axis (plan review F1 — a month without data is unknown, not „0 ponad progiem”). For each pattern:
   `threshold = applicableThreshold(pattern, thresholds)`; skip when `!threshold || pattern.excluded`; otherwise add
   every entry of `overLimit(patternTxs(pattern, byId), threshold, pattern.type).byMonth` into the month map. Every axis
-  month without an entry is `0`. `hasThreshold` = some non-excluded pattern has an applicable threshold. Invariant:
+  month without an entry is `0` (US-05 AC 2 — a month with data and nothing over). `hasThreshold` = some non-excluded pattern has an applicable threshold. Invariant:
   `months.at(-1).overMinor === Σ listOverview(patterns, rows, thresholds).items[].overMinor`.
 - **One guard.** `applicableThreshold(pattern, thresholds)` (= `stored && appliesTo(stored, pattern.type) ? stored :
   null`) is extracted in `view.ts` and used by `listOverview` and the trend (`patternDetail` keeps its own
@@ -165,12 +167,10 @@ the fixture. No caller yet — the app is unchanged.
 
 ### Changes Required:
 
-#### 1. Month step
+#### 1. Month step — none
 
-**File**: `src/lib/patterns/over-limit.ts`
-
-**Contract**: `nextMonth(yearMonth: string): string` beside `previousMonth` — calendar successor (`2025-12` →
-`2026-01`), plain string arithmetic, no `Date`.
+No `nextMonth` (plan review F1: the axis is the sorted set of months present in the data, not a stepped calendar
+range). `over-limit.ts` is unchanged.
 
 #### 2. Shared guard
 
@@ -201,7 +201,7 @@ export function trendBarHeight(value: number, max: number): number
 Rule exactly as in Critical Implementation Details; no rows → `{ referenceMonth: null, months: [], hasThreshold:
 false }`. Header comment cites FR-013, US-05 AC (0 not missing; today's thresholds only; no „niepełny”), the
 maintainer bindings (excess semantics; reference month = latest month in the data), S-05 decision 9 (excluded adds
-nothing), the continuous-axis decision and the `listOverview` invariant. Imports only `over-limit.ts`, `view.ts`,
+nothing), the axis decision (months present in the data — plan review F1) and the `listOverview` invariant. Imports only `over-limit.ts`, `view.ts`,
 `@/types`.
 
 #### 4. Axis formatter
@@ -213,7 +213,7 @@ nothing), the continuous-axis decision and the `listOverview` invariant. Imports
 
 #### 5. Unit tests
 
-**Files**: `test/unit/over-limit-trend.test.ts` (new), `test/unit/over-limit.test.ts`, `test/unit/format.test.ts`
+**Files**: `test/unit/over-limit-trend.test.ts` (new), `test/unit/format.test.ts`
 
 **Contract**: crafted `MerchantPattern` + `PatternSource` literals (the `fixed-overview.test.ts` shape):
 
@@ -227,8 +227,8 @@ nothing), the continuous-axis decision and the `listOverview` invariant. Imports
 6. Sum threshold: the crossing transaction contributes only its excess (the maintainer binding reaches the trend).
 7. Excluded pattern with an applicable threshold → 0 in every month; `hasThreshold: false` when it is the only one.
 8. Inapplicable threshold (`count` on a `fixed` pattern) → 0; `hasThreshold: false`.
-9. Gap month: rows in 2026-05 and 2026-07 only → axis `[05, 06, 07]` with 06 = 0; year boundary 2025-11 … 2026-02 → 4
-   months in order.
+9. Gap month: rows in 2026-05 and 2026-07 only → axis `[05, 07]` (no 06 — no data is not „0”); year boundary: rows in
+   2025-11, 2025-12, 2026-01, 2026-02 → 4 months in chronological order.
 10. The axis starts at an excluded pattern's earliest row.
 11. Invariant: on a mixed set (thresholded, excluded, inapplicable, no threshold) the last month equals
     Σ `listOverview(...).items[].overMinor`.
@@ -241,7 +241,7 @@ nothing), the continuous-axis decision and the `listOverview` invariant. Imports
     `{"pizzeria trzy sery": sum 5000}` → `2025-11` 5444, `2026-03` 479, `2026-04` 1755, `2026-05` 4910, `2026-06` 6012,
     `2026-08` 1707, the rest 0. Assert the keys exist in `derivePatterns` output first (fail loudly on a key drift).
 
-`over-limit.test.ts`: `nextMonth` for „2026-08”, „2025-12”, „2026-09”. `format.test.ts`: `formatMonthAxis` for
+`format.test.ts`: `formatMonthAxis` for
 „2026-05”, „2025-10”, „2026-01”.
 
 ### Success Criteria:
@@ -253,7 +253,7 @@ nothing), the continuous-axis decision and the `listOverview` invariant. Imports
 - `npm run fixture:check` OK; `npm run build` passes
 - `npx supabase db reset && npx supabase test db` — 102 (delta 0); `BASE_URL=http://localhost:4398 npm run smoke` — 121 PASS (delta 0)
 - Deliberate break (exclusion): drop the `pattern.excluded` skip in `overLimitTrend` → case 7 FAILs; restored → green. Meta-check: case 5 stays green, so the red is the exclusion guard, not the summing
-- Deliberate break (axis): build the axis from months that have rows only → case 9 FAILs; restored → green. Meta-check: case 13 stays green (the fixture has 12 consecutive months), so only the gap case guards continuity — recorded, as expected
+- Deliberate break (axis): fill the axis as a continuous calendar range from the first to R → case 9 FAILs; restored → green. Meta-check: case 13 stays green (the fixture has 12 consecutive months), so only the gap case guards the axis rule — recorded, as expected
 - Deliberate break (history): add only `byMonth.get(referenceMonth)` (the `listOverview` shape) → cases 3 and 13 FAIL while case 11 stays green. Meta-check: proves the invariant alone would not catch a trend collapsed to one month, which is why cases 3 / 13 exist
 
 #### Manual Verification:
@@ -327,8 +327,8 @@ child. Header comment: kit `trendChart()`, what is deliberately absent (`.tbar.h
 `design-kit.md`: **K24** (no-name lead exists only in `applyDashboardState`, with the month baked in); **G35** (trend
 states the kit does not define or the PRD overrides: no „niepełny” marker / `trend.current` — PRD US-05 AC 4 and the
 app cannot know completeness; a visible sum per bar — PRD „sumy per miesiąc”, label 9–10 px, bar `min-w-[44px]`
-instead of 24 px, inner horizontal scroll; zero month = 2 px stub instead of the kit's 12 % minimum; gap months
-zero-filled; no-threshold hint placeholder; bar grey / dot / gridline token mapping `muted/55` / `line`; read error via
+instead of 24 px, inner horizontal scroll; zero month = 2 px stub instead of the kit's 12 % minimum; a calendar month
+without data absent from the axis (FR-013 literal; the kit sample has no gap); no-threshold hint placeholder; bar grey / dot / gridline token mapping `muted/55` / `line`; read error via
 K18; placeholder · S-07 faza 2); **G6** status amended („S-07: wdrożone — `/home` na danych, bez „niepełny” (G35)”);
 K24 / G35 appended to „Do rundy 3”.
 
@@ -336,7 +336,9 @@ K24 / G35 appended to „Do rundy 3”.
 
 **File**: `scripts/smoke.mjs`
 
-**Contract**: inserted into the existing run (GETs only; header comment mentions `/home`):
+**Contract**: first extend the checker so `notContains` accepts a single needle **or an array** (all must be absent),
+symmetric to `contains` (`[expected.notContains].flat()` next to `needles`; today it takes one string only — plan
+review F2); then inserted into the existing run (GETs only; header comment mentions `/home`):
 
 1. after „home renders empty state for signed-in user”: „home before import has no trend” — GET `/home` → 200
    notContains `>Ponad progiem<`.
@@ -396,8 +398,9 @@ export interface HomeStats { overMinor: number; previous: { month: string; delta
 export function homeStats(trend: OverLimitTrend, fixed: FixedOverview): HomeStats
 ```
 
-`overMinor` = last axis month (0 without months). `previous` = the second-to-last axis month and `last − it` when the
-axis has ≥ 2 months (continuous axis ⇒ it is `previousMonth(R)`), else `null`. `fixedTotalMinor` = Σ `amountMinor`
+`overMinor` = last axis month (0 without months). `previous` = `previousMonth(R)` and `last − its value` when that
+month is on the axis (it has data — the same comparison rule as `fixedOverview`'s `hasComparison`, S-06 D6), else
+`null` (one month of data, or a gap month before R — plan review F1). `fixedTotalMinor` = Σ `amountMinor`
 over `fixed.changed`, `fixed.new`, `fixed.unchanged` (the amounts `/fixed` lists). `fixedRisen` =
 `fixed.changed.filter((r) => r.deltaMinor > 0).length` (S-06 follow-up formula, verbatim). Header cites the S-06
 follow-up and decisions 5–6.
@@ -444,7 +447,8 @@ accent label colour `excess-text` for `#72501f`; placeholder · S-07 faza 3); K2
 **File**: `test/unit/home-stats.test.ts` (new)
 
 **Contract**: 1) empty trend + empty overview → `overMinor` 0, `previous` null, 0 / 0; 2) one month → `previous` null;
-3) two months rise (+150), drop (−8759), equal (0) → signed `deltaMinor`, `month` = second-to-last; 4) crafted
+3) two consecutive months rise (+150), drop (−8759), equal (0) → signed `deltaMinor`, `month` = `previousMonth(R)`;
+3b) axis `[2026-05, 2026-07]` (gap) → `previous` null; 4) crafted
 `FixedOverview` with a rise, a decrease, a new and an unchanged row → `fixedRisen` 1 (the decrease not counted),
 `fixedTotalMinor` = Σ of the four amounts; 5) F-02 fixture with `{"kino światło": count 1}` → `overMinor` 0,
 `previous` `{ month: "2026-07", deltaMinor: -8759 }`, `fixedTotalMinor` 175298, `fixedRisen` 1.
@@ -524,6 +528,8 @@ rounded-xl border border-dashed border-muted/55 bg-paper-soft px-[22px] py-[19px
   defining the selection rule.
 - Long histories: bars keep `min-w-[44px]` and scroll inside the panel — Trigger: an account with > 24 months or
   usability feedback.
+- S-06 „one-off merchants are D5-fixed” now also inflates the `/home` „Koszty stałe” value (plan review F3) — Trigger:
+  `[human]` 4.11 answered against the Σ, or product feedback on real data.
 
 #### 4. Seam sweep
 
@@ -559,10 +565,10 @@ step 1 („home before import has no trend”) gains notContains `>Dodaj najnows
 #### Manual Verification:
 
 - [reviewer] Seam sweep done: duplicated helpers / classes extracted or justified, stale comments and kit rows (G6, G35, G36, K5, K24, K25) match the code, the follow-ups file lists every item with a `Trigger:`
-- [human] Product owner confirms decision 2 (against FR-013's literal „dla wszystkich miesięcy obecnych w danych”): the axis is continuous from the first to the latest month and a calendar month with no import between two imports shows `0,00 zł`; reversal = axis from months with rows only (one line in `trend.ts`, case 9 flips)
+- [human] Product owner confirms decision 2 as revised by plan review F1 (FR-013 literal „dla wszystkich miesięcy obecnych w danych”): the axis holds only months with ≥ 1 imported debit, so a calendar month with no import between two imports is absent (not `0,00 zł`) and the delta foot is hidden after such a gap; reversal = continuous zero-filled calendar axis (one line in `trend.ts`, case 9 flips, `homeStats.previous` follows)
 - [human] Product owner confirms decision 4 (against the PRD Non-Goal „Wykresy inne niż lista i suma”): the kit's bar chart is kept because every bar carries its numeric sum; reversal = render the months as a list in the same panel
-- [human] Product owner confirms decision 6 (PRD silent — a new figure): „Koszty stałe” value = Σ of the amounts `/fixed` lists for the reference month (incl. an own transfer typed `fixed`, e.g. `jan przykładowy` 1500 zł on the fixture); reversal = foot-only card
-- [visual] Screenshots, desktop 1440 px and mobile ~400 px, on `astro dev --port 4399` with freshly registered local accounts (never the seeded `test@rytm.local`): `home-pre-import` (no import), `home-no-threshold` (fixture imported, no threshold — flat 0,00 zł bars + hint), `home-fixture-trend` (fixture, `kino światło` count 1 and `stacja paliw drogowskaz` count 1 — 12 labelled bars, stat 955,34 zł, foot vs lipca, „Koszty stałe” 1752,98 zł · 1 pozycja podrożała, import panel), `home-one-month` (one month imported with a threshold — tooShort panel, no delta foot), `home-two-months` (two months — tooShort still shown, delta foot), `home-gap-month` (imports for two months with an empty month between — middle bar 0,00 zł), `home-excluded` (the only thresholded pattern excluded — zeros + hint), `home-read-error` (only if reachable without leaving the local DB mutated — else a documented `db reset` in the same step), `home-kit-compare` (the kit `#/home-no-name` frame beside the fixture state)
+- [human] Product owner confirms decision 6 (PRD silent — a new figure): „Koszty stałe” value = Σ of the amounts `/fixed` lists for the reference month (incl. an own transfer typed `fixed`, e.g. `jan przykładowy` 1500 zł on the fixture, and every one-off merchant D5 types `fixed` — S-06 follow-up „one-off merchants list as nowy”, fired by this value, plan review F3); reversal = foot-only card, or a classifier fix in `derivePatterns`
+- [visual] Screenshots, desktop 1440 px and mobile ~400 px, on `astro dev --port 4399` with freshly registered local accounts (never the seeded `test@rytm.local`): `home-pre-import` (no import), `home-no-threshold` (fixture imported, no threshold — flat 0,00 zł bars + hint), `home-fixture-trend` (fixture, `kino światło` count 1 and `stacja paliw drogowskaz` count 1 — 12 labelled bars, stat 955,34 zł, foot vs lipca, „Koszty stałe” 1752,98 zł · 1 pozycja podrożała, import panel), `home-one-month` (one month imported with a threshold — tooShort panel, no delta foot), `home-two-months` (two months — tooShort still shown, delta foot), `home-gap-month` (imports for two months with an empty month between — two bars only, no bar for the empty month, no delta foot), `home-excluded` (the only thresholded pattern excluded — zeros + hint), `home-read-error` (only if reachable without leaving the local DB mutated — else a documented `db reset` in the same step), `home-kit-compare` (the kit `#/home-no-name` frame beside the fixture state)
 - [visual] Fixture US-05 walk-through on screen: set `kino światło` count 1 → `paź 25` 49,13 zł, `maj 26` 133,47 zł, `cze 26` 41,24 zł, `lip 26` 87,59 zł, the rest 0,00 zł; change to 2 → `paź 25` and `cze 26` 0,00 zł, `maj 26` 98,22 zł, `lip 26` 51,98 zł; remove → every bar 0,00 zł and the hint; no bar marked „niepełny”
 
 **Implementation Note**: the Visual step performs the `[visual]` rows; `[human]` rows stay open on the post-run
@@ -578,7 +584,7 @@ checklist.
   cross-pattern sum, excess semantics, excluded and inapplicable thresholds, gap month and year boundary, axis from
   excluded rows, the `listOverview` invariant, `trendBarHeight`, the F-02 fixture (kino / stacja / pizzeria).
 - `test/unit/home-stats.test.ts` — reference value, delta sign and absence, fixed total and rises, the fixture.
-- `test/unit/over-limit.test.ts` — `nextMonth`; `test/unit/format.test.ts` — `formatMonthAxis`.
+- `test/unit/format.test.ts` — `formatMonthAxis`.
 
 ### Integration Tests:
 
@@ -627,11 +633,13 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 1. **One pure aggregate `overLimitTrend` in `src/lib/patterns/trend.ts`, guards shared with `listOverview` through an
    extracted `applicableThreshold`.** Rejected: widening `listOverview` to return every month (mixes a list DTO with a
    series); copying the guard (drift risk). Would change: plan review preferring the trend inside `view.ts`.
-2. **Axis = continuous calendar range from the earliest month in the data to the reference month, zero-filled —
-   against FR-013's literal „miesięcy obecnych w danych”** → `[human]` row. Rejected: months with ≥ 1 row (compresses
-   time; a trend read month-to-month would skip a gap silently). Why: US-05 AC 2 „0, nie brak wartości”, secondary
-   success criterion reads month-to-month; identical on the fixture. Would change: the maintainer preferring the literal
-   reading.
+2. **Axis = the months present in the data (≥ 1 debit), ascending — FR-013 / roadmap outcome literal.** *Revised by
+   plan review F1* (the plan step had chosen a continuous zero-filled calendar range). Rejected: the continuous range —
+   a month with no import would render `0,00 zł`, a figure the app does not know (US-05 AC 2 „0, nie brak wartości”
+   concerns a month *with* transactions none of which is over); it would bias the secondary success criterion („czy
+   suma maleje”) toward a false improvement; and it would contradict S-06's gap rule on the same page (`fixedOverview`
+   treats a gap month as „no comparison”). The axis labels („maj 26”, „lip 26”) still show a gap. Identical on the
+   fixture. `[human]` row 4.9 names it. Would change: the maintainer preferring a continuous time axis.
 3. **No „niepełny” marker (PRD US-05 AC 4 over the kit).** Why: explicit AC, and the reference month is the latest in
    the data — the app cannot know completeness. Would change: the maintainer revising the PRD assumption of 2026-09-18.
 4. **Bar chart kept, with a visible sum on every bar — against the PRD Non-Goal's literal „Wykresy inne niż lista i
@@ -671,14 +679,26 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
     change: a fixture regeneration (then case 13 fails loudly on the key check).
 16. **Gap ids K24 (no-name lead), G35 (trend states), K25 (stat foot samples), G36 (dashboard content)** land with
     the code in Phases 2–3 (S-05 decision 22 precedent). Would change: the orchestrator requiring gap rows at plan time.
-17. **Decisions against the PRD's literal text:** 2 and 4, each with a `[human]` row; 6 adds a figure the PRD does not
+17. **Decisions against the PRD's literal text:** 4, with a `[human]` row (2 now follows the literal, plan review F1,
+    and keeps its `[human]` row); 6 adds a figure the PRD does not
     define and carries a `[human]` row too. Decision 3 follows the PRD against the kit (no row needed).
+
+18. **Plan review triage (2026-09-28, `reviews/plan-review.md`)**: F1 overturned decision 2 (axis = months present in
+    the data; `nextMonth` dropped; `homeStats.previous` = `previousMonth(R)` only when it has data); F2 smoke
+    `notContains` accepts an array (Phase 2); F3 „Koszty stałe” one-off noise → Known risks, `[human]` 4.11, follow-up.
+    Would change: the maintainer answering 4.9 for a continuous axis.
 
 ## Known risks
 
 - **Bar label density**: 12 labels at 9–10 px fit on desktop; on ~400 px the chart scrolls inside the panel. The visual
   step judges legibility; a failure is a G35 note plus a follow-up, not a redesign.
-- **Continuous axis on long gaps**: an account with a year-long gap between imports shows many zero bars (decision 2).
+- **Axis with gaps** (decision 2, plan review F1): bars are equidistant, so a gap between imports is visible only in
+  the axis labels; the delta foot hides after a gap (as `/fixed` shows „no comparison”).
+- **„Koszty stałe” noise** (plan review F3): the value sums every row `/fixed` lists, so every one-off merchant that D5
+  types `fixed` in R inflates it (S-06 follow-up, fired here). Consistent with `/fixed` by construction; the fix
+  belongs to the classifier, not the card — `[human]` 4.11 + follow-up.
+- **Smoke `notContains` arrays** (plan review F2): the checker takes one string today; Phase 2 extends it before any
+  new step relies on two negative needles.
 - **Astro check file count** is recorded, not asserted — only the error delta gates.
 - **Smoke text anchors**: every asserted string must be the only child of its element on one line; check `curl` output
   before asserting.
@@ -697,7 +717,7 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 - [ ] 1.3 `npm run fixture:check` OK; `npm run build` passes
 - [ ] 1.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0); smoke 121 PASS (delta 0)
 - [ ] 1.5 Deliberate break (excluded skip dropped) → case 7 FAILs; restored → green; meta-check recorded
-- [ ] 1.6 Deliberate break (axis from months with rows only) → case 9 FAILs; restored → green; meta-check recorded
+- [ ] 1.6 Deliberate break (axis filled as a continuous calendar range) → case 9 FAILs; restored → green; meta-check recorded
 - [ ] 1.7 Deliberate break (reference month only) → cases 3, 13 FAIL, case 11 green; restored → green; meta-check recorded
 
 #### Manual
@@ -755,8 +775,8 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 #### Manual
 
 - [ ] 4.8 [reviewer] Seam sweep: duplicated helpers / classes extracted or justified; stale comments and kit rows (G6, G35, G36, K5, K24, K25) match the code; follow-ups file lists every item with a `Trigger:`
-- [ ] 4.9 [human] Product owner confirms decision 2 (against FR-013 „miesięcy obecnych w danych”): continuous axis, a month with no import between two imports shows 0,00 zł
+- [ ] 4.9 [human] Product owner confirms decision 2 as revised by plan review F1 (FR-013 literal): axis = months with data only, a month with no import between two imports is absent, delta foot hidden after a gap
 - [ ] 4.10 [human] Product owner confirms decision 4 (against the PRD Non-Goal „Wykresy inne niż lista i suma”): bar chart kept, every bar labelled with its sum
-- [ ] 4.11 [human] Product owner confirms decision 6 (PRD silent): „Koszty stałe” value = Σ of `/fixed` amounts in the reference month
+- [ ] 4.11 [human] Product owner confirms decision 6 (PRD silent): „Koszty stałe” value = Σ of `/fixed` amounts in the reference month, one-off D5-`fixed` merchants included (plan review F3)
 - [ ] 4.12 [visual] Screenshots desktop 1440 px + mobile ~400 px: `home-pre-import`, `home-no-threshold`, `home-fixture-trend`, `home-one-month`, `home-two-months`, `home-gap-month`, `home-excluded`, `home-read-error`, `home-kit-compare`
 - [ ] 4.13 [visual] Fixture US-05 walk-through: `kino światło` count 1 → four non-zero months (49,13 / 133,47 / 41,24 / 87,59 zł); count 2 → 98,22 / 51,98 zł only; removed → all 0,00 zł + hint; no „niepełny”

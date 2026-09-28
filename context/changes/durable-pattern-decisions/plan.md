@@ -1032,14 +1032,14 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [ ] 4.1 `npm test` — Phase 3 count + 1 file, 0 failures
-- [ ] 4.2 `npm run lint` 0; `npx astro check` 0 errors (count recorded)
-- [ ] 4.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 4.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0)
-- [ ] 4.5 `BASE_URL=http://localhost:4398 npm run smoke` — 77 + 26 = 103 PASS
-- [ ] 4.6 Deliberate break (rename upsert sends `excluded: false`) → „rename keeps the exclusion” FAILs; restored → PASS; meta-check recorded
-- [ ] 4.7 Deliberate break (empty decisions into `derivePatterns`) → steps 4, 5, 13, 16 FAIL, writes PASS; restored → PASS; meta-check recorded
-- [ ] 4.8 Deliberate break (`validateMerge` always `true`) → „merge into itself is rejected” FAILs; restored → PASS; meta-check recorded
+- [x] 4.1 `npm test` — Phase 3 count (165, 9 files) + 1 new file = 187 passed, 10 files, 0 failures — PENDING_SHA
+- [x] 4.2 `npm run lint` 0; `npx astro check` 0 errors, 0 warnings, 0 hints (114 files, +3: `decision-form.ts`, `decision.ts`, `decision-form.test.ts`) — PENDING_SHA
+- [x] 4.3 `npm run fixture:check` OK; `npm run build` passes — PENDING_SHA
+- [x] 4.4 `npx supabase db reset && npx supabase test db` — 102 (5 files), delta 0 (no migration this phase; `npm run db:types` confirmed no diff) — PENDING_SHA
+- [x] 4.5 `BASE_URL=http://localhost:4398 npm run smoke` — 77 + 26 = 103 PASS — PENDING_SHA
+- [x] 4.6 Deliberate break (rename upsert sends `{ merchant_key, display_name, excluded: false }`) → "rename keeps the exclusion" **and** its downstream dependent "later import keeps the exclusion" FAIL (2/103); restored → 103/103 PASS. Meta-check: "pattern is renamed" stayed green throughout, so the red proves the untouched column does not survive a full-column upsert, not that rename itself is broken — PENDING_SHA
+- [x] 4.7 Deliberate break (`loadPatternData` derives with `new Map()` instead of `decisions`) → **8** steps FAIL, wider than the plan's named 4 (4, 5, 13, 16) because the merge/name/exclusion also stop holding downstream once decisions never reach derivation: "merged pattern sums its components", "merged pattern is re-typed by D5", "patterns list shows one merged row", "excluded pattern has no over-limit", "rename keeps the exclusion", "later import joins the merged pattern", "later import keeps the name", "later import keeps the exclusion"; restored → 103/103 PASS. Meta-check: the four writes ("pattern is merged", "type is pinned", "pattern is excluded", "pattern is renamed") and the three decision-map-direct reads named in the plan ("absorbed pattern redirects to the merged one", "pinned type shows on the detail", "pinned type takes the amount threshold") all stayed green throughout — proving the break isolates *derivation* reading the decisions, not the writes or the redirect/pin lookups that read the map directly — PENDING_SHA
+- [x] 4.8 Deliberate break (`validateMerge` always returns `true`) → "merge into itself is rejected" FAILs, redirecting to `/patterns/sklep%20smoke?error=decision` instead of `?error=merge` (the DB's `pattern_decisions_no_self_merge` check constraint still rejects the write, but as an untyped DB error, not the app-side validation); restored → 103/103 PASS. Meta-check: exactly 1/103 failed, confirming the DB constraint alone cannot distinguish the two redirect targets — only the app-side `validateMerge` call proves the difference — PENDING_SHA
 
 #### Manual
 

@@ -1,7 +1,9 @@
 // Smoke test: proves the built app, the Vercel adapter and the Supabase auth flow still work together,
 // including the account contract (password change, self-service deletion) which also cleans up the smoke user,
-// the import write path (POST /api/imports: saved, overlap, invalid payload, anonymous) and the import delete
-// path (POST /api/imports/delete: not-found, own delete, patterns dropping the import, re-import accepted).
+// the import write path (POST /api/imports: saved, overlap, invalid payload, anonymous), the import delete
+// path (POST /api/imports/delete: not-found, own delete, patterns dropping the import, re-import accepted) and
+// the durable pattern decision path (POST /api/patterns/decision: merge, type, rename, exclude/restore, unmerge,
+// a second import joining a merged pattern without re-editing — S-05 US-03).
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
@@ -30,6 +32,40 @@ const importPayload = JSON.stringify({
       occurredOn: "2026-05-20",
       amountMinor: 4550,
       bankTxId: "000000000000000002",
+      counterparty: "Kawiarnia smoke",
+      title: "Płatność kartą",
+      details: "",
+    },
+  ],
+});
+// A second, non-overlapping month for the US-03 durability proof (S-05 Phase 4): new bankTxIds, same account.
+// "Sklep smoke" and "Kawiarnia smoke" join the merged pattern created below; "Piekarnia smoke" stays separate.
+const importPayloadJune = JSON.stringify({
+  accountNumber: "11111100000000000000000099",
+  accountName: "Konto smoke",
+  periodStart: "2026-06-01",
+  periodEnd: "2026-06-30",
+  transactions: [
+    {
+      occurredOn: "2026-06-04",
+      amountMinor: 1299,
+      bankTxId: "000000000000000003",
+      counterparty: "Sklep smoke",
+      title: "Zakup",
+      details: "",
+    },
+    {
+      occurredOn: "2026-06-10",
+      amountMinor: 800,
+      bankTxId: "000000000000000004",
+      counterparty: "Piekarnia smoke",
+      title: "Zakup",
+      details: "",
+    },
+    {
+      occurredOn: "2026-06-20",
+      amountMinor: 4700,
+      bankTxId: "000000000000000005",
       counterparty: "Kawiarnia smoke",
       title: "Płatność kartą",
       details: "",
@@ -280,6 +316,155 @@ const steps = [
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: ">brak ustawionego progu<", notContains: ">ponad próg<" },
   ],
+  [
+    "decision with an unknown action is rejected",
+    () => request("/api/patterns/decision", { method: "POST", form: { key: "kawiarnia smoke", action: "nope" } }),
+    { status: 302, location: "/patterns/kawiarnia%20smoke?error=decision" },
+  ],
+  [
+    "merge into itself is rejected",
+    () =>
+      request("/api/patterns/decision", {
+        method: "POST",
+        form: { key: "sklep smoke", action: "merge", target: "sklep smoke" },
+      }),
+    { status: 302, location: "/patterns/sklep%20smoke?error=merge" },
+  ],
+  [
+    "pattern is merged",
+    () =>
+      request("/api/patterns/decision", {
+        method: "POST",
+        form: { key: "sklep smoke", action: "merge", target: "kawiarnia smoke" },
+      }),
+    { status: 302, location: "/patterns/kawiarnia%20smoke?merged=1" },
+  ],
+  [
+    "merged pattern sums its components",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">58,49 zł<" },
+  ],
+  [
+    "merged pattern is re-typed by D5",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">częsty<" },
+  ],
+  [
+    "absorbed pattern redirects to the merged one",
+    () => request("/patterns/sklep%20smoke"),
+    { status: 302, location: "/patterns/kawiarnia%20smoke" },
+  ],
+  ["patterns list shows one merged row", () => request("/patterns"), { status: 200, notContains: ">Sklep smoke<" }],
+  [
+    "type is pinned",
+    () =>
+      request("/api/patterns/decision", {
+        method: "POST",
+        form: { key: "kawiarnia smoke", action: "type", type: "fixed" },
+      }),
+    { status: 302, location: "/patterns/kawiarnia%20smoke?typed=1" },
+  ],
+  [
+    "pinned type shows on the detail",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">stały<" },
+  ],
+  [
+    "threshold on the pinned type is saved",
+    () =>
+      request("/api/patterns/threshold", {
+        method: "POST",
+        form: { key: "kawiarnia smoke", kind: "amount", value: "40" },
+      }),
+    { status: 302, location: "/patterns/kawiarnia%20smoke?saved=1" },
+  ],
+  [
+    "pinned type takes the amount threshold",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">5,50 zł<" },
+  ],
+  [
+    "pattern is excluded",
+    () => request("/api/patterns/decision", { method: "POST", form: { key: "kawiarnia smoke", action: "exclude" } }),
+    { status: 302, location: "/patterns/kawiarnia%20smoke?excluded=1" },
+  ],
+  [
+    "excluded pattern has no over-limit",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">stały<", notContains: ">5,50 zł<" },
+  ],
+  [
+    "rename with an over-long name is rejected",
+    () =>
+      request("/api/patterns/decision", {
+        method: "POST",
+        form: { key: "kawiarnia smoke", action: "rename", name: "a".repeat(101) },
+      }),
+    { status: 302, location: "/patterns/kawiarnia%20smoke?error=name" },
+  ],
+  [
+    "pattern is renamed",
+    () =>
+      request("/api/patterns/decision", {
+        method: "POST",
+        form: { key: "kawiarnia smoke", action: "rename", name: "Kawiarnia Rytm" },
+      }),
+    { status: 302, location: "/patterns/kawiarnia%20smoke?renamed=1" },
+  ],
+  [
+    "rename keeps the exclusion",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">Kawiarnia Rytm<", notContains: ">5,50 zł<" },
+  ],
+  [
+    "import after the decisions is saved",
+    () => request("/api/imports", { method: "POST", form: { payload: importPayloadJune } }),
+    { status: 302, location: "/imports/result?id=" },
+  ],
+  [
+    "later import joins the merged pattern",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">59,99 zł<" },
+  ],
+  [
+    "later import keeps the pinned type",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">stały<" },
+  ],
+  [
+    "later import keeps the name",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">Kawiarnia Rytm<" },
+  ],
+  [
+    "later import keeps the exclusion",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, notContains: ">7,00 zł<" },
+  ],
+  [
+    "pattern is restored",
+    () => request("/api/patterns/decision", { method: "POST", form: { key: "kawiarnia smoke", action: "restore" } }),
+    { status: 302, location: "/patterns/kawiarnia%20smoke?restored=1" },
+  ],
+  [
+    "restored pattern shows its over-limit again",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">7,00 zł<" },
+  ],
+  [
+    "merge is undone",
+    () =>
+      request("/api/patterns/decision", {
+        method: "POST",
+        form: { key: "kawiarnia smoke", action: "unmerge", source: "sklep smoke" },
+      }),
+    { status: 302, location: "/patterns/kawiarnia%20smoke?unmerged=1" },
+  ],
+  [
+    "unmerged pattern has its own detail again",
+    () => request("/patterns/sklep%20smoke"),
+    { status: 200, contains: ">Sklep smoke<" },
+  ],
   ["pattern detail of an unknown key is not found", () => request("/patterns/nie%20ma%20takiego"), { status: 404 }],
   ["imports lists the delete action", () => request("/imports"), { status: 200, contains: ">Usuń import<" }],
   [
@@ -350,6 +535,15 @@ const steps = [
       request("/api/patterns/threshold", {
         method: "POST",
         form: { key: "kawiarnia smoke", kind: "amount", value: "40" },
+      }),
+    { status: 302, location: "/login" },
+  ],
+  [
+    "decision without a session goes to login",
+    () =>
+      request("/api/patterns/decision", {
+        method: "POST",
+        form: { key: "kawiarnia smoke", action: "exclude" },
       }),
     { status: 302, location: "/login" },
   ],

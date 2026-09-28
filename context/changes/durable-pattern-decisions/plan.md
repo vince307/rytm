@@ -18,7 +18,7 @@ the files named below at `main` `f252112`.
 
 - **Patterns are derived per request, no pattern table.** `src/lib/patterns/load.ts` `loadPatterns` pages every
   debit by keyset (`collectPages`, `.order("id")` + `.gt("id", afterId)`) and returns `{ patterns:
-  derivePatterns(rows), rows }`. `src/lib/patterns/derive.ts` `derivePatterns(rows)` groups by
+derivePatterns(rows), rows }`. `src/lib/patterns/derive.ts` `derivePatterns(rows)` groups by
   `merchantKey(rawMerchant(counterparty, title))`; name = most frequent `normalizeMerchant` variant (tie →
   code-point smallest); `type = d5Type(amounts)`; `fixedAmountMinor = type === "fixed" ? medianMinor : null`; sort by
   sum desc, name (`pl`), key. There is no input for any user decision.
@@ -26,12 +26,12 @@ the files named below at `main` `f252112`.
   run `Promise.all([loadPatterns, loadThresholds])` and handle the error pair by hand; the list re-merges
   `listOverview` items by key through a second `Map` (S-04 impl-review F7).
 - **Thresholds.** `src/lib/patterns/thresholds.ts` `loadThresholds` is an **unpaged** `select("merchant_key, kind,
-  value")` (S-04 F5 — trigger names S-05). `src/lib/patterns/view.ts` `listOverview` / `patternDetail` apply a stored
+value")` (S-04 F5 — trigger names S-05). `src/lib/patterns/view.ts` `listOverview` / `patternDetail` apply a stored
   threshold only when `appliesTo(threshold, pattern.type)` (`src/lib/patterns/over-limit.ts`); `ThresholdEditor`
   picks its kinds from the `type` prop. So every consumer already follows the derived `type` — a pinned type emitted
   by `derivePatterns` needs no other change (research §3).
 - **Write precedent.** `src/pages/api/patterns/threshold.ts` `POST` (guard → formData → zod → upsert `onConflict:
-  "user_id,merchant_key"` → redirect with a status param built by `src/lib/patterns/threshold-form.ts`
+"user_id,merchant_key"` → redirect with a status param built by `src/lib/patterns/threshold-form.ts`
   `thresholdRedirect` / `src/lib/patterns/path.ts` `patternHref`). Its invalid-form branch redirects silently to
   `/patterns` (S-04 F4 — not to be copied).
 - **Migration precedent.** `supabase/migrations/20260927200000_pattern_thresholds.sql` (per-operation policies for
@@ -53,7 +53,7 @@ the files named below at `main` `f252112`.
   with four ghost buttons that only fire toasts), `applyPatternState` (`.inline-alert.info.excluded-banner`
   „Wykluczony z analizy” + text-button „Przywróć”), `patterns()` (`.excluded-section` / `.excluded-toggle` /
   `.excluded-list` `.list-item`, meta „Wykluczony z analizy”, „Przywróć”). Copy keys `patternActions.{merge,
-  changeType, rename, exclude, restore, excluded, restored}` exist in `content.json` (reachable as
+changeType, rename, exclude, restore, excluded, restored}` exist in `content.json` (reachable as
   `copy.patternActions`); the modal texts, „Akcje”, „Wykluczone” and the toasts exist only in `app.js` (K11 class).
   No merge picker, rename field, merge undo or pending / error state exists in the kit. Next free gap ids **K22**,
   **G33**.
@@ -87,7 +87,7 @@ the files named below at `main` `f252112`.
 - Decisions must act **before grouping**: resolving each row's key to its root key first is what makes „liczba i suma
   scalonego = suma składników” and „każda transakcja liczy się raz” hold by construction (`derivePatterns`).
 - A partial single-row upsert (`upsert({ merchant_key, excluded: true })`) makes PostgREST emit `on conflict do update
-  set` for the sent columns only — untouched decisions survive. pgTAP proves the SQL; smoke proves it through
+set` for the sent columns only — untouched decisions survive. pgTAP proves the SQL; smoke proves it through
   PostgREST („rename keeps the exclusion”).
 - The fixture already carries the S-05 acceptance oracle (`user-merge`, `user-exclude`), so the durability proof needs
   no new fixture file: unit derive with decisions = oracle 30 groups, a date-split derive, a smoke second import.
@@ -142,7 +142,7 @@ BASE_URL=http://localhost:4398 npm run smoke                        # then: lsof
   a current root as target) resolves every key on the cycle to the **code-point-smallest key of the cycle**, so the
   result stays deterministic and input-order independent.
 - **Partial upserts.** Every decision write sends only `merchant_key` plus the one column it changes, with `onConflict:
-  "user_id,merchant_key"`; never spread a full decision object (it would reset the other decisions to defaults).
+"user_id,merchant_key"`; never spread a full decision object (it would reset the other decisions to defaults).
   „Cofnij scalenie” is an `update … set merged_into = null` on the absorbed key's row.
 - **Merge is the only write that reads.** It needs the current roots to reject self-merge, unknown / absorbed targets
   and excluded targets; all other actions write blind (S-04 decision 7 precedent).
@@ -187,13 +187,14 @@ account-delete cascade.
 
 **Contract**: style of `pattern_thresholds.test.sql` (`begin; … select plan(26); … select * from finish();
 rollback;`, users A/B with fixed UUIDs, A owns one import with one transaction inserted as `postgres`). Assertions:
+
 1. RLS enabled on `pattern_decisions`.
 2. `authenticated` lacks TRUNCATE.
 3. As A: insert `('sportowo.pl', merged_into 'sportowo')` without `user_id` → `lives_ok`.
 4. As A: that row's `user_id` is A.
 5. As A: insert `('sportowo', display_name 'Sportowo')` → `lives_ok`.
 6. As A: `insert (merchant_key, excluded) values ('sportowo', true) on conflict (user_id, merchant_key) do update set
-   excluded = excluded.excluded` → `lives_ok`.
+excluded = excluded.excluded` → `lives_ok`.
 7. As A: `sportowo` has `excluded = true` **and** `display_name = 'Sportowo'` (the partial upsert kept the other
    column).
 8. As A: `update … set pinned_type = 'fixed' where merchant_key = 'sportowo'` returns 1 row.
@@ -292,6 +293,7 @@ pass — `overMinor` 0, `sequence` all `false`, every transaction `overMinor` 0.
 **Files**: `test/unit/patterns.test.ts`, `test/unit/pattern-decisions.test.ts` (new), `test/unit/pattern-view.test.ts`
 
 **Contract**:
+
 - `patterns.test.ts`: the existing F-02 block stays as is (no decisions → 31 groups). New block „derivePatterns with
   the fixture decisions”: decisions `sportowo.pl → sportowo` and `excluded` on the real key of the oracle's
   `przelew-konto-osobiste` group → the partition equals the oracle's 30 groups (a new `oracleGroups()` helper that
@@ -440,6 +442,7 @@ second month and checks nothing needs re-editing. No UI yet — smoke posts dire
 **Intent**: Validation and redirect targets provable without a server; key parsed first (S-04 F4 lesson).
 
 **Contract**:
+
 - `decisionKeySchema = z.object({ key: z.string().min(1).max(500) })` (parsed first, `passthrough`).
 - `decisionSchema` = discriminated union on `action`: `merge` (`target` 1–500), `unmerge` (`source` 1–500), `type`
   (`type` ∈ `fixed` | `frequent`), `rename` (`name` string), `exclude`, `restore` (optional `back: "list"`).
@@ -448,7 +451,7 @@ second month and checks nothing needs re-editing. No UI yet — smoke posts dire
 - `validateMerge(patterns, source, target): boolean` — both are current roots (in `patterns`), `target !== source`,
   target not excluded.
 - `decisionRedirect(key, status, back?)` with statuses `merged | unmerged | typed | renamed | excluded | restored |
-  error-merge | error-name | error-decision` → `patternHref(key, { <status param> })` (`merged=1`, …,
+error-merge | error-name | error-decision` → `patternHref(key, { <status param> })` (`merged=1`, …,
   `error=merge|name|decision`); `back === "list"` → `/patterns?restored=1` / `/patterns?error=decision`.
 
 #### 2. Endpoint
@@ -460,6 +463,7 @@ second month and checks nothing needs re-editing. No UI yet — smoke posts dire
 **Contract**: `export const prerender = false`; `POST`; guard as `src/pages/api/patterns/threshold.ts`; formData in
 try/catch; no usable `key` → `/patterns`; key usable but `decisionSchema` fails → `error-decision` on the key's detail.
 Per action, table `pattern_decisions`, `onConflict: "user_id,merchant_key"`, only the named column:
+
 - `merge`: `loadPatternData`; read error → `error-decision`; `!validateMerge` → `error-merge` (source detail); else
   upsert `{ merchant_key: key, merged_into: target }` → `merged` on the **target**'s detail.
 - `unmerge`: `update({ merged_into: null }).eq("merchant_key", source)` → `unmerged` on `key`'s detail (idempotent).
@@ -468,15 +472,15 @@ Per action, table `pattern_decisions`, `onConflict: "user_id,merchant_key"`, onl
   `renamed`.
 - `exclude` / `restore`: upsert `{ merchant_key: key, excluded: true | false }` → `excluded` / `restored` (`back`
   honoured).
-Any DB error → `console.error("pattern decision failed", action, code, message)` + `error-decision`. The client never
-sends `user_id`.
+  Any DB error → `console.error("pattern decision failed", action, code, message)` + `error-decision`. The client never
+  sends `user_id`.
 
 #### 3. Unit tests
 
 **File**: `test/unit/decision-form.test.ts` (new)
 
 **Contract**: schema accepts each action and rejects an unknown action, a missing `target` / `source`, a type
-`weekly`, a 501-char key; `parseDisplayName` („  Sportowo  ” → „Sportowo”, „” and „   ” → `null`, 100 chars ok, 101 →
+`weekly`, a 501-char key; `parseDisplayName` („ Sportowo ” → „Sportowo”, „” and „ ” → `null`, 100 chars ok, 101 →
 `"invalid"`); `validateMerge` (ok; self; unknown target; absorbed target not among roots; excluded target; unknown
 source); `decisionRedirect` for every status incl. `back: "list"` and a key with a space.
 
@@ -489,6 +493,7 @@ source); `decisionRedirect` for every status incl. `back: "list"` and a key with
 **Contract**: a second payload `importPayloadJune` (same account, 2026-06-01 – 2026-06-30, new `bankTxId`s):
 „Sklep smoke” 12,99 zł (2026-06-04), „Piekarnia smoke” 8,00 zł (2026-06-10), „Kawiarnia smoke” 47,00 zł
 (2026-06-20). After „pattern detail drops the over-limit mark after removal”, all POSTs to `/api/patterns/decision`:
+
 1. „decision with an unknown action is rejected” — `{ key: "kawiarnia smoke", action: "nope" }` → 302
    `/patterns/kawiarnia%20smoke?error=decision`.
 2. „merge into itself is rejected” — `{ key: "sklep smoke", action: "merge", target: "sklep smoke" }` → 302
@@ -503,7 +508,7 @@ source); `decisionRedirect` for every status incl. `back: "list"` and a key with
 8. „type is pinned” — `{ key: "kawiarnia smoke", action: "type", type: "fixed" }` → 302 `…?typed=1`.
 9. „pinned type shows on the detail” — contains `>stały<`.
 10. „threshold on the pinned type is saved” — POST `/api/patterns/threshold` `{ key: "kawiarnia smoke", kind:
-    "amount", value: "40" }` → 302 `…?saved=1`.
+"amount", value: "40" }` → 302 `…?saved=1`.
 11. „pinned type takes the amount threshold” — detail contains `>5,50 zł<`.
 12. „pattern is excluded” — `action: "exclude"` → 302 `…?excluded=1`.
 13. „excluded pattern has no over-limit” — detail contains `>stały<`, notContains `>5,50 zł<`.
@@ -521,8 +526,8 @@ source); `decisionRedirect` for every status incl. `back: "list"` and a key with
     kept).
 24. „merge is undone” — `{ key: "kawiarnia smoke", action: "unmerge", source: "sklep smoke" }` → 302 `…?unmerged=1`.
 25. „unmerged pattern has its own detail again” — GET `/patterns/sklep%20smoke` → 200 contains `>Sklep smoke<`.
-Next to the anonymous steps: 26. „decision without a session goes to login” — anonymous POST → 302 `/login`.
-(Phase 6 and 7 insert their steps between these.)
+    Next to the anonymous steps: 26. „decision without a session goes to login” — anonymous POST → 302 `/login`.
+    (Phase 6 and 7 insert their steps between these.)
 
 ### Success Criteria:
 
@@ -628,21 +633,22 @@ name: string }[]; copy: {…} }`. Trigger: `Button variant="ghost"` with `Glyph 
 `text-excess-text` eyebrow style of `DeleteImportDialog`), `DialogTitle` `x.actionsTitle`, `DialogDescription`
 `x.actionsLead`, `.modal-actions` grid (gap 8, mt 22, left-aligned `Button variant="ghost"`, icons `merge`,
 `switch`, `edit`, `exclude`):
+
 - „Scal z…” (`copy.patternActions.merge`) → reveals a form: label `x.mergeLabel`, native `<select name="target">` of
   `mergeTargets` (8 px radius, F11), submit `x.mergeSubmit`; no targets → the button is `disabled` and
   `x.mergeNone` is shown under it.
 - „Zmień typ” (`copy.patternActions.changeType`) → a form submitting `type` = the other type directly.
 - „Zmień nazwę” (`copy.patternActions.rename`) → reveals a form: label `x.renameLabel`, `<input name="name"
-  maxLength={100}>` prefilled with `name` (kit `.modal-input`: 8 px radius, padding 13, margin 4 0 16), hint
+maxLength={100}>` prefilled with `name` (kit `.modal-input`: 8 px radius, padding 13, margin 4 0 16), hint
   `x.renameHint`, submit `x.renameSubmit`.
 - „Wyklucz z analizy” (`copy.patternActions.exclude`) → a form submitting `exclude` directly; omitted when
   `excluded`.
-Each form: `method="POST" action="/api/patterns/decision"`, hidden `key` + `action`; submit via `SubmitButton`
-with `pending` + `copyExtra.auth.saving`, reset with `usePageShowReset`. Opening focuses the dialog (as
-`DeleteImportDialog`).
-The `copy` prop carries only the strings the dialog renders — never the result-line strings (`x.merged`,
-`x.unmerged`, …): those are asserted in smoke as bare text (plan review F1), which the island's serialized props
-would otherwise satisfy.
+  Each form: `method="POST" action="/api/patterns/decision"`, hidden `key` + `action`; submit via `SubmitButton`
+  with `pending` + `copyExtra.auth.saving`, reset with `usePageShowReset`. Opening focuses the dialog (as
+  `DeleteImportDialog`).
+  The `copy` prop carries only the strings the dialog renders — never the result-line strings (`x.merged`,
+  `x.unmerged`, …): those are asserted in smoke as bare text (plan review F1), which the island's serialized props
+  would otherwise satisfy.
 
 #### 2. Restore form
 
@@ -657,6 +663,7 @@ size: "inline" })`) submit `copy.patternActions.restore`. Shared by the banner (
 **File**: `src/pages/patterns/[...key].astro`
 
 **Contract**:
+
 - `.detail-top`: `BackLink` left, `PatternActionsDialog client:load` right (flex space-between, mb 22; ≤ 560 px
   column). `mergeTargets` = `patterns` other than this one, non-excluded, sorted by name (`pl`).
 - Result line under `.detail-top` from `Astro.url.searchParams`: `merged` → success `x.merged`; `unmerged` → success
@@ -664,7 +671,7 @@ size: "inline" })`) submit `copy.patternActions.restore`. Shared by the banner (
   `x.excludedToast`; `restored` → success `copy.patternActions.restored`; `error=merge|name|decision` → error
   `x.mergeInvalid` / `x.nameInvalid` / `x.decisionError`.
 - Excluded: kit banner above the heading — `InlineAlert kind="info"` whose content is `<span>{copy.patternActions.
-  excluded}</span>` + `RestoreForm` (mb 18).
+excluded}</span>` + `RestoreForm` (mb 18).
 - Merged variants (only when `pattern.merged` is non-empty): under the lead, `x.mergedLabel` and one row per
   variant — its name + a form (hidden `key` = root, `action=unmerge`, `source`) with text button `x.unmerge`.
 - Header comment: the „minus the Akcje menu (S-05)” note replaced.
@@ -674,29 +681,31 @@ size: "inline" })`) submit `copy.patternActions.restore`. Shared by the banner (
 **Files**: `src/content/copy.ts`, `context/foundation/design-kit.md`
 
 **Contract**: `copyExtra.patterns` gains
+
 - under `// DESIGN-GAP: K22` — verbatim from `prototype/app.js`: `actions: "Akcje"`, `actionsEyebrow: "Akcje na
-  wzorcu"`, `actionsTitle: "Zarządzaj wzorcem."`, `actionsLead: "Decyzje dotyczą wszystkich kolejnych miesięcy. Możesz
-  je później odwrócić w ustawieniach wzorca."`, `typeChanged: "Typ wzorca zmieniony."`, `excludedToast: "Wzorzec
-  wykluczony z analizy."`.
+wzorcu"`, `actionsTitle: "Zarządzaj wzorcem."`, `actionsLead: "Decyzje dotyczą wszystkich kolejnych miesięcy. Możesz
+je później odwrócić w ustawieniach wzorca."`, `typeChanged: "Typ wzorca zmieniony."`, `excludedToast: "Wzorzec
+wykluczony z analizy."`.
 - under `// DESIGN-GAP: G33` — placeholders: `mergeLabel: "Scal z wzorcem"`, `mergeSubmit: "Scal"`, `mergeNone:
-  "Brak innych wzorców do scalenia."`, `renameLabel: "Nazwa sprzedawcy"`, `renameHint: "Pusta nazwa przywraca nazwę z
-  wyciągu."`, `renameSubmit: "Zapisz nazwę"`, `merged: "Wzorce scalone."`, `unmerged: "Scalenie cofnięte."`,
+"Brak innych wzorców do scalenia."`, `renameLabel: "Nazwa sprzedawcy"`, `renameHint: "Pusta nazwa przywraca nazwę z
+wyciągu."`, `renameSubmit: "Zapisz nazwę"`, `merged: "Wzorce scalone."`, `unmerged: "Scalenie cofnięte."`,
   `renamed: "Nazwa zmieniona."`, `mergedLabel: "Scalone warianty"`, `unmerge: "Cofnij scalenie"`, `mergeInvalid: "Nie
-  można scalić z tym wzorcem."`, `nameInvalid: "Nazwa może mieć najwyżej 100 znaków."`, `decisionError: "Nie udało
-  się zapisać decyzji. Spróbuj ponownie."`.
-`design-kit.md`: **K22** (strings of the actions dialog and toasts rendered only in `app.js`; the prototype-narration
-toasts „Tryb scalania jest gotowy do podpięcia.” / „Możesz zmienić nazwę inline.” are not product copy and are not
-used), **G33** (what the kit does not define for FR-009: merge picker, rename field + validation, direct-submit type
-change / exclude, pending / error states, result lines instead of toasts, merged-variants list and merge undo, the
-„ustawienia wzorca” named by the lead = this dialog / detail, no way back to the automatic type, absorbed-key URL
-redirect, excluded pattern keeping a visible threshold); **G4** status amended („S-05: menu + dialog, wykluczenie /
-przywrócenie wdrożone; scalanie, zmiana nazwy i typu jako placeholdery G33”); both appended to „Do rundy 3”.
+można scalić z tym wzorcem."`, `nameInvalid: "Nazwa może mieć najwyżej 100 znaków."`, `decisionError: "Nie udało
+się zapisać decyzji. Spróbuj ponownie."`.
+  `design-kit.md`: **K22** (strings of the actions dialog and toasts rendered only in `app.js`; the prototype-narration
+  toasts „Tryb scalania jest gotowy do podpięcia.” / „Możesz zmienić nazwę inline.” are not product copy and are not
+  used), **G33** (what the kit does not define for FR-009: merge picker, rename field + validation, direct-submit type
+  change / exclude, pending / error states, result lines instead of toasts, merged-variants list and merge undo, the
+  „ustawienia wzorca” named by the lead = this dialog / detail, no way back to the automatic type, absorbed-key URL
+  redirect, excluded pattern keeping a visible threshold); **G4** status amended („S-05: menu + dialog, wykluczenie /
+  przywrócenie wdrożone; scalanie, zmiana nazwy i typu jako placeholdery G33”); both appended to „Do rundy 3”.
 
 #### 5. Smoke
 
 **File**: `scripts/smoke.mjs`
 
 **Contract**: inserted into the Phase 4 run:
+
 - after step 3: „merge confirms the result” — GET `/patterns/kawiarnia%20smoke?merged=1` → 200 contains the bare
   `Wzorce scalone.` (`InlineAlert` renders its slot as `<span> text </span>` — whitespace inside the span, so a
   `>text<` anchor never matches; existing InlineAlert smoke steps use bare text too); „detail offers the actions” —
@@ -742,8 +751,7 @@ section with „Przywróć”; the list shows the restore result. Then sweep the
 
 **Intent**: Kit `patterns()` `.excluded-section` without JS.
 
-**Contract**: props `{ patterns: { key: string; name: string }[] }`; renders nothing when empty. A `<details>` (mt
-16) whose `<summary>` is the kit `.excluded-toggle` (`Icon arrow` 14 rotated −90° closed / 0° open, `x.excludedToggle`
+**Contract**: props `{ patterns: { key: string; name: string }[] }`; renders nothing when empty. A `<details>` (mt 16) whose `<summary>` is the kit `.excluded-toggle` (`Icon arrow` 14 rotated −90° closed / 0° open, `x.excludedToggle`
 „Wykluczone”, `<span>` „{n} {plural(n, x.patternForms)}”), then a `Panel`-styled list (padding 0 20): per pattern the
 merchant mark (first character, `bg-paper-soft`, as `PatternsTable`), `item-name`, meta
 `copy.patternActions.excluded`, and `RestoreForm back="list"`. Items are not links (kit).
@@ -785,13 +793,14 @@ G28, G33, K22 agree with what renders); no unused export (`PatternListOverviewIt
 **File**: `scripts/smoke.mjs`
 
 **Contract**: after Phase 6's „excluded pattern shows the banner”:
+
 1. „patterns list shows the excluded section” — GET `/patterns` → 200 contains `>Kawiarnia Rytm<` and notContains
    the bare `Wzorzec przywrócony do analizy.` (negative control for step 3: the string is in no island prop).
 2. „excluded pattern leaves the table” — same → notContains `href="/patterns/kawiarnia%20smoke"`.
-After „restored pattern drops the banner”: 3. „list confirms a restore” — GET `/patterns?restored=1` → contains the
-bare `Wzorzec przywrócony do analizy.` (an `InlineAlert` result line — never a `>text<` anchor, plan review F1).
-Astro text asserted with `>text<` (`>Kawiarnia Rytm<`, `>Cofnij scalenie<`, `>Wykluczony z analizy<`) must sit inline
-in its element (`<div class="item-name">{name}</div>`), not on its own line.
+   After „restored pattern drops the banner”: 3. „list confirms a restore” — GET `/patterns?restored=1` → contains the
+   bare `Wzorzec przywrócony do analizy.` (an `InlineAlert` result line — never a `>text<` anchor, plan review F1).
+   Astro text asserted with `>text<` (`>Kawiarnia Rytm<`, `>Cofnij scalenie<`, `>Wykluczony z analizy<`) must sit inline
+   in its element (`<div class="item-name">{name}</div>`), not on its own line.
 
 ### Success Criteria:
 
@@ -834,9 +843,9 @@ in its element (`<div class="item-name">{name}</div>`), not on its own line.
 - pgTAP `pattern_decisions.test.sql` (26): RLS per operation, partial upsert keeps untouched columns, constraints
   (self-merge, type, name length), import-delete survival, account-delete cascade, anon denied.
 - Smoke (+34): rejected action / self-merge / long name, merge + sum + D5 re-type + absorbed redirect + list row, pin
-  + amount threshold, exclude + zero over-limit + banner + list section + table exit, rename keeps exclusion, second
-  import joins the merge and keeps type / name / exclusion, restore brings the over-limit back, unmerge, result
-  lines, anonymous POST.
+  - amount threshold, exclude + zero over-limit + banner + list section + table exit, rename keeps exclusion, second
+    import joins the merge and keeps type / name / exclusion, restore brings the over-limit back, unmerge, result
+    lines, anonymous POST.
 
 ### Manual Testing Steps:
 
@@ -992,8 +1001,8 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Manual
 
-- [ ] 1.9 [reviewer] Policies per operation and role, update `using` + `with check`, no `import_id`, cascade FK, no `revoke update`
-- [ ] 1.10 [reviewer] pgTAP assertions mapped to RLS / partial upsert / survival / cascade; handoff records which break proved which
+- [x] 1.9 [reviewer] Policies per operation and role, update `using` + `with check`, no `import_id`, cascade FK, no `revoke update` — impl-review: migration read + live two-account probe on the local DB (other user's rows: 0 read / 0 update / 0 delete, spoofed `user_id` insert + ownership move 42501, anon 42501 on all four ops via SQL and PostgREST, `delete_own_account` cascade removes A's rows only; grants authenticated = S/I/U/D)
+- [x] 1.10 [reviewer] pgTAP assertions mapped to RLS / partial upsert / survival / cascade; handoff records which break proved which — impl-review: 16–21 RLS, 6–7 partial upsert, 23 survival, 24–25 cascade; breaks recorded in 1.5–1.7; review break: update `with check (true)` alone leaves 21 green (the select policy also guards the new row) — both relaxed → ownership move succeeds (follow-up F9)
 
 ### Phase 2: Decisions in derivation and view models (pure, with fixture oracle)
 
@@ -1010,7 +1019,7 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Manual
 
-- [ ] 2.9 [reviewer] Only the root's decision is read; nothing applied after grouping; cycle rule deterministic and documented
+- [x] 2.9 [reviewer] Only the root's decision is read; nothing applied after grouping; cycle rule deterministic and documented — impl-review: `derivePatterns` reads only `decisions.get(root)`, resolves before grouping; cycle → smallest key of the cycle (tail excluded), documented in the header
 
 ### Phase 3: Paged reads, one pattern-data read, absorbed-key redirect
 
@@ -1026,7 +1035,7 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Manual
 
-- [ ] 3.8 [reviewer] Both small reads page via `collectPages` (`order id`, `gt id`); pages use only `loadPatternData`; no second `Map` in `patterns.astro`
+- [x] 3.8 [reviewer] Both small reads page via `collectPages` (`order id`, `gt id`); pages use only `loadPatternData`; no second `Map` in `patterns.astro` — impl-review: `loadThresholds`/`loadDecisions` via `collectPages` (`order id`, `gt id`); both pages call only `loadPatternData`; no second `Map` in `patterns.astro`
 
 ### Phase 4: Decision endpoint and the US-03 durability smoke
 
@@ -1038,12 +1047,12 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 - [x] 4.4 `npx supabase db reset && npx supabase test db` — 102 (5 files), delta 0 (no migration this phase; `npm run db:types` confirmed no diff) — 61145cf
 - [x] 4.5 `BASE_URL=http://localhost:4398 npm run smoke` — 77 + 26 = 103 PASS — 61145cf
 - [x] 4.6 Deliberate break (rename upsert sends `{ merchant_key, display_name, excluded: false }`) → "rename keeps the exclusion" **and** its downstream dependent "later import keeps the exclusion" FAIL (2/103); restored → 103/103 PASS. Meta-check: "pattern is renamed" stayed green throughout, so the red proves the untouched column does not survive a full-column upsert, not that rename itself is broken — 61145cf
-- [x] 4.7 Deliberate break (`loadPatternData` derives with `new Map()` instead of `decisions`) → **8** steps FAIL, wider than the plan's named 4 (4, 5, 13, 16) because the merge/name/exclusion also stop holding downstream once decisions never reach derivation: "merged pattern sums its components", "merged pattern is re-typed by D5", "patterns list shows one merged row", "excluded pattern has no over-limit", "rename keeps the exclusion", "later import joins the merged pattern", "later import keeps the name", "later import keeps the exclusion"; restored → 103/103 PASS. Meta-check: the four writes ("pattern is merged", "type is pinned", "pattern is excluded", "pattern is renamed") and the three decision-map-direct reads named in the plan ("absorbed pattern redirects to the merged one", "pinned type shows on the detail", "pinned type takes the amount threshold") all stayed green throughout — proving the break isolates *derivation* reading the decisions, not the writes or the redirect/pin lookups that read the map directly — 61145cf
+- [x] 4.7 Deliberate break (`loadPatternData` derives with `new Map()` instead of `decisions`) → **8** steps FAIL, wider than the plan's named 4 (4, 5, 13, 16) because the merge/name/exclusion also stop holding downstream once decisions never reach derivation: "merged pattern sums its components", "merged pattern is re-typed by D5", "patterns list shows one merged row", "excluded pattern has no over-limit", "rename keeps the exclusion", "later import joins the merged pattern", "later import keeps the name", "later import keeps the exclusion"; restored → 103/103 PASS. Meta-check: the four writes ("pattern is merged", "type is pinned", "pattern is excluded", "pattern is renamed") and the three decision-map-direct reads named in the plan ("absorbed pattern redirects to the merged one", "pinned type shows on the detail", "pinned type takes the amount threshold") all stayed green throughout — proving the break isolates _derivation_ reading the decisions, not the writes or the redirect/pin lookups that read the map directly — 61145cf
 - [x] 4.8 Deliberate break (`validateMerge` always returns `true`) → "merge into itself is rejected" FAILs, redirecting to `/patterns/sklep%20smoke?error=decision` instead of `?error=merge` (the DB's `pattern_decisions_no_self_merge` check constraint still rejects the write, but as an untyped DB error, not the app-side validation); restored → 103/103 PASS. Meta-check: exactly 1/103 failed, confirming the DB constraint alone cannot distinguish the two redirect targets — only the app-side `validateMerge` call proves the difference — 61145cf
 
 #### Manual
 
-- [ ] 4.9 [reviewer] Endpoint parses `key` first, one decision column per write, no client `user_id`, only `merge` reads
+- [x] 4.9 [reviewer] Endpoint parses `key` first, one decision column per write, no client `user_id`, only `merge` reads — impl-review: `decisionKeySchema` first; each write one column + `onConflict`; no `user_id` from the form (live probe: extra `user_id` field ignored, row owned by the session user); only `merge` reads; CSRF 403 on a foreign Origin like the other POSTs; no open redirect (`//evil…` key stays under `/patterns/`)
 
 ### Phase 5: Shared dialog geometry and bfcache pending reset
 
@@ -1076,8 +1085,8 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Manual
 
-- [ ] 6.8 [reviewer] Every string from `copy` / `copyExtra`; K22 byte-for-byte with `app.js`; only G33 placeholders new; no new primitives
-- [ ] 6.9 [reviewer] Keyboard: trigger, four actions, revealed fields and submits reachable; Esc / close work; each form posts one action
+- [x] 6.8 [reviewer] Every string from `copy` / `copyExtra`; K22 byte-for-byte with `app.js`; only G33 placeholders new; no new primitives — impl-review: K22 six strings + „Wykluczone” byte-for-byte with `prototype/app.js`; other strings G33 placeholders or existing keys; only existing primitives reused
+- [x] 6.9 [reviewer] Keyboard: trigger, four actions, revealed fields and submits reachable; Esc / close work; each form posts one action — impl-review (code inspection): trigger, action buttons, `<select>`/`<input>` and submits are native focusable elements, none with `tabIndex=-1`; Radix `Dialog` handles Esc / close button / focus trap; each `<form>` carries exactly one hidden `action`
 
 ### Phase 7: Excluded section on `/patterns` and seam sweep
 
@@ -1088,12 +1097,12 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 - [x] 7.3 `npm run fixture:check` OK; `npm run build` passes — both observed OK — 71eaccb
 - [x] 7.4 `npx supabase db reset && npx supabase test db` — observed **102** (5 files), all pass (delta 0 — no migration this phase) — 71eaccb
 - [x] 7.5 `BASE_URL=http://localhost:4398 npm run smoke` — observed **111** PASS (108 + 3, matches plan), run clean before and after the deliberate break — 71eaccb
-- [x] 7.6 Deliberate break (`patterns.astro`: `PatternsTable` fed `items` instead of `visibleItems`) → "excluded pattern leaves the table" FAILed (1/111 red, `>200<` still returned but the excluded row's `href="/patterns/kawiarnia%20smoke"` reappeared in the table); every other step — including "patterns list shows the excluded section" and "list confirms a restore" — stayed PASS. Restored → 111/111 PASS. Meta-check: the still-green "patterns list shows the excluded section" (asserts the excluded item's *name* on the page) proves the break didn't remove the excluded pattern's data from the read — it specifically proves the table row (the only element with an `href`) stopped filtering `excluded`, isolating exactly what the automated criterion asks to isolate: the section has no links, so only a table row can carry the href — 71eaccb
+- [x] 7.6 Deliberate break (`patterns.astro`: `PatternsTable` fed `items` instead of `visibleItems`) → "excluded pattern leaves the table" FAILed (1/111 red, `>200<` still returned but the excluded row's `href="/patterns/kawiarnia%20smoke"` reappeared in the table); every other step — including "patterns list shows the excluded section" and "list confirms a restore" — stayed PASS. Restored → 111/111 PASS. Meta-check: the still-green "patterns list shows the excluded section" (asserts the excluded item's _name_ on the page) proves the break didn't remove the excluded pattern's data from the read — it specifically proves the table row (the only element with an `href`) stopped filtering `excluded`, isolating exactly what the automated criterion asks to isolate: the section has no links, so only a table row can carry the href — 71eaccb
 - [x] 7.7 Seam-sweep greps: `grep -rn "PatternListOverviewItem\|loadPatterns\b" src test` empty (fixed two stale comments in `decisions.ts`/`thresholds.ts` that referenced a `loadPatterns` name); `grep -rn "DESIGN-GAP: G28" src` matches only `PatternsTable.tsx`'s updated comment; `grep -rnE "#[0-9a-fA-F]{3,6}\b|\[#"` over `ExcludedPatterns.astro`/`merchant-mark.ts`/`patterns.astro` empty (dropped a literal `#e5e9e8` from `merchant-mark.ts`'s own comment, kept only in `design-kit.md`) — 71eaccb
 
 #### Manual
 
-- [x] 7.8 [reviewer] Seam sweep done by the implement step itself (orchestrator's explicit per-run assignment — see agent contract step brief, not the general [reviewer] delegation): merchant-mark classes deduplicated into `src/components/patterns/merchant-mark.ts` (shared by `PatternsTable.tsx` and `ExcludedPatterns.astro`); `Icon.astro`'s `size` union widened to include the kit's `14` rather than duplicating its SVG markup; the two stale `loadPatterns`-name comments in `decisions.ts`/`thresholds.ts` reworded to `collectPages`; kit rows G28, G33 extended with faza-7 delivery notes, K22's `copyExtra` block and the "Do rundy 3" item 22 note the new `excludedToggle` key; G4/G24 re-read and confirmed still accurate (untouched — neither concerns the excluded section); `follow-ups/review-fixes.md` written with every closed/open item carrying a `Trigger:` line — 71eaccb
+- [x] 7.8 [reviewer] Seam sweep done by the implement step itself (orchestrator's explicit per-run assignment — see agent contract step brief, not the general [reviewer] delegation): merchant-mark classes deduplicated into `src/components/patterns/merchant-mark.ts` (shared by `PatternsTable.tsx` and `ExcludedPatterns.astro`); `Icon.astro`'s `size` union widened to include the kit's `14` rather than duplicating its SVG markup; the two stale `loadPatterns`-name comments in `decisions.ts`/`thresholds.ts` reworded to `collectPages`; kit rows G28, G33 extended with faza-7 delivery notes, K22's `copyExtra` block and the "Do rundy 3" item 22 note the new `excludedToggle` key; G4/G24 re-read and confirmed still accurate (untouched — neither concerns the excluded section); `follow-ups/review-fixes.md` written with every closed/open item carrying a `Trigger:` line — 71eaccb — impl-review re-check: `STATUS_PARAMS` duplicate and `fieldBox` were neither extracted nor justified; justification recorded (follow-up F4), stale comments in `patterns.astro` / `pattern-view.test.ts` and design-kit „Do rundy 3” item 8 fixed
 - [ ] 7.9 [human] Product owner confirms decision 9: „nie wchodzi do sumy miesięcznej” = excluded from every „ponad próg” sum and from any S-07 monthly total
 - [ ] 7.10 [visual] Screenshots desktop 1440 px + mobile ~400 px: `detail-actions-closed`, `actions-dialog`, `merge-picker`, `merge-none`, `rename-field`, `rename-error`, `merge-error`, `decision-error`, `pending`, `merged-result`, `unmerged-result`, `typed-result`, `renamed-result`, `excluded-banner`, `restored-result`, `absorbed-redirect`, `list-excluded-closed`, `list-excluded-open`, `list-restored`, `list-all-excluded`
 - [ ] 7.11 [visual] Fixture US-03 walk-through: merged `sportowo` row with combined count and sum under the new name, own transfer only in „Wykluczone”, pinned type on its row

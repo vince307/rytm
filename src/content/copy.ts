@@ -222,7 +222,24 @@ export const copyExtra = {
     nameInvalid: "Nazwa może mieć najwyżej 100 znaków.",
     decisionError: "Nie udało się zapisać decyzji. Spróbuj ponownie.",
   },
-  fixed: { eyebrow: "Koszty stałe", lead: "Rytm porównuje miesiące kalendarzowe i pokazuje różnice." },
+  fixed: {
+    eyebrow: "Koszty stałe",
+    lead: "Rytm porównuje miesiące kalendarzowe i pokazuje różnice.",
+    // DESIGN-GAP: K23 — row/section copy `fixedCosts()` (app.js) renders but `content.json` does not define:
+    // Polish plural count line, the "poprzednio" meta line and the "pierwsze wystąpienie" meta line. Verbatim
+    // from the prototype.
+    itemForms: ["pozycja", "pozycje", "pozycji"],
+    count: "{n} {items}",
+    previously: "{date} · poprzednio {amount}",
+    firstSeen: "pierwsze wystąpienie · {date}",
+    // DESIGN-GAP: G34 — "Koszty stałe" states the kit does not define: an empty section line (the kit's three
+    // sample sections always have rows) and the no-comparison-month message (US-04 AC). Placeholders; the author
+    // supplies the final copy.
+    changedEmpty: "Żaden koszt stały nie zmienił kwoty w tym miesiącu.",
+    unchangedEmpty: "Brak kosztów stałych bez zmian w tym miesiącu.",
+    newEmpty: "Brak nowych kosztów stałych w tym miesiącu.",
+    noComparison: "Nie ma poprzedniego miesiąca do porównania.",
+  },
   settings: {
     eyebrow: "Ustawienia / konto",
     lead: "Sprawdź dane i ustawienia prywatności.",

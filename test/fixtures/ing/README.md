@@ -25,7 +25,7 @@ Wszystkie nazwy, numery, kwoty i daty są wymyślone — żadna wartość nie po
 
 | Plik | Oczekiwany wynik |
 |---|---|
-| `Lista_transakcji_nr_0000123456_010926.csv` | ok; rachunek domyślny `Rachunek Firmowy Główny`, 234 wierszy, import 206 obciążeń, suma 64971,47 zł |
+| `Lista_transakcji_nr_0000123456_010926.csv` | ok; rachunek domyślny `Rachunek Firmowy Główny`, 234 wierszy, import 206 obciążeń, suma 64975,47 zł |
 | `Lista_transakcji_nr_0000123457_011026-overlap.csv` | reject (`overlap`): zakres nachodzi na główny wyciąg przy tym samym numerze rachunku; odrzucenie dopiero po zaimportowaniu głównego (FR-005, `imports_no_overlap`); wiersze danych: 7, zakres 2026-08-01 – 2026-09-30 |
 | `Lista_transakcji_nr_0000098765_011024-no-header.csv` | reject (`no-header`): brak wiersza nagłówka `"Data transakcji"` — preambuła przechodzi wprost w wiersze danych (reguła 1); wiersze danych: 4, zakres 2024-09-01 – 2024-09-30 |
 | `Lista_transakcji_nr_0000099876_021124-currency.csv` | reject (`currency`): jeden wiersz z `Waluta` = `EUR` (reguła 5); wiersze danych: 4, zakres 2024-10-01 – 2024-10-31 |
@@ -64,7 +64,7 @@ Wiersze pułapki: `rows[]` z danym identyfikatorem w `traps`; wzorce: `patterns[
 | T08 | Powtarzalny przelew na własne konto w innym banku (D8) | wzorzec, user-exclude | 30, 51, 73, 97, 117, 139, 158, 171, 191, 208, 228, 246 |
 | T09 | Opłaty US/ZUS, powtarzalne, zmienna kwota | frequent | 23, 31, 47, 52, 65, 74, 91, 98, 113, 118, 134, 140, 150, 159, 168, 173, 182, 192, 202, 209, 221, 229, 242, 247 |
 | T10 | Abonament ze stałą kwotą | fixed | 33, 54, 76, 99, 119, 142, 160, 174, 194, 212, 231, 250 |
-| T11 | Abonament z jedną podwyżką ~12% | jeden wzorzec fixed przy D5 | 27, 49, 67, 92, 114, 135, 151, 170, 185, 204, 224, 244 |
+| T11 | Abonament z dwiema podwyżkami (~12%, potem +4 zł) | jeden wzorzec fixed przy D5 | 27, 49, 67, 92, 114, 135, 151, 170, 185, 204, 224, 244 |
 | T12 | Sprzedawca z rozrzutem ~45% | frequent | 22, 48, 82, 110, 126, 155, 178, 199, 223, 237 |
 | T13 | Zwrot BLIK (kwota dodatnia, `Zwrot transakcji BLIK … Nr zwrotu …`) | pominięty, skipReason credit (D2) | 127, 186 |
 | T14 | PayPal jako pośrednik | sprzedawca nieprzezroczysty (FR-014) | 38, 120, 165, 230 |

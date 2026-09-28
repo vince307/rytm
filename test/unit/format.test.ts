@@ -7,6 +7,7 @@ import {
   formatMoney,
   formatRangeLong,
   formatRangeShort,
+  formatSignedMoney,
   plural,
 } from "@/lib/format";
 
@@ -59,6 +60,17 @@ describe("formatMoney", () => {
     [1234567, "12\u00a0345,67 zł"],
   ])("%i → %s", (minor, text) => {
     expect(formatMoney(minor)).toBe(text);
+  });
+});
+
+describe("formatSignedMoney", () => {
+  it.each([
+    [600, "+6,00 zł"],
+    [-400, "\u22124,00 zł"],
+    [0, "0,00 zł"],
+    [123456, "+1234,56 zł"],
+  ])("%i → %s", (minor, text) => {
+    expect(formatSignedMoney(minor)).toBe(text);
   });
 });
 

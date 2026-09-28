@@ -111,7 +111,7 @@ Odwzorowane w syntetycznym fixture `test/fixtures/ing/` — identyfikatory puła
 - Split payment VAT (para na rachunku głównym i VAT).
 - Przelew na własne konto w innym banku, powtarzalny (D8).
 - Opłaty urzędowe (US/ZUS) — powtarzalne, zmienna kwota: muszą wyjść jako „częsty”, nie „stały”.
-- Abonament ze stałą kwotą; abonament z jedną podwyżką ~12% (musi zostać jednym wzorcem stałym przy D5); sprzedawca z rozrzutem ~45% (musi być „częsty”).
+- Abonament ze stałą kwotą; abonament z dwiema podwyżkami — ~12% w 2026-03, potem +4 zł w miesiącu referencyjnym 2026-08 (obie w tolerancji D5, musi zostać jednym wzorcem stałym; druga podwyżka to przypadek „zmiana kwoty” S-06); sprzedawca z rozrzutem ~45% (musi być „częsty”).
 - Zwrot BLIK (kwota dodatnia, tytuł `Zwrot transakcji BLIK … Nr zwrotu …`) — pomijany (D2).
 
 ## Santander Bank Polska — `historia_<YYYY-MM-DD>_<nr rachunku>.csv`

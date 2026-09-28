@@ -65,11 +65,11 @@ describe("parseIngStatement — main fixture", () => {
     const imported = mainRows.filter((r) => r.imported);
     expect(payload.accountName).toBe("Rachunek Firmowy Główny");
     expect(payload.transactions).toHaveLength(206);
-    expect(payload.transactions.reduce((s, t) => s + t.amountMinor, 0)).toBe(6497147);
+    expect(payload.transactions.reduce((s, t) => s + t.amountMinor, 0)).toBe(6497547);
     expect(payload.transactions.map((t) => [t.occurredOn, t.bankTxId, t.amountMinor])).toEqual(
       imported.map((r) => [r.occurredOn, r.bankTxId, Math.abs(r.amountMinor)]),
     );
-    expect(expected.files[MAIN].imported).toEqual({ count: 206, sumMinor: 6497147 });
+    expect(expected.files[MAIN].imported).toEqual({ count: 206, sumMinor: 6497547 });
   });
 
   it("counts debits and credits per account", () => {

@@ -1,13 +1,108 @@
 ---
+// /fixed — kit `fixedCosts()` (prototype `app.js`), FR-012 / US-04 (S-06): `loadPatternData` → `fixedOverview`
+// gives all three sections their rows — "Zmieniły kwotę", "Nowe w tym miesiącu" (kit `badge('nowy','new')`) and
+// "Bez zmian". Without a comparison month (one month of data, or a gap month between imports) the "Nowe" section
+// shows `x.noComparison` instead of its (necessarily empty, per D6) row list — AC: not "wszystko jest nowe".
 import AppLayout from "@/layouts/AppLayout.astro";
+import { Badge } from "@/components/app/Badge";
+import FixedRow from "@/components/fixed/FixedRow.astro";
+import FixedSection from "@/components/fixed/FixedSection.astro";
+import InlineAlert from "@/components/app/InlineAlert.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
 import ViewEmpty from "@/components/app/ViewEmpty.astro";
 import { copy, copyExtra } from "@/content/copy";
+import { formatIsoDate, formatMoney, formatSignedMoney, plural } from "@/lib/format";
+import { fixedOverview, type FixedOverview } from "@/lib/patterns/fixed";
+import { loadPatternData } from "@/lib/patterns/load";
+import { createClient } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 
 const e = copy.emptyViews;
+const x = copyExtra.fixed;
+
+// Same read shape as `/patterns` (`patterns.astro`) — a failed read, including an unconfigured Supabase client,
+// never shows the empty state or a partial list.
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const dataResult = supabase ? await loadPatternData(supabase) : { error: new Error("Supabase is not configured") };
+const result: { error: unknown } | { referenceMonth: null } | { overview: FixedOverview } = (() => {
+  if ("error" in dataResult) return { error: dataResult.error };
+  const overview = fixedOverview(dataResult.patterns, dataResult.rows);
+  return overview.referenceMonth === null ? { referenceMonth: null } : { overview };
+})();
+if ("error" in result) {
+  // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
+  console.error("fixed costs failed", result.error);
+}
+
+// K23 templates — verbatim row/section copy the kit only renders in `app.js` (`fixedCosts()`), not in
+// `content.json`; `{n}`/`{items}`/`{date}`/`{amount}` interpolation follows the codebase's `.replace()` convention
+// (`patterns/[...key].astro` `sumLabel`, `imports/result.astro` `title`).
+const countText = (n: number) => x.count.replace("{n}", String(n)).replace("{items}", plural(n, x.itemForms));
+const previouslyText = (occurredOn: string, previousMinor: number) =>
+  x.previously.replace("{date}", formatIsoDate(occurredOn)).replace("{amount}", formatMoney(previousMinor));
+const firstSeenText = (firstOccurredOn: string) => x.firstSeen.replace("{date}", formatIsoDate(firstOccurredOn));
+// DESIGN-GAP: G34 — the kit prints only a rise, in amber; a decrease has no kit colour, so it takes the same
+// "good news" green as a `fixed` badge (S-06 plan decision 12). Kept short (helper, not inline) so prettier never
+// wraps the `<b>` element onto three lines — a wrap would put the smoke-asserted delta text on its own indented
+// line, which fails the `>text<` anchor (agent-contract smoke-assertion note, plan review F1).
+const deltaClass = (deltaMinor: number) =>
+  cn("text-[13px] font-bold", deltaMinor > 0 ? "text-excess-text" : "text-green");
 ---
 
 <AppLayout title={copy.fixedCosts.title} active="fixed">
-  <PageTitle eyebrow={copyExtra.fixed.eyebrow} title={e.fixed.title} lead={e.fixed.lead} />
-  <ViewEmpty icon="fixed" title={e.cta} body={copyExtra.emptyViews.body} cta={e.button} href="/imports/new" />
+  {"error" in result ? (
+    <>
+      <PageTitle eyebrow={x.eyebrow} title={copy.fixedCosts.title} lead={x.lead} />
+      {/* DESIGN-GAP: K18 — the kit has no copy for a failed read of a list; `components.error` stands in (patterns.astro precedent). */}
+      <InlineAlert kind="error">{copy.components.error}</InlineAlert>
+    </>
+  ) : "referenceMonth" in result ? (
+    <>
+      <PageTitle eyebrow={x.eyebrow} title={e.fixed.title} lead={e.fixed.lead} />
+      <ViewEmpty icon="fixed" title={e.cta} body={copyExtra.emptyViews.body} cta={e.button} href="/imports/new" />
+    </>
+  ) : (
+    <>
+      <PageTitle eyebrow={x.eyebrow} title={copy.fixedCosts.title} lead={x.lead} />
+      <FixedSection
+        title={copy.fixedCosts.changed}
+        count={countText(result.overview.changed.length)}
+        empty={x.changedEmpty}
+        hasRows={result.overview.changed.length > 0}
+      >
+        {result.overview.changed.map((row) => (
+          <FixedRow
+            name={row.name}
+            meta={previouslyText(row.occurredOn, row.previousMinor)}
+            amount={formatMoney(row.amountMinor)}
+          >
+            <b class:list={deltaClass(row.deltaMinor)}>{formatSignedMoney(row.deltaMinor)}</b>
+          </FixedRow>
+        ))}
+      </FixedSection>
+      <FixedSection
+        title={copy.fixedCosts.new}
+        count={countText(result.overview.new.length)}
+        empty={result.overview.hasComparison ? x.newEmpty : x.noComparison}
+        hasRows={result.overview.new.length > 0}
+      >
+        {result.overview.new.map((row) => (
+          <FixedRow name={row.name} meta={firstSeenText(row.firstOccurredOn)} amount={formatMoney(row.amountMinor)}>
+            <Badge tone="new">{copy.components.new}</Badge>
+          </FixedRow>
+        ))}
+      </FixedSection>
+      <FixedSection
+        compact
+        title={copy.fixedCosts.unchanged}
+        count={countText(result.overview.unchanged.length)}
+        empty={x.unchangedEmpty}
+        hasRows={result.overview.unchanged.length > 0}
+      >
+        {result.overview.unchanged.map((row) => (
+          <FixedRow name={row.name} amount={formatMoney(row.amountMinor)} compact />
+        ))}
+      </FixedSection>
+    </>
+  )}
 </AppLayout>

@@ -17,19 +17,25 @@ interface Props {
   hint?: string;
 }
 const { bars, legend, ariaLabel, note, hint } = Astro.props;
+// Geometry = kit `.monthly-trend` (visual gate, impl review F6): the 200 px `<ol>` is the bar area, its `border-b`
+// is the baseline the bars stand on, the dashed gridline sits at its 50 % (`top-[100px]`, kit `.trend:before`), and
+// the month labels hang 22 px below the baseline (kit `.tbar:after` `bottom:-22px`) inside the wrapper's `pb-[22px]`,
+// so the legend keeps the kit's 31 px from the baseline (9 px + 22 px). `flex-row-reverse` on the scroll box makes a
+// long axis that overflows (≈ 400 px viewport, 12 months) open scrolled to its END — the reference month the stat
+// card above reports — instead of the oldest one (DOM and reading order unchanged; G35).
 // Kit `.info-panel` — one class string for both the "za krótki trend" note and the "brak progu" hint (impl review).
 const infoPanel = "mt-[14px] border-l-[3px] border-ink bg-paper-soft p-[13px] text-xs text-muted";
 ---
 
-<div class="overflow-x-auto">
-  <div class="relative">
+<div class="flex flex-row-reverse overflow-x-auto">
+  <div class="relative min-w-full shrink-0 pb-[22px]">
     <div
-      class="pointer-events-none absolute inset-x-0 top-1/2 border-t border-dashed border-line"
+      class="pointer-events-none absolute inset-x-0 top-[100px] border-t border-dashed border-line"
       aria-hidden="true"
     ></div>
-    <ol aria-label={ariaLabel} class="flex gap-[13px] border-b border-line px-2.5 max-[559px]:gap-[7px]">
+    <ol aria-label={ariaLabel} class="flex h-[200px] gap-[13px] border-b border-line px-2.5 max-[559px]:gap-[7px]">
       {bars.map((bar) => (
-        <li class="flex h-[200px] min-w-[44px] flex-1 flex-col items-center">
+        <li class="relative flex min-w-[44px] flex-1 flex-col items-center">
           <span class="shrink-0 text-[10px] whitespace-nowrap text-muted">{bar.amount}</span>
           <div class="relative w-full flex-1">
             <i
@@ -40,13 +46,15 @@ const infoPanel = "mt-[14px] border-l-[3px] border-ink bg-paper-soft p-[13px] te
               style={bar.height > 0 ? `height:${bar.height}%` : undefined}
             ></i>
           </div>
-          <span class="mt-2 shrink-0 text-[10px] text-muted">{bar.label}</span>
+          <span class="absolute -bottom-[22px] left-1/2 -translate-x-1/2 text-[10px] whitespace-nowrap text-muted">
+            {bar.label}
+          </span>
         </li>
       ))}
     </ol>
   </div>
 </div>
-<div class="mt-[31px] flex items-center gap-[17px] text-[11px] text-muted">
+<div class="mt-[9px] flex items-center gap-[17px] text-[11px] text-muted">
   <span>
     <i class="mr-[5px] inline-block h-2 w-2 rounded-full bg-muted/55" aria-hidden="true"></i>
     {legend}

@@ -1,34 +1,36 @@
 # Handoff — `fixed-cost-changes` (slice S-06)
 
-Written by the `implement` step (`/10x-implement fixed-cost-changes phase 1`, autonomous run
-`2026-09-28-s05-s06-s07`). Phase 1 (fixture only) is implemented, gated and committed; no app code
-exists yet. The one thing the next agent must not get wrong: **the fixture now carries kinoteka's second,
-in-tolerance rise (55,99 → 59,99 zł) on 2026-08-17 — `fixedOverview`'s unit case 16 (Phase 2) must assert
-against this new value, not the old 55,99/6497147 pair.**
+Written by the `implement` step (`/10x-implement fixed-cost-changes phase 2`, autonomous run
+`2026-09-28-s05-s06-s07`). Phase 2 (`fixedOverview` — the pure change/new rule, unit-tested, no caller) is
+implemented, gated and committed. The one thing the next agent must not get wrong: **`derivePatterns` keys on
+the normalized/lower-cased display name, not on `expected.json`'s hand-authored oracle slugs** — T16's real key is
+`"siłownia ruch"` (name `"SIŁOWNIA RUCH"`) and T08's is `"jan przykładowy"` (not `"silownia-ruch"` /
+`"przelew-konto-osobiste"`); `test/unit/fixed-overview.test.ts`'s F-02 case asserts the real keys.
 
 ## 1. State
 
 | Item | Value |
 |---|---|
 | Branch | `feat/fixed-cost-changes`, cut from `main` at `3706508` |
-| Commits | 6 on this branch: identity, research, plan, plan review, `feat(fixed-cost-changes): fixture — in-tolerance price change in the reference month (p1)` (`e0d8e4d`), `docs(fixed-cost-changes): record phase 1 commit sha in plan Progress` (`9362e4e`) |
+| Commits | 9 on this branch: identity, research, plan, plan review, fixture (p1, `e0d8e4d`), phase-1-sha docs (`9362e4e`), phase-1 handoff (`48604cb`), `feat(fixed-cost-changes): fixedOverview — the pure change/new rule (p2)` (`d827e00`), phase-2-sha docs (`f77de29`) |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `implementing` |
-| Roadmap | S-06 `planning` → `in-progress` (this step, `context/foundation/roadmap.md` at-a-glance row + item body) |
-| `## Progress` rows remaining | 31 (`grep -c '^- \[ \]' plan.md`): Phase 1 automated (1.1–1.7) done; 1.8 `[reviewer]` still open; Phases 2–4 (30 rows) untouched |
+| `change.md` status | `implementing` (unchanged this step) |
+| Roadmap | S-06 `in-progress` (unchanged this step — already set by phase 1) |
+| `## Progress` rows remaining | 23 (`grep -c '^- \[ \]' plan.md`): Phase 1 automated done, 1.8 `[reviewer]` open; Phase 2 automated (2.1–2.8) done this step, 2.9 `[reviewer]` open; Phases 3–4 (22 rows) untouched |
 | Working tree | clean after both commits (`.claude/skills/10x-autonomous-run/scripts/tree-clean.sh` → `CLEAN`) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 |---|---|
-| `scripts/fixture-ing.mjs` | T11 `kinoteka` entry: `entries` gains a second 2026-08 step (`5599` × 5 → `5999` on day 17, was `5599` × 6); comment names both rises; `TRAPS.T11` label → „Abonament z dwiema podwyżkami (~12%, potem +4 zł)” |
-| `test/fixtures/ing/Lista_transakcji_nr_0000123456_010926.csv`, `expected.json`, `README.md` | Regenerated via `npm run fixture:ing` (never hand-edited); diff limited to kinoteka's 2026-08-17 row (`-55,99` → `-59,99`), the main-file debit sum (`67193,47` → `67197,47`), `expected.json`'s row `amountMinor`, `files[MAIN].imported.sumMinor` (`6497147` → `6497547`) and the kinoteka pattern's `sumMinor` (`63588` → `63988`; `medianMinor` unchanged at `5299`), and the `README.md` T11 row / import-sum line |
-| `test/unit/ing-parser.test.ts` | Both hardcoded `6497147` assertions → `6497547` |
-| `context/foundation/import-formats.md` | Fixture note: „abonament z jedną podwyżką ~12%” → names the second, in-tolerance 2026-08 rise as the fixture's S-06 „zmiana kwoty” case |
-| `context/changes/fixed-cost-changes/plan.md` | Progress 1.1–1.7 ticked with sha `e0d8e4d`; 1.8 (`[reviewer]`) left open |
-| `context/changes/fixed-cost-changes/change.md` | `status: plan_reviewed` → `implementing` |
-| `context/foundation/roadmap.md` | S-06 row/item `planning` → `in-progress` (pre-check: file was not already dirty, so staged with this step) |
+| `src/lib/patterns/fixed.ts` (new) | `fixedOverview(patterns, rows)` — the pure FR-012/US-04/D6 rule. Header comment states R/P, `hasComparison`, the candidate filter, "new wins over changed", the double-charge rule (latest occurrence in R vs its immediate predecessor in any month) and the lapsed/excluded/frequent exclusion. Imports only `over-limit.ts`, `view.ts`, `@/types` |
+| `src/lib/patterns/over-limit.ts` | `previousMonth(yearMonth)` added beside `monthOf` — calendar predecessor, plain string arithmetic |
+| `src/lib/patterns/view.ts` | `patternTxs` / `indexById` changed from module-private to `export` (signatures unchanged); header comment names `fixed.ts` as a consumer — no duplicated join |
+| `src/lib/format.ts` | `formatSignedMoney(minor)` added — `"+6,00 zł"` / `"−4,00 zł"` (U+2212) / `"0,00 zł"`, built on `formatMoney` |
+| `test/unit/fixed-overview.test.ts` (new) | 16 cases: rise/decrease/unchanged, double charge (rise-first, rise-second, up-then-down), new, new-wins-over-changed, gap-month, one-month, excluded/frequent/pinned/lapsed, no-rows, same-day id tiebreak + shuffle, section order, and the F-02 fixture (kinoteka `+400`, `siłownia ruch` new, `jan przykładowy`/`kawa-testowa.pl`/`muzykalnia` unchanged, `kurs-przyklad.pl`/`phu "przykład" jan testowy` absent) |
+| `test/unit/format.test.ts` | `formatSignedMoney` cases (600, −400, 0, 123456) added after the `formatMoney` describe block |
+| `test/unit/over-limit.test.ts` | `previousMonth` cases (`2026-08`→`2026-07`, `2026-01`→`2025-12`, `2026-10`→`2026-09`) added after `referenceMonth` |
+| `context/changes/fixed-cost-changes/plan.md` | Progress 2.1–2.8 ticked with sha `d827e00` (appended in the follow-up docs commit `f77de29`, same convention as phase 1); 2.9 (`[reviewer]`) left open |
 | `context/changes/fixed-cost-changes/handoff.md` | This file |
 
 ## 3. Verification
@@ -36,61 +38,73 @@ against this new value, not the old 55,99/6497147 pair.**
 | Command | Result |
 |---|---|
 | `git branch --show-current` | `feat/fixed-cost-changes` (observed) |
-| `npm run fixture:ing` then `git diff --stat test/fixtures/ing` | only the 3 files above changed (observed) |
-| `npm run fixture:check` | OK (observed, twice — after generation and after the deliberate breaks) |
-| `npm test` | 190 passed, 11 files — baseline 190/11, delta 0 (observed) |
-| `npm run lint` | 0 errors (observed) |
-| `npx astro check` | 0 errors, 120 files — baseline 120/0, delta 0 (observed) |
+| `npm test` | 213 passed, 12 files — baseline 190/11 (plan Phase 1 baseline), delta +23 tests / +1 file (observed, twice — after writing and after the deliberate-break restores) |
+| `npm run lint` | 0 errors (observed; one `lint:fix` pass needed for two prettier wraps, then clean) |
+| `npx astro check` | 0 errors, 122 files — baseline 120/0 (plan: +2 expected, `fixed.ts` + `fixed-overview.test.ts`), delta 0 errors (observed) |
+| `npm run fixture:check` | OK (observed) |
 | `npm run build` | passes (observed) |
-| `npx supabase db reset && npx supabase test db` | Files=5, Tests=102, Result: PASS — baseline 102/5, delta 0 (observed, sandbox disabled) |
-| `ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398` + `npm run smoke` | 111 PASS / 0 FAIL — baseline 111, delta 0 (observed, sandbox disabled); port 4398 killed after |
-| `grep -rn "6497147" test src` | empty (observed) |
-| Deliberate break 1.5 (drift): generator's T11 last amount → `6099` without regenerating | `fixture:check` FAILED (3), naming the main CSV, `expected.json`, `README.md` — red confirmed. **Restore note**: the first `git checkout -- scripts/fixture-ing.mjs` reverted to pre-Phase-1 HEAD (nothing had been staged yet), wiping the Phase 1 edit; caught immediately, edit reapplied and diff-verified before continuing. Meta-check: proves committed bytes are tied to the generator, not that `5999` is the right value |
-| Deliberate break 1.6 (tolerance): T11 last amount → `6400`, `npm run fixture:ing` | threw `pattern kinoteka: declared fixed, D5 gives frequent` before writing any file (median 5299, gap 1101 > 1000) — red confirmed, `test/fixtures/ing` untouched. Restored via `git checkout -- scripts/fixture-ing.mjs` (this time correctly matching the already-staged Phase 1 edit); `npm run fixture:ing` + `fixture:check` regenerated byte-identical to the staged/committed files. Meta-check: proves kinoteka's `fixed` type is guarded at generation |
-| Post-restore re-run: lint / test / fixture:check / build | all green again (observed) |
+| `npx supabase db reset && npx supabase test db` | Files=5, Tests=102, Result: PASS — baseline 102/5, delta 0 (observed, sandbox disabled; no DB mutation happened this phase, so one reset sufficed) |
+| `ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398` + `npm run smoke` | 111 PASS / 0 FAIL — baseline 111, delta 0 (observed twice, sandbox disabled); port 4398 killed after each run |
+| Deliberate break 2.5 (D6 window): `new` condition changed from "no occurrence in P" to "no occurrence before R at all" | case 8 ("new wins…") FAILed (expected `new` row, got none); case 7 (plain new, no earlier occurrence at all) stayed green — meta-check confirmed the red isolates the P-window, not new-detection itself. Restored; suite green again |
+| Deliberate break 2.6 (double charge): the change loop reduced to comparing only the last tx in R with its immediate predecessor | case 4 (rise on the *first* of two R charges) FAILed (expected a changed row, got none); cases 1 and 5 (single-occurrence rise, rise-on-second) stayed green — meta-check confirmed the red isolates "latest change among R's occurrences", not the rule generally. Restored; suite green again |
+| Deliberate break 2.7 (exclusion): dropped `!pattern.excluded` from the candidate filter (kept `type !== "fixed"`) | case 11's excluded pattern appeared in `changed` alongside `pinned`; the `frequent` twin stayed absent — meta-check confirmed the red is the exclusion filter, not the type filter. Restored; suite green again |
+| Deliberate break 2.8 (comparison guard): `hasComparison` hardcoded to `true` | cases 9 and 10 (gap-month, one-month) FAILed on `hasComparison`; case 16 (F-02 fixture, which does have a real P) stayed green — meta-check confirmed the red proves the gap/one-month guard, not the fixture path. Restored; suite green again |
+| Post-restore re-run: lint / test / astro check / fixture:check / build / pgTAP / smoke | all green again (observed, matches the row above) |
 
 ## 4. Next command
 
-`/10x-implement fixed-cost-changes phase 2`
+`/10x-implement fixed-cost-changes phase 3`
 
 ## 5. Open
 
-- **Lesson for the next agent** (see intro): Phase 2 unit case 16 (`test/unit/fixed-overview.test.ts`, F-02 fixture
-  case) must expect `changed = { occurredOn: "2026-08-17", amountMinor: 5999, previousMinor: 5599, deltaMinor: 400 }`
-  for KINOTEKA — this is now true on disk, not merely planned.
-- **Manual-only Progress rows carried forward (human checklist, unchanged from plan-review handoff):**
-  4.10 `[human]` — product owner confirms plan decision 7 (D5 flip). `[visual]` 4.11, 4.12 — the Visual step.
-  `[reviewer]` 1.8 (this phase — generated-diff review, still open), 2.9, 3.9, 4.9 — `/10x-impl-review`.
-- **Smoke anchors** (Phase 3+): `scripts/smoke.mjs` new `/fixed` steps use `>text<`; if `eslint --fix` wraps an
-  element in `FixedRow.astro` / `FixedSection.astro`, switch to bare text keeping each positive/negative pair
-  (plan review F1, agent-contract smoke-assertion note).
-- **DESIGN-GAPs to add with the code (Phase 3–4, unchanged):** K23 (`copyExtra.fixed` row copy), G34 (states,
-  incl. `Badge.tsx` `new` tone), G5 amended, K9 note.
+- **Key naming lesson** (see intro): any Phase 3/4 code or test referencing fixture pattern identities by name must
+  use `derivePatterns`' real keys (`merchantKey` output — normalized display name, lower-cased), never
+  `expected.json`'s oracle slugs. Confirmed this step: `kinoteka` and `kawa-testowa.pl`/`muzykalnia`/
+  `kurs-przyklad.pl` happen to coincide (domain-like counterparties), but `siłownia ruch`, `jan przykładowy` and
+  `phu "przykład" jan testowy` do not.
+- **Manual-only Progress rows carried forward (human checklist, unchanged from phase 1 handoff):** 1.8
+  `[reviewer]`, 2.9 `[reviewer]` (this phase, still open), 3.9, 4.9 `[reviewer]` — `/10x-impl-review`; 4.10
+  `[human]` — product owner confirms plan decision 7 (D5 flip); 4.11, 4.12 `[visual]` — the Visual step.
+- **Phase 3 starts here**: `src/pages/fixed.astro` still renders the static `PageTitle` + `ViewEmpty` placeholder
+  unconditionally — `fixedOverview` has no caller yet. Phase 3 contract (plan): `createClient` → `loadPatternData`
+  → `fixedOverview(patterns, rows)`, two new components (`FixedSection.astro`, `FixedRow.astro`), the "Zmieniły
+  kwotę" and "Bez zmian" sections, copy gaps K23/G34, and 6 new smoke steps.
+- **Smoke anchors** (Phase 3+, unchanged from phase 1 handoff): use `>text<`; if `eslint --fix` wraps an element in
+  `FixedRow.astro` / `FixedSection.astro`, switch to bare text keeping each positive/negative pair (plan review F1,
+  agent-contract smoke-assertion note). `/fixed` has no island, so no serialized-props false positive either way.
+- **DESIGN-GAPs to add with the code (Phase 3–4, unchanged):** K23 (`copyExtra.fixed` row copy), G34 (states, incl.
+  `Badge.tsx` `new` tone), G5 amended, K9 note.
 - **Follow-ups to write in Phase 4** (`context/changes/fixed-cost-changes/follow-ups/review-fixes.md`, does not
-  exist yet): D5 flip, one-off merchants as „nowy”, G28 `/patterns` badges, S-07 `/home` „N pozycje podrożały”
-  from `fixedOverview().changed`.
+  exist yet): D5 flip, one-off merchants as „nowy”, G28 `/patterns` badges, S-07 `/home` „N pozycje podrożały” from
+  `fixedOverview().changed`.
 - No new risk introduced by this phase; `Known risks` in plan.md (D5 flip, one-off merchants, astro-check count,
   smoke text anchors, badge `new` tint) all still apply unchanged to later phases.
 
 ## 6. Autonomous decisions
 
-- **Exec mode: implemented Phase 1 directly in this context, not delegated to a subagent.** Rejected: delegating
-  per the skill's default `AskUserQuestion` prompt. Why: the agent contract forbids `AskUserQuestion`; Phase 1 is
-  a small, single-file generator edit plus regeneration — cheap enough to do directly, and doing it directly let
-  me verify the deliberate-break sequence firsthand rather than trusting a subagent's report. Would change: a
-  later, larger phase where keeping this context lean matters more (Phase 3 adds two components — delegation is
-  the better default there).
-- **Commit-message wording: descriptive body summarizing the fixture ripple**, not the plan-review skill's
-  proposal loop (`AskUserQuestion` on the message). Why: forbidden to ask; the plan's own Phase 1 contract fully
-  specifies the diff, so the message could be written with certainty. Would change: nothing — this is mechanical.
-- **SHA-append done as a separate follow-up docs commit** (`9362e4e`), matching the run's stated allowance
-  ("a follow-up docs commit for the sha is fine") rather than leaving Progress rows without their sha. Rejected:
-  leaving 1.1–1.7 without a sha (the skill ritual explicitly designs for this gap, but the run's explicit
-  instruction to append the sha takes precedence for a single-phase step). Would change: nothing binds this
-  either way for a multi-phase continuation, where the next phase's commit could absorb the sha line instead.
-- **Dirty-path check before staging: none found.** `git status --porcelain` after all edits showed only the 9
-  files this phase touched (plus, before the follow-up commit, only `plan.md`) — no `AskUserQuestion` needed, no
-  unrelated dirty paths to report.
-- **Roadmap sync applied** (S-06 `planning` → `in-progress`, both at-a-glance row and item body) per the skill's
-  mandatory-lookup/best-effort-edit rule; `context/foundation/roadmap.md` was not pre-dirty, so the edit was
-  staged into the same phase commit as instructed.
+- **Exec mode: implemented Phase 2 directly in this context, not delegated to a subagent.** Rejected: delegating
+  per the skill's default `AskUserQuestion` prompt (forbidden by the agent contract). Why: the pure-function phase
+  is self-contained (one new file, two small exports, unit tests) and doing it directly let me verify all four
+  deliberate breaks and their meta-checks firsthand. Would change: Phase 3, which adds two Astro components and
+  touches the page — delegation becomes the better default there per the phase-1 handoff's own note.
+- **Fixture test keys taken from the actual `derivePatterns` output, not `expected.json`'s oracle slugs.** Rejected:
+  writing the F-02 unit case against the oracle's `key` strings on the assumption they'd match `MerchantPattern.key`
+  (they didn't for two of five patterns under test). Why: `patterns.test.ts`'s own header comment already warns the
+  oracle's keys are hand-authored slugs, never the real grouping key; I verified the real keys by running the
+  fixture through `derivePatterns` directly (a throwaway test, discarded) before writing the assertions. Would
+  change: nothing — this is a factual correction, not a judgment call.
+- **Deliberate-break edits applied directly to `src/lib/patterns/fixed.ts` and restored via `Edit`, not
+  `git checkout --`.** Why: the agent contract prohibits `git checkout --` on a file holding uncommitted phase work
+  (which `fixed.ts` was, being new/untracked at break time); restoring the exact prior string by hand is byte-exact
+  here since I wrote the original. Would change: nothing binds this differently for a later phase's breaks.
+- **SHA-append done as a separate follow-up docs commit** (`f77de29`), matching phase 1's precedent and the run's
+  stated allowance. Rejected: leaving 2.1–2.8 without a sha. Why: consistent with the established pattern on this
+  branch; the phase commit itself cannot know its own sha in advance. Would change: nothing binds this either way
+  for Phase 3, which could fold the sha line into its own phase-start edit instead if preferred.
+- **No `change.md` / roadmap edit this step.** Why: both already reflect `implementing` / `in-progress` from Phase
+  1; no phase-boundary transition (e.g. to `plan_reviewed`, or a status change) applies mid-plan. Would change: a
+  contract rule requiring a per-phase `updated` bump on `change.md` (none found).
+- **Dirty-path check before staging: none found.** `git status --porcelain` after all edits and after each restore
+  showed only the 7 files this phase touched (plus, before the follow-up commit, only `plan.md`) — no
+  `AskUserQuestion` needed, no unrelated dirty paths to report; `tree-clean.sh` confirmed `CLEAN` before the
+  handoff was written.

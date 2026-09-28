@@ -205,7 +205,9 @@ const decisionAlert = params.get("merged")
       )}
       {pattern.excluded && (
         <div class="mb-[18px]">
-          <InlineAlert kind="info">
+          {/* Kit `.excluded-banner{justify-content:space-between}`: „Przywróć” sits at the right edge of the row (the
+              kit's three flex items also centre the text — a side effect not copied: the text stays by its icon). */}
+          <InlineAlert kind="info" bodyClass="flex flex-1 flex-wrap items-center justify-between gap-x-3 gap-y-1">
             <span>{copy.patternActions.excluded}</span>
             <RestoreForm patternKey={pattern.key} />
           </InlineAlert>

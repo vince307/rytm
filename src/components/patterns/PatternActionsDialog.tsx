@@ -40,9 +40,10 @@ interface Props {
   copy: PatternActionsCopy;
 }
 
-// Kit `.modal-actions .btn{justify-content:flex-start}`; `.modal-actions{display:grid}` already stretches its
-// grid-item children to the column's full width, so no explicit `w-full` is needed on the buttons themselves.
-const actionButton = "justify-start";
+// Kit `.modal-actions .btn{justify-content:flex-start}`; in the kit the buttons are the grid items of
+// `.modal-actions{display:grid}` and so stretch to the column's full width. Here each sits inside a `<div>` / `<form>`
+// wrapper (the grid item), so the button needs its own `w-full` (visual gate: content-width buttons at 1440 / 400).
+const actionButton = "w-full justify-start";
 // Kit `.modal-input`: radius 8px, padding 13, margin 4 0 16. DESIGN-GAP: G32 — `bg-paper` not the kit's `--white`
 // (ThresholdEditor precedent). The select has no kit reference (G33) — same box, no margin (labelled by a
 // preceding <label>, F11: new fields use kit 8 px locally).
@@ -50,10 +51,13 @@ const fieldBox =
   "border-line bg-paper focus-within:border-ink focus-within:ring-ink/8 w-full rounded-[8px] border focus-within:ring-[3px]";
 
 export default function PatternActionsDialog({ patternKey, type, name, excluded, mergeTargets, copy }: Props) {
-  const [pending, setPending] = useState(false);
+  // Which action is in flight: every submit is disabled while one posts, but only the one that was pressed shows
+  // the pending text (visual gate: a shared boolean relabelled all three submits „Zapisywanie…”).
+  const [pending, setPending] = useState<"merge" | "type" | "rename" | "exclude" | null>(null);
+  const busy = pending !== null;
   const [revealed, setRevealed] = useState<"merge" | "rename" | null>(null);
   usePageShowReset(() => {
-    setPending(false);
+    setPending(null);
   });
 
   const otherType: PatternType = type === "fixed" ? "frequent" : "fixed";
@@ -102,7 +106,7 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
                 action="/api/patterns/decision"
                 className="mt-2"
                 onSubmit={() => {
-                  setPending(true);
+                  setPending("merge");
                 }}
               >
                 <input type="hidden" name="key" value={patternKey} />
@@ -128,7 +132,8 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
                     variant="primary"
                     size="default"
                     showArrow={false}
-                    pending={pending}
+                    pending={pending === "merge"}
+                    disabled={busy}
                     pendingText={copy.saving}
                   >
                     {copy.mergeSubmit}
@@ -142,7 +147,7 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
             method="POST"
             action="/api/patterns/decision"
             onSubmit={() => {
-              setPending(true);
+              setPending("type");
             }}
           >
             <input type="hidden" name="key" value={patternKey} />
@@ -152,7 +157,8 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
               variant="ghost"
               size="default"
               showArrow={false}
-              pending={pending}
+              pending={pending === "type"}
+              disabled={busy}
               pendingText={copy.saving}
               className={actionButton}
             >
@@ -180,7 +186,7 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
                 action="/api/patterns/decision"
                 className="mt-2"
                 onSubmit={() => {
-                  setPending(true);
+                  setPending("rename");
                 }}
               >
                 <input type="hidden" name="key" value={patternKey} />
@@ -201,7 +207,8 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
                   variant="primary"
                   size="default"
                   showArrow={false}
-                  pending={pending}
+                  pending={pending === "rename"}
+                  disabled={busy}
                   pendingText={copy.saving}
                 >
                   {copy.renameSubmit}
@@ -215,7 +222,7 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
               method="POST"
               action="/api/patterns/decision"
               onSubmit={() => {
-                setPending(true);
+                setPending("exclude");
               }}
             >
               <input type="hidden" name="key" value={patternKey} />
@@ -224,7 +231,8 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
                 variant="ghost"
                 size="default"
                 showArrow={false}
-                pending={pending}
+                pending={pending === "exclude"}
+                disabled={busy}
                 pendingText={copy.saving}
                 className={actionButton}
               >

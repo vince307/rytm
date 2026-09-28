@@ -1,27 +1,31 @@
 # Handoff — `fixed-cost-changes` (slice S-06)
 
-Written by the `research` step (`/10x-research fixed-cost-changes`, autonomous run `2026-09-28-s05-s06-s07`).
-`research.md` settles the change/new rule, the fixture fix and the kit gaps; no product code exists yet. The one thing
-the next agent must not get wrong: **the fixture must be changed (option B: T11 `kinoteka` 55,99 → 59,99 zł on
-2026-08-17) or „Zmieniły kwotę” is empty on real data** — and „nowy” wins over „zmienił kwotę”, sections disjoint.
+Written by the `plan` step (`/10x-plan fixed-cost-changes`, autonomous run `2026-09-28-s05-s06-s07`). `plan.md`
+(4 phases, 38 Progress rows) and `plan-brief.md` are on disk; no product code exists yet. The one thing the next agent
+must not get wrong: **„changed” = the latest occurrence in the reference month whose amount differs from its immediate
+predecessor** (plan decision 3, a deliberate refinement of research's „last vs previous” for double charges), and
+**Phase 1 (fixture) must regenerate through `npm run fixture:ing`, never by hand**.
 
 ## 1. State
 
 | Item | Value |
 |---|---|
 | Branch | `feat/fixed-cost-changes`, cut from `main` at `3706508` |
-| Commits | 2 on this branch after this step: `docs(fixed-cost-changes): change identity (autonomous run)`, `docs(fixed-cost-changes): research` |
+| Commits | 3 on this branch after this step: `docs(fixed-cost-changes): change identity (autonomous run)`, `docs(fixed-cost-changes): research`, `docs(fixed-cost-changes): plan` |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `preparing` (set by `metadata-guard.mjs mark-researched`) |
-| `## Progress` rows remaining | n/a — no `plan.md` yet |
+| `change.md` status | `planned` (`metadata-guard.mjs mark-planned`) |
+| Roadmap | S-06 `proposed` → `planning` (at-a-glance row + `### S-06` body) |
+| `## Progress` rows remaining | 38 (`grep -c '^- \[ \]' plan.md`): 31 automated, 4 `[reviewer]`, 2 `[visual]`, 1 `[human]` |
 | Working tree | clean after the commit (`.claude/skills/10x-autonomous-run/scripts/tree-clean.sh`) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 |---|---|
-| `context/changes/fixed-cost-changes/research.md` | Research: PRD text + silences table with recommendations, rule for changed/new/unchanged/lapsed/no-comparison-month, fixture option table (A vs B, ripple), kit binding, gap list (next id G34) |
-| `context/changes/fixed-cost-changes/change.md` | Frontmatter only: status `new` → `preparing`, `updated` 2026-09-28 |
+| `context/changes/fixed-cost-changes/plan.md` | Full plan: current state, rule (Critical Implementation Details), 4 phases with Intent/Contract, success criteria with baseline + delta and deliberate breaks, 20 autonomous decisions, `## Progress` |
+| `context/changes/fixed-cost-changes/plan-brief.md` | Two-page brief: key decisions table, phases at a glance |
+| `context/changes/fixed-cost-changes/change.md` | Frontmatter status `preparing` → `planned` |
+| `context/foundation/roadmap.md` | S-06 status `planning` |
 | `context/changes/fixed-cost-changes/handoff.md` | This file |
 
 ## 3. Verification
@@ -29,49 +33,50 @@ the next agent must not get wrong: **the fixture must be changed (option B: T11 
 | Command | Result |
 |---|---|
 | `git branch --show-current` | `feat/fixed-cost-changes` (observed) |
-| `python3` over `test/fixtures/ing/expected.json` (imported rows, fixed patterns, R=2026-08, P=2026-07) | 7 fixed patterns; changed in R: none; new in R: `silownia-ruch` (T16); lapsed: `kurs-przyklad.pl`, `phu-przyklad` (observed) |
-| D5 arithmetic for T11 options | A: median 4999, gap 600 ≤ 1000 → fixed, sum −3000; B: median 5299, gap 700 ≤ 1000 → fixed, sum +400 (computed) |
-| `grep -c 6497147 test/unit/ing-parser.test.ts` | 2 (observed) |
-| `grep` `scripts/smoke.mjs` for fixture use | none — inline payloads only (observed) |
-| lint / astro check / tests / build / pgTAP / smoke | **not run** — docs-only step. Baseline on `main` `3706508` per agent contract (inherited, unverified): vitest 190, pgTAP 102, smoke 111 |
+| `npm test` | 190 passed, 11 files (observed; = contract baseline) |
+| `npm run fixture:check` | OK (observed) |
+| Success Criteria ↔ Progress mapping (python over `plan.md`) | 1:1 per phase — P1 7+1, P2 8+1, P3 8+1, P4 8+4 (observed) |
+| `metadata-guard.mjs inspect` / `mark-planned` | ok, `changed: true` (observed) |
+| lint / astro check / build / pgTAP / smoke | **not run** — docs-only step; contract baseline (inherited, unverified): lint 0, astro check 0 errors (120 files), build OK, pgTAP 102, smoke 111 |
+| Smoke-state claim (plan Key Discoveries) | derived by reading `scripts/smoke.mjs` `steps` / payloads, not executed: after „unmerged pattern has its own detail again” R = 2026-06 → Kawiarnia Rytm +1,50 zł, Sklep smoke unchanged, Piekarnia smoke new |
 
 ## 4. Next command
 
-`/10x-plan fixed-cost-changes`
+`/10x-plan-review fixed-cost-changes`
 
 ## 5. Open
 
-- **Fixture change (plan phase 1 candidate):** `scripts/fixture-ing.mjs` `TRAP_SERIES` T11 entry →
-  `4999×6, 5599×5, 5999×1`; update `TRAPS.T11` label + comment; `npm run fixture:ing`; commit regenerated
-  `test/fixtures/ing/*`; `test/unit/ing-parser.test.ts` sum `6497147` → `6497547` (2 assertions);
-  `context/foundation/import-formats.md` fixture note „jedną podwyżką ~12%”. `test/unit/patterns.test.ts` KINOTEKA
-  5299 unchanged under B.
-- **Pure function:** `(patterns, rows)` → sections, in `src/lib/patterns/view.ts` (next to `listOverview`) or a
-  sibling; exported for S-07 `/home` stat card; unit tests on crafted rows for decrease, in-tolerance change, double
-  charge in R, absent-in-P-present-earlier (new wins), no transactions in P (message), excluded, pinned type.
-- **Carried product risks (record as follow-ups in the plan):** D5 flip hides an out-of-tolerance rise from `/fixed`
-  (`d5Type`, FR-012 „niezależnie od tolerancji” contradiction; mitigation S-05 pin); every one-off merchant is
-  `fixed` by D5 and would list as „nowy” on real data.
-- **DESIGN-GAPs to register from G34** in `context/foundation/design-kit.md`: no-comparison-month message, empty
-  section, data-but-no-fixed-pattern, decrease display, K11 row copy (`copyExtra.fixed.*`, new „pozycja” plural
-  tuple, signed-delta formatter in `src/lib/format.ts`), lapsed patterns hidden, read error (`InlineAlert` + K18).
-- **Badge tones** `new`/`changed` (`src/components/app/Badge.tsx` header names S-06) — no Tailwind token for kit
-  `#EFE4D1`; map to allowed names. G28 `/patterns` badges still deferred.
-- **Smoke for `/fixed`** needs its own two-month inline payload in `scripts/smoke.mjs`.
+- **Target deltas:** vitest 190 → 190 + ~20 cases, 11 → 12 files (Phase 2); smoke 111 → 117 (Phase 3) → 121 (Phase
+  4); pgTAP 102 unchanged; astro check +4 files expected (record, not asserted); `ing-parser.test.ts` sum
+  6497147 → 6497547.
+- **Manual-only Progress rows (human checklist):** 4.10 `[human]` — product owner confirms the D5 flip (against
+  FR-012 „niezależnie od tolerancji”): an out-of-tolerance rise turns the pattern `frequent` and it leaves `/fixed`;
+  remedy = S-05 pin. `[visual]` 4.11 (10 named states × desktop + 400 px) and 4.12 (fixture US-04 walk-through) — the
+  Visual step. `[reviewer]` 1.8, 2.9, 3.9, 4.9 — `/10x-impl-review`.
+- **DESIGN-GAPs to add (with the code):** K23 (verbatim `fixedCosts()` row copy → `copyExtra.fixed`), G34 (empty
+  section line, no-comparison message, decrease sign / colour, lapsed hidden, `new` badge token mapping, rows not links,
+  no month label); G5 status amended; K9 note.
+- **Follow-ups to write in Phase 4** (`context/changes/fixed-cost-changes/follow-ups/review-fixes.md`): D5 flip,
+  one-off merchants as „nowy”, G28 `/patterns` badges, S-07 `/home` „N pozycje podrożały” from
+  `fixedOverview().changed`.
+- **Plan-review attention:** decision 3 (double-charge refinement), decision 17 (smoke reuses the S-05 steps' state —
+  step positions named by step title in Phase 3 §5 / Phase 4 §6), `fixed-read-error` visual state may be unreachable
+  without a DB mutation (plan says: then `db reset` in the same step).
 
 ## 6. Autonomous decisions
 
-- **Scope derived from `change.md`** instead of asking (rule 1). Would change: a maintainer question list.
-- **Fixture option B over A.** Chosen: second step 5599 → 5999 in 2026-08. Rejected A (move the rise): changes the
-  asserted median 5299 → 4999 and the displayed „Kwota” in archived screenshots; rejected crafted-rows-only: roadmap
-  risk says unverifiable. Why: one test edit, even-count median case kept, gives an in-tolerance change in R. Would
-  change: the maintainer wanting the fixture's R change to mirror the PRD's ~12% example (then A).
-- **Double charge → last vs immediately previous occurrence (may be in R).** Rejected: last-in-R vs last-before-R.
-  Why: literal FR-012 „względem ostatniego wystąpienia”. Would change: kit author showing a double-charge state.
-- **New wins over changed; lapsed shown nowhere.** Why: D6 is the resolved rule for „nowy”; kit shows each pattern
-  once; „Bez zmian” implies charged this month. Would change: kit adding a lapsed section or a combined row.
-- **No-comparison-month = no user transaction in P** (not „only one month of data”). Why: a gap month would
-  otherwise make everything „nowy”, which the AC forbids. Would change: PRD stating the literal one-month rule only.
-- **Accept D5 flip and one-off-as-fixed for S-06, as follow-ups.** Rejected: typing on pre-R history on `/fixed`
-  only. Why: `/fixed` and `/patterns` must agree on type; D5 change ripples into S-03–S-05. Would change: maintainer
-  product feedback.
+- **No AskUserQuestion; complexity MEDIUM, 0 questions.** Why: research + change.md answered every product question
+  with a recommendation; contract rule 1. Would change: a maintainer message.
+- **„Changed” = latest differing occurrence in R vs its predecessor.** Rejected: research's last-vs-previous (hides a
+  rise on the first of two R charges). Would change: kit author defining a double-charge row.
+- **D5 flip accepted against the PRD literal → `[human]` 4.10.** Rejected: pre-R typing on `/fixed` only (views would
+  disagree on type). Would change: product owner answering „must show”.
+- **Smoke reuses the existing May/June smoke state** instead of a new payload (research). Why: it already holds
+  change / new / unchanged / excluded / one-month. Would change: S-05 steps reordered.
+- **Four phases** (fixture alone; pure rule; view with 2 components + 6 smoke; new section + sweep, 0 components + 4
+  smoke). Would change: a phase not independently green.
+- **Empty sections always render with a muted line; decrease `−` in `green`; only the `new` Badge tone.** Would
+  change: the kit delivering G34 states.
+- **Roadmap synced to `planning` and committed with the plan** (S-05 precedent `617c2b9`; the skill's leave-uncommitted
+  rule would break the clean-tree gate). Would change: the orchestrator owning roadmap edits.
+- Full list with reversal conditions: `plan.md` `## Autonomous decisions` (1–20).

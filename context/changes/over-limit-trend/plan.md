@@ -746,15 +746,15 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` 0; `npx astro check` 0 errors (count recorded)
-- [ ] 3.2 `npm test` — Phase 2 count + the new cases, 14 files, 0 failures (total recorded)
-- [ ] 3.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 3.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0)
-- [ ] 3.5 `BASE_URL=http://localhost:4398 npm run smoke` — 127 + 3 = 130 PASS
-- [ ] 3.6 Deliberate break (delta sign reversed) → „home compares with the previous month” and unit case 3 FAIL; restored → PASS; meta-check recorded
-- [ ] 3.7 Deliberate break (`deltaMinor !== 0` counted as a rise) → unit case 4 FAILs, smoke step 3 green; restored → green; meta-check recorded
-- [ ] 3.8 Deliberate break (foot always rendered) → „home has no comparison with one month” FAILs; restored → PASS; meta-check recorded
-- [ ] 3.9 No raw colours in `StatCard.astro` / `home.astro`; `DESIGN-GAP: K25` on every new key; rows K25, G36 in `design-kit.md`
+- [x] 3.1 `npm run lint` 0; `npx astro check` 0 errors (count recorded) — 30cc44a
+- [x] 3.2 `npm test` — Phase 2 count + the new cases, 14 files, 0 failures (total recorded) — 30cc44a
+- [x] 3.3 `npm run fixture:check` OK; `npm run build` passes — 30cc44a
+- [x] 3.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0) — 30cc44a
+- [x] 3.5 `BASE_URL=http://localhost:4398 npm run smoke` — 127 + 3 = 130 PASS — 30cc44a
+- [x] 3.6 Deliberate break (delta sign reversed) → „home compares with the previous month” and unit case 3 FAIL; restored → PASS; meta-check recorded — 30cc44a
+- [x] 3.7 Deliberate break (`deltaMinor !== 0` counted as a rise) → unit case 4 FAILs, smoke step 3 green; restored → green; meta-check recorded — 30cc44a
+- [x] 3.8 Deliberate break (foot always rendered) → „home has no comparison with one month” FAILs; restored → PASS; meta-check recorded — 30cc44a
+- [x] 3.9 No raw colours in `StatCard.astro` / `home.astro`; `DESIGN-GAP: K25` on every new key; rows K25, G36 in `design-kit.md` — 30cc44a
 
 #### Manual
 

@@ -6,7 +6,9 @@
 // neither a delta nor a badge). A non-compact row's default slot holds the delta (`FixedChangedRow`) or the
 // `nowy` badge (`FixedNewRow`). The mark `<span>` is repeated in both branches (and in `ExcludedPatterns`) on
 // purpose: the shared part is the `merchantMark` class string; a one-line wrapper component would add a file for
-// a single element (S-06 impl-review, seam sweep).
+// a single element (S-06 impl-review, seam sweep). The name column is `min-w-0` and the amount column
+// `shrink-0 whitespace-nowrap`: a long merchant name wraps, an amount / delta never splits before „zł” (S-06 visual
+// gate, `fixed-long-name` at 400 px — the kit's short sample names never hit this).
 import { merchantMark } from "@/components/patterns/merchant-mark";
 
 interface Props {
@@ -19,18 +21,18 @@ const { name, meta, amount, compact = false } = Astro.props;
 ---
 
 {compact ? (
-  <div class="flex min-h-[55px] items-center justify-between border-b border-line last:border-b-0">
-    <div class="flex items-center gap-[11px]">
+  <div class="flex min-h-[55px] items-center justify-between gap-5 border-b border-line last:border-b-0 max-[559px]:gap-3">
+    <div class="flex min-w-0 items-center gap-[11px]">
       <span class:list={merchantMark} aria-hidden="true">
         {Array.from(name)[0]}
       </span>
       <strong class="text-[13px]">{name}</strong>
     </div>
-    <span>{amount}</span>
+    <span class="shrink-0 whitespace-nowrap">{amount}</span>
   </div>
 ) : (
   <div class="flex min-h-[70px] items-center justify-between gap-5 border-b border-line last:border-b-0 max-[559px]:gap-3">
-    <div class="flex items-center gap-[11px]">
+    <div class="flex min-w-0 items-center gap-[11px]">
       <span class:list={merchantMark} aria-hidden="true">
         {Array.from(name)[0]}
       </span>
@@ -39,7 +41,7 @@ const { name, meta, amount, compact = false } = Astro.props;
         {meta && <small class="mt-1 block text-[11px] text-muted">{meta}</small>}
       </div>
     </div>
-    <div class="flex items-center gap-[14px] max-[559px]:flex-col max-[559px]:items-end max-[559px]:gap-1">
+    <div class="flex shrink-0 items-center gap-[14px] whitespace-nowrap max-[559px]:flex-col max-[559px]:items-end max-[559px]:gap-1">
       <span>{amount}</span>
       <slot />
     </div>

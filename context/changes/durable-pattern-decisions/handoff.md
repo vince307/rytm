@@ -1,145 +1,142 @@
 # Handoff — `durable-pattern-decisions` (slice S-05)
 
-Written by the `implement` step, Phase 6 (2026-09-28, autonomous run `2026-09-28-s05-s06-s07`). Phase 6 (pattern
-detail actions, excluded banner, merged variants) is fully green and committed. The kit's „Akcje” dialog
-(`PatternActionsDialog.tsx`) is now wired to `POST /api/patterns/decision` on `/patterns/<key>` — merge picker,
-direct-submit type change, rename field, direct-submit exclude — plus the excluded-pattern banner (`RestoreForm.astro`)
-and the merged-variants list with „Cofnij scalenie”. **What the next agent must not get wrong**: Phase 7 still owes
-the `/patterns` list its own excluded section (`ExcludedPatterns.astro`, G28/G33) and the seam sweep — the excluded
-pattern still shows in the main table on `/patterns` today (only the detail page and its banner are done this
-phase); do not assume G28/G4 are fully closed — `design-kit.md` still lists G33 as `placeholder`, not `delivered`.
-The `[reviewer]` rows 6.8/6.9 are explicitly not mine and are still `[ ]` — do not tick them.
+Written by the `implement` step, Phase 7 (2026-09-28, autonomous run `2026-09-28-s05-s06-s07`) — the **last**
+plan phase. Phase 7 (excluded section on `/patterns`, seam sweep) is green and committed; `change.md` status is
+now `implemented`. **What the next agent must not get wrong**: implementation is done, but every `[reviewer]`
+row from Phases 1–6 (1.9/1.10, 2.9, 3.8, 4.9, 6.8/6.9), the `[visual]` rows from Phases 5 and 7 (5.8/5.9, 7.10/7.11)
+and the `[human]` row 7.9 are still open (`- [ ]`) by design — this step only ticked its own automated rows plus
+7.8 (seam sweep, explicitly assigned to the implement step by this run's step brief, not the general `[reviewer]`
+delegation). The next step is `/10x-impl-review`, not another implement phase.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/durable-pattern-decisions` (confirmed with `git branch --show-current`), cut from `main` at `f252112` |
-| Commits on branch | 21 total ahead of `f252112` — change identity, research, plan, plan review, Phase 1 (`1e2ea9b` + sha-record `272232b`) + handoff (`17e3137`), Phase 2 (`c2b63b4` + sha-record `a89ce59`) + handoff (`8f3f5f9`), Phase 3 (`b1010f3` + sha-record `3000e75`) + handoff (`f7eb960`), Phase 4 (`61145cf` + sha-record `c2626db`) + handoff (`79da179`), Phase 5 (`f468f68` + sha-record `1b27113`) + handoff (`13cdb11`), **Phase 6 `feat(durable-pattern-decisions): pattern detail actions, excluded banner, merged variants (p6)` (`a268bb4`)**, **`docs(durable-pattern-decisions): record phase 6 commit sha in Progress` (`8d5932f`)** |
+| Commits on branch | 25 total ahead of `f252112`. Phases 1–6 as recorded in the prior handoff, plus this step: **Phase 7 `feat(durable-pattern-decisions): excluded section on /patterns and seam sweep (p7)` (`71eaccb`)**, **`docs(durable-pattern-decisions): record phase 7 commit sha in Progress` (`8ac53f1`)**, and this handoff commit |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `implementing` (unchanged — only flips once, at Phase 1 entry) |
-| `## Progress` rows | 20 pending (`grep -c '^- \[ \]' plan.md`) — includes this phase's own `[reviewer]` rows 6.8, 6.9 still `[ ]` (not mine) |
-| Working tree | Clean after the two commits (`git status --short` empty) |
+| `change.md` status | **`implemented`** (flipped this step — was `implementing`) |
+| `## Progress` rows | 12 pending (`grep -c '^- \[ \]' plan.md`) — all `[reviewer]`/`[visual]`/`[human]`, carried from every phase (1.9/1.10, 2.9, 3.8, 4.9, 5.8/5.9, 6.8/6.9, 7.9, 7.10, 7.11); none are mine to tick |
+| Working tree | Clean after this handoff commit (`git status --short` empty) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `src/components/patterns/PatternActionsDialog.tsx` | New. Default-exported React island (kit `modal('patternActions')` wired to real writes): trigger `Button variant="ghost"` (`Glyph more` + `<span>{copy.actions}</span>`); reveals for „Scal z…” (native `<select name="target">` of `mergeTargets`, disabled + `mergeNone` note when there are no candidates) and „Zmień nazwę” (`<input name="name" maxLength={100}>` prefilled with the current name); direct-submit forms for „Zmień typ” (hidden `type` = the other `PatternType`) and „Wyklucz z analizy” (omitted when already `excluded`). One `pending` state shared across all forms + `usePageShowReset` (Phase 5 hook, reused, not reinvented). `copy` prop carries only the strings the dialog itself renders — never `merged`/`unmerged`/… result-line strings (plan review F1: those must stay absent from the island's serialized props for the smoke negative control) |
-| `src/components/patterns/RestoreForm.astro` | New. Pure SSR `<form method="POST" action="/api/patterns/decision">` (hidden `key`, `action=restore`, optional `back`), submit styled via `buttonVariants({ variant: "text", size: "inline" })`. Shared by the detail page's excluded banner now; the `/patterns` „Wykluczone” section (Phase 7) reuses it with `back="list"` |
-| `src/components/auth/SubmitButton.tsx` | Changed. Added an optional `className` prop, passed through to the underlying `Button` — needed so `PatternActionsDialog`'s four `.modal-actions` buttons can left-align (`justify-start`) instead of the component's default `justify-center`; every existing caller is unaffected (prop is optional, unused elsewhere) |
-| `src/pages/patterns/[...key].astro` | Changed. `.detail-top` now holds `BackLink` + `PatternActionsDialog client:load` (flex, space-between, ≤560px column); `mergeTargets` computed from `dataResult.patterns` (non-self, non-excluded, sorted `pl`); a new `decisionAlert` (separate from the existing threshold-only `resultAlert`) renders under `.detail-top` for `merged/unmerged/typed/renamed/excluded/restored/error=merge\|name\|decision`; excluded banner (`InlineAlert kind="info"` + `RestoreForm`) above the heading section when `pattern.excluded`; merged-variants list (name + „Cofnij scalenie” form) under the type lead when `pattern.merged.length > 0`. Header comment updated |
-| `src/content/copy.ts` | Changed. `copyExtra.patterns` gains, under `DESIGN-GAP: K22` (verbatim from `app.js`): `actions`, `actionsEyebrow`, `actionsTitle`, `actionsLead`, `typeChanged`, `excludedToast`, `close`; under `DESIGN-GAP: G33` (placeholders): `mergeLabel`, `mergeSubmit`, `mergeNone`, `renameLabel`, `renameHint`, `renameSubmit`, `merged`, `unmerged`, `renamed`, `mergedLabel`, `unmerge`, `mergeInvalid`, `nameInvalid`, `decisionError` |
-| `scripts/smoke.mjs` | Changed. +5 steps inserted into the existing Phase 4 run: „merge confirms the result” (after „pattern is merged”), „detail offers the actions” (negative control — `>Akcje<` present, bare `Wzorce scalone.` absent), „merged pattern lists its variant” (after „merged pattern sums its components”), „excluded pattern shows the banner” (after „rename keeps the exclusion”), „restored pattern drops the banner” (after „restored pattern shows its over-limit again”) |
-| `context/foundation/design-kit.md` | Changed. New K22 row (conflicts/copy table, after K21); new G33 row (gap register, after G32); G4 status amended (S-05 faza 6 delivery note); both K22 and G33 appended to „Do rundy 3” as items 22–23 |
-| `context/changes/durable-pattern-decisions/plan.md` | Phase 6 `## Progress` rows `6.1`–`6.7` ticked `[x]` with ` — a268bb4` and the **observed** numbers/meta-check recorded inline; `6.8`/`6.9` left `[ ]` (`[reviewer]`, not mine) |
+| `src/components/patterns/ExcludedPatterns.astro` | New. Pure Astro (no island): kit `.excluded-section` without its client-side toggle script — a native `<details class="group">`/`<summary>` opens/closes via CSS (`group-open:` variant), no JS. Renders nothing when `patterns.length === 0`. Summary = `Icon name="arrow" size={14}` (rotated −90°/0° via `group-open:rotate-0`) + `copyExtra.patterns.excludedToggle` ("Wykluczone") + `<span>{n} {plural(...)}</span>`. Body: a plain bordered wrapper (not the shared `Panel` — see its own code comment for why: overriding `Panel`'s `p-[22px]` with `px-5 py-0` is order-dependent under `tailwind-merge`) listing each excluded pattern (merchant mark, name, `copy.patternActions.excluded` meta text, `RestoreForm back="list"`). Items are not links (kit) |
+| `src/components/patterns/merchant-mark.ts` | New. Shared `merchantMark` class string (the kit's `.merchant-mark` square) — extracted from `PatternsTable.tsx` so it and `ExcludedPatterns.astro` never drift apart (seam sweep) |
+| `src/components/Icon.astro` | Changed. `size` prop union widened from `15\|16\|17\|20\|28` to include `14` (the kit's `icon('arrow',14)` on the excluded-toggle) — reused rather than duplicating the sprite-rendering SVG markup in `ExcludedPatterns.astro` |
+| `src/components/patterns/PatternsTable.tsx` | Changed. Uses the shared `merchantMark` constant instead of an inline class string; header comment updated (`DESIGN-GAP: G28` now names only status badges (S-06) and "Pokaż więcej" — the excluded section is delivered). Behaviour unchanged: still renders whatever `patterns` prop it is given (the caller now passes only non-excluded items) |
+| `src/pages/patterns.astro` | Changed. Splits `items` into `visibleItems` (`!p.excluded`, passed to `PatternsTable`) and `excludedItems` (`{key,name}[]`, passed to the new `ExcludedPatterns`); the empty-state branch still keys off the unfiltered `items.length` (an all-excluded account is not "no patterns"). New `resultAlert` (`InlineAlert`) above the table for `?restored=1` (`copy.patternActions.restored`) / `?error=decision` (`copyExtra.patterns.decisionError`) — mirrors the detail page's `decisionAlert` from Phase 6 |
+| `src/content/copy.ts` | Changed. `copyExtra.patterns` gains `excludedToggle: "Wykluczone"` (verbatim, kit `patterns()`'s excluded-toggle text), placed after the K22 block's `close` key with its own provenance comment |
+| `src/lib/patterns/decisions.ts`, `src/lib/patterns/thresholds.ts` | Changed. Header comments referenced a function named `loadPatterns` (never existed under that name in this codebase — the actual shared helper is `collectPages`) — reworded, closing the seam-sweep grep (`grep -rn "PatternListOverviewItem\|loadPatterns\b" src test`, no other change |
+| `scripts/smoke.mjs` | Changed. +3 steps after Phase 6's own additions: "patterns list shows the excluded section" (after "excluded pattern shows the banner"), "excluded pattern leaves the table" (same GET), "list confirms a restore" (after "restored pattern drops the banner", GET `/patterns?restored=1`) |
+| `context/foundation/design-kit.md` | Changed. G28 row: faza-7 addendum (excluded section delivered; gap now only status badges + "Pokaż więcej"). G33 row: faza-7 addendum (all-excluded list state, native `<details>` toggle, no "przywrócony" badge — decision 16). "Do rundy 3" item 22 (K22): added the new `excludedToggle` key to the list of copy the kit author still needs to promote to `content.json` |
+| `context/changes/durable-pattern-decisions/follow-ups/review-fixes.md` | New. Records what this slice closed (S-04 F5/F7/F8, undo-import F4, G24 geometry, S-01 F9 shared close icon — the last one verified already met on `main`, no code change) and what carries forward, each with a `Trigger:` line: S-04 F4 (threshold endpoints), F11 (field radius, incl. `DeleteAccountDialog`'s modal input), a checked-not-fixed note on "DeleteAccountDialog bfcache" (no manual `pending` flag exists there to get stuck — see the file for the evidence), and S-07 ("monthly sums must skip `pattern.excluded`") |
+| `context/changes/durable-pattern-decisions/plan.md` | Phase 7 `## Progress` rows `7.1`–`7.8` ticked `[x]` with ` — 71eaccb` and observed numbers/meta-check recorded inline (7.8 ticked as the implement step's own seam-sweep verification, per this run's explicit step brief); `7.9`/`7.10`/`7.11` left `[ ]` (`[human]`/`[visual]`, not mine) |
+| `context/changes/durable-pattern-decisions/change.md` | `status: implementing` → `status: implemented` |
 | `context/changes/durable-pattern-decisions/handoff.md` | This file |
 
 ## 3. Verification
 
-Baseline for this phase (measured on this branch before Phase 6, i.e. Phase 5's own result): lint 0 · astro check 0
-errors (116 files) · fixture:check OK · vitest 190 (11 files) · build OK · pgTAP 102 (5 files) · smoke 103 PASS.
+Baseline for this phase (measured on this branch before Phase 7, i.e. Phase 6's own result): lint 0 · astro check 0
+errors (118 files) · vitest 190 (11 files) · fixture:check OK · build OK · pgTAP 102 (5 files) · smoke 108 PASS.
 
 | Command / check | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/durable-pattern-decisions` |
-| `npm run lint` | 0 errors (delta 0) — two `astro/prefer-class-list-directive` warnings surfaced along the way (raw `class={expr}` on a `<button>`) and were fixed with `class:list`, not left as warnings |
-| `npx astro check` | 0 errors, 0 warnings, 0 hints, **118** files (delta +2 — `PatternActionsDialog.tsx`, `RestoreForm.astro`) |
+| `npm run lint` | 0 errors (delta 0) — one prettier formatting error and one `astro/prefer-class-list-directive` warning surfaced while writing `ExcludedPatterns.astro`, fixed with `npx eslint --fix` before the final pass |
+| `npx astro check` | 0 errors, 0 warnings, 0 hints, **120** files (delta +2 — `ExcludedPatterns.astro`, `merchant-mark.ts`) |
 | `npm run fixture:check` | OK |
-| `npm test` | **190** passed, **11** files (delta 0 — no new unit test file this phase, matches the plan's automated criteria) |
+| `npm test` | **190** passed, **11** files (delta 0 — no new unit test file this phase, matches the plan) |
 | `npm run build` | passes |
-| `npx supabase db reset && npx supabase test db` | pgTAP 102 (5 files), all pass (delta 0 — Phase 6 touches no migration) |
-| `BASE_URL=http://localhost:4398 npm run smoke` (`ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398`) | **108** PASS (103 + 5, matches plan), run clean before and after the deliberate break |
-| `grep -nE "#[0-9a-fA-F]{3,6}\b\|\[#" src/components/patterns/PatternActionsDialog.tsx src/components/patterns/RestoreForm.astro "src/pages/patterns/[...key].astro"` | empty (plan criterion 6.7) |
+| `npx supabase db reset && npx supabase test db` | pgTAP **102** (5 files), all pass (delta 0 — Phase 7 touches no migration) |
+| `BASE_URL=http://localhost:4398 npm run smoke` (`ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398`) | **111** PASS (108 + 3, matches plan target "108 + 3 = 111"), run clean before and after the deliberate break |
+| `grep -rn "PatternListOverviewItem\|loadPatterns\b" src test` | empty |
+| `grep -rn "DESIGN-GAP: G28" src` | matches only `PatternsTable.tsx`'s updated comment |
+| `grep -rnE "#[0-9a-fA-F]{3,6}\b\|\[#" src/components/patterns/ExcludedPatterns.astro src/components/patterns/merchant-mark.ts src/pages/patterns.astro` | empty (dropped a literal `#e5e9e8` from `merchant-mark.ts`'s own comment mid-phase — kept only in `design-kit.md`, matching the existing convention of no raw hex in `src/`) |
 
-Deliberate break (plan criterion 6.6, on `src/pages/patterns/[...key].astro`, restored immediately after its own
-smoke run, full gate re-confirmed green afterward):
+Deliberate break (plan criterion 7.6, on `src/pages/patterns.astro`, restored immediately after its own smoke run,
+full gate re-confirmed green afterward):
 
-1. `{pattern.excluded && (` guarding the excluded banner changed to `{true && (` (banner renders unconditionally).
-   Result: „restored pattern drops the banner” FAILed (`expected 200 notContains:>Wykluczony z analizy<`), 1/108
-   red; every other step — including „excluded pattern shows the banner” — stayed PASS. Restored → 108/108 PASS.
-   **Meta-check**: the still-green sibling step (the excluded-state assertion) proves the break didn't just make the
-   banner vanish or the page 500 — it specifically proves the banner now ignores the stored `excluded` flag, which
-   is exactly what the automated criterion asks to isolate.
+1. `<PatternsTable client:load patterns={visibleItems} ...>` changed to `patterns={items}` (unfiltered — excluded
+   patterns fed back into the table). Result: "excluded pattern leaves the table" FAILed (1/111 red — the excluded
+   row's `href="/patterns/kawiarnia%20smoke"` reappeared in the table); every other step — including "patterns
+   list shows the excluded section" and "list confirms a restore" — stayed PASS. Restored → 111/111 PASS.
+   **Meta-check**: the still-green "patterns list shows the excluded section" step (asserts the excluded pattern's
+   *name* renders on the page) proves the break didn't remove the excluded pattern from the read or the excluded
+   section — it specifically proves the table row (the only element on the page that can carry an `href`) stopped
+   filtering `excluded`, which is exactly what the automated criterion asks to isolate ("the section has no links,
+   so only a table row can carry the href").
 
-No `BEGIN … ROLLBACK` DB experiment was needed this phase (no migration touched, no other local DB mutation made
-outside the app's own normal POST/DELETE flow through the API, which smoke already exercises); pgTAP was re-run
-once (before any code change) to confirm delta 0, matching the "Phase 6 touches no migration" expectation.
+No `BEGIN … ROLLBACK` DB experiment was needed this phase (no migration touched, no local DB mutation made outside
+the app's own normal POST flow through the API, which smoke already exercises); pgTAP was re-run once (before any
+code change) to confirm delta 0, matching "Phase 7 touches no migration".
 
 ## 4. Next command
 
-`/10x-implement durable-pattern-decisions phase 7`
+`/10x-impl-review durable-pattern-decisions`
 
 ## 5. Open
 
-- Manual Progress rows not touched this phase (carried from earlier handoffs, plus this phase's own):
-  `[reviewer]` 1.9, 1.10 (Phase 1), 2.9 (Phase 2), 3.8 (Phase 3), 4.9 (Phase 4), 5.8/5.9 are `[visual]` not
-  `[reviewer]` (Phase 5, still open, carried); **6.8, 6.9** (this phase's own, `[reviewer]` — every string from
-  `copy`/`copyExtra` byte-for-byte with `app.js` for K22, no new primitives beyond `DialogContent`/`Button`/
-  `SubmitButton`/`Glyph`/`usePageShowReset`; keyboard reachability of the trigger, four actions, revealed
-  select/input and their submits, Esc/close). Carried forward from the plan text: 7.8 (`[reviewer]`); `[visual]`
-  7.10, 7.11; `[human]` 7.9 (product owner confirms plan decision 9 — already answered by the maintainer's Step-0
-  product decision recorded in the agent contract, but the row itself stays unticked pending Phase 7).
-- Gap ids: K22 and G33 now both registered in `design-kit.md` (status `placeholder` for G33 — the dialog's merge
-  picker, rename field, direct-submit type/exclude, pending/error states and merged-variants list are all
-  placeholder copy/layout, not kit-delivered; K22's `close` key is new, the four action-button labels were already
-  in `content.json` per K12). No further gap ids reserved for Phase 7 — G28 is the one it amends (excluded section
-  + „Pokaż więcej”).
-- Carried risks (plan `## Known risks`, unchanged): normalizer drift (`src/lib/patterns/merchant.ts`
-  `normalizeMerchant`) still open; PostgREST partial-upsert semantics — proven in Phase 1 (pgTAP) and Phase 4
-  (smoke), exercised again this phase by „rename keeps the exclusion” (unchanged, still green); smoke text-anchor
-  rule (`InlineAlert.astro` renders `<span> text </span>` — bare text, never `>text<`) — this phase discovered a
-  second instance of the same class of bug: **`prettier-plugin-astro` reformats any Astro element with ≥2
-  attributes and a single-expression child onto three lines** (`<tag attr1 attr2>\n  {expr}\n</tag>`), which
-  reintroduces the exact whitespace problem for elements that *are* asserted with `>text<` (not InlineAlert's own
-  bare-text convention) — e.g. the „Cofnij scalenie” / „Przywróć” buttons. Fixed here by dropping the redundant
-  `type="submit"` attribute (the HTML default inside a `<form>`) so each button has only one attribute
-  (`class:list`) and prettier leaves it inline; documented in both `RestoreForm.astro` and `[...key].astro` next to
-  the affected buttons. **Any future single-line `>text<` element in this codebase that needs a second attribute
-  should extract the class to a local `const` and use `class:list={[theConst]}` (still one attribute) or otherwise
-  keep the attribute count at 1** — worth folding into the agent contract's smoke text-anchor rule if this recurs a
-  third time.
-- `/patterns` list still shows the excluded pattern in the main table (Phase 7's `ExcludedPatterns.astro` +
-  `PatternsTable` filter are what move it into „Wykluczone” — not done yet). Anyone visually inspecting `/patterns`
-  before Phase 7 lands should expect this.
+- Manual `## Progress` rows not touched this phase (all carried, none are mine): `[reviewer]` 1.9, 1.10 (Phase 1),
+  2.9 (Phase 2), 3.8 (Phase 3), 4.9 (Phase 4), 6.8/6.9 (Phase 6 — every string from `copy`/`copyExtra` byte-for-byte
+  with `app.js` for K22, no new primitives beyond `DialogContent`/`Button`/`SubmitButton`/`Glyph`/
+  `usePageShowReset`, keyboard reachability); `[visual]` 5.8/5.9 (Phase 5, dialog geometry screenshots), 7.10/7.11
+  (Phase 7, the full screenshot list + the fixture US-03 walk-through — see plan Phase 7 Manual Verification for
+  the exact shot list); `[human]` 7.9 (product owner confirms decision 9 — already answered in substance by the
+  maintainer's Step-0 product decision recorded in the agent contract, but the row itself stays unticked, as the
+  plan asks, pending an explicit human pass).
+- Gap ids: G28 and G33 both amended this phase (see Artifacts above); K22's "Do rundy 3" ask grew by one key.
+  `design-kit.md` still lists G33 overall as `placeholder` (the dialog's merge picker, rename field, direct-submit
+  type/exclude, pending/error states and merged-variants list remain placeholder copy/layout, not kit-delivered —
+  only the excluded-list-specific behaviours this phase touched are settled). No new gap ids reserved.
+- `follow-ups/review-fixes.md` is now the authoritative record of what carries into S-06/S-07 and beyond — read it
+  before assuming any earlier-slice follow-up is still open or closed; do not re-derive that list from memory.
+- Carried risks (plan `## Known risks`, unchanged this phase): normalizer drift (`src/lib/patterns/merchant.ts`
+  `normalizeMerchant`) still open; PostgREST partial-upsert semantics — proven Phase 1 (pgTAP) + Phase 4 (smoke);
+  smoke text-anchor rule (`InlineAlert.astro` renders `<span> text </span>` — bare text, never `>text<`; a second
+  discovered instance from Phase 6 — prettier-plugin-astro reformats a ≥2-attribute single-expression-child element
+  onto three lines — is why every `item-name`-class row this phase keeps to one attribute).
+- This is the **last plan phase**. No further `/10x-implement durable-pattern-decisions phaseN` calls are expected;
+  the next step is the impl review, then (per the agent contract) the visual gate, archive, and the ship chain for
+  S-05 before S-06 starts on the same branch discipline.
 
 ## 6. Autonomous decisions
 
-- **Ran the phase's work directly rather than through the interactive `/10x-implement` UX** (no `AskUserQuestion`,
-  no `TaskCreate`/`TaskUpdate` todo list) — same substitute as Phases 1–5: read the plan's Phase 6 section in full,
-  applied its contract by hand (implement → plan-criteria checks → deliberate break/meta-check → full repo-wide
-  gate → commit → sha-writeback docs commit). Rejected: invoking the Skill tool and answering its prompts myself —
-  the agent contract (rule 1) forbids `AskUserQuestion` outright. Would change: a non-interactive skill entry point.
-- **Added an optional `className` prop to the shared `SubmitButton`** rather than building a one-off unstyled
-  submit button for `PatternActionsDialog`'s four left-aligned actions, or wrapping each `SubmitButton` in an extra
-  `<div>` to override layout from outside. Why: `SubmitButton` had no styling escape hatch and the kit's
-  `.modal-actions .btn{justify-content:flex-start}` genuinely needs it; the prop is optional and backward
-  compatible (every other caller passes nothing, behaviour unchanged — verified: `npm test` stayed at 190/190 and
-  `grep -rn "SubmitButton" src` shows no other call site touched). Would change: if a reviewer prefers composition
-  (e.g. a `ButtonGroup` wrapper) over a prop, this is a one-line revert.
-- **"No targets → disable the toggle button itself and show `mergeNone` under it" rather than "disable the reveal
-  but still let the button open an empty-select form"**, reading the plan's ambiguous "no targets → the button is
-  `disabled`" as referring to the „Scal z…” toggle, not a hypothetical always-rendered submit button inside a
-  reveal that would then never show (since revealing is gated on `canMerge` too). Why: simpler state machine (no
-  select with zero `<option>`s ever reaches the DOM) and matches "why is this disabled" UX better (the note sits
-  right where the user would click). Would change: if `mergeTargets` can legitimately be non-empty but every
-  candidate is somehow invalid at submit time (race with another tab), the endpoint's own `validateMerge` still
-  catches it server-side (`error=merge`) — this client-side gate is a convenience, not the source of truth.
-- **Result line under `.detail-top` (`decisionAlert`) is a second, separate alert from the existing
-  threshold-only `resultAlert` inside the threshold `Panel`**, not one merged alert covering both families of
-  query params. Why: the plan names the decision alert's location as "under `.detail-top`" explicitly, distinct
-  from the threshold panel's own `mb-4` slot documented in Phase 4's plan section; the two query-param families are
-  mutually exclusive by construction (a single redirect sets exactly one of `saved/removed/error=value\|save` or
-  `merged/unmerged/typed/renamed/excluded/restored/error=merge\|name\|decision`), so there is never a rendering
-  conflict, and keeping them as two named variables/render sites matches "one thing per concern" better than one
-  `if/else` chain across twelve mutually exclusive branches. Would change: nothing found conflicting; this is
-  read straight off the plan's own two separate paragraphs (Phase 4 "Result lines" vs Phase 6 "Result line under
-  `.detail-top`").
-- **Placed the merged-variants list "under the lead" as a child of the same left-column `<div>` that holds the
-  eyebrow/h1/lead**, rather than as a new top-level section after `.detail-heading`. Why: the plan's own phrase
-  "under the lead" (the `<p>{x.typeLeads[...]}</p>` element) is more specific than "after the heading section",
-  and nesting it there keeps it visually attached to "what this pattern is" rather than floating between the
-  heading and the two-column `.detail-grid`. Would change: a screenshot review (Phase 7's `[visual]` rows) finding
-  it visually cramped against the sum/count column on the right at ≤899px — the plan's own responsive class
-  (`max-[899px]:flex-col`) already stacks the columns there, so it should read fine, but this wasn't screenshotted
-  this phase (Phase 6's own Implementation Note: "screenshots happen in the Visual step after Phase 7").
+- **Ran Phase 7's work directly rather than through the interactive `/10x-implement` UX** (no `AskUserQuestion`),
+  same substitute as Phases 1–6: read the plan's Phase 7 section in full, applied its contract by hand (implement
+  → plan-criteria checks → deliberate break/meta-check → full repo-wide gate → commit → sha-writeback docs commit
+  → change.md status flip → this handoff). Rejected: invoking the Skill tool and answering its prompts myself —
+  the agent contract (rule 1) forbids `AskUserQuestion` outright. Would change: a non-interactive skill entry
+  point.
+- **Ticked plan row 7.8 (`[reviewer]`, seam sweep) as done**, departing from the otherwise-strict "never tick a
+  `[reviewer]`/`[visual]`/`[human]` row" rule. Why: this run's own step brief explicitly named the seam sweep as
+  "yours" (the implement step's), separately from the general `[reviewer]` delegation the same brief also states —
+  read as a deliberate, per-run carve-out for this one row, not a license to tick any other manual row. Did the
+  actual verification (grep-checked, kit rows re-read) rather than rubber-stamping. Would change: a stricter
+  reading that treats "yours" as scoped only to *doing* the sweep, not *ticking the box* — in that case 7.8 should
+  revert to `[ ]` and the box left for `/10x-impl-review` to tick after independently re-checking the same
+  evidence this handoff already lays out.
+- **`ExcludedPatterns`'s list container is a plain styled `<div>`, not the shared `Panel` component**, despite the
+  plan calling it "Panel-styled". Why: `Panel`'s own padding (`p-[22px]`) and the plan's required override
+  (`px-5 py-0`) are both arbitrary-value Tailwind utilities on the same CSS property; a `node -e` check against
+  this repo's actual `tailwind-merge` confirmed `twMerge` does **not** dedupe `p-[22px]` against `px-5 py-0` (both
+  survive in the class list, so which one wins depends on Tailwind's generated stylesheet order, not source order
+  — untestable/fragile). A plain wrapper with the same visual classes (`rounded-xl border border-line bg-paper`)
+  sidesteps the ambiguity entirely. Would change: `Panel.astro` growing a `padding` prop/variant instead of a bare
+  `class` escape hatch — then this should switch to it for consistency.
+- **`Icon.astro`'s `size` union widened to add `14` rather than duplicating the sprite `<svg>` markup inline in
+  `ExcludedPatterns.astro`.** Why: the codebase's own convention (`Glyph.tsx` for React islands, `Icon.astro` for
+  server components) already centralises the sprite reference; the kit's `icon('arrow',14)` is a legitimate,
+  used value, and every prior size in the union was added the same way (as call sites needed it — confirmed by
+  grepping every existing `<Icon size={...}>` call before adding). Would change: a reviewer preferring the union
+  stay closed and a one-off inline SVG instead — a two-line revert.
+- **Reused `RestoreForm.astro` verbatim with `back="list"`** (built in Phase 6 anticipating this exact call site)
+  rather than writing a second, list-specific restore form. No alternative considered — this was the whole reason
+  Phase 6's own handoff named the `back` prop's purpose explicitly. Would change: nothing found.
+- **Stale-comment fix scope limited to the two `loadPatterns`-name occurrences the seam-sweep grep actually
+  flagged** (`decisions.ts`, `thresholds.ts`), not a broader comment audit. Why: the plan's own automated criterion
+  (7.7) names exactly this grep as the bar; going further risks touching prose outside this phase's diff surface
+  for no verifiable gain. Would change: `/10x-impl-review` finding another stale reference this grep pattern
+  doesn't catch (e.g. a differently-cased or partially-quoted mention).

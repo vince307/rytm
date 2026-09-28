@@ -40,3 +40,9 @@ pnpm-debug.log*
 # macOS-specific files
 # jetbrains setting folder
 .idea/
+
+# dzienniki autonomicznych runów (/10x-autonomous-run) — lokalne, nie commitujemy
+context/runs/
+
+# konfiguracja i skille Claude Code — lokalne, nie trafiają do repo
+.claude/

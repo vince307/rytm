@@ -564,7 +564,7 @@ step 1 („home before import has no trend”) gains notContains `>Dodaj najnows
 
 #### Manual Verification:
 
-- [reviewer] Seam sweep done: duplicated helpers / classes extracted or justified, stale comments and kit rows (G6, G35, G36, K5, K24, K25) match the code, the follow-ups file lists every item with a `Trigger:`
+- [reviewer] Seam sweep done: duplicated helpers / classes extracted or justified, stale comments and kit rows (G6, G35, G36, K5, K24, K25) match the code, the follow-ups file lists every item with a `Trigger:` — impl review, after fix 51456f7 (F1–F4)
 - [human] Product owner confirms decision 2 as revised by plan review F1 (FR-013 literal „dla wszystkich miesięcy obecnych w danych”): the axis holds only months with ≥ 1 imported debit, so a calendar month with no import between two imports is absent (not `0,00 zł`) and the delta foot is hidden after such a gap; reversal = continuous zero-filled calendar axis (one line in `trend.ts`, case 9 flips, `homeStats.previous` follows)
 - [human] Product owner confirms decision 4 (against the PRD Non-Goal „Wykresy inne niż lista i suma”): the kit's bar chart is kept because every bar carries its numeric sum; reversal = render the months as a list in the same panel
 - [human] Product owner confirms decision 6 (PRD silent — a new figure): „Koszty stałe” value = Σ of the amounts `/fixed` lists for the reference month (incl. an own transfer typed `fixed`, e.g. `jan przykładowy` 1500 zł on the fixture, and every one-off merchant D5 types `fixed` — S-06 follow-up „one-off merchants list as nowy”, fired by this value, plan review F3); reversal = foot-only card, or a classifier fix in `derivePatterns`
@@ -722,7 +722,7 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Manual
 
-- [ ] 1.8 [reviewer] `trend.ts` pure (imports only `over-limit.ts`, `view.ts`, `@/types`); `applicableThreshold` the single guard; `patternTxs` not duplicated; header states axis rule, exclusion rule, invariant
+- [x] 1.8 [reviewer] `trend.ts` pure (imports only `over-limit.ts`, `view.ts`, `@/types`); `applicableThreshold` the single guard; `patternTxs` not duplicated; header states axis rule, exclusion rule, invariant — impl review (break of `applicableThreshold` reddens both `listOverview` and trend case 8)
 
 ### Phase 2: `/home` — title block and the trend panel
 
@@ -740,7 +740,7 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Manual
 
-- [ ] 2.10 [reviewer] Strings from `copy` / `copyExtra`; K24 byte-for-byte with `applyDashboardState` for May; only the G35 hint a placeholder; token colour names only; `Panel`, `PageTitle`, `buttonVariants` reused; `try` covers the pure assembly
+- [x] 2.10 [reviewer] Strings from `copy` / `copyExtra`; K24 byte-for-byte with `applyDashboardState` for May; only the G35 hint a placeholder; token colour names only; `Panel`, `PageTitle`, `buttonVariants` reused; `try` covers the pure assembly — impl review
 
 ### Phase 3: stat cards — „Ponad progiem w tym miesiącu” and „Koszty stałe”
 
@@ -758,7 +758,7 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Manual
 
-- [ ] 3.10 [reviewer] `home.ts` imports only `trend.ts`, `fixed.ts` types, `@/types`; `fixedOverview` reused verbatim; K25 templates reproduce the kit samples byte for byte; allowed colour names only
+- [x] 3.10 [reviewer] `home.ts` imports only `trend.ts`, `fixed.ts` types, `@/types`; `fixedOverview` reused verbatim; K25 templates reproduce the kit samples byte for byte; allowed colour names only — impl review (also imports `previousMonth` from `over-limit.ts`: reuse of the shared month step, not a second one — F7)
 
 ### Phase 4: import panel, follow-ups and seam sweep
 
@@ -774,7 +774,7 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Manual
 
-- [ ] 4.8 [reviewer] Seam sweep: duplicated helpers / classes extracted or justified; stale comments and kit rows (G6, G35, G36, K5, K24, K25) match the code; follow-ups file lists every item with a `Trigger:`
+- [x] 4.8 [reviewer] Seam sweep: duplicated helpers / classes extracted or justified; stale comments and kit rows (G6, G35, G36, K5, K24, K25) match the code; follow-ups file lists every item with a `Trigger:`
 - [ ] 4.9 [human] Product owner confirms decision 2 as revised by plan review F1 (FR-013 literal): axis = months with data only, a month with no import between two imports is absent, delta foot hidden after a gap
 - [ ] 4.10 [human] Product owner confirms decision 4 (against the PRD Non-Goal „Wykresy inne niż lista i suma”): bar chart kept, every bar labelled with its sum
 - [ ] 4.11 [human] Product owner confirms decision 6 (PRD silent): „Koszty stałe” value = Σ of `/fixed` amounts in the reference month, one-off D5-`fixed` merchants included (plan review F3)

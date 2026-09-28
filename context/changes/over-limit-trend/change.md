@@ -1,7 +1,7 @@
 ---
 change_id: over-limit-trend
 title: Trend „ponad progiem” per miesiąc według dzisiejszych progów (S-07)
-status: implemented
+status: impl_reviewed
 created: 2026-09-28
 updated: 2026-09-28
 archived_at: null

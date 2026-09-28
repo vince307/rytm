@@ -19,7 +19,7 @@ carries forward with a `Trigger:` line for the next slice/change to pick up.
   resets `saving`/`pending` on a persisted `pageshow`; also reused by `PatternActionsDialog.tsx` (Phase 6).
 - **undo-import F4 — `DeleteImportDialog`'s `pending` never reset on bfcache restore**
   (`context/archive/2026-09-25-undo-import/follow-ups/review-fixes.md`). Closed Phase 5: same `usePageShowReset`
-  hook, wired into `DeleteImportDialog` and `DeleteAccountDialog`.
+  hook, wired into `DeleteImportDialog` and `ThresholdEditor` (and the new `PatternActionsDialog`); `DeleteAccountDialog` is not wired — see Open below.
 - **undo-import — shared dialog geometry vs kit `.modal`** (G24 in `context/foundation/design-kit.md`). Closed
   Phase 5: `DialogContent` (`src/components/ui/dialog.tsx`) now matches the kit's 480 px / 31 px / 13 px geometry
   and 20 px side margin at 400 px (`design-kit.md` G24 addendum, faza 5).
@@ -55,3 +55,33 @@ carries forward with a `Trigger:` line for the next slice/change to pick up.
   sum — the PRD's FR-017 note (decision 9, `[human]` row 7.9) is explicit that an excluded pattern is not just
   hidden from "ponad próg" but from "every monthly sum". Trigger: S-07 implementation, first phase that builds a
   monthly total.
+
+## From `/10x-impl-review` (2026-09-28) — see `reviews/impl-review.md`
+
+- **F4 — seam justified, not extracted: `STATUS_PARAMS` in `src/lib/patterns/decision-form.ts` vs
+  `src/lib/patterns/threshold-form.ts`.** Same shape (`Record<Status, Record<string,string>>`) but disjoint status
+  sets and both feed `patternHref`; a shared generic would save ~5 lines and couple two independent endpoints. The
+  `fieldBox` 8 px wrapper in `PatternActionsDialog.tsx` repeats `ThresholdEditor.tsx`'s field wrapper — belongs to
+  the F11 sweep above (extract to `src/components/app/field-styles.ts` then). Trigger: a third status map or a third
+  8 px kit field.
+- **F5 — rename field prefilled with the derived name** (`PatternActionsDialog.tsx` `defaultValue={name}`):
+  submitting it untouched stores the current top variant as a permanent `display_name`, freezing it against later
+  variant changes. Fix: pass the stored `displayName` (null → empty field, placeholder = derived name). Trigger:
+  the next change to `PatternActionsDialog` or a G33 kit round drawing the rename field.
+- **F6 — an excluded pattern can be merged as the source** (`validateMerge` checks only the target): by the plan's
+  "only the root's decision applies" rule its exclusion goes inert and its rows re-enter the analysis inside the
+  target until „Cofnij scalenie”. Consistent with plan decision 4, but surprising. Fix if wanted: reject
+  `source.excluded` in `validateMerge` (+ unit case) and hide „Scal z…” while excluded. Trigger: S-07 (monthly
+  totals make the re-entry visible) or product feedback.
+- **F7 — `unmerge` is not scoped to the root** (`src/pages/api/patterns/decision.ts` `case "unmerge"`): any own key
+  can be un-merged from any detail URL and 0 affected rows still answers `unmerged`. RLS-safe and idempotent;
+  scoping with `.eq("merged_into", key)` would break chains (A → B → R is listed on R, stored on A → B). Trigger:
+  a UI that lists chain members, or an unmerge that reports success wrongly in the visual gate.
+- **F8 — shared `DialogContent` has no `max-h`/`overflow-y-auto`** (`src/components/ui/dialog.tsx`); with the merge
+  or rename form revealed on a short mobile viewport the dialog can clip. The kit `.modal` has no scroll rule
+  either (G24 geometry is exact). Trigger: the visual gate's mobile `rename-field`/`merge-picker` shots clipping.
+- **F9 — pgTAP coverage**: `pattern_decisions.test.sql` asserts only TRUNCATE for `authenticated` and only INSERT
+  for `anon`; SELECT/UPDATE/DELETE for anon and TRIGGER/REFERENCES/MAINTAIN were verified live by the review
+  (all denied) but are unasserted. Assertion 21 (moving a row to another user) is guarded twice — the update
+  `with check` **and** the select policy applied to the new row — so it stays green if either is removed (proven in
+  the review by a `BEGIN … ROLLBACK` break). Trigger: the next migration touching `pattern_decisions`.

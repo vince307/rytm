@@ -17,7 +17,7 @@ const x = copyExtra.patterns;
 
 // Patterns are derived on read from the caller's own debits (RLS, FR-006/FR-007) — prototype patterns() (app.js).
 // A failed read — including an unconfigured Supabase client — never shows the empty state or a partial list.
-// `loadPatternData` reads transactions, thresholds and decisions in one call (S-05 F7); `listOverview` returns
+// `loadPatternData` reads transactions, thresholds and decisions in one call (S-04 impl-review F7); `listOverview` returns
 // island-ready items directly — no second `Map` re-merge here.
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 const dataResult = supabase ? await loadPatternData(supabase) : { error: new Error("Supabase is not configured") };
@@ -32,7 +32,7 @@ if ("error" in result) {
 }
 const items: PatternListItem[] = "patterns" in result ? result.patterns : [];
 // Excluded patterns leave the table for the "Wykluczone" section below it (S-05 Phase 7, G28); the empty state
-// (above) still keys off `items.length` — a list of only-excluded patterns is not "no patterns at all".
+// (below) still keys off `items.length` — a list of only-excluded patterns is not "no patterns at all".
 const visibleItems = items.filter((p) => !p.excluded);
 const excludedItems = items.filter((p) => p.excluded).map((p) => ({ key: p.key, name: p.name }));
 

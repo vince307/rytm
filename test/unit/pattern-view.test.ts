@@ -65,7 +65,7 @@ describe("listOverview", () => {
     expect(listOverview(patterns, rows, thresholds).referenceMonth).toBe("2026-05");
   });
 
-  it("carries the applicable threshold and the reference month's over-limit sum, island-ready (S-05 F7 — no separate re-merge needed)", () => {
+  it("carries the applicable threshold and the reference month's over-limit sum, island-ready (S-04 impl-review F7 — no separate re-merge needed)", () => {
     const { items } = listOverview(patterns, rows, thresholds);
     const woltItem = items.find((i) => i.key === "wolt");
     expect(woltItem).toEqual({

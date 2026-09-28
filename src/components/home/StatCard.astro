@@ -1,0 +1,21 @@
+---
+// StatCard.astro — kit `.stat-card` (prototype/styles.css), the `/home` stats row (FR-013, US-05, FR-012, US-04,
+// S-07 Phase 3). `accent` is the kit's `.stat-card.accent` — the only card the PRD asks for a highlight colour on
+// (US-05 "Ponad progiem w tym miesiącu"); its label/foot colour `#72501f` has no dedicated token, `excess-text`
+// is the nearest one (same reasoning as `PageTitle`'s eyebrow, G35/G36 note in design-kit.md).
+import { cn } from "@/lib/utils";
+
+interface Props {
+  label: string;
+  value: string;
+  foot?: string;
+  accent?: boolean;
+}
+const { label, value, foot, accent = false } = Astro.props;
+---
+
+<article class:list={cn("rounded-xl border p-5", accent ? "border-excess bg-excess" : "border-line bg-paper")}>
+  <p class:list={cn("text-xs font-bold", accent ? "text-excess-text" : "text-muted")}>{label}</p>
+  <p class="mt-4 mb-[5px] text-[32px] font-extrabold tracking-[-0.06em] text-ink">{value}</p>
+  {foot && <p class:list={cn("text-xs", accent ? "text-excess-text" : "text-muted")}>{foot}</p>}
+</article>

@@ -7,7 +7,14 @@
 // pre-import view, a one-month state (no change / unchanged rows / no-comparison message, no "nowy"), a changed
 // amount with its previous value, an excluded pattern staying off the list, a new pattern with its "pierwsze
 // wystąpienie" meta and "nowy" badge, and the comparison-present negative control — reusing the smoke user's
-// existing May/June imports and decisions rather than a dedicated payload (S-06 plan Key Discoveries).
+// existing May/June imports and decisions rather than a dedicated payload (S-06 plan Key Discoveries), and
+// /home (FR-013/US-05, FR-012/US-04, S-07 Phases 2-4): pre-import (no trend, no import panel), a one-month
+// no-threshold state (hint + tooShort panel), the over-limit sum after a threshold is saved, the import panel
+// offering the next upload once data exists, the sum dropping to 0 after removal, an excluded pattern's threshold
+// contributing nothing while the newer month still appears on the axis, every month recomputing once the pattern
+// is restored, the accent stat card's delta foot hidden with one month of data and shown once a previous month
+// exists, and the "Koszty stałe" card's total and "podrożała" count — pure GETs inserted between existing steps,
+// no new payload.
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
@@ -158,6 +165,11 @@ const steps = [
     { status: 200, contains: "Nie masz jeszcze żadnego importu." },
   ],
   [
+    "home before import has no trend",
+    () => request("/home"),
+    { status: 200, notContains: [">Ponad progiem<", ">Dodaj najnowszy wyciąg<"] },
+  ],
+  [
     "fixed shows the pre-import view",
     () => request("/fixed"),
     { status: 200, contains: ">Koszty stałe pojawią się po pierwszym imporcie.<", notContains: ">Zmieniły kwotę<" },
@@ -254,6 +266,20 @@ const steps = [
   ],
   ["patterns list the re-imported merchant", () => request("/patterns"), { status: 200, contains: "Kawiarnia smoke" }],
   [
+    "home shows the trend without a threshold",
+    () => request("/home"),
+    {
+      status: 200,
+      contains: [
+        ">Ponad progiem<",
+        ">0,00 zł<",
+        ">maj 26<",
+        "Trend pojawi się po 3 miesiącach danych.",
+        "Ustaw próg na wzorcu, a tu pojawi się suma ponad progiem.",
+      ],
+    },
+  ],
+  [
     "fixed with one month lists no change",
     () => request("/fixed"),
     { status: 200, contains: ">Żaden koszt stały nie zmienił kwoty w tym miesiącu.<" },
@@ -313,6 +339,23 @@ const steps = [
     { status: 302, location: "/patterns/kawiarnia%20smoke?saved=1" },
   ],
   [
+    "home shows the over-limit sum",
+    () => request("/home"),
+    {
+      status: 200,
+      contains: ">5,50 zł<",
+      notContains: "Ustaw próg na wzorcu, a tu pojawi się suma ponad progiem.",
+    },
+  ],
+  ["home offers the next import", () => request("/home"), { status: 200, contains: ">Dodaj najnowszy wyciąg<" }],
+  [
+    // One month of data (May only) — `homeStats.previous` is `null` (`previousMonth` April has no rows), so the
+    // accent stat card renders no delta foot at all (S-07 Phase 3, plan review F1 gap rule).
+    "home has no comparison with one month",
+    () => request("/home"),
+    { status: 200, contains: ">Ponad progiem w tym miesiącu<", notContains: "względem" },
+  ],
+  [
     "pattern detail confirms the saved threshold",
     () => request("/patterns/kawiarnia%20smoke?saved=1"),
     { status: 200, contains: "Sukces — próg zapisany." },
@@ -343,6 +386,11 @@ const steps = [
     "pattern detail drops the over-limit mark after removal",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: ">brak ustawionego progu<", notContains: ">ponad próg<" },
+  ],
+  [
+    "home drops the sum after threshold removal",
+    () => request("/home"),
+    { status: 200, contains: ">0,00 zł<", notContains: ">5,50 zł<" },
   ],
   [
     "decision with an unknown action is rejected",
@@ -500,6 +548,11 @@ const steps = [
     { status: 200, notContains: ">7,00 zł<" },
   ],
   [
+    "home skips an excluded pattern",
+    () => request("/home"),
+    { status: 200, contains: ">cze 26<", notContains: [">5,50 zł<", ">7,00 zł<"] },
+  ],
+  [
     "fixed hides an excluded pattern",
     () => request("/fixed"),
     { status: 200, contains: ">Piekarnia smoke<", notContains: ">Kawiarnia Rytm<" },
@@ -513,6 +566,13 @@ const steps = [
     "restored pattern shows its over-limit again",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: ">7,00 zł<" },
+  ],
+  ["home recomputes every month", () => request("/home"), { status: 200, contains: [">5,50 zł<", ">7,00 zł<"] }],
+  [
+    // June (7,00 zł) vs May (5,50 zł) — the accent card's delta foot, positive control for the previous step.
+    "home compares with the previous month",
+    () => request("/home"),
+    { status: 200, contains: ">+1,50 zł względem maja<" },
   ],
   [
     "restored pattern drops the banner",
@@ -542,6 +602,13 @@ const steps = [
     "fixed lists a changed amount",
     () => request("/fixed"),
     { status: 200, contains: ">+1,50 zł<", notContains: ">Żaden koszt stały nie zmienił kwoty w tym miesiącu.<" },
+  ],
+  [
+    // "Koszty stałe" card: Kawiarnia Rytm 47,00 + Sklep smoke 12,99 + Piekarnia smoke 8,00 = 67,99 zł; only
+    // Kawiarnia Rytm rose (S-07 Phase 3, `homeStats.fixedRisen` counts `deltaMinor > 0` only).
+    "home counts fixed costs that rose",
+    () => request("/home"),
+    { status: 200, contains: [">1 pozycja podrożała<", ">67,99 zł<"] },
   ],
   [
     "fixed shows the previous amount",
@@ -715,19 +782,21 @@ for (const [name, run, expected] of steps) {
   const actual = await run();
   // `contains` accepts a single needle or an array of needles that must all be present (S-06: a `/fixed` step
   // proves two facts from one GET — e.g. a row's name and its section header — rather than splitting into two
-  // named steps just to fit a single-needle assertion).
+  // named steps just to fit a single-needle assertion). `notContains` is symmetric (S-07 plan review F2: a /home
+  // step needs two negative needles — e.g. neither delta amount after an exclusion — from one GET).
   const needles = expected.contains === undefined ? [] : [expected.contains].flat();
+  const antiNeedles = expected.notContains === undefined ? [] : [expected.notContains].flat();
   const ok =
     actual.status === expected.status &&
     (expected.location === undefined || actual.location.startsWith(expected.location)) &&
     needles.every((needle) => actual.body.includes(needle)) &&
-    (expected.notContains === undefined || !actual.body.includes(expected.notContains));
+    antiNeedles.every((needle) => !actual.body.includes(needle));
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
     console.log(
       `      expected ${expected.status} ${expected.location ?? ""} ${needles.join(" & ")} ${
-        expected.notContains ? `notContains:${expected.notContains}` : ""
+        antiNeedles.length ? `notContains:${antiNeedles.join(" & ")}` : ""
       }`,
     );
   }

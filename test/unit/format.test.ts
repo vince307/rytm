@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   formatAccountTail,
   formatIsoDate,
+  formatMonthAxis,
   formatMonthShort,
   formatMoney,
   formatRangeLong,
@@ -87,5 +88,15 @@ describe("formatMonthShort", () => {
     ["2025-12", "gru 2025"],
   ])("%s → %s", (yearMonth, text) => {
     expect(formatMonthShort(yearMonth)).toBe(text);
+  });
+});
+
+describe("formatMonthAxis", () => {
+  it.each([
+    ["2026-05", "maj 26"],
+    ["2025-10", "paź 25"],
+    ["2026-01", "sty 26"],
+  ])("%s → %s", (yearMonth, text) => {
+    expect(formatMonthAxis(yearMonth)).toBe(text);
   });
 });

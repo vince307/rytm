@@ -8,7 +8,9 @@
 // `detailTarget` resolves a requested key through the decisions before the page looks it up, so an absorbed
 // key's URL redirects to its current root (S-05 Critical Implementation Details).
 // `patternTxs` / `indexById` are exported for `src/lib/patterns/fixed.ts` (S-06 `fixedOverview`) — the one join
-// from a pattern to its own rows, not duplicated there.
+// from a pattern to its own rows, not duplicated there. `applicableThreshold` is exported for
+// `src/lib/patterns/trend.ts` (S-07 `overLimitTrend`) — the one definition of "the threshold that applies to this
+// pattern now", so the trend's guard never drifts from `listOverview`'s.
 import { resolveKey } from "@/lib/patterns/derive";
 import {
   appliesTo,
@@ -45,6 +47,18 @@ export function indexById(rows: readonly PatternSource[]): Map<string, PatternSo
   return new Map(rows.map((row) => [row.id, row]));
 }
 
+/** The stored threshold when it exists and its `kind` applies to the pattern's current type (S-04 decision 3) —
+ * `null` otherwise. Does not check `excluded`: callers that must skip an excluded pattern's contribution do so
+ * explicitly at the over-limit call site (the list still *displays* an excluded pattern's threshold, S-05
+ * decision 8), which this guard alone cannot express. */
+export function applicableThreshold(
+  pattern: MerchantPattern,
+  thresholds: ReadonlyMap<string, Threshold>,
+): Threshold | null {
+  const stored = thresholds.get(pattern.key) ?? null;
+  return stored && appliesTo(stored, pattern.type) ? stored : null;
+}
+
 /** What `/patterns` needs, island-ready (S-04 impl-review F7 — no second `Map` re-merge in the page): every
  * pattern's own fields plus its threshold (only when applicable) and reference-month over-limit sum (S-04
  * decision 10 — no month label on the list), in pattern order. */
@@ -56,8 +70,7 @@ export function listOverview(
   const refMonth = referenceMonth(rows);
   const byId = indexById(rows);
   const items = patterns.map((pattern): PatternListItem => {
-    const stored = thresholds.get(pattern.key) ?? null;
-    const threshold = stored && appliesTo(stored, pattern.type) ? stored : null;
+    const threshold = applicableThreshold(pattern, thresholds);
     const base = {
       key: pattern.key,
       name: pattern.name,

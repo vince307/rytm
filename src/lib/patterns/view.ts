@@ -1,7 +1,13 @@
 // Pure assembly of what `/patterns` and `/patterns/<key>` render (S-04), unit-testable without a DB. Both
-// consume the same widened read (`loadPatterns`) and threshold read (`loadThresholds`); the reference month
-// (S-04 Autonomous decision 2) is always `referenceMonth(rows)` over the caller's full read — the list
-// (`listOverview`) and the detail page (`[...key].astro`) each call it on the same rows, so they never disagree.
+// consume the same widened read (`loadPatternData`); the reference month (S-04 Autonomous decision 2) is always
+// `referenceMonth(rows)` over the caller's full read — the list (`listOverview`) and the detail page
+// (`[...key].astro`) each call it on the same rows, so they never disagree.
+// S-05: an excluded pattern keeps its stored/applicable threshold (the panel still shows it) but generates no
+// "ponad próg" anywhere — `overLimit` is simply not run against its transactions. `listOverview` returns
+// island-ready `PatternListItem`s directly (S-04 impl-review F7) — no second `Map` re-merge in the page.
+// `detailTarget` resolves a requested key through the decisions before the page looks it up, so an absorbed
+// key's URL redirects to its current root (S-05 Critical Implementation Details).
+import { resolveKey } from "@/lib/patterns/derive";
 import {
   appliesTo,
   byOccurredThenId,
@@ -10,7 +16,7 @@ import {
   referenceMonth,
   type DatedTx,
 } from "@/lib/patterns/over-limit";
-import type { MerchantPattern, PatternSource, Threshold } from "@/types";
+import type { MerchantPattern, PatternDecision, PatternListItem, PatternSource, Threshold } from "@/types";
 
 interface PatternTx extends DatedTx {
   counterparty: string;
@@ -37,32 +43,57 @@ function indexById(rows: readonly PatternSource[]): Map<string, PatternSource> {
   return new Map(rows.map((row) => [row.id, row]));
 }
 
-export interface PatternListOverviewItem {
-  key: string;
-  /** Only when the stored threshold's kind applies to this pattern's current type (S-04 decision 3). */
-  threshold: Threshold | null;
-  /** The reference month's over-limit sum for this pattern; 0 when there is no applicable threshold or nothing
-   * is over. */
-  overMinor: number;
-}
-
-/** What `/patterns` needs beyond the derived patterns themselves: each row's threshold (only when applicable)
- * and its reference-month over-limit sum (S-04 decision 10 — no month label on the list). */
+/** What `/patterns` needs, island-ready (S-04 impl-review F7 — no second `Map` re-merge in the page): every
+ * pattern's own fields plus its threshold (only when applicable) and reference-month over-limit sum (S-04
+ * decision 10 — no month label on the list), in pattern order. */
 export function listOverview(
   patterns: readonly MerchantPattern[],
   rows: readonly PatternSource[],
   thresholds: ReadonlyMap<string, Threshold>,
-): { referenceMonth: string | null; items: PatternListOverviewItem[] } {
+): { referenceMonth: string | null; items: PatternListItem[] } {
   const refMonth = referenceMonth(rows);
   const byId = indexById(rows);
-  const items = patterns.map((pattern): PatternListOverviewItem => {
+  const items = patterns.map((pattern): PatternListItem => {
     const stored = thresholds.get(pattern.key) ?? null;
     const threshold = stored && appliesTo(stored, pattern.type) ? stored : null;
-    if (!threshold || !refMonth) return { key: pattern.key, threshold, overMinor: 0 };
+    const base = {
+      key: pattern.key,
+      name: pattern.name,
+      type: pattern.type,
+      occurrences: pattern.occurrences,
+      sumMinor: pattern.sumMinor,
+      fixedAmountMinor: pattern.fixedAmountMinor,
+      excluded: pattern.excluded,
+      threshold,
+    };
+    if (!threshold || !refMonth || pattern.excluded) return { ...base, overMinor: 0 };
     const { byMonth } = overLimit(patternTxs(pattern, byId), threshold, pattern.type);
-    return { key: pattern.key, threshold, overMinor: byMonth.get(refMonth) ?? 0 };
+    return { ...base, overMinor: byMonth.get(refMonth) ?? 0 };
   });
   return { referenceMonth: refMonth, items };
+}
+
+export type DetailTarget =
+  { kind: "found"; pattern: MerchantPattern } | { kind: "redirect"; key: string } | { kind: "missing" };
+
+/**
+ * Resolves a requested key through the decisions before looking it up (S-05 Critical Implementation Details): the
+ * key's current root may differ from the requested key when it was merged into another pattern after the
+ * requester's link/bookmark was made. `redirect` only when the root actually has a pattern in this read
+ * (otherwise the owning import may have been deleted, or the key never existed — `missing`, same as before S-05).
+ */
+export function detailTarget(
+  key: string,
+  patterns: readonly MerchantPattern[],
+  decisions: ReadonlyMap<string, PatternDecision>,
+): DetailTarget {
+  const root = resolveKey(key, decisions);
+  if (root !== key) {
+    const pattern = patterns.find((p) => p.key === root);
+    return pattern ? { kind: "redirect", key: root } : { kind: "missing" };
+  }
+  const pattern = patterns.find((p) => p.key === key);
+  return pattern ? { kind: "found", pattern } : { kind: "missing" };
 }
 
 export interface PatternDetailTransaction {
@@ -109,7 +140,8 @@ export function patternDetail(
   const byId = indexById(rows);
   const txs = patternTxs(pattern, byId);
   const applicable = threshold && appliesTo(threshold, pattern.type) ? threshold : null;
-  const { byTx, byMonth } = overLimit(txs, applicable, pattern.type);
+  // An excluded pattern keeps `applicable` in the returned `threshold` (decision 8) but runs no over-limit pass.
+  const { byTx, byMonth } = overLimit(txs, pattern.excluded ? null : applicable, pattern.type);
 
   const monthSet = new Set(txs.map((tx) => monthOf(tx.occurredOn)));
   if (refMonth) monthSet.add(refMonth);

@@ -1,12 +1,13 @@
 // PatternsTable — prototype patterns() toolbar + table + foot (app.js), search/sort as in bindInteractions().
-// DESIGN-GAP: G28 — status badges (nowy / zmiana kwoty), the excluded section and „Pokaż więcej” stay omitted
-// until S-05 / S-06. S-04 (faza 6) delivers the Próg / Ponad progiem columns and the row link + arrow.
+// Renders only non-excluded patterns (`/patterns.astro` filters); the excluded ones go to `ExcludedPatterns`
+// (S-05 Phase 7). DESIGN-GAP: G28 — status badges (nowy / zmiana kwoty, S-06) and „Pokaż więcej” stay omitted.
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/app/Badge";
 import { field, control } from "@/components/app/field-styles";
 import { Glyph } from "@/components/Glyph";
 import { formatMoney, plural } from "@/lib/format";
+import { merchantMark } from "@/components/patterns/merchant-mark";
 import { patternHref } from "@/lib/patterns/path";
 import { cn } from "@/lib/utils";
 import type { PatternListItem, Threshold } from "@/types";
@@ -136,10 +137,7 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
                         focusRing,
                       )}
                     >
-                      <span
-                        className="bg-paper-soft grid size-[30px] shrink-0 place-items-center rounded-lg text-[11px] font-extrabold"
-                        aria-hidden="true"
-                      >
+                      <span className={merchantMark} aria-hidden="true">
                         {Array.from(p.name)[0]}
                       </span>
                       <span>{p.name}</span>

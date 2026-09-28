@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { listOverview, patternDetail } from "@/lib/patterns/view";
-import type { MerchantPattern, PatternSource, Threshold } from "@/types";
+import { detailTarget, listOverview, patternDetail } from "@/lib/patterns/view";
+import type { MerchantPattern, PatternDecision, PatternSource, Threshold } from "@/types";
 
 // Fixture: three independent patterns sharing one read.
 // - "wolt" (frequent): 2 occurrences in April, 3 in May — a count threshold of 2 flags the 3rd May occurrence.
@@ -16,6 +16,8 @@ const wolt: MerchantPattern = {
   medianMinor: 2000,
   fixedAmountMinor: null,
   transactionIds: ["1", "2", "10", "11", "12"],
+  excluded: false,
+  merged: [],
 };
 const kawiarnia: MerchantPattern = {
   key: "kawiarnia",
@@ -26,6 +28,8 @@ const kawiarnia: MerchantPattern = {
   medianMinor: 4550,
   fixedAmountMinor: 4550,
   transactionIds: ["4"],
+  excluded: false,
+  merged: [],
 };
 const sklep: MerchantPattern = {
   key: "sklep",
@@ -36,6 +40,8 @@ const sklep: MerchantPattern = {
   medianMinor: 1299,
   fixedAmountMinor: null,
   transactionIds: ["20"],
+  excluded: false,
+  merged: [],
 };
 const patterns: MerchantPattern[] = [wolt, kawiarnia, sklep];
 
@@ -59,26 +65,80 @@ describe("listOverview", () => {
     expect(listOverview(patterns, rows, thresholds).referenceMonth).toBe("2026-05");
   });
 
-  it("carries the applicable threshold and the reference month's over-limit sum", () => {
+  it("carries the applicable threshold and the reference month's over-limit sum, island-ready (S-04 impl-review F7 — no separate re-merge needed)", () => {
     const { items } = listOverview(patterns, rows, thresholds);
     const woltItem = items.find((i) => i.key === "wolt");
-    expect(woltItem).toEqual({ key: "wolt", threshold: { kind: "count", value: 2 }, overMinor: 2000 });
+    expect(woltItem).toEqual({
+      key: "wolt",
+      name: "Wolt",
+      type: "frequent",
+      occurrences: 5,
+      sumMinor: 10000,
+      fixedAmountMinor: null,
+      excluded: false,
+      threshold: { kind: "count", value: 2 },
+      overMinor: 2000,
+    });
   });
 
   it("a stored threshold whose kind does not apply to the pattern's type renders as no threshold", () => {
     const { items } = listOverview(patterns, rows, thresholds);
-    expect(items.find((i) => i.key === "kawiarnia")).toEqual({ key: "kawiarnia", threshold: null, overMinor: 0 });
+    expect(items.find((i) => i.key === "kawiarnia")).toEqual({
+      key: "kawiarnia",
+      name: "Kawiarnia",
+      type: "fixed",
+      occurrences: 1,
+      sumMinor: 4550,
+      fixedAmountMinor: 4550,
+      excluded: false,
+      threshold: null,
+      overMinor: 0,
+    });
   });
 
   it("no stored threshold at all also yields null + 0, not an error", () => {
     const { items } = listOverview(patterns, rows, thresholds);
-    expect(items.find((i) => i.key === "sklep")).toEqual({ key: "sklep", threshold: null, overMinor: 0 });
+    expect(items.find((i) => i.key === "sklep")).toEqual({
+      key: "sklep",
+      name: "Sklep",
+      type: "frequent",
+      occurrences: 1,
+      sumMinor: 1299,
+      fixedAmountMinor: null,
+      excluded: false,
+      threshold: null,
+      overMinor: 0,
+    });
+  });
+
+  it("returns items in pattern order (not re-sorted)", () => {
+    const { items } = listOverview(patterns, rows, thresholds);
+    expect(items.map((i) => i.key)).toEqual(["wolt", "kawiarnia", "sklep"]);
   });
 
   it("no rows at all yields a null reference month and 0 for every item", () => {
     const { referenceMonth, items } = listOverview(patterns, [], new Map());
     expect(referenceMonth).toBeNull();
     for (const item of items) expect(item.overMinor).toBe(0);
+  });
+
+  it("an excluded pattern keeps its applicable threshold but overMinor is 0, while the same pattern non-excluded is over (S-05)", () => {
+    const woltExcluded: MerchantPattern = { ...wolt, key: "wolt-excluded", excluded: true };
+    const withExcluded = [...patterns, woltExcluded];
+    const withThresholds = new Map(thresholds).set("wolt-excluded", { kind: "count", value: 2 });
+    const { items } = listOverview(withExcluded, rows, withThresholds);
+    expect(items.find((i) => i.key === "wolt-excluded")).toEqual({
+      key: "wolt-excluded",
+      name: "Wolt",
+      type: "frequent",
+      occurrences: 5,
+      sumMinor: 10000,
+      fixedAmountMinor: null,
+      excluded: true,
+      threshold: { kind: "count", value: 2 },
+      overMinor: 0,
+    });
+    expect(items.find((i) => i.key === "wolt")?.overMinor).toBeGreaterThan(0);
   });
 });
 
@@ -138,5 +198,49 @@ describe("patternDetail", () => {
     expect(detail.transactions).toEqual([
       { id: "4", occurredOn: "2026-05-15", counterparty: "Kawiarnia", title: "", amountMinor: 4550, overMinor: 0 },
     ]);
+  });
+
+  it("an excluded pattern keeps its threshold but runs no over-limit pass (S-05)", () => {
+    const woltExcluded: MerchantPattern = { ...wolt, key: "wolt-excluded", excluded: true };
+    const detail = patternDetail(woltExcluded, rows, thresholds.get("wolt") ?? null, refMonth);
+    expect(detail.threshold).toEqual({ kind: "count", value: 2 });
+    expect(detail.overMinor).toBe(0);
+    expect(detail.sequence.every((over) => !over)).toBe(true);
+    expect(detail.transactions.every((t) => t.overMinor === 0)).toBe(true);
+  });
+});
+
+describe("detailTarget (S-05)", () => {
+  // "wolt-old" was merged into "wolt" directly; "wolt-older" was merged into "wolt-old" (a chain, both hops
+  // absorbed keys); "ghost" was merged into "ghost-root", which has no pattern in this read (e.g. every one of
+  // its transactions came from a since-deleted import).
+  const decisions = new Map<string, PatternDecision>([
+    ["wolt-old", { mergedInto: "wolt", excluded: false, pinnedType: null, displayName: null }],
+    ["wolt-older", { mergedInto: "wolt-old", excluded: false, pinnedType: null, displayName: null }],
+    ["ghost", { mergedInto: "ghost-root", excluded: false, pinnedType: null, displayName: null }],
+  ]);
+
+  it("a plain, un-merged key returns its own pattern", () => {
+    expect(detailTarget("wolt", patterns, decisions)).toEqual({ kind: "found", pattern: wolt });
+  });
+
+  it("a key with no decision at all also returns its own pattern", () => {
+    expect(detailTarget("kawiarnia", patterns, new Map())).toEqual({ kind: "found", pattern: kawiarnia });
+  });
+
+  it("an absorbed key redirects to its root", () => {
+    expect(detailTarget("wolt-old", patterns, decisions)).toEqual({ kind: "redirect", key: "wolt" });
+  });
+
+  it("an absorbed key resolves through a chain to the final root, not the first hop", () => {
+    expect(detailTarget("wolt-older", patterns, decisions)).toEqual({ kind: "redirect", key: "wolt" });
+  });
+
+  it("an absorbed key whose root has no pattern in this read is missing, not a redirect to a dead link", () => {
+    expect(detailTarget("ghost", patterns, decisions)).toEqual({ kind: "missing" });
+  });
+
+  it("an unknown key with no decision and no pattern is missing", () => {
+    expect(detailTarget("nope", patterns, decisions)).toEqual({ kind: "missing" });
   });
 });

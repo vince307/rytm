@@ -5,7 +5,7 @@ import { buildImportPayload, parseIngStatement } from "@/lib/import/ing";
 import { d5Type, derivePatterns, median } from "@/lib/patterns/derive";
 import { collectPages, MAX_PAGES } from "@/lib/patterns/load";
 import { merchantKey, normalizeMerchant, rawMerchant } from "@/lib/patterns/merchant";
-import type { PatternSource } from "@/types";
+import type { MerchantPattern, PatternDecision, PatternSource } from "@/types";
 
 // Oracle: test/fixtures/ing/expected.json (F-02). The oracle's keys are hand-authored slugs, so the contract is the
 // partition of rows (sets of bankTxId) plus per-group aggregates — never key strings.
@@ -61,6 +61,33 @@ function expectedGroups(): { pattern: ExpectedPattern; ids: string[] }[] {
     groups.set(id, group);
   }
   return [...groups.values()].map((g) => ({ ...g, ids: g.ids.sort() }));
+}
+
+// S-05: the oracle's `resolvedBy` groups (above) are already what a *decided* partition should look like — this
+// variant does not split `user-merge` back apart, so it is the acceptance shape once the decisions are applied.
+function oracleGroups(): { pattern: ExpectedPattern; ids: string[] }[] {
+  const byPattern = new Map(expected.patterns.map((p) => [p.key, p]));
+  const groups = new Map<string, { pattern: ExpectedPattern; ids: string[] }>();
+  for (const row of expected.rows.filter((r) => r.file === MAIN && r.imported)) {
+    const pattern = byPattern.get(row.pattern ?? "");
+    if (!pattern) throw new Error(`row ${row.bankTxId} has no pattern`);
+    const group = groups.get(pattern.key) ?? { pattern, ids: [] };
+    group.ids.push(row.bankTxId);
+    groups.set(pattern.key, group);
+  }
+  return [...groups.values()].map((g) => ({ ...g, ids: g.ids.sort() }));
+}
+
+function byKey(patterns: readonly MerchantPattern[], key: string): MerchantPattern {
+  const found = patterns.find((p) => p.key === key);
+  if (!found) throw new Error(`no pattern for key "${key}"`);
+  return found;
+}
+
+function oraclePattern(key: string): ExpectedPattern {
+  const found = expected.patterns.find((p) => p.key === key);
+  if (!found) throw new Error(`no oracle pattern "${key}"`);
+  return found;
 }
 
 describe("derivePatterns — F-02 oracle", () => {
@@ -124,6 +151,87 @@ describe("derivePatterns — F-02 oracle", () => {
       .map(({ s }) => s);
     expect(shuffled.map((s) => s.id)).not.toEqual(sources.map((s) => s.id));
     expect(derivePatterns(shuffled)).toEqual(patterns);
+  });
+});
+
+describe("derivePatterns — F-02 oracle with the fixture decisions (S-05)", () => {
+  const sources = fixtureSources();
+  const undecided = derivePatterns(sources);
+
+  // Grounded in the fixture's own recorded raw merchants — never a hardcoded slug (the real `merchantKey` is
+  // whatever key `derivePatterns` gives that group, per the plan).
+  const sportowoRaws = [
+    ...new Set(
+      expected.rows
+        .filter((r) => r.file === MAIN && r.imported && r.pattern === "sportowo")
+        .map((r) => r.rawMerchant ?? ""),
+    ),
+  ];
+  const sportowoKeys = sportowoRaws.map((raw) => merchantKey(raw));
+  const target = sportowoKeys.find((k) => k !== "sportowo.pl");
+  const source = sportowoKeys.find((k) => k === "sportowo.pl");
+  if (!target || !source) throw new Error("fixture no longer has both sportowo raw variants");
+
+  const excludeRaw = expected.rows.find(
+    (r) => r.file === MAIN && r.imported && r.pattern === "przelew-konto-osobiste",
+  )?.rawMerchant;
+  if (!excludeRaw) throw new Error("fixture no longer has the przelew-konto-osobiste group");
+  const excludeKey = merchantKey(excludeRaw);
+
+  const decisions = new Map<string, PatternDecision>([
+    [source, { mergedInto: target, excluded: false, pinnedType: null, displayName: null }],
+    [excludeKey, { mergedInto: null, excluded: true, pinnedType: null, displayName: null }],
+  ]);
+
+  const patterns = derivePatterns(sources, decisions);
+  const oracle = oracleGroups();
+
+  it("the partition equals the oracle's 30 groups", () => {
+    expect(patterns).toHaveLength(30);
+    expect(oracle).toHaveLength(30);
+    const expectedSets = oracle.map((g) => g.ids.join(","));
+    for (const p of patterns) expect(expectedSets).toContain(p.transactionIds.join(","));
+    const all = patterns.flatMap((p) => p.transactionIds);
+    expect(new Set(all).size).toBe(206);
+  });
+
+  it("the merged sportowo pattern sums its (undecided) components and lists the absorbed variant", () => {
+    const merged = byKey(patterns, target);
+    const components = undecided.filter((p) => p.key === target || p.key === source);
+    expect(components).toHaveLength(2);
+    const oracleSportowo = oraclePattern("sportowo");
+    expect(merged.occurrences).toBe(oracleSportowo.occurrences);
+    expect(merged.occurrences).toBe(components.reduce((s, p) => s + p.occurrences, 0));
+    expect(merged.sumMinor).toBe(oracleSportowo.sumMinor);
+    expect(merged.sumMinor).toBe(components.reduce((s, p) => s + p.sumMinor, 0));
+    expect(merged.merged).toEqual([{ key: source, name: "sportowo.pl" }]);
+  });
+
+  it("the excluded group is marked excluded and keeps the oracle's aggregates", () => {
+    const excluded = byKey(patterns, excludeKey);
+    const oracleExcluded = oraclePattern("przelew-konto-osobiste");
+    expect(excluded.excluded).toBe(true);
+    expect(excluded.occurrences).toBe(oracleExcluded.occurrences);
+    expect(excluded.sumMinor).toBe(oracleExcluded.sumMinor);
+    expect(excluded.merged).toEqual([]);
+  });
+
+  it("every other (undecided) group is unaffected", () => {
+    for (const p of patterns) {
+      if (p.key === target || p.key === excludeKey) continue;
+      expect(p.excluded).toBe(false);
+      expect(p.merged).toEqual([]);
+    }
+  });
+
+  it("determinism under a shuffle", () => {
+    let seed = 13;
+    const shuffled = [...sources]
+      .map((s) => ({ s, r: (seed = (Math.imul(seed, 1103515245) + 12345) >>> 0) }))
+      .sort((a, b) => a.r - b.r)
+      .map(({ s }) => s);
+    expect(shuffled.map((s) => s.id)).not.toEqual(sources.map((s) => s.id));
+    expect(derivePatterns(shuffled, decisions)).toEqual(patterns);
   });
 });
 

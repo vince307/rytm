@@ -4,8 +4,11 @@ import Icon from "@/components/Icon.astro";
 import { cn } from "@/lib/utils";
 interface Props {
   kind: "success" | "error" | "info";
+  /** Extra classes on the content wrapper — e.g. the kit `.excluded-banner` puts its text button at the right
+   * edge of the same row (S-05 visual gate). */
+  bodyClass?: string;
 }
-const { kind } = Astro.props;
+const { kind, bodyClass } = Astro.props;
 const tone = { success: "bg-green/15 text-green", error: "bg-excess/25 text-excess-text", info: "bg-ink/8 text-ink" }[
   kind
 ];
@@ -17,7 +20,7 @@ const icon = { success: "success", error: "warning", info: "info" } as const;
   class:list={cn("flex items-start gap-[9px] rounded-lg px-[13px] py-3 text-[13px] leading-snug", tone)}
 >
   <Icon name={icon[kind]} size={16} class="mt-px" />
-  <span>
+  <span class:list={cn(bodyClass)}>
     <slot />
   </span>
 </div>

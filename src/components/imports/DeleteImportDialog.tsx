@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { SubmitButton } from "@/components/auth/SubmitButton";
+import { usePageShowReset } from "@/components/hooks/usePageShowReset";
 
 export interface DeleteImportLabels {
   action: string;
@@ -24,6 +25,10 @@ interface Props {
 export default function DeleteImportDialog({ id, range, describedBy, labels }: Props) {
   const [pending, setPending] = useState(false);
   const title = labels.title.replace("{range}", range);
+  // undo-import F4 / S-04 F8: a bfcache restore (back-navigation after the POST) must not leave the button stuck.
+  usePageShowReset(() => {
+    setPending(false);
+  });
 
   return (
     <Dialog>

@@ -17,6 +17,8 @@ interface SubmitButtonProps {
   disabled?: boolean;
   /** Pending state tracked by the caller — useFormStatus() stays false for a native POST to a URL action. */
   pending?: boolean;
+  /** Extra classes merged onto the underlying `Button` (S-05 — the kit `.modal-actions .btn` left-aligns). */
+  className?: string;
 }
 
 export function SubmitButton({
@@ -27,10 +29,11 @@ export function SubmitButton({
   showArrow = true,
   disabled = false,
   pending: pendingProp = false,
+  className,
 }: SubmitButtonProps) {
   const pending = useFormStatus().pending || pendingProp;
   return (
-    <Button type="submit" variant={variant} size={size} disabled={disabled || pending}>
+    <Button type="submit" variant={variant} size={size} disabled={disabled || pending} className={className}>
       {pending ? pendingText : children}
       {!pending && showArrow && <span aria-hidden="true">↗</span>}
     </Button>

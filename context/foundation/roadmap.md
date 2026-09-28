@@ -3,7 +3,7 @@ project: Rytm
 version: 1
 status: draft
 created: 2026-09-21
-updated: 2026-09-27
+updated: 2026-09-28
 prd_version: 1
 main_goal: quality
 top_blocker: none
@@ -47,7 +47,7 @@ Pieniądze cicho uciekają z konta, a kategoryzacja banku nie odpowiada na pytan
 | S-02 | undo-import                  | zobaczyć listę importów i cofnąć błędny import wraz z jego transakcjami                                     | S-01          | US-02, FR-004                          | done        |
 | S-03 | merchant-patterns            | zobaczyć listę wzorców: sprzedawca, typ, liczba wystąpień, suma, kwota dla stałych                          | S-01, F-02    | US-01, FR-006, FR-007                  | done |
 | S-04 | pattern-threshold-over-limit | otworzyć wzorzec, zobaczyć jego transakcje, ustawić próg i zobaczyć „ponad próg” z sumą miesiąca            | S-03          | US-01, FR-008, FR-010, FR-011          | done        |
-| S-05 | durable-pattern-decisions    | scalić, wykluczyć, zmienić typ i nazwę wzorca, a decyzje przetrwają kolejny import                          | S-03          | US-03, FR-009                          | proposed |
+| S-05 | durable-pattern-decisions    | scalić, wykluczyć, zmienić typ i nazwę wzorca, a decyzje przetrwają kolejny import                          | S-03          | US-03, FR-009                          | done        |
 | S-06 | fixed-cost-changes           | zobaczyć, które wzorce stałe zmieniły kwotę i które są nowe względem poprzedniego miesiąca                  | S-03          | US-04, FR-012                          | proposed |
 | S-07 | over-limit-trend             | zobaczyć sumę „ponad progiem” per miesiąc według dzisiejszych progów                                        | S-04          | US-05, FR-013                          | proposed |
 | S-08 | settings-account             | zobaczyć swoje konto, zmienić hasło i samodzielnie usunąć konto wraz z danymi                               | —             | FR-001, FR-019, NFR prawo do usunięcia | done     |
@@ -167,7 +167,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Naprawia błędy normalizacji z S-03 rękami użytkownika; decyzje jako trwałe reguły mapowania (nie jednorazowe edycje) to jedyny sposób, by nie scalać co miesiąc od nowa.
-- **Status:** proposed
+- **Status:** done
 
 ### S-06: Zmiany kwot i nowe wzorce stałe
 
@@ -228,9 +228,9 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | S-02       | undo-import                  | Lista importów i cofnięcie błędnego importu                 | no                    | Czeka na S-01                         |
 | S-03       | merchant-patterns            | Lista wzorców sprzedawców (normalizacja + typ)              | no                    | Czeka na S-01, F-02                   |
 | S-04       | pattern-threshold-over-limit | Próg na wzorcu i etykieta „ponad próg” z sumą miesiąca      | no                    | Gwiazda przewodnia; czeka na S-03     |
-| S-05       | durable-pattern-decisions    | Scalanie, wykluczanie, typ i nazwa wzorca (trwałe)          | no                    | Czeka na S-03                         |
-| S-06       | fixed-cost-changes           | Zmiany kwot i nowe wzorce stałe vs poprzedni miesiąc        | no                    | Czeka na S-03                         |
-| S-07       | over-limit-trend             | Trend „ponad progiem” per miesiąc                           | no                    | Czeka na S-04                         |
+| S-05       | durable-pattern-decisions    | Scalanie, wykluczanie, typ i nazwa wzorca (trwałe)          | —                     | Done — archived 2026-09-28 → `context/archive/2026-09-28-durable-pattern-decisions/` |
+| S-06       | fixed-cost-changes           | Zmiany kwot i nowe wzorce stałe vs poprzedni miesiąc        | yes                   | S-03 done; run `/10x-new fixed-cost-changes` → `/10x-plan` |
+| S-07       | over-limit-trend             | Trend „ponad progiem” per miesiąc                           | yes                   | S-04 done; trigger z S-05: sumy miesięczne pomijają `pattern.excluded` (decyzja 9, [human] 7.9) + follow-up F6 (wykluczony wzorzec scalony jako źródło) — `context/archive/2026-09-28-durable-pattern-decisions/follow-ups/review-fixes.md` |
 | S-08       | settings-account             | Konto: e-mail, zmiana hasła, usunięcie konta                | yes                   | Run `/10x-plan settings-account`      |
 | S-09       | public-demo-seed             | Konto demo z syntetycznym wyciągiem na produkcji            | no                    | Czeka na F-02, S-03                   |
 
@@ -270,3 +270,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **S-03: Użytkownik może zobaczyć listę wykrytych wzorców: sprzedawca (znormalizowany z opisu, z domeną sprzedawcy dla płatności przez operatorów), typ stały/częsty zaproponowany przez aplikację, liczba wystąpień, suma, kwota dla stałych; każda transakcja liczy się w dokładnie jednym wzorcu.** — Archived 2026-09-27 → `context/archive/2026-09-25-merchant-patterns/`. Lesson: —.
 - **S-02: Użytkownik może zobaczyć listę importów (data, rachunek, zakres, liczba obciążeń) i usunąć błędny import wraz z jego transakcjami; po usunięciu wzorce i sumy nie zawierają jego transakcji, a ponowne wgranie tego zakresu jest przyjęte.** — Archived 2026-09-27 → `context/archive/2026-09-25-undo-import/`. Lesson: —.
 - **S-04: Użytkownik może otworzyć wzorzec, zobaczyć składające się na niego transakcje, ustawić, zmienić i usunąć próg (częsty: liczba wystąpień lub suma na miesiąc; stały: akceptowana kwota) i natychmiast zobaczyć transakcje oznaczone „ponad próg” oraz sumę „ponad progiem w tym miesiącu”.** — Archived 2026-09-27 → `context/archive/2026-09-27-pattern-threshold-over-limit/`. Lesson: —.
+- **S-05: Użytkownik może scalić dwa wzorce w jeden, wykluczyć wzorzec z analizy, zmienić jego typ i nazwę sprzedawcy; decyzje są stosowane automatycznie do kolejnych importów, a wykluczony wzorzec nie generuje „ponad próg”.** — Archived 2026-09-28 → `context/archive/2026-09-28-durable-pattern-decisions/`. Lesson: —.

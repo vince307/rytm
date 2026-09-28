@@ -38,6 +38,39 @@ export type Database = {
         };
         Relationships: [];
       };
+      pattern_decisions: {
+        Row: {
+          created_at: string;
+          display_name: string | null;
+          excluded: boolean;
+          id: number;
+          merchant_key: string;
+          merged_into: string | null;
+          pinned_type: string | null;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          display_name?: string | null;
+          excluded?: boolean;
+          id?: never;
+          merchant_key: string;
+          merged_into?: string | null;
+          pinned_type?: string | null;
+          user_id?: string;
+        };
+        Update: {
+          created_at?: string;
+          display_name?: string | null;
+          excluded?: boolean;
+          id?: never;
+          merchant_key?: string;
+          merged_into?: string | null;
+          pinned_type?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       pattern_thresholds: {
         Row: {
           created_at: string;

@@ -1,6 +1,8 @@
 ---
-// Pattern detail (S-04). Bound to the kit `patternDetail()` (prototype/app.js) minus the "Akcje" menu (S-05);
-// the threshold panel renders `ThresholdEditor`, which posts to `/api/patterns/threshold` (+ `/delete`).
+// Pattern detail (S-04; "Akcje" menu + excluded banner + merged variants added S-05 faza 6). Bound to the kit
+// `patternDetail()` (prototype/app.js); the threshold panel renders `ThresholdEditor`, which posts to
+// `/api/patterns/threshold` (+ `/delete`); the actions dialog (`PatternActionsDialog`) and the excluded banner's
+// `RestoreForm` post to `/api/patterns/decision`.
 // A rest route (`[...key]`) so a key containing `/` still matches; the key is read from the raw, percent-encoded
 // pathname (`keyFromPath`), never `Astro.params` — see plan Critical Implementation Details.
 import AppLayout from "@/layouts/AppLayout.astro";
@@ -9,16 +11,19 @@ import InlineAlert from "@/components/app/InlineAlert.astro";
 import Panel from "@/components/app/Panel.astro";
 import SequenceMark from "@/components/app/SequenceMark.astro";
 import { Badge } from "@/components/app/Badge";
+import { buttonVariants } from "@/components/ui/button";
 import { MonthSelect } from "@/components/patterns/MonthSelect";
+import PatternActionsDialog, { type PatternActionsCopy } from "@/components/patterns/PatternActionsDialog";
+import RestoreForm from "@/components/patterns/RestoreForm.astro";
 import { ThresholdEditor, type ThresholdEditorCopy } from "@/components/patterns/ThresholdEditor";
 import { copy, copyExtra } from "@/content/copy";
 import { formatIsoDate, formatMoney, formatMonthShort, plural } from "@/lib/format";
-import { loadPatterns } from "@/lib/patterns/load";
+import { loadPatternData } from "@/lib/patterns/load";
 import { referenceMonth } from "@/lib/patterns/over-limit";
-import { keyFromPath } from "@/lib/patterns/path";
-import { loadThresholds } from "@/lib/patterns/thresholds";
-import { patternDetail, type PatternDetailView } from "@/lib/patterns/view";
+import { keyFromPath, patternHref } from "@/lib/patterns/path";
+import { detailTarget, patternDetail, type DetailTarget, type PatternDetailView } from "@/lib/patterns/view";
 import { createClient } from "@/lib/supabase";
+import type { MerchantPattern } from "@/types";
 
 const x = copyExtra.patterns;
 
@@ -28,25 +33,24 @@ if (key === null) {
 }
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
-let patternsResult: Awaited<ReturnType<typeof loadPatterns>>;
-let thresholdsResult: Awaited<ReturnType<typeof loadThresholds>>;
-if (supabase) {
-  [patternsResult, thresholdsResult] = await Promise.all([loadPatterns(supabase), loadThresholds(supabase)]);
-} else {
-  const error = new Error("Supabase is not configured");
-  patternsResult = { error };
-  thresholdsResult = { error };
-}
+const dataResult = supabase ? await loadPatternData(supabase) : { error: new Error("Supabase is not configured") };
 
-const readError =
-  "error" in patternsResult ? patternsResult.error : "error" in thresholdsResult ? thresholdsResult.error : null;
+const readError = "error" in dataResult ? dataResult.error : null;
 if (readError) {
   // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
   console.error("pattern detail failed", readError);
 }
 
-const pattern =
-  !readError && "patterns" in patternsResult ? patternsResult.patterns.find((p) => p.key === key) : undefined;
+// Resolves the requested key through the decisions before looking it up (S-05): an absorbed key's URL redirects
+// to its current root; `missing` covers both an unknown key and an owning-import deletion (S-04 decision 8).
+const target: DetailTarget | null =
+  readError || !("patterns" in dataResult) ? null : detailTarget(key, dataResult.patterns, dataResult.decisions);
+
+const redirectHref = target?.kind === "redirect" ? patternHref(target.key) : null;
+if (redirectHref !== null) {
+  return Astro.redirect(redirectHref, 302);
+}
+const pattern: MerchantPattern | undefined = target?.kind === "found" ? target.pattern : undefined;
 
 // DESIGN-GAP: G31 — the kit has no "pattern not found" state (e.g. the owning import was deleted, S-04 decision
 // 8's idempotent delete leaves no trace for the pattern itself either).
@@ -59,14 +63,14 @@ let month = "";
 let refMonth: string | null = null;
 let monthOptions: { value: string; label: string }[] = [];
 
-if (pattern && "rows" in patternsResult && "thresholds" in thresholdsResult) {
-  refMonth = referenceMonth(patternsResult.rows);
+if (pattern && "rows" in dataResult) {
+  refMonth = referenceMonth(dataResult.rows);
   if (!refMonth) {
     // Unreachable: `pattern` was derived from these same `rows`, so a match implies at least one row.
     return Astro.redirect("/patterns");
   }
-  const threshold = thresholdsResult.thresholds.get(key) ?? null;
-  detail = patternDetail(pattern, patternsResult.rows, threshold, refMonth, Astro.url.searchParams.get("month"));
+  const threshold = dataResult.thresholds.get(key) ?? null;
+  detail = patternDetail(pattern, dataResult.rows, threshold, refMonth, Astro.url.searchParams.get("month"));
   month = detail.month ?? refMonth;
   monthOptions = detail.months.map((m) => ({ value: m, label: formatMonthShort(m) }));
 }
@@ -102,7 +106,39 @@ const editorCopy: ThresholdEditorCopy = {
   saving: copyExtra.auth.saving,
 };
 
-// Result lines above the editor (S-04 decision 15: redirect + InlineAlert, no Toast component).
+const actionsCopy: PatternActionsCopy = {
+  actions: x.actions,
+  actionsEyebrow: x.actionsEyebrow,
+  actionsTitle: x.actionsTitle,
+  actionsLead: x.actionsLead,
+  merge: copy.patternActions.merge,
+  changeType: copy.patternActions.changeType,
+  rename: copy.patternActions.rename,
+  exclude: copy.patternActions.exclude,
+  mergeLabel: x.mergeLabel,
+  mergeSubmit: x.mergeSubmit,
+  mergeNone: x.mergeNone,
+  renameLabel: x.renameLabel,
+  renameHint: x.renameHint,
+  renameSubmit: x.renameSubmit,
+  saving: copyExtra.auth.saving,
+  close: x.close,
+};
+
+// Other analysed (non-excluded — S-05 decision 7: a merge target must not itself be excluded), non-self patterns,
+// sorted by name (`pl`) — mirrors validateMerge's own root/excluded checks so the picker never offers a target the
+// endpoint would then reject.
+const mergeTargets =
+  pattern && "patterns" in dataResult
+    ? dataResult.patterns
+        .filter((p) => p.key !== pattern.key && !p.excluded)
+        .map((p) => ({ key: p.key, name: p.name }))
+        .sort((a, b) => a.name.localeCompare(b.name, "pl"))
+    : [];
+
+// Result lines above the editor (S-04 decision 15: redirect + InlineAlert, no Toast component) — threshold saves
+// only; decision results (S-05) get their own alert under `.detail-top` (`decisionAlert` below) since a decision
+// redirect never carries `saved`/`removed`/`error=value|save` and vice versa (mutually exclusive query params).
 const params = Astro.url.searchParams;
 const resultAlert = params.get("saved")
   ? { kind: "success" as const, message: copy.components.success }
@@ -113,11 +149,47 @@ const resultAlert = params.get("saved")
       : params.get("error") === "save"
         ? { kind: "error" as const, message: x.thresholdSaveError }
         : null;
+
+// Kit `.text-button` (K21 style precedent) — kept short so the unmerge button's rendered text stays inline
+// (`>text<`, no wrapping whitespace) for the smoke assertion (agent contract text-anchor rule).
+const unmergeClass = buttonVariants({ variant: "text", size: "inline" });
+
+// Decision result line (S-05 Phase 6), rendered under `.detail-top`, above the heading.
+const decisionAlert = params.get("merged")
+  ? { kind: "success" as const, message: x.merged }
+  : params.get("unmerged")
+    ? { kind: "success" as const, message: x.unmerged }
+    : params.get("typed")
+      ? { kind: "success" as const, message: x.typeChanged }
+      : params.get("renamed")
+        ? { kind: "success" as const, message: x.renamed }
+        : params.get("excluded")
+          ? { kind: "success" as const, message: x.excludedToast }
+          : params.get("restored")
+            ? { kind: "success" as const, message: copy.patternActions.restored }
+            : params.get("error") === "merge"
+              ? { kind: "error" as const, message: x.mergeInvalid }
+              : params.get("error") === "name"
+                ? { kind: "error" as const, message: x.nameInvalid }
+                : params.get("error") === "decision"
+                  ? { kind: "error" as const, message: x.decisionError }
+                  : null;
 ---
 
 <AppLayout title={pattern ? pattern.name : copy.patterns.title} active="patterns">
-  <div class="mb-[22px]">
+  <div class="detail-top mb-[22px] flex items-center justify-between gap-3 max-[560px]:flex-col max-[560px]:items-stretch">
     <BackLink href="/patterns" label={copy.patternDetail.back} />
+    {pattern && (
+      <PatternActionsDialog
+        client:load
+        patternKey={pattern.key}
+        type={pattern.type}
+        name={pattern.name}
+        excluded={pattern.excluded}
+        mergeTargets={mergeTargets}
+        copy={actionsCopy}
+      />
+    )}
   </div>
   {readError ? (
     // DESIGN-GAP: K18 — no kit copy for a failed read; reused from /patterns.
@@ -126,6 +198,21 @@ const resultAlert = params.get("saved")
     <InlineAlert kind="info">{x.detailMissing}</InlineAlert>
   ) : detail ? (
     <>
+      {decisionAlert && (
+        <div class="mb-[18px]">
+          <InlineAlert kind={decisionAlert.kind}>{decisionAlert.message}</InlineAlert>
+        </div>
+      )}
+      {pattern.excluded && (
+        <div class="mb-[18px]">
+          {/* Kit `.excluded-banner{justify-content:space-between}`: „Przywróć” sits at the right edge of the row (the
+              kit's three flex items also centre the text — a side effect not copied: the text stays by its icon). */}
+          <InlineAlert kind="info" bodyClass="flex flex-1 flex-wrap items-center justify-between gap-x-3 gap-y-1">
+            <span>{copy.patternActions.excluded}</span>
+            <RestoreForm patternKey={pattern.key} />
+          </InlineAlert>
+        </div>
+      )}
       <section class="mb-7 flex items-end justify-between gap-5 max-[899px]:flex-col max-[899px]:items-start max-[899px]:gap-6">
         <div>
           <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">
@@ -134,6 +221,26 @@ const resultAlert = params.get("saved")
           </div>
           <h1 class="mt-3 mb-[7px] text-[44px] tracking-[-0.07em] max-[899px]:text-[38px]">{pattern.name}</h1>
           <p class="m-0 text-muted">{x.typeLeads[pattern.type]}</p>
+          {pattern.merged.length > 0 && (
+            <div class="mt-4">
+              <span class="text-xs font-bold text-muted">{x.mergedLabel}</span>
+              <div class="mt-2 grid gap-2">
+                {pattern.merged.map((variant) => (
+                  <div class="flex items-center justify-between gap-3">
+                    <span class="text-[13px]">{variant.name}</span>
+                    <form method="POST" action="/api/patterns/decision">
+                      <input type="hidden" name="key" value={pattern.key} />
+                      <input type="hidden" name="action" value="unmerge" />
+                      <input type="hidden" name="source" value={variant.key} />
+                      {/* No type="submit" — see RestoreForm.astro's comment (prettier-plugin-astro breaks a
+                          multi-attribute button, which would defeat the smoke `>text<` anchor below). */}
+                      <button class:list={[unmergeClass]}>{x.unmerge}</button>
+                    </form>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <div class="text-right max-[899px]:text-left">
           <span class="block text-xs text-muted">{sumLabel}</span>

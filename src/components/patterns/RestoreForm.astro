@@ -1,0 +1,25 @@
+---
+// RestoreForm.astro — the kit's "Przywróć" action for an excluded pattern (patternActions.restore), shared by the
+// detail page's excluded banner (S-05 Phase 6) and the /patterns "Wykluczone" section (S-05 Phase 7). Plain
+// <form> POST, no client JS: the endpoint's own redirect carries the result line (S-04 decision 15 precedent).
+import { buttonVariants } from "@/components/ui/button";
+import { copy } from "@/content/copy";
+
+interface Props {
+  patternKey: string;
+  /** Sends the result to /patterns instead of the pattern's own detail (the list's restore form, Phase 7). */
+  back?: "list";
+}
+
+const { patternKey, back } = Astro.props;
+const restoreClass = buttonVariants({ variant: "text", size: "inline" });
+---
+
+<form method="POST" action="/api/patterns/decision">
+  <input type="hidden" name="key" value={patternKey} />
+  <input type="hidden" name="action" value="restore" />
+  {back && <input type="hidden" name="back" value={back} />}
+  {/* No type="submit" (the default inside a <form>) — a second attribute makes prettier-plugin-astro break the
+      button onto three lines, which would put whitespace around the text the smoke `>text<` anchor needs inline. */}
+  <button class:list={[restoreClass]}>{copy.patternActions.restore}</button>
+</form>

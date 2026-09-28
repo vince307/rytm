@@ -728,15 +728,15 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [ ] 2.1 `npm run lint` 0; `npx astro check` 0 errors (count recorded)
-- [ ] 2.2 `npm test` — Phase 1 count, 0 failures (delta 0)
-- [ ] 2.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 2.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0)
-- [ ] 2.5 `BASE_URL=http://localhost:4398 npm run smoke` — 121 + 6 = 127 PASS
-- [ ] 2.6 Deliberate break (only the last bar) → „home recomputes every month” FAILs, „home shows the over-limit sum” PASSes; restored → PASS; meta-check recorded
-- [ ] 2.7 Deliberate break (excluded skip dropped) → „home skips an excluded pattern” FAILs; restored → PASS; meta-check recorded
-- [ ] 2.8 Deliberate break (no pre-import branch) → „home before import has no trend” FAILs; restored → PASS; meta-check recorded
-- [ ] 2.9 No raw colours in `src/components/home` / `home.astro`; no `trend.current` / `niepełny` in `src`; `DESIGN-GAP: K24` / `G35` on every new key; rows K24, G35 and amended G6 in `design-kit.md`
+- [x] 2.1 `npm run lint` 0; `npx astro check` 0 errors (count recorded) — 3894189
+- [x] 2.2 `npm test` — Phase 1 count, 0 failures (delta 0) — 3894189
+- [x] 2.3 `npm run fixture:check` OK; `npm run build` passes — 3894189
+- [x] 2.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0) — 3894189
+- [x] 2.5 `BASE_URL=http://localhost:4398 npm run smoke` — 121 + 6 = 127 PASS — 3894189
+- [x] 2.6 Deliberate break (only the last bar) → „home recomputes every month” FAILs, „home shows the over-limit sum” PASSes; restored → PASS; meta-check recorded — 3894189
+- [x] 2.7 Deliberate break (excluded skip dropped) → „home skips an excluded pattern” FAILs; restored → PASS; meta-check recorded — 3894189
+- [x] 2.8 Deliberate break (no pre-import branch) → „home before import has no trend” FAILs; restored → PASS; meta-check recorded — 3894189
+- [x] 2.9 No raw colours in `src/components/home` / `home.astro`; no `trend.current` / `niepełny` in `src`; `DESIGN-GAP: K24` / `G35` on every new key; rows K24, G35 and amended G6 in `design-kit.md` — 3894189
 
 #### Manual
 

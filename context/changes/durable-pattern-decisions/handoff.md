@@ -1,159 +1,132 @@
 # Handoff — `durable-pattern-decisions` (slice S-05)
 
-Written by the `implement` step, Phase 4 (2026-09-28, autonomous run `2026-09-28-s05-s06-s07`). Phase 4 (decision
-endpoint + US-03 durability smoke) is fully green and committed: `POST /api/patterns/decision` now writes
-`pattern_decisions` rows for all six actions (merge, unmerge, type, rename, exclude, restore), and smoke proves the
-full US-03 loop over real HTTP, including a second import joining an already-merged/pinned/renamed/excluded pattern
-with no re-editing. **There is still no UI** — everything this phase added is posted directly by smoke; a browser
-user cannot yet trigger any of it (Phase 6 adds the „Akcje” dialog). What the next agent must not get wrong: `merge`
-is the **only** action that reads (`loadPatternData`, to run `validateMerge` against the current roots) — every
-other action writes blind, straight from the parsed form, exactly as the plan's Critical Implementation Details
-say; do not add a read to `unmerge`/`type`/`rename`/`exclude`/`restore` "for consistency". Every write is a
-**partial** upsert (`{ merchant_key: key, <one column> }`, `onConflict: "user_id,merchant_key"`) — never spread a
-full decision object, or a later phase's write will silently reset every other column on that row (proven by
-smoke "rename keeps the exclusion" and this phase's break 4.6).
+Written by the `implement` step, Phase 5 (2026-09-28, autonomous run `2026-09-28-s05-s06-s07`). Phase 5 (shared
+dialog geometry + bfcache pending reset, G24 / undo-import F4 / S-04 F8) is fully green and committed. The shared
+`DialogContent`/`DialogOverlay` (`src/components/ui/dialog.tsx`) now match the kit `.modal`/`.modal-backdrop`
+exactly (480 px / 31 px padding / 13 px radius, `bg-ink/44`, 20 px viewport margin baked into the content's own
+`w-[calc(100%-40px)]` rather than the overlay's padding — the two Radix nodes are siblings inside the portal, not
+parent/child, so centring has to live on the content, not a `grid place-items-center` on the overlay). New
+`usePageShowReset` hook (`src/components/hooks/`) resets a stuck `pending`/`saving` state on a bfcache restore,
+wired into `DeleteImportDialog` and `ThresholdEditor`. **What the next agent must not get wrong**: this phase
+touches nothing on `/patterns/[...key].astro` or the decision endpoint — Phase 6 is the first phase to actually
+wire the dialog geometry and the bfcache hook onto a *new* consumer (`PatternActionsDialog`); when it builds that
+component it should reuse `usePageShowReset` the same way, not reinvent a bfcache fix. The `[visual]` rows 5.8/5.9
+(screenshots + manual bfcache back-navigation check) are explicitly not mine and are still `[ ]` — do not tick them.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/durable-pattern-decisions` (confirmed with `git branch --show-current`), cut from `main` at `f252112` |
-| Commits on branch | 13 — change identity, research, plan, plan review, Phase 1 (`1e2ea9b` + sha-record `272232b`), Phase 1 handoff (`17e3137`), Phase 2 (`c2b63b4` + sha-record `a89ce59`), Phase 2 handoff (`8f3f5f9`), Phase 3 (`b1010f3` + sha-record `3000e75`), Phase 3 handoff (`f7eb960`), **Phase 4 `feat(durable-pattern-decisions): decision endpoint and US-03 durability smoke (p4)` (`61145cf`)**, **`docs(durable-pattern-decisions): record phase 4 commit sha in Progress` (`c2626db`)** |
+| Commits on branch | 15 — change identity, research, plan, plan review, Phase 1 (`1e2ea9b` + sha-record `272232b`), Phase 1 handoff (`17e3137`), Phase 2 (`c2b63b4` + sha-record `a89ce59`), Phase 2 handoff (`8f3f5f9`), Phase 3 (`b1010f3` + sha-record `3000e75`), Phase 3 handoff (`f7eb960`), Phase 4 (`61145cf` + sha-record `c2626db`), Phase 4 handoff (`79da179`), **Phase 5 `feat(durable-pattern-decisions): shared dialog geometry and bfcache pending reset (p5)` (`f468f68`)**, **`docs(durable-pattern-decisions): record phase 5 commit sha in Progress` (`1b27113`)** |
 | Pushed / PR / merged | no / none / no |
 | `change.md` status | `implementing` (unchanged — only flips once, at Phase 1 entry) |
-| `## Progress` rows remaining | 39 pending (`grep -c '^- \[ \]' plan.md`); Phase 4's own `4.9` `[reviewer]` still `[ ]` (not mine) |
+| `## Progress` rows | 38 done / 27 pending (`grep -c '^- \[ \]' plan.md`) — includes this phase's own `[visual]` rows 5.8, 5.9 still `[ ]` (not mine) |
 | Working tree | Clean after the two commits (`git status --short` empty) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `src/lib/patterns/decision-form.ts` | New. `decisionKeySchema` (key alone, `.loose()` so the rest of the form passes through unvalidated — parsed first, S-04 F4 lesson). `decisionSchema` — zod discriminated union on `action`: `merge` (`target`), `unmerge` (`source`), `type` (`type` ∈ `fixed`\|`frequent`), `rename` (`name`), `exclude`, `restore` (optional `back: "list"`). `parseDisplayName(raw)` — trim; empty → `null`; >100 chars → the literal `"invalid"` (eslint `no-redundant-type-constituents` disabled on that one signature with a comment — the rule doesn't distinguish a sentinel literal from `string` structurally). `validateMerge(patterns, source, target)` — both must be current roots in `patterns`, `target !== source`, `target` not excluded. `decisionRedirect(key, status, back?)` — maps each of 9 `DecisionStatus` values to its query param on the key's own detail, or (`back === "list"`) to `/patterns` |
-| `src/pages/api/patterns/decision.ts` | New. `POST`, `prerender = false`. Guard identical to `threshold.ts` (unconfigured client / no user → `/login`). Parses `decisionKeySchema` first (no usable key → `/patterns`), then `decisionSchema` (fails → `error-decision` on the key's own detail). One `switch` per action; every branch does exactly one partial upsert (or, for `unmerge`, one `update … set merged_into = null … .eq("merchant_key", source)`) and one `console.error` + `error-decision` on a DB error. `merge` alone calls `loadPatternData` first and rejects via `error-merge` (not `error-decision`) when `validateMerge` fails |
-| `test/unit/decision-form.test.ts` | New, 22 cases: `decisionKeySchema` (accepts with extra fields, rejects empty/missing/>500 chars); `decisionSchema` (accepts all six actions incl. `restore` with/without `back`, rejects unknown action, missing `target`/`source`, bad `type`, >500-char key); `parseDisplayName` (trim, empty/whitespace → `null`, 100 ok, 101 → `"invalid"`); `validateMerge` (ok, self, unknown target, target not a current root i.e. already-absorbed shape, excluded target, unknown source); `decisionRedirect` (all 9 statuses, `back: "list"`, a key with a space) |
-| `scripts/smoke.mjs` | New `importPayloadJune` (same account, 2026-06-01..30, 3 new `bankTxId`s: Sklep smoke 12,99 zł 06-04, Piekarnia smoke 8,00 zł 06-10, Kawiarnia smoke 47,00 zł 06-20). 26 new steps inserted after "pattern detail drops the over-limit mark after removal": 25 sequential steps proving the full US-03 loop (unknown action → self-merge rejected → merge → sums/re-types → absorbed-key redirect → list drops the absorbed row → pin type → threshold → exclude → over-long rename rejected → rename → exclusion survives the rename → second import → merge/type/name/exclusion all hold on the new rows with no re-editing → restore → unmerge → absorbed key has its own detail again), plus 1 anonymous-session step ("decision without a session goes to login") placed alongside the other anonymous checks. Top file comment updated to mention the decision path |
-| `context/changes/durable-pattern-decisions/plan.md` | Phase 4 `## Progress` rows `4.1`–`4.8` ticked `[x]` with ` — 61145cf` and the **observed** numbers/meta-checks recorded inline (§3 below has the same detail); `4.9` left `[ ]` for `/10x-impl-review` |
+| `src/components/ui/dialog.tsx` | Changed. `DialogOverlay`: `bg-ink/40` → `bg-ink/44` (exact match to kit `rgba(32,47,64,.44)` — `--ink` is `#202F40`, confirmed by grep in `src/styles/brand.css`). `DialogContent`: `max-w-[440px] p-[22px] rounded-xl` → `w-[calc(100%-40px)] max-w-[480px] p-[31px] rounded-[13px]` (values read directly from `design/rytm-os/prototype/styles.css` `.modal-backdrop`/`.modal`). The 20 px kit viewport margin is expressed via the content's own `calc(100%-40px)` width, not overlay padding/grid, because `DialogOverlay` and `DialogPrimitive.Content` are portal siblings in this Radix structure, not parent/child — centring an overlay-level `grid place-items-center` would not affect the content at all. Header comment updated, written without a literal hex value so the plan's own `grep -nE "#[0-9a-fA-F]{3,6}..."` criterion stays a true negative. Border and shadow literal untouched (not named by the plan's contract) |
+| `src/components/hooks/usePageShowReset.ts` | New. `onPersistedPageShow(target: EventTarget, callback): () => void` — pure, DOM-free (takes any `EventTarget`), adds a `pageshow` listener that calls `callback` only when `event.persisted` is `true`, returns the cleanup. `usePageShowReset(reset: () => void)` — thin `useEffect` wiring it to `window` |
+| `src/components/imports/DeleteImportDialog.tsx` | Changed. `usePageShowReset(() => setPending(false))` added next to the existing `pending` state (undo-import F4) |
+| `src/components/patterns/ThresholdEditor.tsx` | Changed. `usePageShowReset(() => setSaving(false))` added next to the existing `saving` state (S-04 F8) |
+| `test/unit/page-show-reset.test.ts` | New, 3 cases: persisted `pageshow` → callback called once; non-persisted → callback not called; after `cleanup()` → callback not called even on a persisted event. Uses a plain `new EventTarget()` + `Object.assign(new Event("pageshow"), { persisted })` — no jsdom, matches the plan's contract and this repo's Node-only vitest environment (no jsdom/testing-library dependency exists) |
+| `context/foundation/design-kit.md` | G24 row: appended the S-05 faza 5 delivery note (dialog geometry now matches the kit, closing the 400 px side-margin discrepancy the row itself named; `usePageShowReset` note) |
+| `context/changes/durable-pattern-decisions/plan.md` | Phase 5 `## Progress` rows `5.1`–`5.7` ticked `[x]` with ` — f468f68` and the **observed** numbers/meta-check recorded inline (§3 below has the same detail); `5.8`/`5.9` left `[ ]` (`[visual]`, not mine) |
 | `context/changes/durable-pattern-decisions/handoff.md` | This file |
 
 ## 3. Verification
 
-Baseline for this phase (measured on this branch before Phase 4, i.e. Phase 3's own result): lint 0 · astro check 0
-errors (111 files) · fixture:check OK · vitest 165 (9 files) · build OK · pgTAP 102 (5 files) · smoke 77 PASS.
+Baseline for this phase (measured on this branch before Phase 5, i.e. Phase 4's own result): lint 0 · astro check 0
+errors (114 files) · fixture:check OK · vitest 187 (10 files) · build OK · pgTAP 102 (5 files) · smoke 103 PASS.
 
 | Command / check | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/durable-pattern-decisions` |
 | `npm run lint` | 0 errors (delta 0) |
-| `npx astro check` | 0 errors, 0 warnings, 0 hints, **114** files (delta +3 — `decision-form.ts`, `decision.ts`, `decision-form.test.ts`) |
+| `npx astro check` | 0 errors, 0 warnings, 0 hints, **116** files (delta +2 — `usePageShowReset.ts`, `page-show-reset.test.ts`) |
 | `npm run fixture:check` | OK |
-| `npm test` | **187** passed, **10** files (baseline 165/9 + 22 new cases in 1 new file, delta +22/+1 file) |
+| `npm test` | **190** passed, **11** files (baseline 187/10 + 3 new cases in 1 new file, delta +3/+1 file) |
 | `npm run build` | passes |
-| `npx supabase db reset && npx supabase test db` | pgTAP 102 (5 files), all pass (delta 0 — Phase 4 touches no migration) |
-| `npm run db:types` | run to confirm no drift; `git diff --stat src/db/database.types.ts` empty (delta 0, as expected) |
-| `BASE_URL=http://localhost:4398 npm run smoke` (`ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398`) | **103** PASS (baseline 77, +26), run clean before and after all three deliberate breaks |
+| `npx supabase db reset && npx supabase test db` | pgTAP 102 (5 files), all pass (delta 0 — Phase 5 touches no migration) |
+| `BASE_URL=http://localhost:4398 npm run smoke` (`ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398`) | **103** PASS (delta 0), run clean before and after the deliberate break |
+| `grep -nE "#[0-9a-fA-F]{3,6}\b\|\[#" src/components/ui/dialog.tsx` | empty (plan criterion 5.7) |
 
-Deliberate breaks (all on `src/pages/api/patterns/decision.ts` / `src/lib/patterns/load.ts` / `decision-form.ts`,
-each restored immediately after its own smoke run, full gate re-confirmed green afterward):
+Deliberate break (plan criterion 5.6, on `src/components/hooks/usePageShowReset.ts`, restored immediately after
+its own test run, full gate re-confirmed green afterward):
 
-1. **Plan criterion 4.6** — rename's upsert changed to send `{ merchant_key, display_name, excluded: false }`
-   (a full-column write instead of the partial one) → 2/103 smoke steps FAIL: "rename keeps the exclusion" (the
-   one the plan names) **and** its downstream dependent "later import keeps the exclusion" (the exclusion, once
-   wrongly reset, stays reset through the later import too — both are the same root cause, not two bugs).
-   Restored → 103/103. **Meta-check**: "pattern is renamed" itself stayed green throughout, so the red proves the
-   untouched `excluded` column does not survive a full-column upsert — not that the rename action is broken.
-2. **Plan criterion 4.7** — `loadPatternData` changed to call `derivePatterns(rows, new Map())` instead of
-   `derivePatterns(rows, decisions)` → **8** smoke steps FAIL, wider than the plan's named 4 (steps 4, 5, 13, 16):
-   "merged pattern sums its components", "merged pattern is re-typed by D5", "patterns list shows one merged row",
-   "excluded pattern has no over-limit", "rename keeps the exclusion", "later import joins the merged pattern",
-   "later import keeps the name", "later import keeps the exclusion". The 4 extra failures ("patterns list shows
-   one merged row" and the three "later import keeps/joins …" steps) are the same root cause reaching further
-   downstream — once no decision ever reaches `derivePatterns`, the merge stops holding for *any* read, not just
-   the ones the plan's criterion named; recording the wider, actually-observed set rather than trimming it to the
-   plan's 4 to stay literal. Restored → 103/103. **Meta-check**: the four write steps ("pattern is merged", "type
-   is pinned", "pattern is excluded", "pattern is renamed") and the three reads that consult the decisions map
-   directly rather than through `derivePatterns` ("absorbed pattern redirects to the merged one" —
-   `detailTarget`/`resolveKey` — "pinned type shows on the detail" and "pinned type takes the amount threshold" —
-   both trivially true for a single-occurrence pattern under D5 regardless of the pin) all stayed green throughout
-   — isolating the break to derivation specifically, exactly as Phase 3's own unguarded break (3.7) predicted this
-   phase would catch.
-3. **Plan criterion 4.8** — `validateMerge` changed to always `return true` → exactly 1/103 FAILs: "merge into
-   itself is rejected" redirects to `/patterns/sklep%20smoke?error=decision` instead of `?error=merge` (the DB's
-   `pattern_decisions_no_self_merge` check constraint still rejects the write as an untyped error, but the
-   app-side `error-merge` branch never fires). Restored → 103/103. **Meta-check**: the DB would refuse the
-   self-merge either way, so the *only* observable difference is which redirect target fires — confirming the
-   app-side validation is what the smoke step actually proves, not just "the write eventually fails".
+1. `onPersistedPageShow`'s handler changed to call `callback()` unconditionally, dropping the
+   `if ((event as PageTransitionEvent).persisted)` guard → `test/unit/page-show-reset.test.ts` "does not call the
+   callback on a non-persisted pageshow" FAILs (1/190 — `expected 1 to be +0`). Restored → 190/190 PASS.
+   **Meta-check**: the other two cases in the same file ("calls the callback once on a persisted pageshow", "stops
+   listening after cleanup") stayed green throughout the break, so the red isolates the `persisted` filter
+   specifically — not the listener registration or the cleanup function, both of which the break left untouched.
 
-No `BEGIN … ROLLBACK` DB experiment was needed this phase (no migration touched); pgTAP was re-run once at the end
-(after all three code breaks were restored) to confirm delta 0.
+No `BEGIN … ROLLBACK` DB experiment was needed this phase (no migration touched, and no other local DB mutation was
+made); pgTAP was re-run once (before any code change) to confirm delta 0, matching the "Phase 5 touches no
+migration" expectation — not re-run a second time after the break since the break was pure TypeScript with no DB
+surface.
 
 ## 4. Next command
 
-`/10x-implement durable-pattern-decisions phase 5`
+`/10x-implement durable-pattern-decisions phase 6`
 
 ## 5. Open
 
 - Manual Progress rows not touched this phase (carried from earlier handoffs, plus this phase's own):
-  `[reviewer]` 1.9, 1.10 (Phase 1), 2.9 (Phase 2), 3.8 (Phase 3), **4.9** (this phase's own — "the endpoint mirrors
-  the threshold endpoint (guard, parse, log, redirect) but parses `key` first; every write sends one decision
-  column; the client never sends `user_id`; `merge` is the only action that reads" — verified by hand during
-  implementation, see `src/pages/api/patterns/decision.ts` in full, but still needs `/10x-impl-review`'s own
-  check), 5.8, 5.9 (Phase 5, `[visual]`), 6.8, 6.9, 7.8 (`[reviewer]`); `[visual]` 5.8, 5.9, 7.10, 7.11; `[human]`
-  7.9 (product owner confirms plan decision 9, „nie wchodzi do sumy miesięcznej” — already answered by the
-  maintainer's Step-0 product decision recorded in the agent contract, but the row itself is still unticked
-  pending Phase 7).
-- Gap ids still reserved for later phases: K22, G33 (Phase 6); G4/G24/G28 rows to be updated in Phases 5–7
-  (`context/foundation/design-kit.md`) — nothing registered yet, Phase 4 touched no UI/copy/kit rows.
-- Carried risks (plan `## Known risks`, unchanged, now partly exercised): normalizer drift
-  (`src/lib/patterns/merchant.ts` `normalizeMerchant`) still open; PostgREST partial-upsert semantics — now
-  **proven** by pgTAP 6–7 (Phase 1) *and* smoke "rename keeps the exclusion" (this phase, break 4.6) rather than
-  just asserted; smoke text-anchor rule (`InlineAlert.astro` renders `<span> text </span>` — bare text, never
-  `>text<`) — relevant starting Phase 6's `patternActions` toasts, not yet exercised (this phase's own new smoke
-  assertions are all plain `>text<` page content or `notContains`, no `InlineAlert` result lines yet since there
-  is no UI to render one).
-- Carried from Phase 3 §5 — `src/pages/patterns/[...key].astro`'s `astro check` false positive on
-  `Astro.redirect(patternHref(...), ...)` called directly inside a nested `if`/`return`: worked around there by
-  precomputing the href first. Not re-triggered this phase (no new `Astro.redirect(patternHref(...))` call site
-  was added — the endpoint redirects via `context.redirect(decisionRedirect(...))`, a different shape); flagging
-  again here only so Phase 6 (which does touch `[...key].astro`) knows to watch for it if it adds another
-  `Astro.redirect(patternHref(...))` site.
-- **New, not in the plan text**: the plan's own criterion 4.7 explicitly says "steps 4, 5, 13, 16 FAIL" for the
-  empty-decisions break; the actually-observed failure set was 8 steps (see §3 point 2). This is not a defect in
-  the implementation — it is the plan's criterion under-stating its own blast radius, because steps 7 ("patterns
-  list shows one merged row") and 18/20/21 (the three "later import …" steps) are logically downstream of the
-  same merge/exclusion state the named 4 steps check. No plan or code change needed; recorded here so
-  `/10x-impl-review` does not read "4 failures expected, 8 observed" as a red flag without this context.
-- Phase 5 (next) is: shared dialog geometry (`DialogContent` → kit `.modal`, G24) and the `usePageShowReset` bfcache
-  hook (undo-import F4, S-04 F8), visible only on `/settings` and `/imports`. It does not touch anything this
-  phase added — no interaction expected. Phase 6 is the first phase to actually wire the decision endpoint to a
-  UI (the „Akcje” dialog); until then a decision can only be made the way this phase's smoke does it, by POSTing
-  directly.
+  `[reviewer]` 1.9, 1.10 (Phase 1), 2.9 (Phase 2), 3.8 (Phase 3), 4.9 (Phase 4 — endpoint contract review); **5.8,
+  5.9** (this phase's own, `[visual]` — screenshots `settings-delete-dialog`/`imports-delete-dialog` at 1440 px and
+  ~400 px, and a manual bfcache back-navigation check on `/settings` "Zapisz próg" and `/imports` "Usuń import").
+  Carried forward from the plan text: 6.8, 6.9, 7.8 (`[reviewer]`); `[visual]` 7.10, 7.11; `[human]` 7.9 (product
+  owner confirms plan decision 9 — already answered by the maintainer's Step-0 product decision recorded in the
+  agent contract, but the row itself stays unticked pending Phase 7).
+- Gap ids still reserved for later phases: K22, G33 (Phase 6). G24 itself is now closed for the dialog-geometry part
+  of its note (see `context/foundation/design-kit.md`); the row's other named gaps (password/deletion result-state
+  copy) were already delivered in an earlier slice and are unaffected by this phase.
+- Carried risks (plan `## Known risks`, unchanged): normalizer drift (`src/lib/patterns/merchant.ts`
+  `normalizeMerchant`) still open; PostgREST partial-upsert semantics — proven in Phase 1 (pgTAP) and Phase 4
+  (smoke); smoke text-anchor rule (`InlineAlert.astro` renders `<span> text </span>` — bare text, never `>text<`) —
+  still relevant starting Phase 6's `patternActions` toasts, not yet exercised by anything this phase added (no new
+  `InlineAlert` result line was touched — this phase's dialogs render no result text of their own).
+- **New this phase, not in the plan text**: `DialogOverlay` and `DialogPrimitive.Content` are portal *siblings* in
+  this Radix version, not parent/child, which the plan's prose ("overlay `bg-ink/44` with the kit's 20 px viewport
+  margin; content `w-[calc(100%-40px)] max-w-[480px] …`") already implicitly assumes (it puts the margin math on
+  the content, not the overlay) — flagging explicitly here because a first pass at this phase tried adding
+  `grid place-items-center p-5` to the overlay to "add the margin there" and had to be reverted (it has zero visual
+  effect on a sibling node); Phase 6, if it ever touches `dialog.tsx` again, should not re-attempt that.
+- `src/components/hooks/` did not exist before this phase (research.md noted it); it now holds exactly one file,
+  `usePageShowReset.ts`. Phase 6's plan section does not name a new hook, so no further additions are expected
+  there, but if one is needed this is the established location.
 
 ## 6. Autonomous decisions
 
 - **Ran the phase's work directly rather than through the interactive `/10x-implement` UX** (no `AskUserQuestion`,
-  no `TaskCreate`/`TaskUpdate` todo list) — same substitute as Phases 1–3: read the plan's Phase 4 section in
-  full, applied its contract by hand (implement → plan-criteria checks → deliberate break/meta-check per criterion
-  → full repo-wide gate → commit → sha-writeback docs commit). Rejected: invoking the Skill tool and answering its
-  prompts myself — the agent contract (rule 1) forbids `AskUserQuestion` outright. Would change: a non-interactive
-  skill entry point.
-- **Recorded break 4.7's actually-observed 8-step failure set in full, rather than trimming the write-up to the
-  plan's named 4 steps to look literal.** Why: the extra 4 failures are real, deterministic, and explained by the
-  same root cause (steps 7, 18, 20, 21 are all downstream reads of the merge/exclusion state that steps 4, 5, 13,
-  16 also check) — silently under-reporting a break's blast radius would be worse than a plan criterion that
-  slightly under-counts its own effect. Would change: if a future review decides the plan text itself should be
-  corrected to name all 8, that is a plan edit, not an implementation one — left as-is since the plan document's
-  job is to state the *minimum* proof, and 8/8 ⊇ 4/4.
-- **Disabled `@typescript-eslint/no-redundant-type-constituents` on `parseDisplayName`'s signature alone**, with a
-  same-line justification comment, rather than restructuring the return type to a discriminated object (e.g.
-  `{ ok: true; value: string | null } | { ok: false }`). Why: the plan's own contract spells out the exact return
-  shape as `string | null | "invalid"` and the smoke/unit-test call sites all narrow on `=== "invalid"`;
-  restructuring would be an unplanned API change for a lint technicality the rule itself cannot distinguish (a
-  sentinel literal vs. an arbitrary string are structurally identical to TypeScript). Would change: if a second,
-  unrelated function in this codebase hits the same rule, worth asking whether a shared "sentinel" type alias is
-  worth introducing instead of repeating the per-site disable.
-- **Used `.loose()` instead of the plan text's literal `.passthrough()`** on `decisionKeySchema`. Why: this repo
-  pins zod 4.6.5, where `.passthrough()` is deprecated in favour of `.loose()` (confirmed via `npx eslint`, which
-  flags the deprecated call under `@typescript-eslint/no-deprecated`); `.loose()` is the direct replacement with
-  identical runtime behaviour (unknown keys pass through unvalidated) — not a behavioural decision, just following
-  the installed dependency's own migration off a deprecated alias the plan's prose predates. Would change: nothing
-  — this is what the plan's contract meant, expressed in the current API.
+  no `TaskCreate`/`TaskUpdate` todo list) — same substitute as Phases 1–4: read the plan's Phase 5 section in full,
+  applied its contract by hand (implement → plan-criteria checks → deliberate break/meta-check → full repo-wide
+  gate → commit → sha-writeback docs commit). Rejected: invoking the Skill tool and answering its prompts myself —
+  the agent contract (rule 1) forbids `AskUserQuestion` outright. Would change: a non-interactive skill entry
+  point.
+- **Put the kit's 20 px viewport margin entirely on `DialogContent`'s width (`w-[calc(100%-40px)]`) rather than on
+  `DialogOverlay` as padding + grid centring**, even though the plan's prose phrase "overlay `bg-ink/44` with the
+  kit's 20 px viewport margin" could be read as asking for overlay-level padding. Why: `DialogOverlay` and
+  `DialogPrimitive.Content` are rendered as siblings inside `DialogPortal` (not nested), so any padding/grid
+  centring added to the overlay has no effect on the separately-positioned (`fixed top-1/2 left-1/2` +
+  transform) content — verified by reading the actual component tree before editing, and by the plan's own explicit
+  content contract (`w-[calc(100%-40px)] max-w-[480px] rounded-[13px] p-[31px]`), which already encodes the margin
+  into the content's width. Would change: nothing — the plan's own two clauses (overlay clause, content clause)
+  are consistent once read against the actual Radix structure; only the prose's placement of "20 px viewport
+  margin" next to "overlay" briefly suggested the wrong node.
+- **Reworded the `dialog.tsx` header comment to avoid a literal hex value (`#202F40`)** rather than leaving a
+  human-readable colour reference. Why: the plan's own automated criterion 5.7 is a literal
+  `grep -nE "#[0-9a-fA-F]{3,6}\b|\[#"` over the whole file with no comment exception, and a first pass's comment
+  (`--ink is #202F40`) made that grep non-empty although it changed no rendered colour — the grep is a blunt
+  instrument by design (plan text: "the shadow's existing `rgba(32,47,64,…)` is the only literal and stays as it
+  was"), so satisfying it literally was preferred over arguing the comment doesn't count. Would change: if the
+  criterion is ever revised to exclude comments, the more readable hex-bearing wording could return.
+- **No `npm run db:types` run this phase.** Why: Phase 5's plan section names no migration and touches no table;
+  the automated-verification list for this phase (unlike Phase 1's) does not call for it, and `git status` after
+  `supabase db reset` confirms no schema drift was introduced. Would change: if a future review wants it run
+  defensively on every phase regardless of migration touch, that's a contract change to the plan/agent-contract
+  text, not something to infer here.

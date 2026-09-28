@@ -1066,13 +1066,13 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [x] 6.1 `npm run lint` 0; `npx astro check` 0 errors (count recorded) — observed lint 0 errors; astro check 0 errors, **118** files (delta +2 — `PatternActionsDialog.tsx`, `RestoreForm.astro`)
-- [x] 6.2 `npm test` — Phase 5 count, 0 failures — observed **190 passed, 11 files** (delta 0 — no new unit test file this phase)
-- [x] 6.3 `npm run fixture:check` OK; `npm run build` passes — both observed OK
-- [x] 6.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0) — observed **102** (5 files), all pass, delta 0 (no migration this phase)
-- [x] 6.5 `BASE_URL=http://localhost:4398 npm run smoke` — 103 + 5 = 108 PASS — observed **108** PASS
-- [x] 6.6 Deliberate break (banner ignores `excluded`) → „restored pattern drops the banner” FAILs; restored → PASS; meta-check recorded — `{pattern.excluded && (…)}` changed to `{true && (…)}` in `[...key].astro`: „restored pattern drops the banner” FAILed (1/108, `expected 200 notContains:>Wykluczony z analizy<`) while „excluded pattern shows the banner” stayed PASS; restored → 108/108 PASS. Meta-check: the still-green sibling proves the banner follows the stored `excluded` flag, not merely that it renders
-- [x] 6.7 No raw colours in new components / changed page; `DESIGN-GAP: K22` / `G33` on every new key; rows K22, G33 and amended G4 in `design-kit.md` — `grep -nE "#[0-9a-fA-F]{3,6}\b|\[#" src/components/patterns/PatternActionsDialog.tsx src/components/patterns/RestoreForm.astro "src/pages/patterns/[...key].astro"` empty; K22/G33 both added to `design-kit.md` gap register + „Do rundy 3” (items 22–23); G4 status amended
+- [x] 6.1 `npm run lint` 0; `npx astro check` 0 errors (count recorded) — observed lint 0 errors; astro check 0 errors, **118** files (delta +2 — `PatternActionsDialog.tsx`, `RestoreForm.astro`) — a268bb4
+- [x] 6.2 `npm test` — Phase 5 count, 0 failures — observed **190 passed, 11 files** (delta 0 — no new unit test file this phase) — a268bb4
+- [x] 6.3 `npm run fixture:check` OK; `npm run build` passes — both observed OK — a268bb4
+- [x] 6.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0) — observed **102** (5 files), all pass, delta 0 (no migration this phase) — a268bb4
+- [x] 6.5 `BASE_URL=http://localhost:4398 npm run smoke` — 103 + 5 = 108 PASS — observed **108** PASS — a268bb4
+- [x] 6.6 Deliberate break (banner ignores `excluded`) → „restored pattern drops the banner” FAILs; restored → PASS; meta-check recorded — `{pattern.excluded && (…)}` changed to `{true && (…)}` in `[...key].astro`: „restored pattern drops the banner” FAILed (1/108, `expected 200 notContains:>Wykluczony z analizy<`) while „excluded pattern shows the banner” stayed PASS; restored → 108/108 PASS. Meta-check: the still-green sibling proves the banner follows the stored `excluded` flag, not merely that it renders — a268bb4
+- [x] 6.7 No raw colours in new components / changed page; `DESIGN-GAP: K22` / `G33` on every new key; rows K22, G33 and amended G4 in `design-kit.md` — `grep -nE "#[0-9a-fA-F]{3,6}\b|\[#" src/components/patterns/PatternActionsDialog.tsx src/components/patterns/RestoreForm.astro "src/pages/patterns/[...key].astro"` empty; K22/G33 both added to `design-kit.md` gap register + „Do rundy 3” (items 22–23); G4 status amended — a268bb4
 
 #### Manual
 

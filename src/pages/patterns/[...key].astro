@@ -13,12 +13,12 @@ import { MonthSelect } from "@/components/patterns/MonthSelect";
 import { ThresholdEditor, type ThresholdEditorCopy } from "@/components/patterns/ThresholdEditor";
 import { copy, copyExtra } from "@/content/copy";
 import { formatIsoDate, formatMoney, formatMonthShort, plural } from "@/lib/format";
-import { loadPatterns } from "@/lib/patterns/load";
+import { loadPatternData } from "@/lib/patterns/load";
 import { referenceMonth } from "@/lib/patterns/over-limit";
-import { keyFromPath } from "@/lib/patterns/path";
-import { loadThresholds } from "@/lib/patterns/thresholds";
-import { patternDetail, type PatternDetailView } from "@/lib/patterns/view";
+import { keyFromPath, patternHref } from "@/lib/patterns/path";
+import { detailTarget, patternDetail, type DetailTarget, type PatternDetailView } from "@/lib/patterns/view";
 import { createClient } from "@/lib/supabase";
+import type { MerchantPattern } from "@/types";
 
 const x = copyExtra.patterns;
 
@@ -28,25 +28,24 @@ if (key === null) {
 }
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
-let patternsResult: Awaited<ReturnType<typeof loadPatterns>>;
-let thresholdsResult: Awaited<ReturnType<typeof loadThresholds>>;
-if (supabase) {
-  [patternsResult, thresholdsResult] = await Promise.all([loadPatterns(supabase), loadThresholds(supabase)]);
-} else {
-  const error = new Error("Supabase is not configured");
-  patternsResult = { error };
-  thresholdsResult = { error };
-}
+const dataResult = supabase ? await loadPatternData(supabase) : { error: new Error("Supabase is not configured") };
 
-const readError =
-  "error" in patternsResult ? patternsResult.error : "error" in thresholdsResult ? thresholdsResult.error : null;
+const readError = "error" in dataResult ? dataResult.error : null;
 if (readError) {
   // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
   console.error("pattern detail failed", readError);
 }
 
-const pattern =
-  !readError && "patterns" in patternsResult ? patternsResult.patterns.find((p) => p.key === key) : undefined;
+// Resolves the requested key through the decisions before looking it up (S-05): an absorbed key's URL redirects
+// to its current root; `missing` covers both an unknown key and an owning-import deletion (S-04 decision 8).
+const target: DetailTarget | null =
+  readError || !("patterns" in dataResult) ? null : detailTarget(key, dataResult.patterns, dataResult.decisions);
+
+const redirectHref = target?.kind === "redirect" ? patternHref(target.key) : null;
+if (redirectHref !== null) {
+  return Astro.redirect(redirectHref, 302);
+}
+const pattern: MerchantPattern | undefined = target?.kind === "found" ? target.pattern : undefined;
 
 // DESIGN-GAP: G31 — the kit has no "pattern not found" state (e.g. the owning import was deleted, S-04 decision
 // 8's idempotent delete leaves no trace for the pattern itself either).
@@ -59,14 +58,14 @@ let month = "";
 let refMonth: string | null = null;
 let monthOptions: { value: string; label: string }[] = [];
 
-if (pattern && "rows" in patternsResult && "thresholds" in thresholdsResult) {
-  refMonth = referenceMonth(patternsResult.rows);
+if (pattern && "rows" in dataResult) {
+  refMonth = referenceMonth(dataResult.rows);
   if (!refMonth) {
     // Unreachable: `pattern` was derived from these same `rows`, so a match implies at least one row.
     return Astro.redirect("/patterns");
   }
-  const threshold = thresholdsResult.thresholds.get(key) ?? null;
-  detail = patternDetail(pattern, patternsResult.rows, threshold, refMonth, Astro.url.searchParams.get("month"));
+  const threshold = dataResult.thresholds.get(key) ?? null;
+  detail = patternDetail(pattern, dataResult.rows, threshold, refMonth, Astro.url.searchParams.get("month"));
   month = detail.month ?? refMonth;
   monthOptions = detail.months.map((m) => ({ value: m, label: formatMonthShort(m) }));
 }

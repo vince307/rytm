@@ -1016,13 +1016,13 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [ ] 3.1 `npm test` — Phase 2 count + the new cases, 0 failures
-- [ ] 3.2 `npm run lint` 0; `npx astro check` 0 errors (count recorded)
-- [ ] 3.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 3.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0)
-- [ ] 3.5 `BASE_URL=http://localhost:4398 npm run smoke` — 77 PASS (delta 0)
-- [ ] 3.6 Deliberate break (`detailTarget` returns `missing`) → absorbed-key cases FAIL; restored → green; meta-check recorded
-- [ ] 3.7 Deliberate break (empty decisions into `derivePatterns`) → recorded as uncaught until Phase 4
+- [x] 3.1 `npm test` — Phase 2 count (158, 9 files) + 7 new cases = 165 passed, 9 files, 0 failures — _pending commit_
+- [x] 3.2 `npm run lint` 0; `npx astro check` 0 errors, 0 warnings, 0 hints (111 files, +1 from the new `decisions.ts`) — _pending commit_
+- [x] 3.3 `npm run fixture:check` OK; `npm run build` passes — _pending commit_
+- [x] 3.4 `npx supabase db reset && npx supabase test db` — 102 (5 files), delta 0 (no migration this phase; `npm run db:types` confirmed no diff) — _pending commit_
+- [x] 3.5 `BASE_URL=http://localhost:4398 npm run smoke` — 77 PASS (delta 0) — _pending commit_
+- [x] 3.6 Deliberate break (`detailTarget`'s redirect branch always returns `{ kind: "missing" }`) → `pattern-view.test.ts`'s two absorbed-key cases FAIL ("redirects to its root", "resolves through a chain"; 19/21 passed in that file); every other `detailTarget`/`listOverview` case stayed green. Restored → 21/21 green. Meta-check: the "unknown key" and "key with no decision" cases stayed green throughout, so the red isolates the redirect branch specifically, not key lookup in general — _pending commit_
+- [x] 3.7 Deliberate break (`loadPatternData` passes `new Map()` instead of `decisions` to `derivePatterns`) → `npm run lint`, `npx astro check`, `npm test` (165/165) and `npm run build` **all stayed green** — confirmed uncaught, exactly as the plan's own criterion states; restored → unchanged green. This is the plan's flagged gap, not a regression: Phase 4's smoke step "merged pattern sums its components" is the guard — _pending commit_
 
 #### Manual
 

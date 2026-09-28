@@ -1,14 +1,19 @@
-// Reads every debit of the signed-in user (RLS scopes the rows) and derives the merchant patterns.
-// PostgREST caps a response at `max_rows` (1000 locally and on hosted Supabase), so a plain select would silently
-// truncate and break "every transaction counts once" (FR-007). The loop pages by keyset (`id > afterId`), not
-// offset (S-03 follow-up F2): an import deleted mid-read shifts an offset page and silently skips or repeats rows,
-// but a keyset page is unaffected — a gap in the id sequence is simply not returned, never duplicated. There is
-// therefore no `count` query to compare against (it would no longer detect anything a keyset read could miss).
+// Reads every debit of the signed-in user (RLS scopes the rows), together with the caller's thresholds and
+// durable decisions, and derives the merchant patterns — one entry point (`loadPatternData`) for both pages, the
+// decision endpoint (S-05 Phase 4) and any later slice (S-06, S-07). PostgREST caps a response at `max_rows`
+// (1000 locally and on hosted Supabase), so a plain select would silently truncate and break "every transaction
+// counts once" (FR-007). The loop pages by keyset (`id > afterId`), not offset (S-03 follow-up F2): an import
+// deleted mid-read shifts an offset page and silently skips or repeats rows, but a keyset page is unaffected — a
+// gap in the id sequence is simply not returned, never duplicated. There is therefore no `count` query to compare
+// against (it would no longer detect anything a keyset read could miss). `loadThresholds` (S-04 F5) and
+// `loadDecisions` page the same way, reusing `collectPages` from here.
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/db/database.types";
+import { loadDecisions } from "@/lib/patterns/decisions";
 import { derivePatterns } from "@/lib/patterns/derive";
-import type { MerchantPattern, PatternSource } from "@/types";
+import { loadThresholds } from "@/lib/patterns/thresholds";
+import type { MerchantPattern, PatternDecision, PatternSource, Threshold } from "@/types";
 
 export const PAGE_SIZE = 1000;
 
@@ -34,7 +39,7 @@ export async function collectPages<T extends { id: number }>(
     rows.push(...result.rows);
     afterId = result.rows[result.rows.length - 1].id;
   }
-  return { error: new Error("patterns read exceeded MAX_PAGES without an empty page") };
+  return { error: new Error("paged read exceeded MAX_PAGES without an empty page") };
 }
 
 interface TransactionSourceRow {
@@ -45,12 +50,12 @@ interface TransactionSourceRow {
   occurred_on: string;
 }
 
-/** One read serves both the list and the detail (S-04): the widened select carries `occurred_on` for the
- * over-limit rule, and the raw rows (`PatternSource[]`, keyed by transaction id) are returned alongside the
- * derived patterns so a detail view can pick its own pattern's transactions out of the same read. */
-export async function loadPatterns(
+/** The widened select carries `occurred_on` for the over-limit rule; the raw rows (`PatternSource[]`, keyed by
+ * transaction id) are what `loadPatternData` also returns, so a detail view can pick its own pattern's
+ * transactions out of the same read. Not exported — `loadPatternData` is the one entry point. */
+async function loadTransactionRows(
   supabase: SupabaseClient<Database>,
-): Promise<{ patterns: MerchantPattern[]; rows: PatternSource[] } | { error: unknown }> {
+): Promise<{ rows: PatternSource[] } | { error: unknown }> {
   const result = await collectPages<TransactionSourceRow>(async (afterId) => {
     let query = supabase
       .from("transactions")
@@ -69,5 +74,33 @@ export async function loadPatterns(
     title: row.title,
     occurredOn: row.occurred_on,
   }));
-  return { patterns: derivePatterns(rows), rows };
+  return { rows };
+}
+
+/**
+ * One read serves both pages (S-04), the decision endpoint and every later slice: the caller's transactions,
+ * thresholds and decisions in parallel (`Promise.all` — any one erroring fails the whole read, no partial list),
+ * then `derivePatterns(rows, decisions)` so the returned patterns already reflect every durable decision (S-05).
+ */
+export async function loadPatternData(supabase: SupabaseClient<Database>): Promise<
+  | {
+      patterns: MerchantPattern[];
+      rows: PatternSource[];
+      thresholds: Map<string, Threshold>;
+      decisions: Map<string, PatternDecision>;
+    }
+  | { error: unknown }
+> {
+  const [rowsResult, thresholdsResult, decisionsResult] = await Promise.all([
+    loadTransactionRows(supabase),
+    loadThresholds(supabase),
+    loadDecisions(supabase),
+  ]);
+  if ("error" in rowsResult) return { error: rowsResult.error };
+  if ("error" in thresholdsResult) return { error: thresholdsResult.error };
+  if ("error" in decisionsResult) return { error: decisionsResult.error };
+  const { rows } = rowsResult;
+  const { thresholds } = thresholdsResult;
+  const { decisions } = decisionsResult;
+  return { patterns: derivePatterns(rows, decisions), rows, thresholds, decisions };
 }

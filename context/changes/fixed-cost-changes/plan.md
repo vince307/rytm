@@ -683,14 +683,14 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [ ] 3.1 `npm run lint` 0; `npx astro check` 0 errors (count recorded)
-- [ ] 3.2 `npm test` — Phase 2 count, 0 failures (delta 0)
-- [ ] 3.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 3.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0)
-- [ ] 3.5 `BASE_URL=http://localhost:4398 npm run smoke` — 111 + 6 = 117 PASS
-- [ ] 3.6 Deliberate break (unsigned delta) → „fixed lists a changed amount” FAILs, „fixed shows the previous amount” PASSes; restored → PASS; meta-check recorded
-- [ ] 3.7 Deliberate break (no pre-import branch) → „fixed shows the pre-import view” FAILs; restored → PASS; meta-check recorded
-- [ ] 3.8 No raw colours in new components / page; `DESIGN-GAP: K23` / `G34` on every new key; rows K23, G34 and amended G5 in `design-kit.md`
+- [x] 3.1 `npm run lint` 0; `npx astro check` 0 errors (count recorded) — 124 files, 0 errors — a8e8b0c
+- [x] 3.2 `npm test` — Phase 2 count, 0 failures (delta 0) — 213 passed, 12 files, delta 0 — a8e8b0c
+- [x] 3.3 `npm run fixture:check` OK; `npm run build` passes — a8e8b0c
+- [x] 3.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0) — 102, 5 files, delta 0 — a8e8b0c
+- [x] 3.5 `BASE_URL=http://localhost:4398 npm run smoke` — 111 + 6 = 117 PASS — 117/117 PASS — a8e8b0c
+- [x] 3.6 Deliberate break (unsigned delta) → „fixed lists a changed amount” FAILs, „fixed shows the previous amount” PASSes; restored → PASS; meta-check recorded — a8e8b0c
+- [x] 3.7 Deliberate break (no pre-import branch) → „fixed shows the pre-import view” FAILs; restored → PASS; meta-check recorded — a8e8b0c
+- [x] 3.8 No raw colours in new components / page; `DESIGN-GAP: K23` / `G34` on every new key; rows K23, G34 and amended G5 in `design-kit.md` — a8e8b0c
 
 #### Manual
 

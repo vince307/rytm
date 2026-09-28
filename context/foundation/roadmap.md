@@ -49,7 +49,7 @@ Pieniądze cicho uciekają z konta, a kategoryzacja banku nie odpowiada na pytan
 | S-04 | pattern-threshold-over-limit | otworzyć wzorzec, zobaczyć jego transakcje, ustawić próg i zobaczyć „ponad próg” z sumą miesiąca            | S-03          | US-01, FR-008, FR-010, FR-011          | done     |
 | S-05 | durable-pattern-decisions    | scalić, wykluczyć, zmienić typ i nazwę wzorca, a decyzje przetrwają kolejny import                          | S-03          | US-03, FR-009                          | done     |
 | S-06 | fixed-cost-changes           | zobaczyć, które wzorce stałe zmieniły kwotę i które są nowe względem poprzedniego miesiąca                  | S-03          | US-04, FR-012                          | done     |
-| S-07 | over-limit-trend             | zobaczyć sumę „ponad progiem” per miesiąc według dzisiejszych progów                                        | S-04          | US-05, FR-013                          | planning |
+| S-07 | over-limit-trend             | zobaczyć sumę „ponad progiem” per miesiąc według dzisiejszych progów                                        | S-04          | US-05, FR-013                          | in-progress |
 | S-08 | settings-account             | zobaczyć swoje konto, zmienić hasło i samodzielnie usunąć konto wraz z danymi                               | —             | FR-001, FR-019, NFR prawo do usunięcia | done     |
 | S-09 | public-demo-seed             | wejść na publiczną instancję i zobaczyć zaimportowany syntetyczny wyciąg bez prawdziwych danych             | F-02, S-03    | FR-014, NFR prywatność                 | proposed |
 
@@ -191,7 +191,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Rozszerza regułę z S-04 na wszystkie miesiące; ostatni w strumieniu, bo zmienia zachowanie użytkownika dopiero po kilku importach, a niepełny bieżący miesiąc świadomie nie jest oznaczany (założenie PRD).
-- **Status:** planning
+- **Status:** in-progress
 
 ### S-08: Konto i usunięcie konta
 

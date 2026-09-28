@@ -712,13 +712,13 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [ ] 1.1 `npm test` — 213 + the new cases, 13 files, 0 failures (total recorded); `pattern-view.test.ts` untouched and green
-- [ ] 1.2 `npm run lint` 0; `npx astro check` 0 errors (count recorded)
-- [ ] 1.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 1.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0); smoke 121 PASS (delta 0)
-- [ ] 1.5 Deliberate break (excluded skip dropped) → case 7 FAILs; restored → green; meta-check recorded
-- [ ] 1.6 Deliberate break (axis filled as a continuous calendar range) → case 9 FAILs; restored → green; meta-check recorded
-- [ ] 1.7 Deliberate break (reference month only) → cases 3, 13 FAIL, case 11 green; restored → green; meta-check recorded
+- [x] 1.1 `npm test` — 213 + the new cases, 13 files, 0 failures (total recorded); `pattern-view.test.ts` untouched and green
+- [x] 1.2 `npm run lint` 0; `npx astro check` 0 errors (count recorded)
+- [x] 1.3 `npm run fixture:check` OK; `npm run build` passes
+- [x] 1.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0); smoke 121 PASS (delta 0)
+- [x] 1.5 Deliberate break (excluded skip dropped) → case 7 FAILs; restored → green; meta-check recorded
+- [x] 1.6 Deliberate break (axis filled as a continuous calendar range) → case 9 FAILs; restored → green; meta-check recorded
+- [x] 1.7 Deliberate break (reference month only) → cases 3, 13 FAIL, case 11 green; restored → green; meta-check recorded
 
 #### Manual
 

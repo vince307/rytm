@@ -53,6 +53,14 @@ export function formatMonthShort(yearMonth: string): string {
   return monthShort.format(Date.UTC(Number(year), Number(month) - 1, 1));
 }
 
+const monthAxis = new Intl.DateTimeFormat("pl-PL", { month: "short", year: "2-digit", timeZone: "UTC" });
+
+/** `2026-05` → `maj 26` — the `/home` trend chart's per-bar axis label (kit `trendChart()` `data-day`, S-07). */
+export function formatMonthAxis(yearMonth: string): string {
+  const [year, month] = yearMonth.split("-");
+  return monthAxis.format(Date.UTC(Number(year), Number(month) - 1, 1));
+}
+
 const dayMonth = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "long", timeZone: "UTC" });
 const longDate = (iso: string) => {
   const { year, month, day } = parts(iso);

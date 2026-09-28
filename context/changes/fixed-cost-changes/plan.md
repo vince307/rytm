@@ -138,7 +138,12 @@ BASE_URL=http://localhost:4398 npm run smoke                        # then: lsof
   order = the order of `patterns` (derivePatterns: sum desc, name, key) — deterministic, no second sort.
 - **Single-string rendering.** Meta lines (`„20.06.2026 · poprzednio 45,50 zł”`, `„pierwsze wystąpienie ·
   10.06.2026”`), amounts, deltas, counts and the empty / no-comparison lines are each built as one string (template
-  helper) and rendered as the only child of their element, so smoke's `>text<` anchors match.
+  helper) and rendered as the only child of their element, so smoke's `>text<` anchors match. The element's
+  `{expr}` stays on the same line as its opening and closing tag — `eslint --fix` (eslint-plugin-prettier) wraps
+  long elements onto three lines, and Astro then emits `<tag> text </tag>` (the `InlineAlert` trap, agent contract);
+  check the served HTML (`curl`) before asserting. If the formatter insists on wrapping, assert the bare text instead
+  (`/fixed` has no island, so no serialized-props false positive) and keep each positive / negative pair (plan
+  review F1).
 
 ## Phase 1: Fixture — an in-tolerance price change in the reference month
 
@@ -508,7 +513,7 @@ K23 agree with what renders); no unused export.
 - `BASE_URL=http://localhost:4398 npm run smoke` — 117 + 4 = 121 PASS (+10 over the baseline 111)
 - Deliberate break (message): render `x.newEmpty` regardless of `hasComparison` → „fixed without a previous month says so” FAILs while „fixed compares with the previous month” PASSes; restored → PASS. Meta-check: proves the message follows `hasComparison`, not that it renders
 - Deliberate break (exclusion reaches the page): drop the `!excluded` filter in `fixedOverview` → „fixed hides an excluded pattern” FAILs (and unit case 11); restored → PASS. Meta-check: „fixed marks a new pattern” stays green, so the red is the exclusion, not the read
-- Seam-sweep greps: `grep -rn "Further tones" src` empty; `grep -rnE "#[0-9a-fA-F]{3,6}\b|\[#"` over `src/components/fixed`, `src/pages/fixed.astro`, `src/components/app/Badge.tsx` empty; `grep -rn "DESIGN-GAP: G34\|DESIGN-GAP: K23" src` matches only `copy.ts` and `fixed.astro`
+- Seam-sweep greps: `grep -rn "Further tones" src` empty; `grep -rnE "#[0-9a-fA-F]{3,6}\b|\[#"` over `src/components/fixed`, `src/pages/fixed.astro`, `src/components/app/Badge.tsx` empty; `grep -rn "DESIGN-GAP: G34\|DESIGN-GAP: K23" src` matches only `copy.ts`, `fixed.astro` and `Badge.tsx` (the `new` tone mapping is a G34 item — plan review F2)
 
 #### Manual Verification:
 
@@ -633,6 +638,9 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 - **Astro check file count** is recorded, not asserted — only the error delta gates.
 - **Smoke text anchors**: every asserted string must be the only child of its element (single-string rendering); the
   pre-import title already is (`PageTitle` `<h1>{title}</h1>`).
+- **Badge `new` tint** (plan review F5): `bg-excess/25` over `paper` ≈ `#E7DCCA` vs the kit's `#EFE4D1`; `/20` would be
+  closer (≈ `#E9E0D0`) but `/25` keeps one mapping with `InlineAlert`'s error tint. The visual step compares against
+  the kit; a mismatch is a G34 note, not a new token.
 
 ## Progress
 
@@ -699,7 +707,7 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 - [ ] 4.5 `BASE_URL=http://localhost:4398 npm run smoke` — 117 + 4 = 121 PASS (+10 over the baseline 111)
 - [ ] 4.6 Deliberate break (message ignores `hasComparison`) → „fixed without a previous month says so” FAILs, „fixed compares with the previous month” PASSes; restored → PASS; meta-check recorded
 - [ ] 4.7 Deliberate break (`!excluded` filter dropped) → „fixed hides an excluded pattern” FAILs; restored → PASS; meta-check recorded
-- [ ] 4.8 Seam-sweep greps: no „Further tones”; no raw colours in `src/components/fixed`, `fixed.astro`, `Badge.tsx`; `DESIGN-GAP: G34` / `K23` only in `copy.ts` and `fixed.astro`
+- [ ] 4.8 Seam-sweep greps: no „Further tones”; no raw colours in `src/components/fixed`, `fixed.astro`, `Badge.tsx`; `DESIGN-GAP: G34` / `K23` only in `copy.ts`, `fixed.astro`, `Badge.tsx`
 
 #### Manual
 

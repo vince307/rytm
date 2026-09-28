@@ -764,13 +764,13 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [x] 4.1 `npm run lint` 0; `npx astro check` 0 errors (count recorded)
-- [x] 4.2 `npm test` — Phase 3 count, 0 failures (final: 213 + the S-07 cases, 14 files)
-- [x] 4.3 `npm run fixture:check` OK; `npm run build` passes
-- [x] 4.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0, 5 files)
-- [x] 4.5 `BASE_URL=http://localhost:4398 npm run smoke` — 130 + 1 = 131 PASS (+10 over the baseline 121)
-- [x] 4.6 Deliberate break (import panel on the empty branch) → „home before import has no trend” FAILs; restored → PASS; meta-check recorded
-- [x] 4.7 Seam-sweep greps: no raw colours in `src/components/home` / `home.astro`; no `niepełny` / `trend.current` in `src`; `DESIGN-GAP: G35` / `G36` / `K24` / `K25` only in `copy.ts`, `home.astro`, `src/components/home/*`; `appliesTo(stored` at most once in `src/lib/patterns`
+- [x] 4.1 `npm run lint` 0; `npx astro check` 0 errors (count recorded) — 286884f
+- [x] 4.2 `npm test` — Phase 3 count, 0 failures (final: 213 + the S-07 cases, 14 files) — 286884f
+- [x] 4.3 `npm run fixture:check` OK; `npm run build` passes — 286884f
+- [x] 4.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0, 5 files) — 286884f
+- [x] 4.5 `BASE_URL=http://localhost:4398 npm run smoke` — 130 + 1 = 131 PASS (+10 over the baseline 121) — 286884f
+- [x] 4.6 Deliberate break (import panel on the empty branch) → „home before import has no trend” FAILs; restored → PASS; meta-check recorded — 286884f
+- [x] 4.7 Seam-sweep greps: no raw colours in `src/components/home` / `home.astro`; no `niepełny` / `trend.current` in `src`; `DESIGN-GAP: G35` / `G36` / `K24` / `K25` only in `copy.ts`, `home.astro`, `src/components/home/*`; `appliesTo(stored` at most once in `src/lib/patterns` — 286884f
 
 #### Manual
 

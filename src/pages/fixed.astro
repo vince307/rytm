@@ -1,9 +1,10 @@
 ---
 // /fixed — kit `fixedCosts()` (prototype `app.js`), FR-012 / US-04 (S-06): `loadPatternData` → `fixedOverview`
-// gives the "Zmieniły kwotę" and "Bez zmian" sections their rows. The "Nowe w tym miesiącu" section, the
-// no-comparison message and the `new` Badge tone land in Phase 4 — until then `overview.new` is read but not
-// rendered (a would-be-new pattern is simply absent from both sections here, same as a lapsed one).
+// gives all three sections their rows — "Zmieniły kwotę", "Nowe w tym miesiącu" (kit `badge('nowy','new')`) and
+// "Bez zmian". Without a comparison month (one month of data, or a gap month between imports) the "Nowe" section
+// shows `x.noComparison` instead of its (necessarily empty, per D6) row list — AC: not "wszystko jest nowe".
 import AppLayout from "@/layouts/AppLayout.astro";
+import { Badge } from "@/components/app/Badge";
 import FixedRow from "@/components/fixed/FixedRow.astro";
 import FixedSection from "@/components/fixed/FixedSection.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
@@ -38,6 +39,7 @@ if ("error" in result) {
 const countText = (n: number) => x.count.replace("{n}", String(n)).replace("{items}", plural(n, x.itemForms));
 const previouslyText = (occurredOn: string, previousMinor: number) =>
   x.previously.replace("{date}", formatIsoDate(occurredOn)).replace("{amount}", formatMoney(previousMinor));
+const firstSeenText = (firstOccurredOn: string) => x.firstSeen.replace("{date}", formatIsoDate(firstOccurredOn));
 // DESIGN-GAP: G34 — the kit prints only a rise, in amber; a decrease has no kit colour, so it takes the same
 // "good news" green as a `fixed` badge (S-06 plan decision 12). Kept short (helper, not inline) so prettier never
 // wraps the `<b>` element onto three lines — a wrap would put the smoke-asserted delta text on its own indented
@@ -76,6 +78,18 @@ const deltaClass = (deltaMinor: number) => [
             amount={formatMoney(row.amountMinor)}
           >
             <b class:list={deltaClass(row.deltaMinor)}>{formatSignedMoney(row.deltaMinor)}</b>
+          </FixedRow>
+        ))}
+      </FixedSection>
+      <FixedSection
+        title={copy.fixedCosts.new}
+        count={countText(result.overview.new.length)}
+        empty={result.overview.hasComparison ? x.newEmpty : x.noComparison}
+        hasRows={result.overview.new.length > 0}
+      >
+        {result.overview.new.map((row) => (
+          <FixedRow name={row.name} meta={firstSeenText(row.firstOccurredOn)} amount={formatMoney(row.amountMinor)}>
+            <Badge tone="new">{copy.components.new}</Badge>
           </FixedRow>
         ))}
       </FixedSection>

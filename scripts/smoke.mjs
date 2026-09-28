@@ -4,9 +4,10 @@
 // path (POST /api/imports/delete: not-found, own delete, patterns dropping the import, re-import accepted) and
 // the durable pattern decision path (POST /api/patterns/decision: merge, type, rename, exclude/restore, unmerge,
 // a second import joining a merged pattern without re-editing — S-05 US-03) and /fixed (FR-012/US-04, S-06):
-// pre-import view, a one-month state (no change / unchanged rows), a changed amount with its previous value, and
-// an excluded pattern staying off the list — reusing the smoke user's existing May/June imports and decisions
-// rather than a dedicated payload (S-06 plan Key Discoveries).
+// pre-import view, a one-month state (no change / unchanged rows / no-comparison message, no "nowy"), a changed
+// amount with its previous value, an excluded pattern staying off the list, a new pattern with its "pierwsze
+// wystąpienie" meta and "nowy" badge, and the comparison-present negative control — reusing the smoke user's
+// existing May/June imports and decisions rather than a dedicated payload (S-06 plan Key Discoveries).
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
@@ -263,6 +264,15 @@ const steps = [
     { status: 200, contains: [">Kawiarnia smoke<", ">Bez zmian<"] },
   ],
   [
+    "fixed without a previous month says so",
+    () => request("/fixed"),
+    {
+      status: 200,
+      contains: ">Nie ma poprzedniego miesiąca do porównania.<",
+      notContains: ">nowy<",
+    },
+  ],
+  [
     "pattern detail renders the month total",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: "Suma w maju" },
@@ -490,6 +500,11 @@ const steps = [
     { status: 200, notContains: ">7,00 zł<" },
   ],
   [
+    "fixed hides an excluded pattern",
+    () => request("/fixed"),
+    { status: 200, contains: ">Piekarnia smoke<", notContains: ">Kawiarnia Rytm<" },
+  ],
+  [
     "pattern is restored",
     () => request("/api/patterns/decision", { method: "POST", form: { key: "kawiarnia smoke", action: "restore" } }),
     { status: 302, location: "/patterns/kawiarnia%20smoke?restored=1" },
@@ -532,6 +547,16 @@ const steps = [
     "fixed shows the previous amount",
     () => request("/fixed"),
     { status: 200, contains: [">20.06.2026 · poprzednio 45,50 zł<", ">Kawiarnia Rytm<"] },
+  ],
+  [
+    "fixed marks a new pattern",
+    () => request("/fixed"),
+    { status: 200, contains: [">pierwsze wystąpienie · 10.06.2026<", ">nowy<"] },
+  ],
+  [
+    "fixed compares with the previous month",
+    () => request("/fixed"),
+    { status: 200, notContains: ">Nie ma poprzedniego miesiąca do porównania.<" },
   ],
   ["pattern detail of an unknown key is not found", () => request("/patterns/nie%20ma%20takiego"), { status: 404 }],
   ["imports lists the delete action", () => request("/imports"), { status: 200, contains: ">Usuń import<" }],

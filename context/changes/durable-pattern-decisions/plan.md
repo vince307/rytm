@@ -999,14 +999,14 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [x] 2.1 `npm test` — Phase 1 count (141, 8 files) + 1 new file = 158 (9 files), every new case green, 0 failures
-- [x] 2.2 `npm run lint` 0; `npx astro check` 0 errors (110 files, +1 from the new test file — `tsconfig.json` includes `**/*`)
-- [x] 2.3 `npm run fixture:check` OK; `npm run build` passes
-- [x] 2.4 `npx supabase db reset && npx supabase test db` — 102 (5 files), delta 0
-- [x] 2.5 `BASE_URL=http://localhost:4398 npm run smoke` — 77 PASS (delta 0)
-- [x] 2.6 Deliberate break (`resolveKey` one hop only, no loop) → chain, 2-cycle, 3-cycle cases in `pattern-decisions.test.ts` FAIL (3 tests); restored → green (54/54). Meta-check: `patterns.test.ts`'s direct single-hop merge case (`sportowo.pl → sportowo`) stayed green throughout, so the red isolates multi-hop/cycle resolution, not merging itself
-- [x] 2.7 Deliberate break (`type = d5Type(amounts)`, `pinnedType` ignored) → "a pinned type overrides D5 both ways" and the US-03 date-split case FAIL (2 tests); restored → green. Meta-check: the F-02 fixture partition case (`derivePatterns — F-02 oracle`) stayed green, so the red isolates the pin, not derivation generally
-- [x] 2.8 Deliberate break (`excluded` check dropped from `listOverview`'s early return) → the new excluded-list case FAILs (`overMinor` 2000 instead of 0); restored → green. Meta-check: the non-excluded twin (`wolt`, `overMinor` 2000 in the untouched test) stayed green throughout, proving the threshold does apply and only exclusion zeroes it
+- [x] 2.1 `npm test` — Phase 1 count (141, 8 files) + 1 new file = 158 (9 files), every new case green, 0 failures — c2b63b4
+- [x] 2.2 `npm run lint` 0; `npx astro check` 0 errors (110 files, +1 from the new test file — `tsconfig.json` includes `**/*`) — c2b63b4
+- [x] 2.3 `npm run fixture:check` OK; `npm run build` passes — c2b63b4
+- [x] 2.4 `npx supabase db reset && npx supabase test db` — 102 (5 files), delta 0 — c2b63b4
+- [x] 2.5 `BASE_URL=http://localhost:4398 npm run smoke` — 77 PASS (delta 0) — c2b63b4
+- [x] 2.6 Deliberate break (`resolveKey` one hop only, no loop) → chain, 2-cycle, 3-cycle cases in `pattern-decisions.test.ts` FAIL (3 tests); restored → green (54/54). Meta-check: `patterns.test.ts`'s direct single-hop merge case (`sportowo.pl → sportowo`) stayed green throughout, so the red isolates multi-hop/cycle resolution, not merging itself — c2b63b4
+- [x] 2.7 Deliberate break (`type = d5Type(amounts)`, `pinnedType` ignored) → "a pinned type overrides D5 both ways" and the US-03 date-split case FAIL (2 tests); restored → green. Meta-check: the F-02 fixture partition case (`derivePatterns — F-02 oracle`) stayed green, so the red isolates the pin, not derivation generally — c2b63b4
+- [x] 2.8 Deliberate break (`excluded` check dropped from `listOverview`'s early return) → the new excluded-list case FAILs (`overMinor` 2000 instead of 0); restored → green. Meta-check: the non-excluded twin (`wolt`, `overMinor` 2000 in the untouched test) stayed green throughout, proving the threshold does apply and only exclusion zeroes it — c2b63b4
 
 #### Manual
 

@@ -1,122 +1,109 @@
 # Handoff — `over-limit-trend` (slice S-07)
 
-Written by the `implement phase 3` step (`/10x-implement over-limit-trend phase 3`, run
-`2026-09-28-s05-s06-s07`). Phase 3 (`/home` stat cards — "Ponad progiem w tym miesiącu" and "Koszty stałe") is
-implemented, gated and committed. The one thing the next agent must not get wrong: the accent stat card's delta
-foot is computed by `deltaFootFor` in `home.astro`'s frontmatter, which **requires** a non-null `HomeStats.previous`
-(`NonNullable<HomeStats["previous"]>` parameter) — it must stay behind the `result.stats.previous ? … : undefined`
-ternary at the `StatCard` call site (`src/pages/home.astro`). Calling it unconditionally (the Phase 3 deliberate
-break) prints a delta foot with one month of data, which is exactly what US-05/plan review F1's gap rule forbids.
+Written by the `implement phase 4` step (`/10x-implement over-limit-trend phase 4`, run
+`2026-09-28-s05-s06-s07`) — the **last** plan phase. Phase 4 (import panel, follow-ups, seam sweep) is implemented,
+gated and committed; `change.md` is now `implemented`. The one thing the next agent must not get wrong: 8 manual
+Progress rows (`1.8`, `2.10`, `3.10`, `4.8`–`4.13`) are still `[ ]` — they were left open **on purpose** ([reviewer] /
+[human] / [visual], not this agent's to verify), not missed. `/10x-impl-review` owns `1.8`/`2.10`/`3.10`/`4.8`; the
+`[human]`/`[visual]` rows stay open on the post-run checklist per the plan's own Implementation Note.
 
 ## 1. State
 
 | Item | Value |
 |---|---|
 | Branch | `feat/over-limit-trend`, cut from `main` at `c0b0068` |
-| Commits | 11 on the branch: `8c08aef` change identity, `3fedeb7` research, `6278303` plan, `579cb9e` plan review, `0a40fab` feat p1, `5ac8aa7` docs (p1 SHA), `b5592b7` handoff after p1, `3894189` feat p2, `2082444` docs (p2 SHA), `7e21d6f` handoff after p2, `30cc44a` **feat(over-limit-trend): /home — karty statystyk „Ponad progiem” i „Koszty stałe” (p3)**, `0fd4a11` docs (p3 SHA record) |
+| Commits | 13 on the branch: `8c08aef` change identity, `3fedeb7` research, `6278303` plan, `579cb9e` plan review, `0a40fab` feat p1, `5ac8aa7` docs (p1 SHA), `b5592b7` handoff after p1, `3894189` feat p2, `2082444` docs (p2 SHA), `7e21d6f` handoff after p2, `30cc44a` feat p3, `0fd4a11` docs (p3 SHA), `5855bdc` handoff after p3, **`286884f` feat(over-limit-trend): import panel, follow-ups i seam sweep (p4)**, `4fec6ef` chore: close out plan (epilogue) |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `implementing` (unchanged) |
-| `## Progress` rows remaining | 16 (`grep -c '^- \[ \]' plan.md`) — Phase 3 fully closed except `3.10 [reviewer]`; also still open from earlier phases: `1.8 [reviewer]`, `2.10 [reviewer]`; Phase 4 (4.1–4.13) untouched |
+| `change.md` status | `implemented` (this step, was `implementing`) |
+| `## Progress` rows remaining | 8 (`grep -c '^- \[ \]' plan.md`) — all manual: `1.8 [reviewer]`, `2.10 [reviewer]`, `3.10 [reviewer]`, `4.8 [reviewer]`, `4.9/4.10/4.11 [human]`, `4.12/4.13 [visual]`. Every `#### Automated` row across all 4 phases is `[x]` with a SHA |
 | Working tree | clean (`git status --porcelain` empty after both commits) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 |---|---|
-| `src/lib/patterns/home.ts` | New. `homeStats(trend, fixed): HomeStats` — `overMinor` = trend's last axis point; `previous` = `{ month, deltaMinor }` against `previousMonth(referenceMonth)` only when that month is on the trend's axis (else `null`, S-06 D6 / plan review F1 gap rule); `fixedTotalMinor` = Σ `amountMinor` over `fixed.changed`/`new`/`unchanged`; `fixedRisen` = count of `changed` rows with `deltaMinor > 0` |
-| `src/components/home/StatCard.astro` | New. Kit `.stat-card` / `.stat-card.accent`; props `{ label, value, foot?, accent? }`; label/value/foot each the sole child of their element (smoke `>text<` anchor rule); value colour is always `ink` (kit does not override `.stat-value` under `.accent`) |
-| `src/pages/home.astro` | Rewritten. `try` now runs `overLimitTrend` → (if `referenceMonth` non-null) `fixedOverview` → `homeStats`; result union gains `stats: HomeStats` alongside `trend`. New 2-column grid (`grid-cols-[1.2fr_1fr]`, `max-[899px]:grid-cols-1`) between `PageTitle` and the trend `Panel`: accent `StatCard` (label `copy.dashboard.stats[0].label`, value `formatMoney(stats.overMinor)`, foot via `deltaFootFor` only when `stats.previous` is set) and a plain `StatCard` (label `copy.dashboard.stats[2].label` — "Koszty stałe", value `formatMoney(stats.fixedTotalMinor)`, foot always via `risenFootFor`) |
-| `src/content/copy.ts` | `copyExtra.home` gains `deltaFoot` ("{delta} względem {month}"), `monthsGenitive` (12-form table), `risen` ("{n} {items}"), `risenForms` (K25, generalising the kit's `dashboard.stats[].foot` samples) |
-| `context/foundation/design-kit.md` | New rows **K25** (stat-foot copy only as kit samples) and **G36** (dashboard content the PRD doesn't define: "Rozpoznane wydatki" / "Co wraca najczęściej" not rendered, "Koszty stałe" value = Σ `/fixed` amounts); both ids appended to „Do rundy 3” (items 28–29) |
-| `scripts/smoke.mjs` | Header comment extended to mention Phase 3; 3 new steps inserted into the existing run: `home has no comparison with one month` (after "home shows the over-limit sum"), `home compares with the previous month` (after "home recomputes every month"), `home counts fixed costs that rose` (after "fixed lists a changed amount") |
-| `test/unit/home-stats.test.ts` | New. Cases 1–4 (empty, one month, three signed-delta sub-cases, gap month, `FixedOverview` sums/rises) plus case 5 (F-02 fixture, `kino światło` count 1: `overMinor` 0, `previous` `{ month: "2026-07", deltaMinor: -8759 }`, `fixedTotalMinor` 175298, `fixedRisen` 1) |
-| `context/changes/over-limit-trend/plan.md` | Phase 3 `## Progress` rows 3.1–3.9 ticked with SHA `30cc44a`; row 3.10 `[reviewer]` left open |
+| `src/components/home/ImportPanel.astro` | New. Kit `.import-panel` / `.import-copy` / `.import-icon`; props `{ title, body, cta, href }`; dashed border `border-muted/55` (kit `#9da9aa`) reuses the exact nearest-token mapping `TrendChart.astro` already established for the bar/gridline grey (G35 note) — no second token guess introduced; 38 px `bg-ink text-paper` icon box (`Icon name="import" size={17}`, `grid place-items-center`, same convention as `ImportWizard.tsx` / `imports/result.astro`); `<strong>{title}</strong>` and `{cta}` inside `buttonVariants({ variant: "ghost" })` each stay/end as the sole child of their element after `eslint --fix` (checked — the `<a>` wraps onto its own lines but `{cta}` is Prettier's block-child of `<a>`, not a wrapped inline span, so the smoke needle isn't affected — `cta` text isn't asserted anyway) |
+| `src/pages/home.astro` | `ImportPanel` added after the trend `Panel` in the content branch (`copy.dashboard.importTitle`/`importBody`, `copyExtra.imports.choose`, `/imports/new`); header comment updated — no longer says "import panel lands in Phase 4" |
+| `scripts/smoke.mjs` | Header comment extended to "Phases 2-4"; new step `home offers the next import` (after "home shows the over-limit sum") — contains `>Dodaj najnowszy wyciąg<`; `home before import has no trend` (Phase 2's step 1) gains a second `notContains` needle `>Dodaj najnowszy wyciąg<` (negative control) |
+| `context/changes/over-limit-trend/follow-ups/review-fixes.md` | New. 5 open items (S-05 F6 excluded-re-entry-via-merge, `patternTxs` drift→500 on `/patterns`/`/fixed`, G36 unrendered figures, long-history bar scroll, S-06 one-off-D5-fixed noise in „Koszty stałe”), each with a `Trigger:` line, plus one "from this phase" note (the `muted/55` reuse) |
+| `context/changes/over-limit-trend/plan.md` | Phase 4 `## Progress` rows 4.1–4.7 ticked with SHA `286884f`; row 4.8 (and earlier `1.8`/`2.10`/`3.10`) left open — not this agent's to verify |
+| `context/changes/over-limit-trend/change.md` | `status: implemented` |
 | `context/changes/over-limit-trend/handoff.md` | This file |
 
 ## 3. Verification
 
-All commands run and observed in this step (not inherited); baseline is Phase 2's own gate (`main` `c0b0068`
-lint 0 · astro check 0 errors, 127 files · fixture:check OK · vitest 238, 13 files · build OK · pgTAP 102, 5 files ·
-smoke 127 PASS).
+All commands run and observed in this step (not inherited); baseline is Phase 3's own gate (`main` `c0b0068` lint 0 ·
+astro check 0 errors, 130 files · fixture:check OK · vitest 246, 14 files · build OK · pgTAP 102, 5 files · smoke 130
+PASS).
 
 | Command | Result |
 |---|---|
 | `git branch --show-current` | `feat/over-limit-trend` (confirmed before writing) |
-| `npm run lint` | 0 errors (one round of `npm run lint:fix` needed for Prettier wrapping in `StatCard.astro`, `home.ts` and `home.astro`, then clean — verified the fixed formatting kept every smoke-asserted string as the sole child of its element) |
-| `npx astro check` | 130 files, 0 errors/warnings/hints (baseline 127, +3 expected: `home.ts`, `home-stats.test.ts`, `StatCard.astro`) |
+| `npm run lint` | 0 errors (one round of `npm run lint:fix` needed for `ImportPanel.astro`'s Prettier wrapping, then clean) |
+| `npx astro check` | 131 files, 0 errors/warnings/hints (baseline 130, +1 expected: `ImportPanel.astro`) |
 | `npm run fixture:check` | OK |
-| `npm test` | 246 passed, 14 files (baseline 238/13, +8: home-stats.test.ts cases 1, 2, 3×3, 3b, 4, 5 — matches Phase 3's "14 files" target exactly) |
+| `npm test` | 246 passed, 14 files (delta 0 — Phase 4 adds no unit tests, matches the plan) |
 | `npm run build` | passes |
-| `npx supabase db reset && npx supabase test db` (sandbox disabled — Docker/127.0.0.1:54321) | Files=5, Tests=102, PASS (delta 0) — run once before the breaks and once more after, both clean |
-| `ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398 --ignore-lock` + `BASE_URL=http://localhost:4398 npm run smoke` (sandbox disabled) | 130 PASS (127 + 3, matches plan exactly); server killed after (`lsof -ti :4398 \| xargs kill`) |
-| Deliberate break 1 (`home.ts`: `deltaMinor: prevEntry.overMinor - last.overMinor`, sign reversed) | `npx vitest run test/unit/home-stats.test.ts` → case 3 (rise, drop) and the F-02 fixture case FAIL (3 of 8 tests), case 3 (equal, delta 0) and case 3b (gap → `previous: null`) stay green; smoke: `home compares with the previous month` FAILs (`+1,50 zł` no longer matches), `home has no comparison with one month` stays green (positive control — no foot is rendered there regardless of sign). Restored via `Edit`; re-ran unit tests (8/8 green) and smoke (130/130). Meta-check: the red isolates the sign, not the foot's presence |
-| Deliberate break 2 (`home.ts`: `fixed.changed.filter((row) => row.deltaMinor !== 0)`) | Unit case 4 FAILs (`fixedRisen` 2 instead of 1 — the crafted decrease now counts); smoke `home counts fixed costs that rose` stays green (the smoke user's `/fixed` state has no decrease at that point in the flow, so only the unit case guards the `> 0` filter). Restored; re-ran unit tests (8/8) and smoke (confirmed the one step green). Meta-check matches the plan exactly |
-| Deliberate break 3 (`home.astro`: accent `StatCard` foot always calls `deltaFootFor` with a `{ month: "2026-01", deltaMinor: 0 }` fallback instead of the `result.stats.previous ? … : undefined` ternary) | `home has no comparison with one month` FAILs (`notContains: "względem"` now matches "0,00 zł względem stycznia"); `home compares with the previous month` (positive control, later in the flow where `previous` is genuinely set) stays green. Restored via `Edit`; re-ran smoke (130/130) |
-| Post-restore full gate | `npm run lint` / `astro check` / `fixture:check` / `npm test` / `npm run build` re-run clean after both restores (see rows above); `git status --porcelain` checked before staging — only the 7 intended files |
-| Automated grep row 3.9 | `grep -rnE "#[0-9a-fA-F]{3,6}\b\|\[#" src/components/home/StatCard.astro src/pages/home.astro` matches only `StatCard.astro`'s header comment (`#72501f`, documenting the kit hex next to the `excess-text` token substitution) — same convention as `Panel.astro`'s `#d9c2a0` comment and Phase 2's `TrendChart.astro` header (judged as satisfying the criterion's intent, same reasoning Phase 2 recorded); `grep -n "K25"` hits `copy.ts`, `home.astro` (a doc comment) and `design-kit.md` (row + „Do rundy 3” item); rows K25/G36 present in `design-kit.md` |
+| `npx supabase db reset && npx supabase test db` (sandbox disabled — Docker/127.0.0.1:54321) | Files=5, Tests=102, PASS (delta 0) |
+| `ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398 --ignore-lock` + `BASE_URL=http://localhost:4398 npm run smoke` (sandbox disabled) | 131 PASS (130 + 1, matches plan exactly); server killed after (`lsof -ti :4398 \| xargs kill`) |
+| Deliberate break (`home.astro`: render `ImportPanel` also inside the `referenceMonth === null` branch) | `home before import has no trend` FAILs (`notContains: ">Dodaj najnowszy wyciąg<"` now matches); `home offers the next import` (positive control, later in the flow where data exists) stays green. Restored via `git checkout -- src/pages/home.astro` (file was pre-staged before the break, so this reset to the intended Phase 4 content, not the pre-phase original). Re-ran smoke: 131 PASS / 0 FAIL. Meta-check: the red isolates the branch placement, not the panel's own content |
+| Seam-sweep greps (4.7) | `grep -rnE "#[0-9a-fA-F]{3,6}\b\|\[#"` over `src/components/home` / `home.astro` matches only header-comment hex documentation (`#72501f`, `#9aaab3`/`#d2d7d8`, `#9da9aa`/`#e8ecea`) — same accepted convention as Phases 2–3, no `bg-[#...]` arbitrary-value classes anywhere; `grep -rn "niepełny\|trend.current"` matches only `TrendChart.astro`'s own header comment (pre-existing since Phase 2, documents the deliberate omission); `grep -rn "DESIGN-GAP: G35\|G36\|K24\|K25"` hits only `copy.ts`, `home.astro`, `src/components/home/*` (`ImportPanel.astro` carries none — it's a straightforward 1:1 kit match, not a gap); `grep -c "appliesTo(stored" src/lib/patterns/*.ts` = 1 (`view.ts` only) |
+| Post-restore full gate | `npm run lint` / `astro check` re-run clean after the break-restore (see rows above); `git status --porcelain` checked before both stages — only the 5 intended files, no unrelated dirty paths |
 
 ## 4. Next command
 
-`/10x-implement over-limit-trend phase 4`
+`/10x-impl-review over-limit-trend`
 
 ## 5. Open
 
-- **Manual Progress rows still pending overall (unchanged in kind from the Phase 2 handoff, `3.10` newly due):**
-  `1.8 [reviewer]`, `2.10 [reviewer]`, `3.10 [reviewer]` (due now, not done by this step — `home.ts` import/reuse
-  audit: note below); `4.8 [reviewer]`; `4.9 / 4.10 / 4.11 [human]`; `4.12 / 4.13 [visual]`.
-- **Possible finding for row 3.10's reviewer**: the plan's literal text for 3.10 reads "`home.ts` imports only
-  `trend.ts`, `fixed.ts` types, `@/types`" — `home.ts` also imports `previousMonth` from `@/lib/patterns/over-limit`
-  (needed to compute the comparison month; `trend.ts` does not re-export it). `fixed.ts` itself already imports
-  `previousMonth` directly from `over-limit.ts` (same source, same pattern), so this reads as the same omission
-  Phase 2 hit with `TrendChart`'s `ariaLabel` prop (not literally in the contract's prop list, but required and
-  consistent with the codebase) rather than a real drift — recorded as an autonomous decision below, not silently
-  fixed or hidden.
-- **DESIGN-GAPs added this phase:** K25 (stat-foot copy templates, `copyExtra.home.deltaFoot`/`monthsGenitive`/
-  `risen`/`risenForms`), G36 (dashboard content the PRD doesn't define — "Rozpoznane wydatki" / "Co wraca
-  najczęściej" not rendered, "Koszty stałe" value = Σ `/fixed` amounts) — both registered in
-  `context/foundation/design-kit.md`, both appended to „Do rundy 3” (items 28–29).
-- **Carried risks (from the plan, unchanged unless noted):** bar label legibility at ~400 px — still not checked,
-  no dev server was left running for a manual phone-width look (the `[visual]` step after Phase 4 owns this,
-  now also covering the new 2-column stat grid's mobile stacking, `max-[899px]:grid-cols-1`); axis gaps hide the
-  delta foot (Phase 3 now implements this exactly — `homeStats.previous` returns `null` on a gap, verified by unit
-  case 3b and the crafted "one month" smoke step); „Koszty stałe” noise on real data (plan review F3, `[human]`
-  4.11 — the fixed total `home.ts` computes reuses `fixedOverview` verbatim, so the noise is unchanged from
-  `/fixed`, not amplified); smoke `>text<` anchors on wrapped elements — re-verified this phase for every new
-  label/value/foot span via `eslint --fix`'s output (see Verification); `Intl` ICU output pinned by
-  `formatMonthAxis`/`formatSignedMoney` (unchanged, reused).
-- **New note for Phase 4 implementer:** the stat grid sits between `PageTitle` and the trend `Panel` in
-  `home.astro`'s third JSX branch — the import panel (Phase 4 contract) goes **after** the trend `Panel`, so it
-  does not need to touch this grid at all; only the page's closing structure changes.
+- **Manual Progress rows, all still pending (none are this agent's to verify):** `1.8 [reviewer]` (`trend.ts`
+  import/guard audit, Phase 1), `2.10 [reviewer]` (copy/token audit, Phase 2), `3.10 [reviewer]` (`home.ts`
+  import audit — see the Phase 3 handoff's recorded autonomous decision on the `previousMonth` import), `4.8
+  [reviewer]` (this phase's seam sweep — see §3 above for the automated half of it), `4.9`/`4.10`/`4.11 [human]`
+  (product-owner confirmations of plan decisions 2/4/6), `4.12`/`4.13 [visual]` (screenshots + the fixture
+  walk-through, `astro dev --port 4399`).
+- **DESIGN-GAPs**: none added this phase. `ImportPanel.astro` is a direct 1:1 render of the kit's `.import-panel`
+  (title/body copy already existed in `content.json` as `dashboard.importTitle`/`importBody`, cta from
+  `copyExtra.imports.choose` — no gap). G35/G36/K24/K25 (Phases 2–3) unchanged, still accurate per the seam sweep.
+- **Follow-ups filed** (`context/changes/over-limit-trend/follow-ups/review-fixes.md`): S-05 F6 (excluded-pattern
+  re-entry via merge), `patternTxs` drift→500 on `/patterns`/`/fixed` (only `/home` wraps in `try`), G36 (Rozpoznane
+  wydatki / Co wraca najczęściej unrendered), long-history bar scroll (>24 months unverified), S-06 one-off-D5-fixed
+  noise in „Koszty stałe” (plan review F3). Each carries a `Trigger:` line.
+- **Carried risks (unchanged from Phase 3, still open):** bar label legibility at ~400 px (now also covering the
+  import panel's mobile column stack, `max-[559px]:flex-col`) — `[visual]` 4.12 owns this; axis gaps hide the delta
+  foot (implemented, unit + smoke covered); „Koszty stałe” noise (follow-up filed above, `[human]` 4.11).
+- **Note for `/10x-impl-review`**: this is the full-plan review (no phase number) since Phase 4 was the last — it
+  should look at all four phases together, not just Phase 4, per the standard skill behaviour when no phase arg is
+  given.
 
 ## 6. Autonomous decisions
 
-Made by the `implement phase 3` step of run `2026-09-28-s05-s06-s07` in place of asking a human.
+Made by the `implement phase 4` step of run `2026-09-28-s05-s06-s07` in place of asking a human.
 
-- **`home.ts` imports `previousMonth` directly from `@/lib/patterns/over-limit`, not solely from `trend.ts`/
-  `fixed.ts`.** Why: the plan's Phase 3 contract text for `home.ts` does not itself restrict imports (only the
-  Manual row 3.10 phrases it as "imports only `trend.ts`, `fixed.ts` types, `@/types`"), and `previousMonth` is
-  defined in `over-limit.ts` — `fixed.ts` already imports it from the same place (`import { …, previousMonth, … }
-  from "@/lib/patterns/over-limit"`), so re-importing it through `trend.ts` would mean re-exporting a symbol
-  `trend.ts` does not otherwise need, purely to satisfy a literal reading of a manual-review row. Rejected: adding
-  a `previousMonth` re-export to `trend.ts` (indirection with no behavioural benefit, and `trend.ts`'s own header
-  states its imports are `over-limit.ts`, `view.ts`, `@/types` — adding an export used only by `home.ts` would
-  contradict that). Would change: row 3.10's reviewer treating this as a real drift rather than an omission in the
-  row's wording (same class of call as Phase 2's `ariaLabel` decision) — then either add the re-export to
-  `trend.ts` or reword the row.
-- **The "Koszty stałe" foot always renders** (`risenFootFor` called unconditionally, no `undefined` fallback),
-  while the accent card's foot is conditional on `stats.previous`. Why: the plan's contract text for the second
-  card doesn't describe a hidden-foot state — "N pozycje podrożały" is a valid sentence at `n = 0`
-  ("0 pozycji podrożało"), unlike the accent foot's "{delta} względem {month}" which has no meaningful value
-  without a comparison month at all. Rejected: hiding the second foot too when `fixedRisen === 0` (not asked for
-  by the plan, and an empty-looking accent-only stats row would look broken next to a card with no foot at all).
-  Would change: a `[human]`/`[reviewer]` finding that a zero count should hide the foot — then wrap it in the same
-  conditional the accent card uses.
-- **No `AskUserQuestion` at any of the skill's normal gates** (exec-mode choice, commit-message approval,
-  dirty-path prompt, next-phase decision) — decided in place per the agent contract's rule 1. Exec mode:
-  in-context (Phase 3 is two small new files plus one page/copy/design-kit/smoke edit each — same reasoning as
-  Phases 1–2). Commit message: proposed and used as drafted. Dirty paths: none appeared (`git status --porcelain`
-  checked before both stages). Next phase: this step stops after Phase 3 per the task's explicit instruction.
-  Would change: a human reviewing mid-run with an explicit alternative instruction.
-- **Two commits instead of one** (`30cc44a` feat, `0fd4a11` docs SHA-record) — same reasoning as Phases 1–2: the
-  SHA can only be known after the closing commit exists, so the append is necessarily a second, small commit; the
-  contract explicitly allows this. Would change: nothing.
+- **Exec mode: in-context, not delegated to a subagent.** Why: Phase 4 is one small new component plus a page/smoke/
+  follow-ups edit each — same reasoning Phases 1–3 recorded for their own size. Would change: a phase this size
+  turning out to need multi-file cross-cutting reasoning (it didn't).
+- **Commit messages: proposed and used as drafted**, no `AskUserQuestion` at the skill's normal commit-approval gate
+  — decided in place per the agent contract's rule 1. Would change: a human reviewing mid-run with an explicit
+  alternative wording.
+- **Dirty-path prompt not needed**: `git status --porcelain` before both stagings showed only files this phase
+  touched — no unrelated dirty paths to prompt about.
+- **No manual-verification pause before committing** (the skill's "Phase [N] Complete - Ready for Manual
+  Verification" gate normally stops for a human). Chosen: treat automated-green as sufficient to proceed straight to
+  staging/commit, since no human is in the loop this run (agent contract rule 1) and the manual rows are explicitly
+  [reviewer]/[human]/[visual], owned by later steps. Would change: a maintainer instruction to pause runs even
+  without a human present.
+- **Stragglers at "After all phases": chose "Proceed to epilogue" over "Pause".** 8 manual rows are still `- [ ]`
+  when every automated row is done. Chosen: flip `change.md` to `implemented` and run the epilogue commit anyway —
+  this is exactly what the task instructions for this step specified ("run the skill's epilogue → change.md status
+  implemented, even with [reviewer]/[visual]/[human] rows open"). Would change: nothing — this was an explicit
+  instruction, not a judgment call.
+- **Two commits instead of one** (`286884f` feat, `4fec6ef` epilogue/chore) — same reasoning as every prior phase:
+  the epilogue's SHA-back-reference can only be written after the closing commit exists, and this being the last
+  phase also needed `change.md` flipped to `implemented`, which the skill's own epilogue step handles as a separate
+  commit. Would change: nothing.
+- **`git checkout -- src/pages/home.astro` used to restore the deliberate break**, not a manual re-edit. Safe because
+  the file was staged with the intended Phase 4 content *before* the break was introduced (gate step 2 of the
+  ritual), so the reset landed exactly on the pre-break, post-phase state — never on the pre-phase original, and
+  never discarding uncommitted phase work (agent contract's git-safety concern). Verified by an immediate green
+  smoke re-run (131/0) rather than assumed. Would change: nothing — this is the ritual's documented mechanism.

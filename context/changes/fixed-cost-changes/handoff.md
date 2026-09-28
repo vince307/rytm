@@ -1,30 +1,34 @@
 # Handoff — `fixed-cost-changes` (slice S-06)
 
-Written by the `plan-review` step (`/10x-plan-review fixed-cost-changes`, autonomous run `2026-09-28-s05-s06-s07`).
-The plan is reviewed (VERDICT: PROCEED, 0 critical / 2 warnings fixed / 4 observations); no product code exists yet.
-The one thing the next agent must not get wrong: **Phase 1 regenerates the fixture only through `npm run fixture:ing`
-(never by hand), and every smoke-asserted string must reach the served HTML without formatter whitespace** (plan
-Critical Implementation Details, review F1).
+Written by the `implement` step (`/10x-implement fixed-cost-changes phase 1`, autonomous run
+`2026-09-28-s05-s06-s07`). Phase 1 (fixture only) is implemented, gated and committed; no app code
+exists yet. The one thing the next agent must not get wrong: **the fixture now carries kinoteka's second,
+in-tolerance rise (55,99 → 59,99 zł) on 2026-08-17 — `fixedOverview`'s unit case 16 (Phase 2) must assert
+against this new value, not the old 55,99/6497147 pair.**
 
 ## 1. State
 
 | Item | Value |
 |---|---|
 | Branch | `feat/fixed-cost-changes`, cut from `main` at `3706508` |
-| Commits | 4 on this branch after this step: identity, research, plan, `docs(fixed-cost-changes): plan review` |
+| Commits | 6 on this branch: identity, research, plan, plan review, `feat(fixed-cost-changes): fixture — in-tolerance price change in the reference month (p1)` (`e0d8e4d`), `docs(fixed-cost-changes): record phase 1 commit sha in plan Progress` (`9362e4e`) |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `plan_reviewed` |
-| Roadmap | S-06 `planning` (unchanged by this step) |
-| `## Progress` rows remaining | 38 (`grep -c '^- \[ \]' plan.md`): 31 automated, 4 `[reviewer]`, 2 `[visual]`, 1 `[human]` |
-| Working tree | clean after the commit (`.claude/skills/10x-autonomous-run/scripts/tree-clean.sh`) |
+| `change.md` status | `implementing` |
+| Roadmap | S-06 `planning` → `in-progress` (this step, `context/foundation/roadmap.md` at-a-glance row + item body) |
+| `## Progress` rows remaining | 31 (`grep -c '^- \[ \]' plan.md`): Phase 1 automated (1.1–1.7) done; 1.8 `[reviewer]` still open; Phases 2–4 (30 rows) untouched |
+| Working tree | clean after both commits (`.claude/skills/10x-autonomous-run/scripts/tree-clean.sh` → `CLEAN`) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 |---|---|
-| `context/changes/fixed-cost-changes/reviews/plan-review.md` | Review report: verified claims (smoke state, fixture arithmetic, unit case 16), follow-up grep, PRD check, F1–F6, verdict |
-| `context/changes/fixed-cost-changes/plan.md` | F1: whitespace / formatter rule added to Critical Implementation Details („Single-string rendering”); F2: seam-sweep grep criterion + Progress 4.8 allow `Badge.tsx`; F5: `## Known risks` badge-tint line |
-| `context/changes/fixed-cost-changes/change.md` | Frontmatter status `planned` → `plan_reviewed` |
+| `scripts/fixture-ing.mjs` | T11 `kinoteka` entry: `entries` gains a second 2026-08 step (`5599` × 5 → `5999` on day 17, was `5599` × 6); comment names both rises; `TRAPS.T11` label → „Abonament z dwiema podwyżkami (~12%, potem +4 zł)” |
+| `test/fixtures/ing/Lista_transakcji_nr_0000123456_010926.csv`, `expected.json`, `README.md` | Regenerated via `npm run fixture:ing` (never hand-edited); diff limited to kinoteka's 2026-08-17 row (`-55,99` → `-59,99`), the main-file debit sum (`67193,47` → `67197,47`), `expected.json`'s row `amountMinor`, `files[MAIN].imported.sumMinor` (`6497147` → `6497547`) and the kinoteka pattern's `sumMinor` (`63588` → `63988`; `medianMinor` unchanged at `5299`), and the `README.md` T11 row / import-sum line |
+| `test/unit/ing-parser.test.ts` | Both hardcoded `6497147` assertions → `6497547` |
+| `context/foundation/import-formats.md` | Fixture note: „abonament z jedną podwyżką ~12%” → names the second, in-tolerance 2026-08 rise as the fixture's S-06 „zmiana kwoty” case |
+| `context/changes/fixed-cost-changes/plan.md` | Progress 1.1–1.7 ticked with sha `e0d8e4d`; 1.8 (`[reviewer]`) left open |
+| `context/changes/fixed-cost-changes/change.md` | `status: plan_reviewed` → `implementing` |
+| `context/foundation/roadmap.md` | S-06 row/item `planning` → `in-progress` (pre-check: file was not already dirty, so staged with this step) |
 | `context/changes/fixed-cost-changes/handoff.md` | This file |
 
 ## 3. Verification
@@ -32,47 +36,61 @@ Critical Implementation Details, review F1).
 | Command | Result |
 |---|---|
 | `git branch --show-current` | `feat/fixed-cost-changes` (observed) |
-| Smoke-state claim (plan decision 17) | verified by reading `scripts/smoke.mjs` `steps`, `importPayload`, `importPayloadJune` — not executed. Holds at all four insertion points (details in the review) |
-| Fixture sum 6497147 → 6497547 | recomputed from `test/fixtures/ing/expected.json`: 206 imported main-file rows, Σ 6 497 147; kinoteka 2026-08-17 5599 row imported, only in the main CSV → +400 = 6 497 547 (observed) |
-| D5 on kinoteka after change | median 5299, tolerance 1000, max deviation 700 → fixed; 6400 → 1101 → frequent (arithmetic, observed) |
-| Unit case 16 partition | D5 recomputed over the 31 derived groups: matches the plan's changed / new / unchanged / absent split (observed, python over `expected.json`) |
-| Follow-up grep (`Trigger` naming S-06) | none in `follow-ups/review-fixes.md` files; G28 (design-kit) deferred with a follow-up (observed) |
-| lint / astro check / vitest / build / pgTAP / smoke | **not run** — docs-only step; contract baseline (inherited, unverified): lint 0, astro check 0 errors (120 files), vitest 190 (11 files), build OK, pgTAP 102, smoke 111 |
+| `npm run fixture:ing` then `git diff --stat test/fixtures/ing` | only the 3 files above changed (observed) |
+| `npm run fixture:check` | OK (observed, twice — after generation and after the deliberate breaks) |
+| `npm test` | 190 passed, 11 files — baseline 190/11, delta 0 (observed) |
+| `npm run lint` | 0 errors (observed) |
+| `npx astro check` | 0 errors, 120 files — baseline 120/0, delta 0 (observed) |
+| `npm run build` | passes (observed) |
+| `npx supabase db reset && npx supabase test db` | Files=5, Tests=102, Result: PASS — baseline 102/5, delta 0 (observed, sandbox disabled) |
+| `ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4398` + `npm run smoke` | 111 PASS / 0 FAIL — baseline 111, delta 0 (observed, sandbox disabled); port 4398 killed after |
+| `grep -rn "6497147" test src` | empty (observed) |
+| Deliberate break 1.5 (drift): generator's T11 last amount → `6099` without regenerating | `fixture:check` FAILED (3), naming the main CSV, `expected.json`, `README.md` — red confirmed. **Restore note**: the first `git checkout -- scripts/fixture-ing.mjs` reverted to pre-Phase-1 HEAD (nothing had been staged yet), wiping the Phase 1 edit; caught immediately, edit reapplied and diff-verified before continuing. Meta-check: proves committed bytes are tied to the generator, not that `5999` is the right value |
+| Deliberate break 1.6 (tolerance): T11 last amount → `6400`, `npm run fixture:ing` | threw `pattern kinoteka: declared fixed, D5 gives frequent` before writing any file (median 5299, gap 1101 > 1000) — red confirmed, `test/fixtures/ing` untouched. Restored via `git checkout -- scripts/fixture-ing.mjs` (this time correctly matching the already-staged Phase 1 edit); `npm run fixture:ing` + `fixture:check` regenerated byte-identical to the staged/committed files. Meta-check: proves kinoteka's `fixed` type is guarded at generation |
+| Post-restore re-run: lint / test / fixture:check / build | all green again (observed) |
 
 ## 4. Next command
 
-`/10x-implement fixed-cost-changes phase 1`
+`/10x-implement fixed-cost-changes phase 2`
 
 ## 5. Open
 
-- **Target deltas (unchanged):** vitest 190 → 190 + ~20 cases, 11 → 12 files (Phase 2); smoke 111 → 117 (Phase 3) →
-  121 (Phase 4); pgTAP 102 unchanged; `ing-parser.test.ts` sum 6497147 → 6497547 (Phase 1).
-- **Manual-only Progress rows (human checklist):** 4.10 `[human]` — product owner confirms plan decision 7 (D5 flip:
-  an out-of-tolerance rise turns the pattern `frequent` and it leaves `/fixed`; remedy = S-05 pin; review F3).
-  `[visual]` 4.11, 4.12 — the Visual step (compare the `new` badge tint with kit `#EFE4D1`, review F5).
-  `[reviewer]` 1.8, 2.9, 3.9, 4.9 — `/10x-impl-review`.
-- **Smoke anchors:** `scripts/smoke.mjs` new `/fixed` steps use `>text<`; if `eslint --fix` wraps an element in
-  `FixedRow.astro` / `FixedSection.astro`, switch to bare text keeping each positive / negative pair (review F1).
-- **DESIGN-GAPs to add (with the code):** K23 (`copyExtra.fixed` row copy), G34 (states, incl. `Badge.tsx` `new` tone),
-  G5 amended, K9 note.
-- **Follow-ups to write in Phase 4** (`context/changes/fixed-cost-changes/follow-ups/review-fixes.md`): D5 flip,
-  one-off merchants as „nowy”, G28 `/patterns` badges, S-07 `/home` „N pozycje podrożały” from
-  `fixedOverview().changed`.
+- **Lesson for the next agent** (see intro): Phase 2 unit case 16 (`test/unit/fixed-overview.test.ts`, F-02 fixture
+  case) must expect `changed = { occurredOn: "2026-08-17", amountMinor: 5999, previousMinor: 5599, deltaMinor: 400 }`
+  for KINOTEKA — this is now true on disk, not merely planned.
+- **Manual-only Progress rows carried forward (human checklist, unchanged from plan-review handoff):**
+  4.10 `[human]` — product owner confirms plan decision 7 (D5 flip). `[visual]` 4.11, 4.12 — the Visual step.
+  `[reviewer]` 1.8 (this phase — generated-diff review, still open), 2.9, 3.9, 4.9 — `/10x-impl-review`.
+- **Smoke anchors** (Phase 3+): `scripts/smoke.mjs` new `/fixed` steps use `>text<`; if `eslint --fix` wraps an
+  element in `FixedRow.astro` / `FixedSection.astro`, switch to bare text keeping each positive/negative pair
+  (plan review F1, agent-contract smoke-assertion note).
+- **DESIGN-GAPs to add with the code (Phase 3–4, unchanged):** K23 (`copyExtra.fixed` row copy), G34 (states,
+  incl. `Badge.tsx` `new` tone), G5 amended, K9 note.
+- **Follow-ups to write in Phase 4** (`context/changes/fixed-cost-changes/follow-ups/review-fixes.md`, does not
+  exist yet): D5 flip, one-off merchants as „nowy”, G28 `/patterns` badges, S-07 `/home` „N pozycje podrożały”
+  from `fixedOverview().changed`.
+- No new risk introduced by this phase; `Known risks` in plan.md (D5 flip, one-off merchants, astro-check count,
+  smoke text anchors, badge `new` tint) all still apply unchanged to later phases.
 
 ## 6. Autonomous decisions
 
-- **Verdict PROCEED, not RETHINK.** Why: every risky claim (smoke state, fixture arithmetic, case 16 partition, helper
-  symbols) holds against the code; findings are two low-impact gate defects. Would change: a claim failing on
-  execution in Phase 1–3.
-- **D5 flip (plan decision 7) not overturned; stays on `[human]` 4.10.** Rejected: forcing pre-R typing now. Why:
-  FR-012's resolution note („tolerance used only to detect the fixed pattern”) makes it a legitimate reading, not
-  clearly wrong. Would change: the product owner answering „must show”.
-- **F2 fixed by widening the grep to `Badge.tsx`** rather than forbidding the G34 marker there. Rejected: moving the
-  mapping note to K9 only. Why: the plan itself files the tone mapping under G34. Would change: the kit delivering a
-  `new` badge token.
-- **F5 kept as a known risk** (keep `bg-excess/25`, one mapping with `InlineAlert`). Rejected: `/20` (closer but a
-  second mapping). Would change: the visual step showing a visible mismatch.
-- **Verification by reading, not running, for smoke state** — matches the plan step's method; the first smoke run is
-  Phase 3's gate. Would change: the orchestrator requiring an executed smoke in review steps.
-- **Change status set by hand** (`sed` on `change.md` frontmatter) — the `metadata-guard.mjs` scripts have no
-  `mark-plan-reviewed` command. Would change: a guard command for this transition.
+- **Exec mode: implemented Phase 1 directly in this context, not delegated to a subagent.** Rejected: delegating
+  per the skill's default `AskUserQuestion` prompt. Why: the agent contract forbids `AskUserQuestion`; Phase 1 is
+  a small, single-file generator edit plus regeneration — cheap enough to do directly, and doing it directly let
+  me verify the deliberate-break sequence firsthand rather than trusting a subagent's report. Would change: a
+  later, larger phase where keeping this context lean matters more (Phase 3 adds two components — delegation is
+  the better default there).
+- **Commit-message wording: descriptive body summarizing the fixture ripple**, not the plan-review skill's
+  proposal loop (`AskUserQuestion` on the message). Why: forbidden to ask; the plan's own Phase 1 contract fully
+  specifies the diff, so the message could be written with certainty. Would change: nothing — this is mechanical.
+- **SHA-append done as a separate follow-up docs commit** (`9362e4e`), matching the run's stated allowance
+  ("a follow-up docs commit for the sha is fine") rather than leaving Progress rows without their sha. Rejected:
+  leaving 1.1–1.7 without a sha (the skill ritual explicitly designs for this gap, but the run's explicit
+  instruction to append the sha takes precedence for a single-phase step). Would change: nothing binds this
+  either way for a multi-phase continuation, where the next phase's commit could absorb the sha line instead.
+- **Dirty-path check before staging: none found.** `git status --porcelain` after all edits showed only the 9
+  files this phase touched (plus, before the follow-up commit, only `plan.md`) — no `AskUserQuestion` needed, no
+  unrelated dirty paths to report.
+- **Roadmap sync applied** (S-06 `planning` → `in-progress`, both at-a-glance row and item body) per the skill's
+  mandatory-lookup/best-effort-edit rule; `context/foundation/roadmap.md` was not pre-dirty, so the edit was
+  staged into the same phase commit as instructed.

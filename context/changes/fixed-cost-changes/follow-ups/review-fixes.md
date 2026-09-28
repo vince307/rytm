@@ -20,8 +20,9 @@ slice/change to pick up.
   `DESIGN-GAP: G28` for these; `fixedOverview` (this change) is the exact pure function that would drive them
   (`changed`/`new` row `key`s), plus a `Badge` `tone="changed"` (not yet added — only `new` shipped this phase).
   Trigger: the next change to `/patterns` or `PatternsTable.tsx`.
-- **S-07 `/home` „Koszty stałe · N pozycje podrożały”** = `fixedOverview(patterns, rows).changed.length` (every
-  `changed` row is by definition a rise or a fall; if the stat card wants only rises, filter `deltaMinor > 0`).
+- **S-07 `/home` „Koszty stałe · N pozycje podrożały”** = `fixedOverview(patterns, rows).changed.filter((r) => r.deltaMinor > 0).length`
+  („podrożały” counts rises only — `changed` also holds decreases; plan Phase 4 §4 contract, corrected by the
+  implementation review, which found the unfiltered `.changed.length` here).
   Reuse `fixedOverview` directly — do not re-derive the change/new rule. Trigger: S-07.
 
 ## From this phase's own implementation (not a review finding, recorded for completeness)

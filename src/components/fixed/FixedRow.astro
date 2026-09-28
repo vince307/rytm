@@ -3,8 +3,10 @@
 // `fixedOverview`). `merchantMark` is the same square `ExcludedPatterns.astro` uses (first character of `name`,
 // no case change) so the two list rows never drift apart. A compact row (the "Bez zmian" section) renders just
 // the mark, name and amount — no meta line, no `.fixed-change` wrapper, no slot (the kit's unchanged rows carry
-// neither a delta nor a badge). A non-compact row's default slot holds the delta (`FixedChangedRow`) or, from
-// Phase 4, the `nowy` badge (`FixedNewRow`).
+// neither a delta nor a badge). A non-compact row's default slot holds the delta (`FixedChangedRow`) or the
+// `nowy` badge (`FixedNewRow`). The mark `<span>` is repeated in both branches (and in `ExcludedPatterns`) on
+// purpose: the shared part is the `merchantMark` class string; a one-line wrapper component would add a file for
+// a single element (S-06 impl-review, seam sweep).
 import { merchantMark } from "@/components/patterns/merchant-mark";
 
 interface Props {

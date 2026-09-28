@@ -15,6 +15,7 @@ import { formatIsoDate, formatMoney, formatSignedMoney, plural } from "@/lib/for
 import { fixedOverview, type FixedOverview } from "@/lib/patterns/fixed";
 import { loadPatternData } from "@/lib/patterns/load";
 import { createClient } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 
 const e = copy.emptyViews;
 const x = copyExtra.fixed;
@@ -44,10 +45,8 @@ const firstSeenText = (firstOccurredOn: string) => x.firstSeen.replace("{date}",
 // "good news" green as a `fixed` badge (S-06 plan decision 12). Kept short (helper, not inline) so prettier never
 // wraps the `<b>` element onto three lines — a wrap would put the smoke-asserted delta text on its own indented
 // line, which fails the `>text<` anchor (agent-contract smoke-assertion note, plan review F1).
-const deltaClass = (deltaMinor: number) => [
-  "text-[13px] font-bold",
-  deltaMinor > 0 ? "text-excess-text" : "text-green",
-];
+const deltaClass = (deltaMinor: number) =>
+  cn("text-[13px] font-bold", deltaMinor > 0 ? "text-excess-text" : "text-green");
 ---
 
 <AppLayout title={copy.fixedCosts.title} active="fixed">

@@ -1,6 +1,6 @@
 # Handoff — `fixed-cost-changes` (slice S-06)
 
-Written by the visual gate step (autonomous run `2026-09-28-s05-s06-s07`). Every `[visual]` state of rows 4.11 and 4.12
+Written by the visual gate step and finalised by the ship step (autonomous run `2026-09-28-s05-s06-s07`). The ship step archives this folder, pushes, opens the PR and merges; PR/CI/merge/deploy recorded in `context/runs/2026-09-28-s05-s06-s07/run-log.md`. Every `[visual]` state of rows 4.11 and 4.12
 was captured at 1440 px and 400 px against the kit frames, and the US-04 walk-through was hand-checked. Two real
 discrepancies were fixed in `29c4829`. The result is `VISUAL: PASS`. What the next agent must not get wrong: the next
 step is `/10x-archive fixed-cost-changes`, then ship. **No hosted `db push` is due**, because this change has no
@@ -12,9 +12,9 @@ migration. The `[human]` row 4.10 stays open on the post-run checklist.
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Branch                       | `feat/fixed-cost-changes` (confirmed with `git branch --show-current`), cut from `main` at `3706508`                                                                                                                                                                |
 | Commits                      | 18 on this branch after this step. This step added `29c4829` `fix(fixed-cost-changes): kwoty /fixed nie łamią się przed „zł”, znak sprzedawcy z promieniem 8 px jak w kicie` and the `docs(fixed-cost-changes): bramka wizualna` commit, which carries this handoff |
-| Pushed / PR / merged         | no / none / no                                                                                                                                                                                                                                                      |
-| `change.md` status           | `impl_reviewed` (unchanged; `/10x-archive` stamps it)                                                                                                                                                                                                               |
-| Roadmap                      | S-06 `in-progress` (unchanged; `/10x-archive` flips it)                                                                                                                                                                                                             |
+| Pushed / PR / merged         | ship step: PR/CI/merge/deploy recorded in `context/runs/2026-09-28-s05-s06-s07/run-log.md`                                                                                                                                                                          |
+| `change.md` status           | `archived` (stamped by `/10x-archive` in the ship step)                                                                                                                                                                                                             |
+| Roadmap                      | S-06 `done` (flipped by `/10x-archive`); `## Backlog Handoff` S-06 row closed, S-07 row carries the S-06 trigger                                                                                                                                                    |
 | `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`): 4.10 `[human]`                                                                                                                                                                                                                    |
 | Working tree                 | clean after the docs commit                                                                                                                                                                                                                                         |
 | Local DB                     | `npx supabase db reset` run twice: after the read-error REVOKE and after the smoke. Seed restored, 0 `visual-%` accounts, `authenticated` SELECT on `transactions` = `t`                                                                                            |
@@ -56,8 +56,9 @@ Everything below was observed in this step, on the final code including `29c4829
 
 ## 4. Next command
 
-`/10x-archive fixed-cost-changes` then ship. No hosted `npx supabase db push` is due, because there is no migration
-(`git diff --name-only main...HEAD -- supabase/` is empty).
+`none — shipped`. No hosted `npx supabase db push` was due (no migration: `git diff --name-only main...HEAD -- supabase/migrations` is empty).
+
+**Restated for S-07:** the stat card „N pozycje podrożały” = `fixedOverview(...).changed.filter((r) => r.deltaMinor > 0)` — reuse `fixedOverview`, do not re-derive the rule (`follow-ups/review-fixes.md`, `Trigger: S-07`).
 
 ## 5. Open
 

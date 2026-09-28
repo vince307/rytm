@@ -1,0 +1,45 @@
+---
+// FixedRow.astro — kit `.fixed-row` (prototype `styles.css`), shared by all three `/fixed` sections (S-06
+// `fixedOverview`). `merchantMark` is the same square `ExcludedPatterns.astro` uses (first character of `name`,
+// no case change) so the two list rows never drift apart. A compact row (the "Bez zmian" section) renders just
+// the mark, name and amount — no meta line, no `.fixed-change` wrapper, no slot (the kit's unchanged rows carry
+// neither a delta nor a badge). A non-compact row's default slot holds the delta (`FixedChangedRow`) or, from
+// Phase 4, the `nowy` badge (`FixedNewRow`).
+import { merchantMark } from "@/components/patterns/merchant-mark";
+
+interface Props {
+  name: string;
+  meta?: string;
+  amount: string;
+  compact?: boolean;
+}
+const { name, meta, amount, compact = false } = Astro.props;
+---
+
+{compact ? (
+  <div class="flex min-h-[55px] items-center justify-between border-b border-line last:border-b-0">
+    <div class="flex items-center gap-[11px]">
+      <span class:list={merchantMark} aria-hidden="true">
+        {Array.from(name)[0]}
+      </span>
+      <strong class="text-[13px]">{name}</strong>
+    </div>
+    <span>{amount}</span>
+  </div>
+) : (
+  <div class="flex min-h-[70px] items-center justify-between gap-5 border-b border-line last:border-b-0 max-[559px]:gap-3">
+    <div class="flex items-center gap-[11px]">
+      <span class:list={merchantMark} aria-hidden="true">
+        {Array.from(name)[0]}
+      </span>
+      <div>
+        <strong class="text-[13px]">{name}</strong>
+        {meta && <small class="mt-1 block text-[11px] text-muted">{meta}</small>}
+      </div>
+    </div>
+    <div class="flex items-center gap-[14px] max-[559px]:flex-col max-[559px]:items-end max-[559px]:gap-1">
+      <span>{amount}</span>
+      <slot />
+    </div>
+  </div>
+)}

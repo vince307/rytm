@@ -1,13 +1,95 @@
 ---
+// /fixed — kit `fixedCosts()` (prototype `app.js`), FR-012 / US-04 (S-06): `loadPatternData` → `fixedOverview`
+// gives the "Zmieniły kwotę" and "Bez zmian" sections their rows. The "Nowe w tym miesiącu" section, the
+// no-comparison message and the `new` Badge tone land in Phase 4 — until then `overview.new` is read but not
+// rendered (a would-be-new pattern is simply absent from both sections here, same as a lapsed one).
 import AppLayout from "@/layouts/AppLayout.astro";
+import FixedRow from "@/components/fixed/FixedRow.astro";
+import FixedSection from "@/components/fixed/FixedSection.astro";
+import InlineAlert from "@/components/app/InlineAlert.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
 import ViewEmpty from "@/components/app/ViewEmpty.astro";
 import { copy, copyExtra } from "@/content/copy";
+import { formatIsoDate, formatMoney, formatSignedMoney, plural } from "@/lib/format";
+import { fixedOverview, type FixedOverview } from "@/lib/patterns/fixed";
+import { loadPatternData } from "@/lib/patterns/load";
+import { createClient } from "@/lib/supabase";
 
 const e = copy.emptyViews;
+const x = copyExtra.fixed;
+
+// Same read shape as `/patterns` (`patterns.astro`) — a failed read, including an unconfigured Supabase client,
+// never shows the empty state or a partial list.
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const dataResult = supabase ? await loadPatternData(supabase) : { error: new Error("Supabase is not configured") };
+const result: { error: unknown } | { referenceMonth: null } | { overview: FixedOverview } = (() => {
+  if ("error" in dataResult) return { error: dataResult.error };
+  const overview = fixedOverview(dataResult.patterns, dataResult.rows);
+  return overview.referenceMonth === null ? { referenceMonth: null } : { overview };
+})();
+if ("error" in result) {
+  // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
+  console.error("fixed costs failed", result.error);
+}
+
+// K23 templates — verbatim row/section copy the kit only renders in `app.js` (`fixedCosts()`), not in
+// `content.json`; `{n}`/`{items}`/`{date}`/`{amount}` interpolation follows the codebase's `.replace()` convention
+// (`patterns/[...key].astro` `sumLabel`, `imports/result.astro` `title`).
+const countText = (n: number) => x.count.replace("{n}", String(n)).replace("{items}", plural(n, x.itemForms));
+const previouslyText = (occurredOn: string, previousMinor: number) =>
+  x.previously.replace("{date}", formatIsoDate(occurredOn)).replace("{amount}", formatMoney(previousMinor));
+// DESIGN-GAP: G34 — the kit prints only a rise, in amber; a decrease has no kit colour, so it takes the same
+// "good news" green as a `fixed` badge (S-06 plan decision 12). Kept short (helper, not inline) so prettier never
+// wraps the `<b>` element onto three lines — a wrap would put the smoke-asserted delta text on its own indented
+// line, which fails the `>text<` anchor (agent-contract smoke-assertion note, plan review F1).
+const deltaClass = (deltaMinor: number) => [
+  "text-[13px] font-bold",
+  deltaMinor > 0 ? "text-excess-text" : "text-green",
+];
 ---
 
 <AppLayout title={copy.fixedCosts.title} active="fixed">
-  <PageTitle eyebrow={copyExtra.fixed.eyebrow} title={e.fixed.title} lead={e.fixed.lead} />
-  <ViewEmpty icon="fixed" title={e.cta} body={copyExtra.emptyViews.body} cta={e.button} href="/imports/new" />
+  {"error" in result ? (
+    <>
+      <PageTitle eyebrow={x.eyebrow} title={copy.fixedCosts.title} lead={x.lead} />
+      {/* DESIGN-GAP: K18 — the kit has no copy for a failed read of a list; `components.error` stands in (patterns.astro precedent). */}
+      <InlineAlert kind="error">{copy.components.error}</InlineAlert>
+    </>
+  ) : "referenceMonth" in result ? (
+    <>
+      <PageTitle eyebrow={x.eyebrow} title={e.fixed.title} lead={e.fixed.lead} />
+      <ViewEmpty icon="fixed" title={e.cta} body={copyExtra.emptyViews.body} cta={e.button} href="/imports/new" />
+    </>
+  ) : (
+    <>
+      <PageTitle eyebrow={x.eyebrow} title={copy.fixedCosts.title} lead={x.lead} />
+      <FixedSection
+        title={copy.fixedCosts.changed}
+        count={countText(result.overview.changed.length)}
+        empty={x.changedEmpty}
+        hasRows={result.overview.changed.length > 0}
+      >
+        {result.overview.changed.map((row) => (
+          <FixedRow
+            name={row.name}
+            meta={previouslyText(row.occurredOn, row.previousMinor)}
+            amount={formatMoney(row.amountMinor)}
+          >
+            <b class:list={deltaClass(row.deltaMinor)}>{formatSignedMoney(row.deltaMinor)}</b>
+          </FixedRow>
+        ))}
+      </FixedSection>
+      <FixedSection
+        compact
+        title={copy.fixedCosts.unchanged}
+        count={countText(result.overview.unchanged.length)}
+        empty={x.unchangedEmpty}
+        hasRows={result.overview.unchanged.length > 0}
+      >
+        {result.overview.unchanged.map((row) => (
+          <FixedRow name={row.name} amount={formatMoney(row.amountMinor)} compact />
+        ))}
+      </FixedSection>
+    </>
+  )}
 </AppLayout>

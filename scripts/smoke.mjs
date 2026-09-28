@@ -3,7 +3,10 @@
 // the import write path (POST /api/imports: saved, overlap, invalid payload, anonymous), the import delete
 // path (POST /api/imports/delete: not-found, own delete, patterns dropping the import, re-import accepted) and
 // the durable pattern decision path (POST /api/patterns/decision: merge, type, rename, exclude/restore, unmerge,
-// a second import joining a merged pattern without re-editing — S-05 US-03).
+// a second import joining a merged pattern without re-editing — S-05 US-03) and /fixed (FR-012/US-04, S-06):
+// pre-import view, a one-month state (no change / unchanged rows), a changed amount with its previous value, and
+// an excluded pattern staying off the list — reusing the smoke user's existing May/June imports and decisions
+// rather than a dedicated payload (S-06 plan Key Discoveries).
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
@@ -153,6 +156,11 @@ const steps = [
     () => request("/home"),
     { status: 200, contains: "Nie masz jeszcze żadnego importu." },
   ],
+  [
+    "fixed shows the pre-import view",
+    () => request("/fixed"),
+    { status: 200, contains: ">Koszty stałe pojawią się po pierwszym imporcie.<", notContains: ">Zmieniły kwotę<" },
+  ],
   ["settings renders account e-mail", () => request("/settings"), { status: 200, contains: email }],
   [
     "import is saved and shows its result",
@@ -244,6 +252,16 @@ const steps = [
     { status: 302, location: "/imports/result?id=" },
   ],
   ["patterns list the re-imported merchant", () => request("/patterns"), { status: 200, contains: "Kawiarnia smoke" }],
+  [
+    "fixed with one month lists no change",
+    () => request("/fixed"),
+    { status: 200, contains: ">Żaden koszt stały nie zmienił kwoty w tym miesiącu.<" },
+  ],
+  [
+    "fixed with one month lists unchanged patterns",
+    () => request("/fixed"),
+    { status: 200, contains: [">Kawiarnia smoke<", ">Bez zmian<"] },
+  ],
   [
     "pattern detail renders the month total",
     () => request("/patterns/kawiarnia%20smoke"),
@@ -505,6 +523,16 @@ const steps = [
     () => request("/patterns/sklep%20smoke"),
     { status: 200, contains: ">Sklep smoke<" },
   ],
+  [
+    "fixed lists a changed amount",
+    () => request("/fixed"),
+    { status: 200, contains: ">+1,50 zł<", notContains: ">Żaden koszt stały nie zmienił kwoty w tym miesiącu.<" },
+  ],
+  [
+    "fixed shows the previous amount",
+    () => request("/fixed"),
+    { status: 200, contains: [">20.06.2026 · poprzednio 45,50 zł<", ">Kawiarnia Rytm<"] },
+  ],
   ["pattern detail of an unknown key is not found", () => request("/patterns/nie%20ma%20takiego"), { status: 404 }],
   ["imports lists the delete action", () => request("/imports"), { status: 200, contains: ">Usuń import<" }],
   [
@@ -559,6 +587,7 @@ const steps = [
   ],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   ["home redirects after signout", () => request("/home"), { status: 302, location: "/login" }],
+  ["fixed without a session goes to login", () => request("/fixed"), { status: 302, location: "/login" }],
   [
     "import without a session goes to login",
     () => request("/api/imports", { method: "POST", form: { payload: importPayload } }),
@@ -659,16 +688,20 @@ const steps = [
 let failed = 0;
 for (const [name, run, expected] of steps) {
   const actual = await run();
+  // `contains` accepts a single needle or an array of needles that must all be present (S-06: a `/fixed` step
+  // proves two facts from one GET — e.g. a row's name and its section header — rather than splitting into two
+  // named steps just to fit a single-needle assertion).
+  const needles = expected.contains === undefined ? [] : [expected.contains].flat();
   const ok =
     actual.status === expected.status &&
     (expected.location === undefined || actual.location.startsWith(expected.location)) &&
-    (expected.contains === undefined || actual.body.includes(expected.contains)) &&
+    needles.every((needle) => actual.body.includes(needle)) &&
     (expected.notContains === undefined || !actual.body.includes(expected.notContains));
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
     console.log(
-      `      expected ${expected.status} ${expected.location ?? ""} ${expected.contains ?? ""} ${
+      `      expected ${expected.status} ${expected.location ?? ""} ${needles.join(" & ")} ${
         expected.notContains ? `notContains:${expected.notContains}` : ""
       }`,
     );

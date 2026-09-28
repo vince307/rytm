@@ -981,14 +981,14 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [x] 1.1 `npx supabase db reset && npx supabase test db` — pgTAP 76 (4 files) + 26 = 102 (5 files), all pass
-- [x] 1.2 `npm run db:types` regenerates `src/db/database.types.ts` with `pattern_decisions`; diff shows only the new table
-- [x] 1.3 `npm run lint` 0; `npx astro check` 0 errors (count recorded); `npm test` 141 (delta 0); `npm run fixture:check` OK; `npm run build` passes
-- [x] 1.4 `BASE_URL=http://localhost:4398 npm run smoke` — 77 PASS (delta 0)
-- [x] 1.5 Deliberate break (update policy dropped) → assertions 6–8 FAIL; restored → green; meta-check recorded
-- [x] 1.6 Deliberate break (self-merge check removed) → assertion 10 FAILs; restored → green; meta-check recorded
-- [x] 1.7 Deliberate break (FK without cascade) → assertion 24 FAILs; restored → green; meta-check recorded
-- [x] 1.8 Migration file name matches `^[0-9]{14}_[a-z_]+\.sql$` and sorts after `20260927200000_pattern_thresholds.sql`
+- [x] 1.1 `npx supabase db reset && npx supabase test db` — pgTAP 76 (4 files) + 26 = 102 (5 files), all pass — 1e2ea9b
+- [x] 1.2 `npm run db:types` regenerates `src/db/database.types.ts` with `pattern_decisions`; diff shows only the new table — 1e2ea9b
+- [x] 1.3 `npm run lint` 0; `npx astro check` 0 errors (count recorded); `npm test` 141 (delta 0); `npm run fixture:check` OK; `npm run build` passes — 1e2ea9b
+- [x] 1.4 `BASE_URL=http://localhost:4398 npm run smoke` — 77 PASS (delta 0) — 1e2ea9b
+- [x] 1.5 Deliberate break (update policy dropped) → assertions 6–8 FAIL; restored → green; meta-check recorded — 1e2ea9b
+- [x] 1.6 Deliberate break (self-merge check removed) → assertion 10 FAILs; restored → green; meta-check recorded — 1e2ea9b
+- [x] 1.7 Deliberate break (FK without cascade) → assertion 24 FAILs; restored → green; meta-check recorded — 1e2ea9b
+- [x] 1.8 Migration file name matches `^[0-9]{14}_[a-z_]+\.sql$` and sorts after `20260927200000_pattern_thresholds.sql` — 1e2ea9b
 
 #### Manual
 

@@ -38,6 +38,7 @@ const result: { error: unknown } | { patterns: PatternListItem[] } = (() => {
       occurrences: p.occurrences,
       sumMinor: p.sumMinor,
       fixedAmountMinor: p.fixedAmountMinor,
+      excluded: p.excluded,
       threshold: item?.threshold ?? null,
       overMinor: item?.overMinor ?? 0,
     };

@@ -16,6 +16,8 @@ const wolt: MerchantPattern = {
   medianMinor: 2000,
   fixedAmountMinor: null,
   transactionIds: ["1", "2", "10", "11", "12"],
+  excluded: false,
+  merged: [],
 };
 const kawiarnia: MerchantPattern = {
   key: "kawiarnia",
@@ -26,6 +28,8 @@ const kawiarnia: MerchantPattern = {
   medianMinor: 4550,
   fixedAmountMinor: 4550,
   transactionIds: ["4"],
+  excluded: false,
+  merged: [],
 };
 const sklep: MerchantPattern = {
   key: "sklep",
@@ -36,6 +40,8 @@ const sklep: MerchantPattern = {
   medianMinor: 1299,
   fixedAmountMinor: null,
   transactionIds: ["20"],
+  excluded: false,
+  merged: [],
 };
 const patterns: MerchantPattern[] = [wolt, kawiarnia, sklep];
 
@@ -79,6 +85,19 @@ describe("listOverview", () => {
     const { referenceMonth, items } = listOverview(patterns, [], new Map());
     expect(referenceMonth).toBeNull();
     for (const item of items) expect(item.overMinor).toBe(0);
+  });
+
+  it("an excluded pattern keeps its applicable threshold but overMinor is 0, while the same pattern non-excluded is over (S-05)", () => {
+    const woltExcluded: MerchantPattern = { ...wolt, key: "wolt-excluded", excluded: true };
+    const withExcluded = [...patterns, woltExcluded];
+    const withThresholds = new Map(thresholds).set("wolt-excluded", { kind: "count", value: 2 });
+    const { items } = listOverview(withExcluded, rows, withThresholds);
+    expect(items.find((i) => i.key === "wolt-excluded")).toEqual({
+      key: "wolt-excluded",
+      threshold: { kind: "count", value: 2 },
+      overMinor: 0,
+    });
+    expect(items.find((i) => i.key === "wolt")?.overMinor).toBeGreaterThan(0);
   });
 });
 
@@ -138,5 +157,14 @@ describe("patternDetail", () => {
     expect(detail.transactions).toEqual([
       { id: "4", occurredOn: "2026-05-15", counterparty: "Kawiarnia", title: "", amountMinor: 4550, overMinor: 0 },
     ]);
+  });
+
+  it("an excluded pattern keeps its threshold but runs no over-limit pass (S-05)", () => {
+    const woltExcluded: MerchantPattern = { ...wolt, key: "wolt-excluded", excluded: true };
+    const detail = patternDetail(woltExcluded, rows, thresholds.get("wolt") ?? null, refMonth);
+    expect(detail.threshold).toEqual({ kind: "count", value: 2 });
+    expect(detail.overMinor).toBe(0);
+    expect(detail.sequence.every((over) => !over)).toBe(true);
+    expect(detail.transactions.every((t) => t.overMinor === 0)).toBe(true);
   });
 });

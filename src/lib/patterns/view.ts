@@ -2,6 +2,8 @@
 // consume the same widened read (`loadPatterns`) and threshold read (`loadThresholds`); the reference month
 // (S-04 Autonomous decision 2) is always `referenceMonth(rows)` over the caller's full read — the list
 // (`listOverview`) and the detail page (`[...key].astro`) each call it on the same rows, so they never disagree.
+// S-05: an excluded pattern keeps its stored/applicable threshold (the panel still shows it) but generates no
+// "ponad próg" anywhere — `overLimit` is simply not run against its transactions.
 import {
   appliesTo,
   byOccurredThenId,
@@ -58,7 +60,7 @@ export function listOverview(
   const items = patterns.map((pattern): PatternListOverviewItem => {
     const stored = thresholds.get(pattern.key) ?? null;
     const threshold = stored && appliesTo(stored, pattern.type) ? stored : null;
-    if (!threshold || !refMonth) return { key: pattern.key, threshold, overMinor: 0 };
+    if (!threshold || !refMonth || pattern.excluded) return { key: pattern.key, threshold, overMinor: 0 };
     const { byMonth } = overLimit(patternTxs(pattern, byId), threshold, pattern.type);
     return { key: pattern.key, threshold, overMinor: byMonth.get(refMonth) ?? 0 };
   });
@@ -109,7 +111,8 @@ export function patternDetail(
   const byId = indexById(rows);
   const txs = patternTxs(pattern, byId);
   const applicable = threshold && appliesTo(threshold, pattern.type) ? threshold : null;
-  const { byTx, byMonth } = overLimit(txs, applicable, pattern.type);
+  // An excluded pattern keeps `applicable` in the returned `threshold` (decision 8) but runs no over-limit pass.
+  const { byTx, byMonth } = overLimit(txs, pattern.excluded ? null : applicable, pattern.type);
 
   const monthSet = new Set(txs.map((tx) => monthOf(tx.occurredOn)));
   if (refMonth) monthSet.add(refMonth);

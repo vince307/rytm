@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { appliesTo, monthOf, overLimit, referenceMonth, type DatedTx } from "@/lib/patterns/over-limit";
+import { appliesTo, monthOf, overLimit, previousMonth, referenceMonth, type DatedTx } from "@/lib/patterns/over-limit";
 import type { Threshold } from "@/types";
 
 const tx = (id: string, occurredOn: string, amountMinor: number): DatedTx => ({ id, occurredOn, amountMinor });
@@ -132,5 +132,15 @@ describe("referenceMonth", () => {
 
   it("is null for no rows", () => {
     expect(referenceMonth([])).toBeNull();
+  });
+});
+
+describe("previousMonth", () => {
+  it.each([
+    ["2026-08", "2026-07"],
+    ["2026-01", "2025-12"],
+    ["2026-10", "2026-09"],
+  ])("%s → %s", (yearMonth, text) => {
+    expect(previousMonth(yearMonth)).toBe(text);
   });
 });

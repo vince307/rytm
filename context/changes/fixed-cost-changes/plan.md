@@ -666,14 +666,14 @@ Made by the plan step of run `2026-09-28-s05-s06-s07` in place of asking a human
 
 #### Automated
 
-- [ ] 2.1 `npm test` — 190 + the new cases, 12 files, 0 failures (total recorded)
-- [ ] 2.2 `npm run lint` 0; `npx astro check` 0 errors (count recorded)
-- [ ] 2.3 `npm run fixture:check` OK; `npm run build` passes
-- [ ] 2.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0); smoke 111 PASS (delta 0)
-- [ ] 2.5 Deliberate break (new = no occurrence before R) → case 8 FAILs; restored → green; meta-check recorded
-- [ ] 2.6 Deliberate break (last occurrence vs predecessor only) → case 4 FAILs; restored → green; meta-check recorded
-- [ ] 2.7 Deliberate break (`!excluded` filter dropped) → case 11 FAILs; restored → green; meta-check recorded
-- [ ] 2.8 Deliberate break (`hasComparison` always true) → cases 9, 10 FAIL; restored → green; meta-check recorded
+- [x] 2.1 `npm test` — 190 + the new cases, 12 files, 0 failures (total recorded) — 213 passed, 12 files
+- [x] 2.2 `npm run lint` 0; `npx astro check` 0 errors (count recorded) — 122 files, 0 errors
+- [x] 2.3 `npm run fixture:check` OK; `npm run build` passes
+- [x] 2.4 `npx supabase db reset && npx supabase test db` — 102 (delta 0); smoke 111 PASS (delta 0)
+- [x] 2.5 Deliberate break (new = no occurrence before R) → case 8 FAILs; restored → green; meta-check recorded
+- [x] 2.6 Deliberate break (last occurrence vs predecessor only) → case 4 FAILs; restored → green; meta-check recorded
+- [x] 2.7 Deliberate break (`!excluded` filter dropped) → case 11 FAILs; restored → green; meta-check recorded
+- [x] 2.8 Deliberate break (`hasComparison` always true) → cases 9, 10 FAIL; restored → green; meta-check recorded
 
 #### Manual
 

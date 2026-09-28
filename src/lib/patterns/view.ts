@@ -7,6 +7,8 @@
 // island-ready `PatternListItem`s directly (S-04 impl-review F7) — no second `Map` re-merge in the page.
 // `detailTarget` resolves a requested key through the decisions before the page looks it up, so an absorbed
 // key's URL redirects to its current root (S-05 Critical Implementation Details).
+// `patternTxs` / `indexById` are exported for `src/lib/patterns/fixed.ts` (S-06 `fixedOverview`) — the one join
+// from a pattern to its own rows, not duplicated there.
 import { resolveKey } from "@/lib/patterns/derive";
 import {
   appliesTo,
@@ -25,7 +27,7 @@ interface PatternTx extends DatedTx {
 
 /** Picks one pattern's own rows out of the full read's rows, by transaction id. Throws only if a pattern's
  * `transactionIds` and the rows it was derived from have drifted apart (a programming error, not real input). */
-function patternTxs(pattern: MerchantPattern, byId: ReadonlyMap<string, PatternSource>): PatternTx[] {
+export function patternTxs(pattern: MerchantPattern, byId: ReadonlyMap<string, PatternSource>): PatternTx[] {
   return pattern.transactionIds.map((id) => {
     const row = byId.get(id);
     if (!row) throw new Error(`pattern "${pattern.key}" references missing transaction "${id}"`);
@@ -39,7 +41,7 @@ function patternTxs(pattern: MerchantPattern, byId: ReadonlyMap<string, PatternS
   });
 }
 
-function indexById(rows: readonly PatternSource[]): Map<string, PatternSource> {
+export function indexById(rows: readonly PatternSource[]): Map<string, PatternSource> {
   return new Map(rows.map((row) => [row.id, row]));
 }
 

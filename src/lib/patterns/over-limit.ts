@@ -22,6 +22,13 @@ export function monthOf(isoDate: string): string {
   return isoDate.slice(0, 7);
 }
 
+/** Calendar predecessor of a `YYYY-MM` month string (S-06 `fixedOverview`'s "poprzedni miesiąc kalendarzowy",
+ * D6): `"2026-01"` → `"2025-12"`. Plain arithmetic on the string, no `Date` / time zone. */
+export function previousMonth(yearMonth: string): string {
+  const [year, month] = yearMonth.split("-").map(Number);
+  return month === 1 ? `${year - 1}-12` : `${year}-${String(month - 1).padStart(2, "0")}`;
+}
+
 /** Latest calendar month across the rows, or `null` for no rows (S-04 Autonomous decision 2). Plain string
  * comparison is correct: `YYYY-MM` sorts lexicographically the same as chronologically. */
 export function referenceMonth(rows: readonly { occurredOn: string }[]): string | null {

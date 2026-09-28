@@ -78,3 +78,10 @@ const money = new Intl.NumberFormat("pl-PL", { minimumFractionDigits: 2, maximum
 export function formatMoney(minor: number): string {
   return `${money.format(minor / 100)} zł`;
 }
+
+/** `+6,00 zł` / `−6,00 zł` (U+2212 minus, the kit's typographic sign) — a signed amount for `/fixed` "Zmieniły
+ * kwotę" (S-06 `fixedOverview`). `0` → `"0,00 zł"`, no sign. Built on `formatMoney`. */
+export function formatSignedMoney(minor: number): string {
+  if (minor === 0) return formatMoney(0);
+  return `${minor > 0 ? "+" : "−"}${formatMoney(Math.abs(minor))}`;
+}

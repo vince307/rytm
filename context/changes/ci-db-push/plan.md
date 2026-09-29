@@ -376,25 +376,25 @@ if the ledger is wrong.
 
 #### Automated
 
-- [x] 2.1 No doc still tells anyone to push by hand
-- [x] 2.2 Prettier check passes on the edited docs
+- [x] 2.1 No doc still tells anyone to push by hand — 2d72101
+- [x] 2.2 Prettier check passes on the edited docs — 2d72101
 
 #### Manual
 
-- [x] 2.3 Backward-compatibility hard rule in `CLAUDE.md` names expand → deploy → contract
+- [x] 2.3 Backward-compatibility hard rule in `CLAUDE.md` names expand → deploy → contract — 2d72101
 
 ### Phase 3: Local agent tooling stops touching the hosted DB
 
 #### Automated
 
-- [ ] 3.1 `db push` in the skill appears only as prohibition or CI description
-- [ ] 3.2 SKILL.md preflight no longer uses `projects list` / `project-ref`
-- [ ] 3.3 `.claude/settings.local.json` is valid JSON
-- [ ] 3.4 `.claude` files stay ignored by git
+- [x] 3.1 `db push` in the skill appears only as prohibition or CI description
+- [x] 3.2 SKILL.md preflight no longer uses `projects list` / `project-ref`
+- [x] 3.3 `.claude/settings.local.json` is valid JSON
+- [x] 3.4 `.claude` files stay ignored by git
 
 #### Manual
 
-- [ ] 3.5 Ship step needs no Supabase token on the machine
+- [x] 3.5 Ship step needs no Supabase token on the machine
 
 ### Phase 4: Rollout and first CI push
 

@@ -361,27 +361,27 @@ if the ledger is wrong.
 
 #### Automated
 
-- [x] 1.1 Workflow parses as YAML
-- [x] 1.2 `environment: production` only on the `deploy` job
-- [x] 1.3 Supabase step order link → dry-run → push → migration list, after build and before vercel deploy
-- [x] 1.4 Local failing `db push --yes </dev/null` exits non-zero, recorded in `reviews/local-push-failure.md`
-- [x] 1.5 Throwaway migration removed from `supabase/migrations`
-- [x] 1.6 `npm run lint` passes
+- [x] 1.1 Workflow parses as YAML — 480d4a5
+- [x] 1.2 `environment: production` only on the `deploy` job — 480d4a5
+- [x] 1.3 Supabase step order link → dry-run → push → migration list, after build and before vercel deploy — 480d4a5
+- [x] 1.4 Local failing `db push --yes </dev/null` exits non-zero, recorded in `reviews/local-push-failure.md` — 480d4a5
+- [x] 1.5 Throwaway migration removed from `supabase/migrations` — 480d4a5
+- [x] 1.6 `npm run lint` passes — 480d4a5
 
 #### Manual
 
-- [x] 1.7 Supabase secrets only in `env:` of the Supabase steps of `deploy`
+- [x] 1.7 Supabase secrets only in `env:` of the Supabase steps of `deploy` — 480d4a5
 
 ### Phase 2: Repository docs describe CI as the only path to the hosted DB
 
 #### Automated
 
-- [ ] 2.1 No doc still tells anyone to push by hand
-- [ ] 2.2 Prettier check passes on the edited docs
+- [x] 2.1 No doc still tells anyone to push by hand
+- [x] 2.2 Prettier check passes on the edited docs
 
 #### Manual
 
-- [ ] 2.3 Backward-compatibility hard rule in `CLAUDE.md` names expand → deploy → contract
+- [x] 2.3 Backward-compatibility hard rule in `CLAUDE.md` names expand → deploy → contract
 
 ### Phase 3: Local agent tooling stops touching the hosted DB
 

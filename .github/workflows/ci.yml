@@ -97,20 +97,22 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: supabase link --project-ref psqbtvooufapkatpkxlw
+      # --skip-vault: never let a future [db.vault] in config.toml rewrite production Vault secrets from CI.
       - name: Pending hosted migrations
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: supabase db push --dry-run
+        run: supabase db push --dry-run --skip-vault
       - name: Push hosted migrations
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: supabase db push --yes
+        run: supabase db push --yes --skip-vault
       # Agents verify the push from this step's log (10x-autonomous-run ship gate); keep the name stable.
+      # JSON must be explicit: the CLI prints JSON on its own only when it detects an AI agent, never in plain CI.
       - name: Hosted migration ledger
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: supabase migration list
+        run: supabase migration list --output-format json
       - run: npx vercel@48 deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

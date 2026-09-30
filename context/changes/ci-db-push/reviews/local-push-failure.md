@@ -22,7 +22,11 @@ Conclusions for the `deploy` job:
 
 - A failing migration exits 1, so the `Push hosted migrations` step goes red and `vercel deploy` is skipped.
 - `--yes` answers the confirmation prompt; nothing blocks without a TTY.
-- Without a TTY the CLI prints **JSON**, not the table. In CI the dry-run and push steps print a `message` field
-  (hosted: "Remote database is up to date."). The `Hosted migration ledger` step prints
-  `{"migrations":[{"local":…,"remote":…},…]}`. The ship-gate check in `10x-autonomous-run` (Phase 3) must read this
-  JSON form: every new version must have both `local` and `remote` set.
+- ~~Without a TTY the CLI prints JSON~~ — **corrected by impl-review F1**: the JSON above appeared because the
+  proof ran inside Claude Code. CLI 2.117.0 prints JSON only with `--output-format json` or when it detects an AI
+  agent (`AI_AGENT`, `CLAUDECODE`, …); a TTY plays no part. Re-checked: with those vars removed and `CI=true`,
+  `migration list --local` prints the text table; with `--output-format json` it prints JSON.
+- So on GitHub Actions the dry-run and push steps print text (hosted: "Remote database is up to date."), and the
+  `Hosted migration ledger` step passes `--output-format json` explicitly to print
+  `{"migrations":[{"local":…,"remote":…},…]}` for the ship-gate check (`scripts/hosted-ledger.sh`).
+- The exit-code and `--yes` conclusions above do not depend on the output format.

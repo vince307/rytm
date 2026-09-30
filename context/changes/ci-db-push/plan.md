@@ -387,14 +387,14 @@ if the ledger is wrong.
 
 #### Automated
 
-- [x] 3.1 `db push` in the skill appears only as prohibition or CI description
-- [x] 3.2 SKILL.md preflight no longer uses `projects list` / `project-ref`
-- [x] 3.3 `.claude/settings.local.json` is valid JSON
-- [x] 3.4 `.claude` files stay ignored by git
+- [x] 3.1 `db push` in the skill appears only as prohibition or CI description — d19afd2
+- [x] 3.2 SKILL.md preflight no longer uses `projects list` / `project-ref` — d19afd2
+- [x] 3.3 `.claude/settings.local.json` is valid JSON — d19afd2
+- [x] 3.4 `.claude` files stay ignored by git — d19afd2
 
 #### Manual
 
-- [x] 3.5 Ship step needs no Supabase token on the machine
+- [x] 3.5 Ship step needs no Supabase token on the machine — d19afd2
 
 ### Phase 4: Rollout and first CI push
 

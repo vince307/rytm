@@ -159,14 +159,14 @@ Recommendation (not a blocker): authenticate an owned domain in Brevo (DKIM/DMAR
 - The `deploy` job binds the GitHub Environment `production` and runs, between `npm run build` and `vercel deploy`: `supabase/setup-cli@v1` (`2.117.0`) → `Link hosted Supabase` → `Pending hosted migrations` (`db push --dry-run`) → `Push hosted migrations` (`db push --yes`) → `Hosted migration ledger` (`migration list`). A failed migration stops the job before Vercel; earlier files stay applied.
 - Local proof (`context/changes/ci-db-push/reviews/local-push-failure.md`): a failing `db push --yes` without a TTY exits 1 and rolls back the failing file. The CLI prints JSON only with `--output-format json` (or when it detects an AI agent), so the ledger step passes it explicitly; the dry-run and push steps print text. Both push steps use `--skip-vault` (impl-review F1, F7).
 - Migrations must be backward-compatible with the deploy in production (hard rule in `CLAUDE.md`).
-- First run: _pending — filled in after the merge of `ci-db-push` (run URL, merge sha, dry-run message, ledger)._
+- First run (2026-09-30): merge `98a306c` (PR #10), run https://github.com/vince307/rytm/actions/runs/36756578942 . Attempt 1 failed at `Link hosted Supabase` — `Invalid access token format` (the secret held something other than the token; the CLI requires `^sbp_(oauth_|v0_)?[a-f0-9]{40}$`); Vercel was skipped and production stayed on the previous deploy. After re-setting `SUPABASE_ACCESS_TOKEN`, attempt 2 was green end to end: `Finished supabase link.`, dry-run and push both `Remote database is up to date.`, ledger 6 local = 6 remote up to `20260928120000` (`hosted-ledger.sh` → `LEDGER OK (0 new: none)`), then `vercel deploy --prod`; `https://rytm-phi.vercel.app/login` answers 200.
 
 ## Manual steps still open
 
 1. ~~PKCE callback~~ — done 2026-09-21 (`fe68166`) and **verified on production by the owner** the same day: signup with a non-member address → `/confirm-email` → „Wyślij ponownie” (re-sent 14:06:15 UTC) → link → `/auth/callback` → signed in on `/home` (`email_confirmed_at` 14:07:26, `last_sign_in_at` 14:08:56 UTC); „Nie pamiętam hasła” → link → `/reset/new` → new password → sign-in; `/register` with a taken address → occupied state. The Brevo mail landed in Yahoo's spam folder — see the sender-domain recommendation.
 2. Optional: create the Protection Bypass for Automation secret and store it as `VERCEL_AUTOMATION_BYPASS_SECRET`.
 3. Optional: sender domain for Brevo (see recommendation above).
-4. Before merging `ci-db-push`: create the GitHub Environment `production` (no required reviewers), a Supabase scoped access token for `psqbtvooufapkatpkxlw`, and `gh secret set SUPABASE_ACCESS_TOKEN --env production` / `gh secret set SUPABASE_DB_PASSWORD --env production` (fed from stdin).
+4. ~~Before merging `ci-db-push`: create the GitHub Environment `production` (no required reviewers), a Supabase scoped access token for `psqbtvooufapkatpkxlw`, and `gh secret set SUPABASE_ACCESS_TOKEN --env production` / `gh secret set SUPABASE_DB_PASSWORD --env production` (fed from stdin).~~ — done 2026-09-30.
 
 ## Deferred (from the risk register)
 

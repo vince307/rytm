@@ -400,7 +400,7 @@ if the ledger is wrong.
 
 #### Automated
 
-- [ ] 4.1 `production` environment holds both Supabase secrets
+- [x] 4.1 `production` environment holds both Supabase secrets
 - [ ] 4.2 Merge run: `ci`, `smoke`, `deploy` success
 - [ ] 4.3 `deploy` log shows "Remote database is up to date" and ledger `20260928120000` local = remote
 

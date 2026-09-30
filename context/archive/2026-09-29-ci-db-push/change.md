@@ -1,10 +1,10 @@
 ---
 change_id: ci-db-push
 title: Run hosted Supabase migrations from the CI deploy job, not the laptop
-status: implemented
+status: archived
 created: 2026-09-29
 updated: 2026-09-30
-archived_at: null
+archived_at: 2026-09-30T19:02:43Z
 ---
 
 ## Notes

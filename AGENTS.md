@@ -40,7 +40,7 @@ No unit test runner yet. `scripts/smoke.mjs` is the only automated check; run it
 
 ## Deployment
 
-Production ships only from the `deploy` job in `@.github/workflows/ci.yml` (push to `main`, after `ci` + `smoke`). Vercel's Git integration builds previews for other branches; `main` is disabled in `@vercel.json`. Current state and secret inventory: `@context/deployment/deploy-plan.md`.
+Production ships only from the `deploy` job in `@.github/workflows/ci.yml` (push to `main`, after `ci` + `smoke`); the same job applies hosted Supabase migrations (`supabase db push`) before the Vercel deploy, so nobody pushes migrations by hand. Vercel's Git integration builds previews for other branches; `main` is disabled in `@vercel.json`. Current state and secret inventory: `@context/deployment/deploy-plan.md`.
 
 ## Commits
 

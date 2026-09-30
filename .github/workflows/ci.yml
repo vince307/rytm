@@ -64,12 +64,16 @@ jobs:
       - if: always()
         run: supabase stop --no-backup
 
-  # Production ships only from here: push to main -> lint/check/build + smoke green -> prebuilt deploy.
+  # Production ships only from here: push to main -> lint/check/build + smoke green -> hosted migrations -> prebuilt deploy.
   # Vercel's Git integration is disabled for main in vercel.json; it still builds previews for other branches.
+  # The schema goes live minutes before the new code, so migrations must stay backward-compatible with the
+  # deploy currently in production. A failed migration stops the job before `vercel deploy`.
   deploy:
     needs: [ci, smoke]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    # Holds SUPABASE_ACCESS_TOKEN / SUPABASE_DB_PASSWORD; jobs running on PRs cannot read them.
+    environment: production
     concurrency: production
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -83,4 +87,32 @@ jobs:
       - run: npm ci
       - run: npx vercel@48 pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
       - run: npm run build
+      - uses: supabase/setup-cli@v1
+        with:
+          # Same pin as the smoke job.
+          version: 2.117.0
+      # `link` stores the IPv4 session pooler URL; runners have no IPv6 route to the direct DB host.
+      - name: Link hosted Supabase
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase link --project-ref psqbtvooufapkatpkxlw
+      # --skip-vault: never let a future [db.vault] in config.toml rewrite production Vault secrets from CI.
+      - name: Pending hosted migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase db push --dry-run --skip-vault
+      - name: Push hosted migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase db push --yes --skip-vault
+      # Agents verify the push from this step's log (10x-autonomous-run ship gate); keep the name stable.
+      # JSON must be explicit: the CLI prints JSON on its own only when it detects an AI agent, never in plain CI.
+      - name: Hosted migration ledger
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase migration list --output-format json
       - run: npx vercel@48 deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

@@ -22,14 +22,14 @@ Interview answers used as weights: persistent connections **No** · cost **Minim
 
 Scores are Pass / Partial / Fail against `references/agent-friendly-criteria.md`. All six platforms passed the hard filters (no persistent process needed; every platform runs Astro 7 SSR). Research checked 2026-09-18.
 
-| Platform | CLI-first | Managed / serverless | Agent-readable docs | Stable deploy API | MCP / integration | Cost @ 10k–100k req/mo |
-|---|---|---|---|---|---|---|
-| Vercel | Pass | Pass | Pass | Pass | Partial (beta) | $0 Hobby (non-commercial) |
-| Cloudflare Workers | Pass | Pass | Pass | Pass | Partial (unlabelled, treat as beta) | ~$5 Workers Paid |
-| Netlify | Partial | Pass | Pass | Pass | Pass (GA) | $0 Free (300 credits, 20 prod deploys/mo) |
-| Railway | Partial | Pass | Pass | Pass | Pass (GA) | $5–7 Hobby |
-| Render | Partial | Pass | Pass | Pass | Pass (GA) | $0 Free (spin-down) or $7 Starter |
-| Fly.io | Partial | Partial | Pass | Pass | Partial (experimental) | $2–5 pay-as-you-go |
+| Platform           | CLI-first | Managed / serverless | Agent-readable docs | Stable deploy API | MCP / integration                   | Cost @ 10k–100k req/mo                    |
+| ------------------ | --------- | -------------------- | ------------------- | ----------------- | ----------------------------------- | ----------------------------------------- |
+| Vercel             | Pass      | Pass                 | Pass                | Pass              | Partial (beta)                      | $0 Hobby (non-commercial)                 |
+| Cloudflare Workers | Pass      | Pass                 | Pass                | Pass              | Partial (unlabelled, treat as beta) | ~$5 Workers Paid                          |
+| Netlify            | Partial   | Pass                 | Pass                | Pass              | Pass (GA)                           | $0 Free (300 credits, 20 prod deploys/mo) |
+| Railway            | Partial   | Pass                 | Pass                | Pass              | Pass (GA)                           | $5–7 Hobby                                |
+| Render             | Partial   | Pass                 | Pass                | Pass              | Pass (GA)                           | $0 Free (spin-down) or $7 Starter         |
+| Fly.io             | Partial   | Partial              | Pass                | Pass              | Partial (experimental)              | $2–5 pay-as-you-go                        |
 
 **Vercel.** `@astrojs/vercel` 11.x targets Astro 7 (GA). CLI covers deploy (`vercel`, `vercel --prod`), rollback (`vercel rollback`, Hobby: only to the immediately previous production deploy), logs (`vercel logs`), env (`vercel env`); `--yes`, `VERCEL_TOKEN` and `--non-interactive` make it scriptable, stdout is the deployment URL, non-zero exit on failure. Docs: `vercel.com/docs/llms.txt` and a `.md` twin of every page. Hobby: 1M invocations, 4 active-CPU-hours, 360 GB-hours, 300 s max duration, 4.5 MB request body, 1 h log retention, **non-commercial personal use only**. Region defaults to `iad1`; set `fra1` in `vercel.json` (single region on Hobby). Vercel MCP (`https://mcp.vercel.com`) is **beta** as of 2026-09-15.
 
@@ -83,26 +83,26 @@ The swap went smoothly and the first deploy took ten minutes; that was the probl
 ## Operational Story
 
 - **Preview deploys**: every branch push via the Git integration (or `vercel` from the CLI) produces `https://rytm-<hash>-<team>.vercel.app`; previews are protected by Vercel Authentication by default — automated checks send `x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET`; previews from fork PRs need manual approval.
-- **Secrets**: `SUPABASE_URL` / `SUPABASE_KEY` live in Vercel project env vars, scoped per environment (`vercel env add SUPABASE_KEY production < file`, default `sensitive`); the GitHub Actions gate keeps its own copies as repository secrets; rotation = `vercel env rm` + `vercel env add` + redeploy, done by the human.
-- **Rollback**: `vercel rollback` (instant, to the immediately previous production deployment on Hobby) or `vercel promote <url>` to re-point at any earlier deployment; Supabase migrations are not rolled back by either — write down-migrations before applying up.
-- **Approval**: a human runs `vercel --prod`, rotates secrets, changes the plan, deletes the project, and applies Supabase migrations; an agent may run `vercel` (preview), `vercel logs`, `vercel env ls`, `vercel inspect`, and `npm run smoke` against a preview unattended, using a project-scoped `VERCEL_TOKEN` in an env var (never in `.mcp.json` or the repo).
+- **Secrets**: `SUPABASE_URL` / `SUPABASE_KEY` live in Vercel project env vars, scoped per environment (`vercel env add SUPABASE_KEY production < file`, default `sensitive`); the GitHub Actions gate keeps its own copies as repository secrets, and the `deploy` job reads `SUPABASE_ACCESS_TOKEN` / `SUPABASE_DB_PASSWORD` from the GitHub Environment `production` (added 2026-09-29, `ci-db-push`); rotation = `vercel env rm` + `vercel env add` + redeploy, done by the human.
+- **Rollback**: `vercel rollback` (instant, to the immediately previous production deployment on Hobby) or `vercel promote <url>` to re-point at any earlier deployment; Supabase migrations are not rolled back by either — a failed or bad migration is fixed forward with a new migration in a new PR (since 2026-09-29 the CI `deploy` job applies them).
+- **Approval**: a human runs `vercel --prod`, rotates secrets, changes the plan, deletes the project, and runs `supabase migration repair`; hosted Supabase migrations are applied only by the CI `deploy` job (since 2026-09-29, `ci-db-push`); an agent may run `vercel` (preview), `vercel logs`, `vercel env ls`, `vercel inspect`, and `npm run smoke` against a preview unattended, using a project-scoped `VERCEL_TOKEN` in an env var (never in `.mcp.json` or the repo).
 - **Logs**: build logs via `vercel inspect <url> --logs`; runtime logs via `vercel logs <url> --json --since 1h` (1-hour retention on Hobby, `--follow` capped at 5 min); GitHub Actions logs via `gh run view --log`.
 
 ## Risk Register
 
-| Risk | Source | Likelihood | Impact | Mitigation |
-|---|---|---|---|---|
-| Project becomes "commercial" under Hobby fair-use, forcing Pro ($20/mo) or migration | Devil's advocate | M | M | Keep Rytm strictly personal until a monetisation decision; at that point re-run this research — Cloudflare Workers ($5 flat) is the pre-approved runner-up. |
-| Adapter swap leaves stale Cloudflare instructions in `CLAUDE.md`, `AGENTS.md`, `tech-stack.md`, `ci.yml` | Devil's advocate / Pre-mortem | H | M | The deploy plan lists every file to touch; run `/10x-rule-review` on both rules files after the swap; delete `wrangler.jsonc` and `.dev.vars` handling in the same commit. |
-| CI `smoke` job silently tests the wrong env (`cp .env .dev.vars`) | Pre-mortem | H | M | Update the job to write only `.env`; fail the job if `SUPABASE_URL` is empty at preview start. |
-| Runaway CSV parse burns the 4 active-CPU-hour quota and pauses the project | Unknown unknowns | L | H | Cap rows per import (reject > N rows with a clear error), stream-parse, add a hard time budget in the import handler; watch usage in `vercel` dashboard before the deadline week. |
-| Region left at `iad1`, doubling Supabase latency on every request | Devil's advocate | M | M | Commit `vercel.json` with `"regions": ["fra1"]` in the first deploy; verify with `vercel inspect` (region shown). |
-| Agent's preview verification hits the Vercel Authentication page and reports success | Pre-mortem / Unknown unknowns | M | M | Smoke test asserts on a page marker, not on HTTP 200; pass the protection-bypass header from a GitHub secret. |
-| Bug noticed after 1 h has no runtime logs | Devil's advocate | M | L | Log import failures to a Supabase `import_errors` table (per-user, RLS) rather than relying on platform logs. |
-| Agent follows Vercel's stale Astro page and uses removed `@astrojs/vercel/serverless` / `functionPerRoute` | Devil's advocate | M | L | Point the deploy plan at `docs.astro.build/en/guides/integrations-guide/vercel/`; adapter 11 config is `adapter: vercel()` with no sub-path. |
-| Push to `main` deploys to production before CI lint/check finishes | Unknown unknowns | M | M | Either deploy production from GitHub Actions after the gate (`vercel deploy --prebuilt --prod`) or leave Git integration on and accept that CI is advisory; decide in the deploy plan. |
-| 4.5 MB request body cap rejects a very large multi-year CSV with a bare 413 | Research finding | L | L | Validate file size client-side and show the limit in the import UI (kit copy needed → gap register). |
-| Vercel MCP still beta; agent tooling may change | Research finding | L | L | Use the CLI for MVP; add MCP only when repeated `--help` cycles appear. |
+| Risk                                                                                                       | Source                        | Likelihood | Impact | Mitigation                                                                                                                                                                             |
+| ---------------------------------------------------------------------------------------------------------- | ----------------------------- | ---------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Project becomes "commercial" under Hobby fair-use, forcing Pro ($20/mo) or migration                       | Devil's advocate              | M          | M      | Keep Rytm strictly personal until a monetisation decision; at that point re-run this research — Cloudflare Workers ($5 flat) is the pre-approved runner-up.                            |
+| Adapter swap leaves stale Cloudflare instructions in `CLAUDE.md`, `AGENTS.md`, `tech-stack.md`, `ci.yml`   | Devil's advocate / Pre-mortem | H          | M      | The deploy plan lists every file to touch; run `/10x-rule-review` on both rules files after the swap; delete `wrangler.jsonc` and `.dev.vars` handling in the same commit.             |
+| CI `smoke` job silently tests the wrong env (`cp .env .dev.vars`)                                          | Pre-mortem                    | H          | M      | Update the job to write only `.env`; fail the job if `SUPABASE_URL` is empty at preview start.                                                                                         |
+| Runaway CSV parse burns the 4 active-CPU-hour quota and pauses the project                                 | Unknown unknowns              | L          | H      | Cap rows per import (reject > N rows with a clear error), stream-parse, add a hard time budget in the import handler; watch usage in `vercel` dashboard before the deadline week.      |
+| Region left at `iad1`, doubling Supabase latency on every request                                          | Devil's advocate              | M          | M      | Commit `vercel.json` with `"regions": ["fra1"]` in the first deploy; verify with `vercel inspect` (region shown).                                                                      |
+| Agent's preview verification hits the Vercel Authentication page and reports success                       | Pre-mortem / Unknown unknowns | M          | M      | Smoke test asserts on a page marker, not on HTTP 200; pass the protection-bypass header from a GitHub secret.                                                                          |
+| Bug noticed after 1 h has no runtime logs                                                                  | Devil's advocate              | M          | L      | Log import failures to a Supabase `import_errors` table (per-user, RLS) rather than relying on platform logs.                                                                          |
+| Agent follows Vercel's stale Astro page and uses removed `@astrojs/vercel/serverless` / `functionPerRoute` | Devil's advocate              | M          | L      | Point the deploy plan at `docs.astro.build/en/guides/integrations-guide/vercel/`; adapter 11 config is `adapter: vercel()` with no sub-path.                                           |
+| Push to `main` deploys to production before CI lint/check finishes                                         | Unknown unknowns              | M          | M      | Either deploy production from GitHub Actions after the gate (`vercel deploy --prebuilt --prod`) or leave Git integration on and accept that CI is advisory; decide in the deploy plan. |
+| 4.5 MB request body cap rejects a very large multi-year CSV with a bare 413                                | Research finding              | L          | L      | Validate file size client-side and show the limit in the import UI (kit copy needed → gap register).                                                                                   |
+| Vercel MCP still beta; agent tooling may change                                                            | Research finding              | L          | L      | Use the CLI for MVP; add MCP only when repeated `--help` cycles appear.                                                                                                                |
 
 ## Getting Started
 
@@ -117,6 +117,7 @@ Verified against the pinned versions (Astro 7.3.2, `@astrojs/vercel` 11.x, `verc
 ## Out of Scope
 
 The following were not evaluated in this research:
+
 - Docker image configuration
 - CI/CD pipeline setup
 - Production-scale architecture (multi-region, HA, DR)

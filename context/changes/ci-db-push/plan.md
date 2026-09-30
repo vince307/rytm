@@ -400,11 +400,11 @@ if the ledger is wrong.
 
 #### Automated
 
-- [x] 4.1 `production` environment holds both Supabase secrets
-- [x] 4.2 Merge run: `ci`, `smoke`, `deploy` success
-- [x] 4.3 `deploy` log shows "Remote database is up to date" and ledger `20260928120000` local = remote
+- [x] 4.1 `production` environment holds both Supabase secrets — e919196
+- [x] 4.2 Merge run: `ci`, `smoke`, `deploy` success — e919196
+- [x] 4.3 `deploy` log shows "Remote database is up to date" and ledger `20260928120000` local = remote — e919196
 
 #### Manual
 
-- [x] 4.4 Production still serves the app after the merge deploy
+- [x] 4.4 Production still serves the app after the merge deploy — e919196
 - [ ] 4.5 First real migration later shows up applied in the `deploy` log

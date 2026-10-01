@@ -468,13 +468,13 @@ Recorded in place of the skill's user questions (no human in the loop, run contr
 
 #### Automated
 
-- [x] 2.1 `npm run fixture:check` exits 0 with OK lines for `ing` and `santander`
-- [x] 2.2 Deliberate break 1 (bytes): flipped Santander byte → red on santander, ing OK; restored → green
-- [x] 2.3 Deliberate break 2 (semantics): refund marked imported + regenerated → red on D2; restored → green
-- [x] 2.4 Deliberate break 3 (aggregation): flipped ING byte → red on ing with santander OK; restored → green
-- [x] 2.5 Standalone `node scripts/fixture-ing-check.mjs` exits 0
-- [x] 2.6 CI workflow and ING files unchanged vs `main`
-- [x] 2.7 Full local gate vs baseline (Δ0; `fixture:check` covers both banks)
+- [x] 2.1 `npm run fixture:check` exits 0 with OK lines for `ing` and `santander` — c9efa9a
+- [x] 2.2 Deliberate break 1 (bytes): flipped Santander byte → red on santander, ing OK; restored → green — c9efa9a
+- [x] 2.3 Deliberate break 2 (semantics): refund marked imported + regenerated → red on D2; restored → green — c9efa9a
+- [x] 2.4 Deliberate break 3 (aggregation): flipped ING byte → red on ing with santander OK; restored → green — c9efa9a
+- [x] 2.5 Standalone `node scripts/fixture-ing-check.mjs` exits 0 — c9efa9a
+- [x] 2.6 CI workflow and ING files unchanged vs `main` — c9efa9a
+- [x] 2.7 Full local gate vs baseline (Δ0; `fixture:check` covers both banks) — c9efa9a
 
 #### Manual
 

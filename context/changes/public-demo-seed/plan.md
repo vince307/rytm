@@ -376,28 +376,28 @@ means unsetting `DEMO_EMAIL` on Vercel and redeploying. The demo account then be
 
 #### Automated
 
-- [x] 1.1 Unit tests pass, including `test/unit/demo.test.ts`
-- [x] 1.2 Lint passes
-- [x] 1.3 Type and Astro check pass
-- [x] 1.4 Build passes
-- [x] 1.5 Local DB reset applies the new seed and pgTAP still passes
-- [x] 1.6 Smoke passes with the 8 new demo steps
+- [x] 1.1 Unit tests pass, including `test/unit/demo.test.ts` — 1e7cc35
+- [x] 1.2 Lint passes — 1e7cc35
+- [x] 1.3 Type and Astro check pass — 1e7cc35
+- [x] 1.4 Build passes — 1e7cc35
+- [x] 1.5 Local DB reset applies the new seed and pgTAP still passes — 1e7cc35
+- [x] 1.6 Smoke passes with the 8 new demo steps — 1e7cc35
 
 #### Manual
 
-- [x] 1.7 Each of the four refusals shows its sentence in the right place locally
-- [x] 1.8 Demo account can still set a threshold and merge or exclude a pattern locally
+- [x] 1.7 Each of the four refusals shows its sentence in the right place locally — 1e7cc35
+- [x] 1.8 Demo account can still set a threshold and merge or exclude a pattern locally — 1e7cc35
 
 ### Phase 2: Demo procedure and docs
 
 #### Automated
 
-- [ ] 2.1 Prettier passes on the edited docs
-- [ ] 2.2 `DEMO_EMAIL` is documented in every relevant file
+- [x] 2.1 Prettier passes on the edited docs
+- [x] 2.2 `DEMO_EMAIL` is documented in every relevant file
 
 #### Manual
 
-- [ ] 2.3 Reset procedure in `deploy-plan.md` is followable without other context
+- [x] 2.3 Reset procedure in `deploy-plan.md` is followable without other context
 
 ### Phase 3: Rollout and seeding on production
 

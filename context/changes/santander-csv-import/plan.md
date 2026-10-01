@@ -171,6 +171,9 @@ in this phase.
   check (23514).
 - `comment on function`, then `revoke execute … from public, anon` and `grant execute … to authenticated`.
 - `import_ing_statement` is not mentioned in this file.
+- `user_id` is never a parameter and never read from `p_transactions`: both insert column lists stay exactly as in
+  `import_ing_statement` (no `user_id`), so `user_id` comes only from the column default `auth.uid()` and the
+  `with check` RLS policies (security invoker, never definer).
 - The header states: expand only, the old function stays for the deploy window, a later contract migration may drop
   it, no new table (so no new RLS policies), and the user_id cascade is unchanged.
 
@@ -193,6 +196,7 @@ regression.
   - `anon` → 42501.
   - `has_function_privilege('anon', …)` is false.
   - User B does not see user A's Santander import.
+  - An element of `p_transactions` carrying a `user_id` key of user B still lands under the caller (user A).
 - `domain_rls.test.sql`: `plan(28)` grows by the new asserts. A direct insert with `source 'santander'` is accepted,
   and one with `'mbank'` → 23514.
 
@@ -284,8 +288,9 @@ Santander. 23P01 → overlap, the demo guard, and the `?error=` codes are unchan
 **Intent**: Prove the new path end to end without touching any ING step.
 
 **Contract**:
-- A `santanderPayload` constant with `source: "santander"`, an invented 26-digit account, 2 debits, `bankTxId: null`,
-  and a distinctive `counterparty`.
+- A `santanderPayload` constant with `source: "santander"`, an invented 26-digit account, `accountName: "Rachunek"`
+  (what the wizard sends, `copyExtra.imports.santanderAccountName` from Phase 5; Phase 5's list step asserts
+  `>Santander · Rachunek<` on it), 2 debits, `bankTxId: null`, and a distinctive `counterparty`.
 - New steps, inserted after "signin re-created account" and before "delete re-created account (cleanup)":
   - The Santander import is saved → 302 `/imports/result?id=`.
   - Its result renders "Dodaliśmy 2 obciążenia."
@@ -514,7 +519,9 @@ Every unknown-format use, including the G27 stand-ins, then names both banks, an
 
 **Contract**:
 - `readStatement` becomes a thin wrapper over `readImportFile(bytes, { santanderAccountName:
-  x.santanderAccountName })` (change 4 below).
+  x.santanderAccountName })` (change 4 below). It keeps its `file.size > MAX_FILE_BYTES` check (and the G27
+  comment) **before** `file.arrayBuffer()`, so an oversized file is never read into memory; `readImportFile`
+  repeats the check on `bytes.length` only so it can be unit-tested.
 - `Loaded` holds the detected result, including `bank`.
 - The payload comes from `buildPayload`.
 - Step 1 chip shows `x.formatRecognised[bank]`. Step 2 `<small>` shows `x.bankName[bank]`. Step 3 account value shows
@@ -582,6 +589,7 @@ rows are all credits → `empty`.
 - [human] Product owner imports their own real Santander PLN export locally (never committed, never shared) and confirms the debit count and range match the bank's statement
 - [human] Accept the deviation from `import-formats.md` rule 7: Lp is not stored and Santander rows have no per-row key (decision 4)
 - [human] Accept the K26 wording, including the generic "Rachunek" as the Santander account name (two Santander accounts would be told apart only by range on the list) (decision 5)
+- [human] Accept that S-11 re-keys Santander card patterns: a threshold or decision saved on a raw-tail Santander pattern between S-10 and S-11 is orphaned by S-11's normaliser unless S-11 migrates keys (`change.md` decision 4)
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful before proceeding to the next phase.
 
@@ -653,6 +661,13 @@ These are recorded in place of the skill's user questions (no human in the loop,
   in between (accepted in `change.md` decision 4).
 - A future real export with a different filter bound (R1) is caught only by the Phase 1 shape metric, run by hand.
 - After a `vercel rollback`, Santander imports would be labelled "ING · Rachunek" until roll-forward. This is cosmetic.
+- Vercel previews share the production database (`context/deployment/deploy-plan.md`). From Phase 3 on, this
+  branch's PR preview calls `import_statement`, which exists in production only after the merge's `deploy` job, so
+  every import on the preview (ING included) ends in `?error=failed` until merge. Production is unaffected (the
+  migration lands before the code). Verification of this slice is local only; do not read a failed preview import as
+  a product bug, and do not "fix" it with a fallback to `import_ing_statement` (plan-review F2).
+- Santander `title` keeps the bank's card description, including the masked card number (`<6>******<4>`); it is the
+  user's own data under RLS, like ING titles, and is not rendered on the list (plan-review F6).
 
 ## References
 
@@ -759,3 +774,4 @@ These are recorded in place of the skill's user questions (no human in the loop,
 - [ ] 6.8 [human] Owner imports their real Santander PLN export locally; count and range match the bank
 - [ ] 6.9 [human] Accept the rule-7 deviation: Lp not stored, no per-row Santander key
 - [ ] 6.10 [human] Accept the K26 wording, incl. "Rachunek" as the Santander account name
+- [ ] 6.11 [human] Accept that S-11 re-keys Santander card patterns (thresholds/decisions saved in between are orphaned)

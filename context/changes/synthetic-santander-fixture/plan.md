@@ -461,8 +461,8 @@ Recorded in place of the skill's user questions (no human in the loop, run contr
 
 #### Manual
 
-- [ ] 1.8 [reviewer] Every trap ST01–ST14 has rows and manifest entries; main file matches the real-export shape
-- [ ] 1.9 [reviewer] Privacy overlap scan: no value from the real exports in the fixture
+- [x] 1.8 [reviewer] Every trap ST01–ST14 has rows and manifest entries; main file matches the real-export shape — a936cfd (impl review)
+- [x] 1.9 [reviewer] Privacy overlap scan: no value from the real exports in the fixture — a936cfd (impl review)
 
 ### Phase 2: Santander check and the two-bank gate
 
@@ -478,7 +478,7 @@ Recorded in place of the skill's user questions (no human in the loop, run contr
 
 #### Manual
 
-- [ ] 2.8 [reviewer] Check rules assert only facts the real export has
+- [x] 2.8 [reviewer] Check rules assert only facts the real export has — a936cfd (impl review)
 
 ### Phase 3: Shape comparator, format doc and seam sweep
 
@@ -493,6 +493,6 @@ Recorded in place of the skill's user questions (no human in the loop, run contr
 
 #### Manual
 
-- [ ] 3.7 [reviewer] Shape comparison against the real exports prints masks only; differences explained or fixed
-- [ ] 3.8 [reviewer] `import-formats.md` and the fixture README agree with research and hold no real value
+- [x] 3.7 [reviewer] Shape comparison against the real exports prints masks only; differences explained or fixed — a936cfd (impl review)
+- [x] 3.8 [reviewer] `import-formats.md` and the fixture README agree with research and hold no real value — a936cfd (impl review)
 - [ ] 3.9 [human] Product owner confirms the oracle's product calls (`Wypłata BLIK` own pattern, ST03 user-merge, `Oplata za …` fixed)

@@ -62,7 +62,7 @@ Success criteria re-run on 2026-10-01: `npm test` 256/256, lint, `astro check` 0
 - **Location**: context/deployment/deploy-plan.md (env inventory)
 - **Detail**: `SUPABASE_URL`/`SUPABASE_KEY` are scoped to "production, preview", but `DEMO_EMAIL` only to production. On a preview URL `isDemoEmail` fails open, so the demo account could delete itself, undo its import or upload anything. Vercel Authentication on previews limits this to team members.
 - **Fix**: `printf 'demo@rytm.example' | vercel env add DEMO_EMAIL preview` (human), and update the inventory row to "production, preview".
-- **Decision**: PENDING — deploy-plan rows updated to "production, preview"; waiting for the owner to run `printf 'demo@rytm.example' | vercel env add DEMO_EMAIL preview`.
+- **Decision**: FIXED — owner added `DEMO_EMAIL` to Vercel preview (2026-10-01); deploy-plan rows say "production, preview".
 
 ### F4 — Guard is app-level only; the DB and GoTrue still allow the actions
 

@@ -703,12 +703,12 @@ These are recorded in place of the skill's user questions (no human in the loop,
 
 #### Automated
 
-- [x] 2.1 `db reset` applies the migration; `supabase test db` passes with `import_statement.test.sql`
-- [x] 2.2 `db:types` regenerated with `import_statement`
-- [x] 2.3 ING migration, `import_rpc.test.sql`, `import_delete.test.sql` unchanged vs `main`
-- [x] 2.4 Deliberate break 1: literal `'ing'` in the new function turns the source assert red; restored → green
-- [x] 2.5 Deliberate break 2: missing revoke turns the anon asserts red; restored → green
-- [x] 2.6 Full local gate vs baseline (pgTAP + delta, others Δ0)
+- [x] 2.1 `db reset` applies the migration; `supabase test db` passes with `import_statement.test.sql` — b7f29e1
+- [x] 2.2 `db:types` regenerated with `import_statement` — b7f29e1
+- [x] 2.3 ING migration, `import_rpc.test.sql`, `import_delete.test.sql` unchanged vs `main` — b7f29e1
+- [x] 2.4 Deliberate break 1: literal `'ing'` in the new function turns the source assert red; restored → green — b7f29e1
+- [x] 2.5 Deliberate break 2: missing revoke turns the anon asserts red; restored → green — b7f29e1
+- [x] 2.6 Full local gate vs baseline (pgTAP + delta, others Δ0) — b7f29e1
 
 #### Manual
 

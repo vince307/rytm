@@ -171,11 +171,11 @@ One shared account that reviewers sign in to on `https://rytm-phi.vercel.app`; c
 
 ### Seeding (in order)
 
-1. Pick the demo address (a real inbox — production requires e-mail confirmation, e.g. a Gmail `+` alias) and a strong password; both get published.
-2. `vercel env add DEMO_EMAIL production` with that address.
-3. Deploy: merge to `main` and wait for the green `deploy` job (or wait for the next one, if the code is already live).
-4. On `https://rytm-phi.vercel.app/register`: sign up with the address and password.
-5. Confirm the e-mail from the link in the inbox, then sign in.
+1. Pick the demo address and a strong password; both get published. The address needs no inbox (the user is confirmed by hand in step 4), so a reserved domain such as `demo@rytm.example` works.
+2. `printf '<address>' | vercel env add DEMO_EMAIL production` (piped — the interactive prompt does not work from an agent's `!` shell).
+3. Deploy: merge to `main` and wait for the green `deploy` job (or wait for the next one, if the code is already live). Never create the user before the guard is live.
+4. Supabase dashboard → project `rytm` → Authentication → Users → Add user → Create new user: the address and password, **Auto Confirm User** ticked.
+5. Sign in on `https://rytm-phi.vercel.app/login`.
 6. `/imports/new`: import the fixture in the wizard with its default account „Rachunek Firmowy Główny” (not „Rachunek VAT”). Expected: 206 debits, 01.09.2025–31.08.2026; `/patterns`, `/fixed` and `/home` show the synthetic data.
 
 ### What the guard refuses
@@ -194,10 +194,12 @@ Thresholds, pattern decisions (merge, exclude, type, name) and fixed-cost pinnin
 ### Reset
 
 1. Supabase dashboard → project `rytm` → Authentication → Users: delete the demo user. The cascade removes its imports, transactions and pattern data.
-2. Sign up again with the same address and password, confirm the e-mail, sign in.
+2. Add the user again exactly as in seeding step 4 (same address and password, Auto Confirm User), then sign in.
 3. Import the fixture again (step 6 above) — allowed, because the account is empty.
 
 `DEMO_EMAIL` stays as it is; no deploy is needed.
+
+**Seeded** 2026-10-01: `demo@rytm.example` added with Auto Confirm after the green `deploy` of PR #12; wizard import of the fixture's default account → 206 debits (01.09.2025–31.08.2026). Credentials in `README.md` § Demo.
 
 ## Manual steps still open
 

@@ -484,12 +484,12 @@ Recorded in place of the skill's user questions (no human in the loop, run contr
 
 #### Automated
 
-- [x] 3.1 `fixture:shape:santander` without files (no arg and `-- ""`) exits 0 with a message
-- [x] 3.2 Privacy guard: output on a renamed fixture copy matches neither `\d{26}` nor `historia_`
-- [x] 3.3 Deliberate break: printing the file name turns the privacy grep red; restored → green
-- [x] 3.4 `npm run fixture:check` OK for both banks after any generator fix
-- [x] 3.5 Seam sweep: one Santander CSV reader; no `TODO`/`ING-only` in the new scripts
-- [x] 3.6 Full local gate vs baseline (Δ0)
+- [x] 3.1 `fixture:shape:santander` without files (no arg and `-- ""`) exits 0 with a message — f28cf54
+- [x] 3.2 Privacy guard: output on a renamed fixture copy matches neither `\d{26}` nor `historia_` — f28cf54
+- [x] 3.3 Deliberate break: printing the file name turns the privacy grep red; restored → green — f28cf54
+- [x] 3.4 `npm run fixture:check` OK for both banks after any generator fix — f28cf54
+- [x] 3.5 Seam sweep: one Santander CSV reader; no `TODO`/`ING-only` in the new scripts — f28cf54
+- [x] 3.6 Full local gate vs baseline (Δ0) — f28cf54
 
 #### Manual
 

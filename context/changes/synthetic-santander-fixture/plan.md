@@ -75,6 +75,11 @@ both banks. The shape comparator imports the Santander check's reader.
 
 ## Critical Implementation Details
 
+**Header invariants (plan review F2; each observed true on the real PLN and USD exports, booleans only).**
+Header col 5 (opening) + Σ col 5 of all data rows == header col 6 (closing); Lp N's col 6 − Lp N's col 5 == opening;
+Lp 1's booking date is the **unique** maximum (so it is chronologically last whatever the tie-break); the file name's
+date == header col 0 and its 26 digits == header col 2 without `'` and spaces.
+
 **Two date formats and two orders.** Header col 0 is `YYYY-MM-DD`, header col 1 and every data-row date are
 `DD-MM-YYYY`. File order is Lp 1..N ascending, rows roughly newest-first by booking date with a few adjacent
 inversions (real ≈ 8%) — the fixture must contain inversions, Lp 1 must carry the maximum booking date, and booking
@@ -130,7 +135,7 @@ The generator, the main PLN export, the USD reject file, `expected.json`, the ge
   | ST01 | Two cards on one account; the same merchant paid with both | one pattern; card mask not part of the merchant |
   | ST02 | Same chain, different branch numbers in the card tail (invented chain) | one pattern, `resolvedBy: normalization` |
   | ST03 | Same merchant written two ways by the card operator (`MARKA *Marka App` vs `MARKA APPS <CITY>`), monthly same amount | one `fixed` pattern, `resolvedBy: user-merge` |
-  | ST04 | Card ATM withdrawals at ≥ 2 addresses | one `frequent` pattern `bankomat`, `resolvedBy: normalization` |
+  | ST04 | Card ATM withdrawals at ≥ 2 addresses | `rawMerchant` = the ATM address tail (regex, like every card row); one `frequent` pattern `bankomat`, `resolvedBy: normalization` (S-11 maps it; the parser does not) |
   | ST05 | `Zakup BLIK` with counterparty in col 3; one row carries a domain-shaped token in the description | raw merchant = col 3 (rule 5), D3 domain rule not used |
   | ST06 | `Wypłata BLIK` (BLIK cash withdrawal) | raw merchant = col 3 (rule 5); own pattern, not merged into `bankomat` |
   | ST07 | Transfers: `Przelew środków`, `Przelew na telefon`, a free-title debit with a `,` in col 2 (quoted) | raw merchant = col 3 |
@@ -143,7 +148,10 @@ The generator, the main PLN export, the USD reject file, `expected.json`, the ge
   | ST14 | USD account file (header col 4 `USD`, 3 card rows in `USD`, one tail with `*`, one with `_`) | file rejected, `reason: currency` |
 
   Plus seeded noise: one-off card merchants (ASCII, invented), a few `frequent` card merchants with spread > D5
-  tolerance, so D5 yields both types.
+  tolerance, so D5 yields both types. Over-merge guards for S-11 (plan review F3): ≥ 2 distinct merchants share one
+  city tail token, and ≥ 1 card tail ends in a two-word city — each stays its own pattern. ST10's Santander rows keep
+  amounts inside the ING `pizzeria-trzy-sery` spread so its Santander `type` is `frequent` like the ING oracle's, and
+  the `crossBank` entry records `"type": "frequent"` for the joined pattern.
 - `expected.json` shape (`JSON.stringify(…, null, 2) + "\n"`):
 
   ```json
@@ -241,7 +249,8 @@ the files from disk independently of the generator.
    `YMD`, col 1 `DMY`, col 2 `'` + `\d{2}( \d{4}){6}`, col 4 `[A-Z]{3}`, col 5/col 6 quoted amounts, col 7 == data
    rows; data rows: col 0/col 1 `DMY`, booking ≥ operation, col 5/col 6 quoted `-?\d+,\d{2}`, col 7 Lp == 1..N in
    file order; header col 1 ≤ every operation date, header col 0 ≥ every booking date; header col 6 == Lp 1's col 6;
-   Lp 1 has the maximum booking date and ≥ 1 adjacent booking-date inversion exists (main file); card rows match
+   opening + Σ amounts == closing; Lp N's col 6 − col 5 == opening; file name date/digits == header col 0/col 2;
+   Lp 1 has the unique maximum booking date and ≥ 1 adjacent booking-date inversion exists (main file); card rows match
    `CARD`, description amount == |col 5|, description currency == header col 4, col 3/col 4 empty, tail ASCII with
    single spaces; refunds > 0, card payments/ATM < 0; ≥ 2 distinct card masks; filled col 4 is grouped digits
    without `'`; col 2/col 3 quoted iff they contain `,`.
@@ -249,7 +258,8 @@ the files from disk independently of the generator.
    == col 1/col 0; `imported` == (amount < 0) with `skipReason: credit` otherwise (D2); `rawMerchant` re-derived by
    rule 5; `imported.count`/`sumMinor`/`declaredCount`/`period` consistent; D5: every `fixed` pattern within
    tolerance of its median, every `frequent` with ≥ 2 occurrences has one outside; every `TRAPS` id appears in
-   ≥ 1 row; each `crossBank` pattern exists in both the Santander `patterns` and the ING oracle's `patterns`.
+   ≥ 1 row; each `crossBank` pattern exists in both the Santander `patterns` and the ING oracle's `patterns`, with the entry's
+   `type` in both.
 4. Reject file: `expect: reject`, `reason: currency`, header col 4 ≠ `PLN`; it trips only its own reason (format
    otherwise valid) and the main file does not trip it.
 
@@ -321,7 +331,9 @@ compared within the same currency, tolerance in percentage points like the ING t
 **Contract**: Table and subsections corrected per research.md § Real export: `Lp` 1..N ascending in file order, rows ≈
 newest booking date first, not strictly; header col 0 `YYYY-MM-DD` vs col 1 `DD-MM-YYYY` and the grouped account mask;
 quoting names col 5 and col 6; card tail ASCII without Polish letters; `Wypłata BLIK` and the `:<11 digits>` BLIK
-suffix; free-title transfer shape; recurring `Oplata za …` debit; col 4 mask. One line pointing at
+suffix; free-title transfer shape; recurring `Oplata za …` debit; col 4 mask; the ATM line of the regex block says
+`rawMerchant` = address tail and the „bankomat” pattern comes from normalization (S-11), so rule 5 and the fixture
+manifest agree (plan review F1); the header invariants above. One line pointing at
 `test/fixtures/santander/README.md` (ST01–ST14) in „Kształty do seeda (dodatkowe)”. No value from the real exports.
 
 #### 3. Project commands
@@ -361,6 +373,7 @@ accepted (ING scripts stay untouched) and noted in the generator header.
 
 - [reviewer] `npm run fixture:shape:santander -- <real export dir from the run contract>` (sandbox disabled): output holds only masks/shares, no file name; every remaining difference is explained in the implement handoff or fixed in the generator
 - [reviewer] `import-formats.md` Santander section and `test/fixtures/santander/README.md` agree with each other and with research.md § Real export; neither contains a value from the real exports
+- [human] Product owner confirms the oracle's product calls S-11 is measured against: `Wypłata BLIK` its own pattern (not `bankomat`), ST03 resolved by user-merge (not automatic normalization), `Oplata za …` a `fixed` pattern — reversible by editing the generator + regenerating
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful before proceeding to the next phase.
 
@@ -409,7 +422,15 @@ Recorded in place of the skill's user questions (no human in the loop, run contr
 | Period and size | 2026-03-01 → 2026-08-31, ≈180 rows | 12 months like ING | Enough months for D5 fixed/frequent; keeps the file reviewable | S-11 needing a longer series |
 | Account number / BIN | Invented, public bank code `1090`; test BIN `411111` | Fully random digits | Plausible shape for S-10 detection without any real value | Detection rules relying on checksums |
 | Doc corrections phase | Phase 3, after the comparator re-checks shapes | Phase 1 | The comparator confirms the facts the doc states | — |
-| PRD literal text | No deviation from FR-018/FR-014 — no `[human]` row needed | — | F-03 ships data and scripts only | — |
+| PRD literal text | No deviation from FR-018/FR-014; the oracle's product calls get `[human]` row 3.9 (plan review F4) | — | F-03 ships data and scripts only, but S-11 is measured against its slugs | — |
+
+## Known risks
+
+- Overlap rejection (S-10) is provable with this fixture only as an identical re-import of the main file; a partial
+  overlap needs a test-built variant in S-10 (plan review O1).
+- The real export's balances form no clean chain under any simple ordering (file order or booking date); the
+  fixture's chronological chain is cleaner by design — 3.7 should list it as an explained difference, the check never
+  asserts a chain (plan review O3).
 
 ## References
 
@@ -474,3 +495,4 @@ Recorded in place of the skill's user questions (no human in the loop, run contr
 
 - [ ] 3.7 [reviewer] Shape comparison against the real exports prints masks only; differences explained or fixed
 - [ ] 3.8 [reviewer] `import-formats.md` and the fixture README agree with research and hold no real value
+- [ ] 3.9 [human] Product owner confirms the oracle's product calls (`Wypłata BLIK` own pattern, ST03 user-merge, `Oplata za …` fixed)

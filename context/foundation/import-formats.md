@@ -2,7 +2,7 @@
 project: "Rytm"
 context_type: greenfield
 created: 2026-09-18
-updated: 2026-09-24
+updated: 2026-10-02
 source: "analiza prawdziwych eksportów CSV (lokalnie, pliki nie trafiają do repo)"
 banks:
   - id: ing
@@ -122,38 +122,49 @@ Status: **po pierwszym przepływie ING** (D4). Uwaga: w rozmowach ten bank bywa�
 |---|---|
 | Kodowanie | UTF-8, bez BOM, LF |
 | Separator | `,` |
-| Cudzysłów pól | `"` — tylko przy kwotach (bo przecinek dziesiętny) i polach zawierających przecinek |
-| Pułapka | Nr rachunku w wierszu nagłówka z wiodącym `'` |
-| Kwota | `"-24,31"` — przecinek dziesiętny, minus = obciążenie |
-| Daty | `DD-MM-YYYY`; kol. 0 = data księgowania, kol. 1 = data operacji (**używana**; różnią się w ~90% wierszy — karty księgują z opóźnieniem 1–3 dni) |
+| Cudzysłów pól | `"` — przy kwocie (kol. 5) **i** saldzie po operacji (kol. 6), bo przecinek dziesiętny; w kol. 2/kol. 3 tylko gdy zawierają przecinek. Bez escapowania `""`. **Nie ściśle RFC 4180:** `"` otwiera pole w cudzysłowie tylko na początku pola; pole **bez** cudzysłowu może zawierać `"` w środku (nazwa sprzedawcy w cudzysłowie w końcówce opisu kartowego, ≈ 2% wierszy, różne odstępy: `"X"`, `" X"`, `"X Y"`) — parser nie może takiego wiersza odrzucić (fixture: ST15) |
+| Pułapka | Nr rachunku w wierszu nagłówka (kol. 2) z wiodącym `'`, w grupach (2 + 6×4 cyfry, 26 cyfr łącznie, spacje między grupami) |
+| Kwota | `"-24,31"` — przecinek dziesiętny, bez separatora tysięcy, minus = obciążenie |
+| Daty | `DD-MM-YYYY` w wierszach danych; kol. 0 = data księgowania, kol. 1 = data operacji (**używana**; różnią się w ~90% wierszy — karty księgują z opóźnieniem 1–3 dni; kol. 0 ≥ kol. 1 na każdym wierszu). Nagłówek ma **dwa różne formaty** w jednym wierszu: kol. 0 (data eksportu) `YYYY-MM-DD`, kol. 1 (początek zakresu) `DD-MM-YYYY` |
 | Waluta | tylko w wierszu nagłówka (kol. 4) — `PLN` / `USD` / … |
 | Nagłówek kolumn | **brak** |
-| ID transakcji | **brak** — tylko `Lp` (1..N, malejąco po dacie księgowania, sekwencyjne w obrębie eksportu). Potwierdza FR-005: bez dedupu, odrzucanie nakładających się zakresów |
+| ID transakcji | **brak** — tylko `Lp` (1..N **rosnąco w kolejności pliku**, sekwencyjne w obrębie eksportu). Wiersze są ≈ od najnowszej daty księgowania, **nie ściśle** — zdarzają się sąsiadujące inwersje (realnie ~8% sąsiednich par); `Lp` 1 ma zawsze unikalnie najwyższą datę księgowania w pliku. Potwierdza FR-005: bez dedupu, odrzucanie nakładających się zakresów |
 | Pola wielowierszowe | brak |
 | Liczba kolumn | 9 (ostatnia pusta) |
 
 ### Struktura pliku
 
 ```
-wiersz 1     nagłówek: data eksportu, data początku zakresu, 'nr rachunku, właściciel,
-             waluta, saldo początkowe, saldo końcowe, liczba wierszy, (puste)
-wiersze 2..  dane: data księgowania, data operacji, opis, kontrahent, nr rachunku
-             kontrahenta, kwota, saldo po operacji, lp, (puste)
+wiersz 1     nagłówek: data eksportu (YYYY-MM-DD), data początku zakresu (DD-MM-YYYY),
+             'nr rachunku (grupowany, wiodący '), właściciel (jedno pole, bez przecinka),
+             waluta, saldo początkowe (w cudzysłowie), saldo końcowe (w cudzysłowie),
+             liczba wierszy danych, (puste)
+wiersze 2..  dane: data księgowania (DD-MM-YYYY), data operacji (DD-MM-YYYY), opis,
+             kontrahent, nr rachunku kontrahenta (grupowany, bez wiodącego '), kwota
+             (w cudzysłowie), saldo po operacji (w cudzysłowie), lp, (puste)
 ```
 
 Koniec zakresu **nie występuje** w nagłówku → D7: koniec = data eksportu (kol. 0 nagłówka).
+
+**Niezmienniki nagłówka** (sprawdzane przez `scripts/fixture-santander-check.mjs`, każdy potwierdzony na prawdziwym eksporcie PLN i USD): saldo początkowe (kol. 5) + Σ kwot wszystkich wierszy danych == saldo końcowe (kol. 6); saldo wiersza `Lp N` minus jego kwota == saldo początkowe; `Lp` 1 ma unikalnie maksymalną datę księgowania w pliku (więc jest chronologicznie ostatni, niezależnie od sposobu rozstrzygania remisów); saldo wiersza `Lp` 1 (kol. 6) == saldo końcowe nagłówka; data w nazwie pliku == kol. 0 nagłówka, a 26 cyfr z nazwy pliku == cyfry kol. 2 nagłówka (bez `'` i spacji). Salda liczone są w prawdziwym porządku chronologicznym (data księgowania, potem data operacji, `Lp` malejąco jako remis) — **nie** w kolejności pliku; plik nie ma gładkiego łańcucha sald we własnej kolejności, więc żadna reguła importu/kontroli nie może tego zakładać.
 
 ### Opis transakcji kartowej (kol. 2) — parser regex
 
 ```
 DOP. VISA <6 cyfr>******<4 cyfry> PŁATNOŚĆ KARTĄ <kwota> <WALUTA> <sprzedawca i miasto>
 DOP. VISA …                        ZWROT PŁATNOŚCI KARTĄ <kwota> <WALUTA> <sprzedawca>     → kwota dodatnia, pomijany (D2)
-DOP. VISA …                        WYPŁATA Z BANKOMATU KARTĄ <kwota> <WALUTA> <adres>      → sprzedawca „bankomat”
-Zakup BLIK <operator/sprzedawca>                                                            → kontrahent w kol. 3
-Przelew środków / Przelew na telefon / dowolny tytuł                                        → sprzedawca = kol. 3 (kontrahent)
+DOP. VISA …                        WYPŁATA Z BANKOMATU KARTĄ <kwota> <WALUTA> <adres>      → rawMerchant = tekst adresu (ten sam regex);
+                                                                                               wzorzec „bankomat” to dopiero wynik normalizacji (S-11), nie reguły 5
+Zakup BLIK <operator/sprzedawca>:<11 cyfr>                                                  → kontrahent w kol. 3; `:<11 cyfr>` jest stałą końcówką opisu
+Wypłata BLIK <tekst>:<11 cyfr>                                                              → wypłata gotówki przez BLIK, kontrahent w kol. 3, ta sama `:<11 cyfr>` końcówka;
+                                                                                               własny wzorzec, **nie** scalany z „bankomat”
+Przelew środków / Przelew na telefon / dowolny tytuł (np. faktura/opłata z `/`-separowanymi    → sprzedawca = kol. 3 (kontrahent); tytuł z przecinkiem
+  identyfikatorami, w cudzysłowie gdy zawiera przecinek)                                        wychodzi w kol. 2 w cudzysłowie
+Oplata za <coś> (ten sam kontrahent/rachunek/tytuł co miesiąc, stała kwota)                 → sprzedawca = kol. 3; wzorzec stały (fixed) po D5 —
+                                                                                               **nie** zakładać, że to opłata bankowa (nieudowadnialne z samego kształtu)
 ```
 
-Kwota w opisie ma kropkę dziesiętną, w kol. 5 przecinek; są zgodne (0 rozjazdów na 438 kart). Na jednym rachunku mogą być **dwie karty** (różne końcówki) — numer karty nie jest częścią sprzedawcy.
+Końcówka opisu kartowego (sprzedawca/adres) jest **ASCII, bez polskich znaków diakrytycznych**, z pojedynczymi spacjami (2–7 tokenów) — istotne dla łączenia sprzedawców między bankami (S-11). Kwota w opisie ma kropkę dziesiętną, w kol. 5 przecinek; są zgodne (0 rozjazdów na 438 kart). Na jednym rachunku mogą być **dwie karty** (różne końcówki) — numer karty nie jest częścią sprzedawcy. Kol. 3/kol. 4 są puste na każdym wierszu kartowym (w tym bankomatowym); dla BLIK i przelewów kol. 4 (nr rachunku kontrahenta), gdy wypełniona, jest grupowana tak jak nagłówkowa kol. 2 (2 + 6×4 cyfry, spacje między grupami), ale bez cudzysłowu i bez wiodącego `'`.
 
 ### Reguły importu Santander
 
@@ -161,7 +172,7 @@ Kwota w opisie ma kropkę dziesiętną, w kol. 5 przecinek; są zgodne (0 rozjaz
 2. Waluta (kol. 4 nagłówka) ≠ `PLN` → odrzuć plik z komunikatem (fixture: plik konta USD).
 3. Kontrola: liczba wierszy danych == kol. 7 nagłówka.
 4. Pomiń kwoty ≥ 0 (D2).
-5. Sprzedawca surowy: regex powyżej dla `DOP. VISA …`; inaczej kol. 3, a gdy pusta — kol. 2.
+5. Sprzedawca surowy: regex powyżej dla `DOP. VISA …` (dla WYPŁATA Z BANKOMATU KARTĄ to tekst adresu — wzorzec „bankomat” pojawia się dopiero po normalizacji S-11, nie w tej regule); inaczej kol. 3, a gdy pusta — kol. 2.
 6. Zakres importu: start = kol. 1 nagłówka, koniec = kol. 0 nagłówka (D7).
 7. Brak ID: klucz wewnętrzny = `(import_id, lp)`.
 
@@ -170,6 +181,8 @@ Kwota w opisie ma kropkę dziesiętną, w kol. 5 przecinek; są zgodne (0 rozjaz
 - Ta sama sieć z różnymi numerami placówek w opisie kartowym.
 - Ten sam sprzedawca zapisany dwojako przez operatora kart (`MARKA *Marka App` vs `Marka Apps Miasto`).
 - Wypłata z bankomatu (nie jest sprzedawcą w sensie reguły — użytkownik wyklucza przez FR-009 albo seed pokazuje ją jako wzorzec „częsty”).
+- Pełna lista pułapek (ST01–ST15) z liniami w fixture: `test/fixtures/santander/README.md` (generowany przez
+  `npm run fixture:santander`, zawsze aktualny po regeneracji).
 
 ## Wykrywanie formatu
 

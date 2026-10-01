@@ -1,2 +1,4 @@
 # Fixture ING (CSV cp1250 + LF, expected.json, README) jest porównywany bajt w bajt z generatorem (scripts/fixture-ing.mjs); bez konwersji końców linii.
 test/fixtures/ing/** -text
+# Fixture Santander (CSV UTF-8 + LF, expected.json, README) jest porównywany bajt w bajt z generatorem (scripts/fixture-santander.mjs); bez konwersji końców linii.
+test/fixtures/santander/** -text

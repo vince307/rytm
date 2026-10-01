@@ -1,83 +1,86 @@
 # Handoff — `santander-csv-import` (slice S-10)
 
-The `/10x-implement santander-csv-import phase 2` step of autonomous run `2026-10-01-m2-santander` implemented
-Phase 2 (expand-only migration + `import_statement` RPC + pgTAP + regenerated types). It is committed and the local
-gate is green. The next agent must not get this wrong: **the endpoint still calls `import_ing_statement`** — Phase 2
-only widens the database, it does not touch `src/pages/api/imports.ts` or `src/lib/import/schema.ts`. A subtle pgTAP
-trap to watch for in Phase 3+: never write `(select col from tbl where id = <volatile_function_call>)` — Postgres can
-re-evaluate a volatile function once per row a scan visits when it appears in a WHERE filter with no index, calling
-a write RPC a second time and colliding with its own just-inserted range (hit and fixed in this step, see `## 3`).
-Always split a write call and its assertion into two statements, as `import_rpc.test.sql` already does.
+The `/10x-implement santander-csv-import phase 3` step of autonomous run `2026-10-01-m2-santander` implemented
+Phase 3 (source-aware payload schema + `banks.ts` + the endpoint calling `import_statement`). It is committed and
+the local gate is green. The next agent must not get this wrong: **`bankTxId` is now `string | null`** on
+`ImportPayload["transactions"][number]` — any new code reading it (Phase 4's Santander reader, Phase 6's wizard
+wiring) must handle `null` explicitly; four pre-existing unit test fixtures (`fixed-overview`, `home-stats`,
+`over-limit-trend`, `patterns`) needed a one-line adaptation (`t.bankTxId ?? ""`) because they reused `bankTxId` as
+a stand-in `PatternSource.id` — the real app never does this (`src/lib/patterns/load.ts` uses the transaction row's
+own `id`), so this was a test-only ripple, not a product change.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/santander-csv-import`, cut from `main` at `1fed366` |
-| Commits | 8 on top of `1fed366`: identity (`d2f2a86`), research (`e5f54f9`), plan (`396ea97`), plan review (`e576f3d`), Phase 1 fix (`b7880c3`), Phase 1 SHA backfill (`00c4400`), Phase 1 handoff (`03f4d08`), **this step**: Phase 2 migration+RPC+pgTAP+types (`b7f29e1`), Phase 2 SHA backfill (`e9d14d8`) |
+| Commits | 12 on top of `1fed366`: identity (`d2f2a86`), research (`e5f54f9`), plan (`396ea97`), plan review (`e576f3d`), Phase 1 fix (`b7880c3`), Phase 1 SHA backfill (`00c4400`), Phase 1 handoff (`03f4d08`), Phase 2 migration+RPC+pgTAP+types (`b7f29e1`), Phase 2 SHA backfill (`e9d14d8`), Phase 2 handoff (`d9a09fb`), **this step**: Phase 3 payload+endpoint (`2afa395`), Phase 3 SHA backfill (`208ff48`) |
 | Pushed / PR / merged | no / no / no |
 | `change.md` status | `implementing` (unchanged) |
-| `## Progress` rows remaining | 32 (`grep -c '^- \[ \]' plan.md`; was 38, -6 for Phase 2's automated rows) |
+| `## Progress` rows remaining | 27 (`grep -c '^- \[ \]' plan.md`; was 32, -5 for Phase 3's automated rows) |
 | Working tree | clean (`bash .claude/skills/10x-autonomous-run/scripts/tree-clean.sh` → `CLEAN`) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `supabase/migrations/20261002120000_import_statement_source.sql` | Expand-only: widens `imports_source_check` to `('ing', 'santander')`; adds `public.import_statement(p_source, p_account_number, p_account_name, p_period_start, p_period_end, p_transactions)` — same body/validations as `import_ing_statement`, same insert column lists (no `user_id` in either list, so `user_id` comes only from the column default `auth.uid()` and RLS), writing `p_source` instead of the literal `'ing'`; `security invoker`, `set search_path = ''`; explicit `revoke … from public, anon` + `grant … to authenticated`. `import_ing_statement` is untouched and not mentioned in this file. |
-| `supabase/tests/database/import_statement.test.sql` (new) | `plan(15)`: success + `source='santander'` + null `bank_tx_id` (×2 rows), a second disjoint-range Santander import accepted, overlap rejected (23P01, no row added), out-of-period rejected (22023, no row), `import_statement('ing', …)` still records `'ing'`, unknown source rejected (23514), a payload element carrying another user's `user_id` key still lands under the caller, `has_function_privilege('anon', …)` false, anon `throws_ok` 42501, account-B isolation. |
-| `supabase/tests/database/domain_rls.test.sql` | `plan(28)` → `plan(30)`: two new asserts — a direct insert with `source = 'santander'` is accepted, one with `'mbank'` → 23514. |
-| `src/db/database.types.ts` (generated) | Regenerated via `npm run db:types`; `Functions.import_statement` present. |
-| `context/changes/santander-csv-import/plan.md` | `## Progress` 2.1–2.6 ticked with `— b7f29e1`; no other section touched. |
-| `context/changes/santander-csv-import/handoff.md` | This file. |
+| `src/lib/import/banks.ts` (new) | `BANK_SOURCES = ["ing", "santander"]`, `BankSource`, `isBankSource` — the one source of truth for the supported banks |
+| `src/lib/import/schema.ts` | `importPayloadSchema` gains `source: z.enum(BANK_SOURCES).default("ing")` (stale tab with no `source` parses as ING); `bankTxId` is now `.nullable()`; a third `.refine()` enforces non-null for `ing`, null for `santander`. Header comment updated to name `import_statement` |
+| `src/lib/import/ing.ts` | `buildImportPayload` return literal gains `source: "ing"`; nothing else changed |
+| `src/pages/api/imports.ts` | Calls `supabase.rpc("import_statement", { p_source: p.source, …​ })` instead of `import_ing_statement`; header comment updated. Every redirect / error-code mapping unchanged |
+| `test/unit/schema.test.ts` | 5 new cases: stale-tab default → `ing`, unknown source rejected, Santander payload with null `bankTxId` accepted, Santander payload with an 18-digit id rejected, ING payload with a null id rejected. `payload()` factory gains `source: "ing"` |
+| `test/unit/{fixed-overview,home-stats,over-limit-trend,patterns}.test.ts` | One-line adaptation each: `id: t.bankTxId` → `id: t.bankTxId ?? ""` (with a comment) — `bankTxId`'s widened type otherwise fails `astro check` against `PatternSource.id: string`. ING fixture data never actually produces `null` here |
+| `scripts/smoke.mjs` | Additions only (`git diff main` shows no removed lines): `santanderPayload` / `santanderInvalidPayload` constants + `santanderResultPath`, and 5 new steps inserted between "signin re-created account" and "delete re-created account (cleanup)" — save, result debit count, patterns list (`>Santander smoke<`, the rendered node), overlap rejection, invalid-id rejection |
+| `context/changes/santander-csv-import/plan.md` | `## Progress` 3.1–3.5 ticked with `— 2afa395`; no other section touched |
+| `context/changes/santander-csv-import/handoff.md` | This file |
 
 ## 3. Verification
 
 | Command | Result (observed in this step) |
 | --- | --- |
 | `git branch --show-current` | `feat/santander-csv-import` (confirmed before starting) |
-| `npx supabase migration up` (sandbox disabled: Docker) | Applied cleanly from the prior state |
-| `npx supabase db reset && npx supabase test db` (sandbox disabled: Docker) | **First attempt failed**: `import_statement.test.sql` aborted mid-run (`conflicting key value violates exclusion constraint`). Root cause: a pgTAP `is()` call used `(select source from public.imports where id = public.import_statement(…))` — a volatile function inside a `WHERE` filter on a multi-row table gets re-evaluated once per row the scan visits (not hoisted), so the RPC ran a second time with the same account/range it had just inserted and collided with its own row. Fixed by splitting the write (`select public.import_statement(…);`) and the assertion (a separate `select is((select source from public.imports where account_number = …), …)`) into two statements, matching `import_rpc.test.sql`'s own pattern. After the fix: `npx supabase db reset && npx supabase test db` → Files=6, Tests=119, **Result: PASS** (baseline Files=5, Tests=102 — Δ+17: +2 `domain_rls.test.sql`, +15 new `import_statement.test.sql`) |
-| `npm run db:types && grep -q import_statement src/db/database.types.ts` | match found |
-| `git diff --exit-code main -- supabase/migrations/20260924224014_import_ing_statement.sql supabase/tests/database/import_rpc.test.sql supabase/tests/database/import_delete.test.sql` | exit 0 (unchanged) |
-| **Deliberate break 1** (2.4): edited the migration file so the new function's insert read `values ('ing', p_account_number, …)` (literal, not `p_source`); `db reset` + `test db` → test 2 ("the import records source santander") failed red (`have: ing / want: santander`); restored the file (byte-diff confirmed identical to pre-break); `db reset` + `test db` → green again | red → green confirmed |
-| **Deliberate break 2** (2.5): deleted the `revoke execute … from public, anon` line; `db reset` + `test db` → test 13 ("anon has no EXECUTE privilege on import_statement") failed red; the `throws_ok` 42501 assertion (test 14) stayed green — this local Supabase stack already restricts `anon` more broadly (observed, not assumed), so only the explicit-privilege assertion is sensitive to this specific line, not the end-to-end call. Restored the line (byte-diff confirmed identical); `db reset` + `test db` → both green | red → green confirmed; **meta-check**: the privilege assertion is the one that actually proves the revoke's effect in this environment — recorded as a deviation from the plan's assumption that *both* anon asserts would flip (`## 6` decision 1) |
-| `npm run lint` | 0 errors (baseline: 0) |
-| `npx astro check` | 0 errors, 0 warnings, 137 files (baseline: 137 files, 0 errors) |
-| `npm run fixture:check` | `fixture:check ing OK`, `fixture:check santander OK` |
-| `npm test` | 256 passed, 15 files (baseline 256/15 — Δ0) |
+| `npx vitest run test/unit/schema.test.ts test/unit/ing-parser.test.ts` | 26 passed, 2 files — confirms the new schema cases and that `ing-parser.test.ts` needed no change beyond what `buildImportPayload` itself now returns |
+| `npm run lint` | First pass: 2 prettier errors (new code); `npm run lint:fix` resolved both; final: 0 errors (baseline 0) |
+| `npx astro check` | First pass: 4 errors in 4 unrelated test fixtures (`PatternSource.id` no longer assignable from widened `bankTxId`) — fixed with `?? ""` (see `## 2`); final: 0 errors, 0 warnings, 138 files (baseline 137 files, 0 errors — +1 for `banks.ts`) |
+| `npm run fixture:check` | `fixture:check ing OK`, `fixture:check santander OK` (Δ0, expected — Phase 3 doesn't touch the fixtures) |
+| `npm test` | 261 passed, 15 files (baseline 256/15 — Δ+5, the new schema cases) |
 | `npm run build` | OK |
-| `astro dev --port 4398` + `npm run smoke` (sandbox disabled: network) | 140 PASS / 0 FAIL (baseline 140/0 — Δ0, expected: Phase 2 doesn't touch the endpoint); dev server killed after (`lsof -ti :4398 -ti :4399` clear) |
-| Final `npx supabase db reset` | Left the local DB on the committed migration set + seed only (no stray experiment data) |
+| `npx supabase db reset && npx supabase test db` (sandbox disabled: Docker) | Files=6, Tests=119, **Result: PASS** (baseline Files=6/Tests=119 after Phase 2 — Δ0, expected: Phase 3 doesn't touch the database) |
+| `astro dev --port 4398` + `npm run smoke` (sandbox disabled: network) | 145 PASS / 0 FAIL (baseline 140/0 — Δ+5, the new Santander smoke steps) |
+| `git diff main -- scripts/smoke.mjs` | Only added lines (`grep '^-'` on the diff, excluding the `---` header, is empty) |
+| **Deliberate break 1** (3.3): endpoint hard-coded `p_source: "mbank"` instead of `p.source`; re-ran smoke → the Santander save step (and, as a side effect of hard-coding unconditionally, every ING import step too — `23514` on any source) failed red with `?error=failed`; restored the file (byte-diff confirmed identical to staged); re-ran smoke → 145/0 again. **Meta-check** (plan's own text): reverting the call to `import_ing_statement` instead would NOT have gone red for Santander (it accepts a null `bank_tx_id`) — so this break specifically proves `p_source` reaches the database, not that the stored value is `'santander'` (that's pgTAP 2.1 and, later, the Phase 5 list step) | red → green confirmed; meta-check holds |
+| **Deliberate break 2** (3.4): deleted the third `.refine()` in `schema.ts` (the per-bank `bankTxId` rule); `npx vitest run test/unit/schema.test.ts` → exactly the two predicted cases failed red ("rejects a santander payload carrying an 18-digit bankTxId", "rejects an ing payload with a null bankTxId"), the other 10 stayed green; restored the file (byte-diff confirmed identical); re-ran → 12/12 green | red → green confirmed |
+| Final `lsof -ti :4398 -ti :4399` | Clear — dev server killed after the gate |
 
 ## 4. Next command
 
-`/10x-implement santander-csv-import phase 3`
+`/10x-implement santander-csv-import phase 4`
 
 ## 5. Open
 
-**Carried from Phase 1 handoff, unchanged:** S-11 re-keys Santander card patterns; R1 guarded only by the Phase 1
-shape metric (also run once against both real exports, Phase 1 `## 3`); rollback shows "ING · Rachunek"; the PR
-preview (production DB) cannot import until merge (Known risks, plan-review F2 — **binding for Phase 3**: the
-endpoint will start calling `import_statement`, which does not exist in production until the merge's `deploy` job,
-so every import on this branch's auto-built PR preview, ING included, will end in `?error=failed` until merge — do
-not read that as a regression and do not add a fallback to `import_ing_statement`); Santander `title` holds the
-masked card number (own data, RLS).
+**Carried from Phase 1/2 handoffs, unchanged:** S-11 re-keys Santander card patterns; R1 guarded only by the Phase 1
+shape metric (run once by hand against both real exports); rollback shows "ING · Rachunek"; the PR preview
+(production DB) cannot import until merge (Known risks, plan-review F2 — **binding through Phase 6**: do not read a
+failed preview import as a regression, do not add a fallback to `import_ing_statement`); Santander `title` holds the
+masked card number (own data, RLS); the pgTAP volatile-function-in-WHERE hazard from Phase 2's handoff (no new
+pgTAP this phase, so not re-triggered, but still relevant if Phase 4+ adds any).
 
 **New from this step:**
-- A reusable pgTAP hazard worth remembering for Phase 3's new test cases: never embed a volatile RPC call inside a
-  `WHERE` filter subquery used as a value — split the write and the read assertion into two statements (see `## 3`).
-- Deliberate break 2's anon assertions did not both flip red as the plan's meta-check predicted; only
-  `has_function_privilege` did. Recorded as an autonomous decision (`## 6` #1), not a STOP — the revoke still has an
-  observable, provable effect, just a narrower one than the plan text assumed for this local stack.
+- `ImportTransaction.bankTxId` is `string | null` everywhere now, not just for the Santander path. Phase 4's reader
+  (`src/lib/import/santander.ts`, not yet created) must build its payload with `bankTxId: null` on every
+  transaction (rule 7) — the schema refine already enforces this per `source`, but the reader itself must emit it
+  correctly or every Santander payload will fail validation with `error=invalid`.
+- The smoke Santander account number `"22222200000000000000000099"` and counterparty `"Santander smoke"` are now
+  reserved identifiers in `scripts/smoke.mjs` — Phase 5/6 smoke additions (if any) should pick different literals to
+  avoid collisions if they touch the same account.
 
-**Manual-only Progress rows (checklist, unchanged):**
+**Manual-only Progress rows (checklist, unchanged except the new one below):**
 
 - 1.6 [reviewer] Real-export comparison — recorded finding in Phase 1 handoff; still unticked (not mine to tick).
-- **2.7 [reviewer] Migration review** — new this phase: the migration is expand-only and backward-compatible; the
-  header/function comment name the deploy window, the grants, and the per-account FR-005 rule (all present — see
-  `supabase/migrations/20261002120000_import_statement_source.sql` header and the function's `comment on function`).
-- 3.6 [reviewer] ING smoke steps byte-identical.
+- 2.7 [reviewer] Migration review — recorded finding in Phase 2 handoff; still unticked (not mine to tick).
+- **3.6 [reviewer] ING smoke steps byte-identical; stale-tab default covered by them** — new this phase: confirmed
+  by `git diff main -- scripts/smoke.mjs` (additions only, see `## 3`) and by the new schema test "parses a payload
+  without source as ing (stale-tab default)"; still unticked (not mine to tick).
 - 4.7 [reviewer] Reader vs rules 1–6.
 - 5.6 [visual] List and result.
 - 6.6 [visual] Every wizard state at 1280 and ~400 px.
@@ -93,29 +96,33 @@ masked card number (own data, RLS).
 
 ## 6. Autonomous decisions
 
-1. **Deliberate break 2 did not flip both anon assertions red; proceeded on the one that did.**
-   - Chosen: accept `has_function_privilege('anon', …) = false` flipping red (and back to green on restore) as
-     sufficient proof that the explicit revoke matters, record the observed difference, continue to the full gate.
-   - Rejected: treating the plan's "the anon asserts go red" (plural) as a hard criterion and blocking on it;
-     redesigning the test to force both assertions to be break-sensitive (e.g. by granting `anon` broader baseline
-     privileges elsewhere, which would weaken an unrelated guarantee).
-   - Why: this local Supabase stack already restricts the `anon` role beyond function-level grants (observed, not
-     assumed — the `throws_ok` 42501 call stayed green with the revoke line removed), so the two assertions are not
-     equally sensitive to this one line in this environment. The privilege-level assertion is the correct, precise
-     one for proving "the explicit revoke matters, because a new function is executable by anon by default" — it is
-     the literal mechanism the plan's comment describes. Blocking Phase 2 on a discrepancy between the plan's
-     prose and an environment-specific detail already covered by test 14 (anon still can't execute) would add no
-     safety.
-   - What would change it: a reviewer concluding the `throws_ok` 42501 assertion is *load-bearing on the revoke
-     line specifically* (not on broader anon restrictions) in a different environment (e.g. production), in which
-     case a documented note would be needed that local and production anon defaults can diverge.
-2. **Fixed a pgTAP double-evaluation bug in my own new test, not inherited from the plan.**
-   - Chosen: rewrite the one `is()` assertion that embedded `public.import_statement(…)` inside a
-     `WHERE id = …` filter as two statements (a bare write, then a separate read-only assertion).
-   - Rejected: wrapping the subquery in `WITH … AS MATERIALIZED (…)` to force single evaluation (works, but less
-     readable and inconsistent with `import_rpc.test.sql`'s existing style); leaving it and hoping it was a one-off.
-   - Why: confirmed by direct psql reproduction (see `## 3`) that Postgres re-evaluates a volatile function used as
-     a per-row filter expression on a multi-row table — here, second call collided with the first call's own
-     freshly-inserted exclusion-constraint key. The two-statement split matches the plan's own `import_rpc.test.sql`
-     precedent and removes any ambiguity about evaluation count.
-   - What would change it: nothing — this is a correctness fix for a bug I introduced, not a plan deviation.
+1. **Execution mode: implemented Phase 3 directly in this context rather than delegating to a subagent.**
+   - Chosen: write and verify the code myself, in this session.
+   - Rejected: dispatch a `general-purpose` subagent per the skill's "delegate" option.
+   - Why: the agent-contract run rule forbids `AskUserQuestion` (which the skill would otherwise use to ask exec
+     mode), and I am already the single fresh agent assigned to this whole phase; delegating would add a
+     round-trip and a second context for no benefit at this phase's size (4 production files + 5 test files).
+   - What would change it: a phase large enough that keeping this context lean mattered more than the round-trip
+     cost — not the case here.
+2. **The per-bank `bankTxId` refine also widened `bankTxId` to `string | null` for ING**, which broke 4 unrelated
+   test fixtures at `astro check` (`fixed-overview`, `home-stats`, `over-limit-trend`, `patterns` — all used
+   `t.bankTxId` as a stand-in `PatternSource.id`).
+   - Chosen: fix each with `id: t.bankTxId ?? ""` plus a one-line comment, since ING's reader never actually
+     produces `null` (confirmed by reading `ing.ts`) and the real app computes `PatternSource.id` from the
+     transaction row's own `id`, never from `bankTxId` (`src/lib/patterns/load.ts`), so this stand-in was always
+     test-local shorthand.
+   - Rejected: a non-null assertion (`t.bankTxId!`) — blocked by `@typescript-eslint/no-non-null-assertion`
+     (confirmed by running lint); leaving the type narrower for ING-only (e.g. a conditional type keyed on
+     `source`) — not worth the complexity for 4 test call sites.
+   - Why: smallest, most honest fix; no production code or behavior changed, only 4 test fixtures.
+   - What would change it: a future phase needing `bankTxId` type-narrowed by `source` at the type level (e.g. a
+     discriminated union) — not needed by this plan.
+3. **Deliberate break 1 (3.3) broke every import, not only Santander's**, because hard-coding `p_source: "mbank"`
+   is unconditional.
+   - Chosen: accept this as proving the plan's intended thing (p_source reaches the database) even though the
+     blast radius was wider than "the Santander save step" alone; the plan's own meta-check text anticipates this
+     exact shape of break and names precisely what it does and doesn't prove.
+   - Rejected: scoping the break to apply only when `p.source === "santander"` (e.g. `p_source: p.source === "santander" ? "mbank" : p.source`) to isolate the blast radius.
+   - Why: the plan's literal break text is "the endpoint passes `p_source: "mbank"` instead of `p.source`" —
+     unconditional, matching what I did; a scoped version would be a different, invented break not asked for.
+   - What would change it: a future phase's break-check needing a narrower blast radius for its own reasons.

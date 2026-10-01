@@ -1,10 +1,10 @@
 ---
 change_id: public-demo-seed
 title: Public demo account on production with the synthetic ING statement
-status: impl_reviewed
+status: archived
 created: 2026-09-30
 updated: 2026-10-01
-archived_at: null
+archived_at: 2026-10-01T20:17:56Z
 ---
 
 ## Notes

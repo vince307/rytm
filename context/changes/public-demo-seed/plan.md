@@ -392,23 +392,23 @@ means unsetting `DEMO_EMAIL` on Vercel and redeploying. The demo account then be
 
 #### Automated
 
-- [x] 2.1 Prettier passes on the edited docs
-- [x] 2.2 `DEMO_EMAIL` is documented in every relevant file
+- [x] 2.1 Prettier passes on the edited docs — 1fe95d1
+- [x] 2.2 `DEMO_EMAIL` is documented in every relevant file — 1fe95d1
 
 #### Manual
 
-- [x] 2.3 Reset procedure in `deploy-plan.md` is followable without other context
+- [x] 2.3 Reset procedure in `deploy-plan.md` is followable without other context — 1fe95d1
 
 ### Phase 3: Rollout and seeding on production
 
 #### Automated
 
-- [ ] 3.1 Merge run green for `ci`, `smoke`, `deploy`
-- [ ] 3.2 Production `/login` answers 200
+- [x] 3.1 Merge run green for `ci`, `smoke`, `deploy` — e04e6f0
+- [x] 3.2 Production `/login` answers 200 — e04e6f0
 
 #### Manual
 
-- [ ] 3.3 `DEMO_EMAIL` set on Vercel production before the merge
-- [ ] 3.4 Demo account on production shows one import of 206 debits and the synthetic patterns
-- [ ] 3.5 The four refusals work on production
-- [ ] 3.6 README credentials work from a private window
+- [x] 3.3 `DEMO_EMAIL` set on Vercel production before the merge — e04e6f0
+- [x] 3.4 Demo account on production shows one import of 206 debits and the synthetic patterns — e04e6f0
+- [x] 3.5 The four refusals work on production — e04e6f0
+- [x] 3.6 README credentials work from a private window — e04e6f0

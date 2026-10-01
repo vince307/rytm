@@ -42,7 +42,7 @@ const hasError = params.has("error");
       <p class="mb-7 text-sm text-muted">{r.lead}</p>
       <NewPasswordForm
         client:load
-        serverError={hasError ? x.resetNewError : null}
+        serverError={params.get("error") === "demo" ? copyExtra.settings.demoLocked : hasError ? x.resetNewError : null}
         labels={{
           password: x.newPassword,
           confirm: x.repeatPassword,

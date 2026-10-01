@@ -57,18 +57,18 @@ Commits `4b27098` (swap) and `aaad9c9` (framework preset), then this file.
 
 ## Secrets inventory
 
-| Where                           | Name                                 | Environments / notes                                                                                                                                                                                                                                                                    |
-| ------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Vercel env                      | `SUPABASE_URL`                       | production, preview (encrypted)                                                                                                                                                                                                                                                         |
-| Vercel env                      | `SUPABASE_KEY`                       | production, preview (`--sensitive`: cannot be read back with `vercel env pull`)                                                                                                                                                                                                         |
-| Vercel env                      | `DEMO_EMAIL`                         | production only; not a secret (it is published in the README), but added and changed only by the human like every Vercel env var; unset = no demo account (S-09, see Demo account below)                                                                                                |
-| GitHub secrets                  | `SUPABASE_URL`, `SUPABASE_KEY`       | used by the `ci` build step                                                                                                                                                                                                                                                             |
-| GitHub secrets                  | `VERCEL_TOKEN`                       | account token `rytm-github-actions`, scope kamilp's projects — created in the dashboard, used by `deploy`                                                                                                                                                                               |
-| GitHub secrets                  | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | from `.vercel/project.json`                                                                                                                                                                                                                                                             |
-| GitHub Environment `production` | `SUPABASE_ACCESS_TOKEN`              | Supabase **scoped** access token limited to `psqbtvooufapkatpkxlw`; read only by the `deploy` job (`link`, `db push`, `migration list`); created and rotated by the human                                                                                                               |
-| GitHub Environment `production` | `SUPABASE_DB_PASSWORD`               | Postgres password of the hosted project, used by `db push` through the session pooler; copy of the local `.env` value                                                                                                                                                                   |
-| GitHub secrets                  | `VERCEL_AUTOMATION_BYPASS_SECRET`    | **not yet created** — needed only when a preview-smoke job is added                                                                                                                                                                                                                     |
-| Local `.env` (gitignored)       | `SUPABASE_DB_PASSWORD`               | the owner's copy of the DB password (CI holds the other, on the `production` environment); keep it. Since 2026-09-20 `SUPABASE_URL`/`SUPABASE_KEY` here point at the local Docker Supabase (values from `.env.example`); the production pair lives only on Vercel and in GitHub secrets |
+| Where                           | Name                                 | Environments / notes                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Vercel env                      | `SUPABASE_URL`                       | production, preview (encrypted)                                                                                                                                                                                                                                                                                                                        |
+| Vercel env                      | `SUPABASE_KEY`                       | production, preview (`--sensitive`: cannot be read back with `vercel env pull`)                                                                                                                                                                                                                                                                        |
+| Vercel env                      | `DEMO_EMAIL`                         | production, preview (previews share the production database, so the guard must hold there too); not a secret (it is published in the README; `astro.config.mjs` declares it `access: "secret"` only to keep it server-side), but added and changed only by the human like every Vercel env var; unset = no demo account (S-09, see Demo account below) |
+| GitHub secrets                  | `SUPABASE_URL`, `SUPABASE_KEY`       | used by the `ci` build step                                                                                                                                                                                                                                                                                                                            |
+| GitHub secrets                  | `VERCEL_TOKEN`                       | account token `rytm-github-actions`, scope kamilp's projects — created in the dashboard, used by `deploy`                                                                                                                                                                                                                                              |
+| GitHub secrets                  | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | from `.vercel/project.json`                                                                                                                                                                                                                                                                                                                            |
+| GitHub Environment `production` | `SUPABASE_ACCESS_TOKEN`              | Supabase **scoped** access token limited to `psqbtvooufapkatpkxlw`; read only by the `deploy` job (`link`, `db push`, `migration list`); created and rotated by the human                                                                                                                                                                              |
+| GitHub Environment `production` | `SUPABASE_DB_PASSWORD`               | Postgres password of the hosted project, used by `db push` through the session pooler; copy of the local `.env` value                                                                                                                                                                                                                                  |
+| GitHub secrets                  | `VERCEL_AUTOMATION_BYPASS_SECRET`    | **not yet created** — needed only when a preview-smoke job is added                                                                                                                                                                                                                                                                                    |
+| Local `.env` (gitignored)       | `SUPABASE_DB_PASSWORD`               | the owner's copy of the DB password (CI holds the other, on the `production` environment); keep it. Since 2026-09-20 `SUPABASE_URL`/`SUPABASE_KEY` here point at the local Docker Supabase (values from `.env.example`); the production pair lives only on Vercel and in GitHub secrets                                                                |
 
 No secret value has ever been written to the repo or pasted into a chat; `vercel env add` and `gh secret set` were fed from `.env` via stdin.
 
@@ -166,16 +166,16 @@ Recommendation (not a blocker): authenticate an owned domain in Brevo (DKIM/DMAR
 
 One shared account that reviewers sign in to on `https://rytm-phi.vercel.app`; credentials are in `README.md` § Demo. The server recognises it by `DEMO_EMAIL` (trimmed, case-insensitive; `src/lib/demo.ts`). No script, migration or agent writes demo data to production — seeding and reset are owner steps in the app and the Supabase dashboard.
 
-- **Env var**: `DEMO_EMAIL` on Vercel, production environment only. Human only, like every `vercel env add/rm` (operating model below); a change takes effect with the next production deploy.
+- **Env var**: `DEMO_EMAIL` on Vercel, production and preview environments (previews use the production database; without it the guard fails open there). Human only, like every `vercel env add/rm` (operating model below); a change takes effect with the next production deploy.
 - **Data rule**: only the synthetic fixture `test/fixtures/ing/Lista_transakcji_nr_0000123456_010926.csv` is ever imported into this account — never a real statement, the account is shared.
 
 ### Seeding (in order)
 
-1. Pick the demo address (a real inbox — production requires e-mail confirmation, e.g. a Gmail `+` alias) and a strong password; both get published.
-2. `vercel env add DEMO_EMAIL production` with that address.
-3. Deploy: merge to `main` and wait for the green `deploy` job (or wait for the next one, if the code is already live).
-4. On `https://rytm-phi.vercel.app/register`: sign up with the address and password.
-5. Confirm the e-mail from the link in the inbox, then sign in.
+1. Pick the demo address and a strong password; both get published. The address needs no inbox (the user is confirmed by hand in step 4), so a reserved domain such as `demo@rytm.example` works.
+2. `printf '<address>' | vercel env add DEMO_EMAIL production` and the same for `preview` (piped — the interactive prompt does not work from an agent's `!` shell).
+3. Deploy: merge to `main` and wait for the green `deploy` job (or wait for the next one, if the code is already live). Never create the user before the guard is live.
+4. Supabase dashboard → project `rytm` → Authentication → Users → Add user → Create new user: the address and password, **Auto Confirm User** ticked.
+5. Sign in on `https://rytm-phi.vercel.app/login`.
 6. `/imports/new`: import the fixture in the wizard with its default account „Rachunek Firmowy Główny” (not „Rachunek VAT”). Expected: 206 debits, 01.09.2025–31.08.2026; `/patterns`, `/fixed` and `/home` show the synthetic data.
 
 ### What the guard refuses
@@ -188,16 +188,24 @@ For the demo account only; every other account behaves as before.
 | Account deletion (`/api/auth/delete`)       | `/settings?error=demo-delete`   |
 | Undo an import (`/api/imports/delete`)      | `/imports?error=demo`           |
 | Any import while the account has ≥ 1 import | `/imports/new?error=demo`       |
+| New password via `/api/auth/reset/new`      | `/reset/new?error=demo`         |
 
 Thresholds, pattern decisions (merge, exclude, type, name) and fixed-cost pinning stay usable, so visitors drift the demo state over time; there is no automatic reset.
+
+### Known limitation
+
+The guard is app-level only (a deliberate plan choice: no migration, no DB-level guard). RLS still lets the demo user delete its own imports, `delete_own_account` still runs for it, and GoTrue still accepts a password change. Someone holding the demo session token plus the project's anon key could call Supabase directly and skip the Astro endpoints. The anon key is server-only in this app (`astro:env/server`), which narrows this, but Supabase treats it as public by design. Recovery is the reset below. Not verified: whether the hosted project has double-confirm for e-mail changes (the demo address cannot receive mail, so with it on an e-mail change cannot complete).
 
 ### Reset
 
 1. Supabase dashboard → project `rytm` → Authentication → Users: delete the demo user. The cascade removes its imports, transactions and pattern data.
-2. Sign up again with the same address and password, confirm the e-mail, sign in.
-3. Import the fixture again (step 6 above) — allowed, because the account is empty.
+2. Add the user again as in seeding step 4 (same address, Auto Confirm User), but with a **temporary, unpublished password** — with the published one, any reviewer who signs in before step 3 gets the empty account's one allowed import and could upload any statement.
+3. Sign in with the temporary password and import the fixture again (step 6 above) — allowed, because the account is empty.
+4. Set the published password back: dashboard → SQL Editor, `update auth.users set encrypted_password = extensions.crypt('<published password>', extensions.gen_salt('bf')) where email = '<demo address>';` (the app's own password change is refused for the demo account by design). Sign in once with the published password to confirm.
 
 `DEMO_EMAIL` stays as it is; no deploy is needed.
+
+**Seeded** 2026-10-01: `demo@rytm.example` added with Auto Confirm after the green `deploy` of PR #12; wizard import of the fixture's default account → 206 debits (01.09.2025–31.08.2026). Credentials in `README.md` § Demo.
 
 ## Manual steps still open
 

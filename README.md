@@ -8,7 +8,7 @@ Wersja produkcyjna: https://rytm-phi.vercel.app
 
 Konto demo działa wyłącznie na syntetycznym wyciągu ING (12 miesięcy, fikcyjne transakcje) — żadnych prawdziwych danych.
 
-- E-mail: `<uzupełnione po zasileniu konta>`
-- Hasło: `<uzupełnione po zasileniu konta>`
+- E-mail: `demo@rytm.example`
+- Hasło: `Rytm-Demo-e3GGeT1UFm-2026`
 
 Konto jest wspólne dla wszystkich recenzentów, dlatego zmiana hasła, usunięcie konta, cofnięcie importu i wgranie kolejnego wyciągu są wyłączone. Progi i decyzje o wzorcach działają — to, co zobaczysz, mógł już zmienić ktoś inny.

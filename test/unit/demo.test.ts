@@ -55,6 +55,7 @@ describe("DEMO_ERROR", () => {
       delete: "/settings?error=demo-delete",
       undo: "/imports?error=demo",
       import: "/imports/new?error=demo",
+      resetNew: "/reset/new?error=demo",
     });
   });
 });

@@ -39,7 +39,7 @@ const rows = (data ?? []).map((i) => ({
 // Status after a delete redirect (POST /api/imports/delete) — DESIGN-GAP: G30, InlineAlert above the list/empty
 // view (the kit shows a toast; the flow is a server redirect, precedent /settings and /login `deleted`).
 // One status for all three states (read error, empty, table) — e.g. a second "missing" after the last delete
-// must still say so above the empty view.
+// must still say so above the empty view. `demo` is the shared demo account's refusal (S-09) — DESIGN-GAP: G37.
 const deleteErrorParam = Astro.url.searchParams.get("error");
 const status: { kind: "success" | "error"; text: string } | null = Astro.url.searchParams.has("deleted")
   ? { kind: "success", text: x.deleted }
@@ -47,7 +47,9 @@ const status: { kind: "success" | "error"; text: string } | null = Astro.url.sea
     ? { kind: "error", text: x.deleteMissing }
     : deleteErrorParam === "delete"
       ? { kind: "error", text: x.deleteError }
-      : null;
+      : deleteErrorParam === "demo"
+        ? { kind: "error", text: x.demoLocked }
+        : null;
 
 const cell = "border-b border-line px-[17px] py-4 align-middle";
 const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] whitespace-nowrap text-muted uppercase");

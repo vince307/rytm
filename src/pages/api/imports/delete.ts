@@ -1,6 +1,8 @@
 import type { APIRoute } from "astro";
+import { DEMO_EMAIL } from "astro:env/server";
 import { createClient } from "@/lib/supabase";
 import { DELETE_IMPORT_MISSING, deleteImportRedirect, deleteImportSchema } from "@/lib/import/delete";
+import { DEMO_ERROR, isDemoEmail } from "@/lib/demo";
 
 export const prerender = false;
 
@@ -17,6 +19,10 @@ export const POST: APIRoute = async (context) => {
   } = await supabase.auth.getUser();
   if (!user) {
     return context.redirect("/login");
+  }
+  // S-09: the demo account is shared and public — undoing its import would empty the demo for every reviewer.
+  if (isDemoEmail(user.email, DEMO_EMAIL)) {
+    return context.redirect(DEMO_ERROR.undo);
   }
 
   let form: Record<string, FormDataEntryValue>;

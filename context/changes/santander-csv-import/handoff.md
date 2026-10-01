@@ -1,89 +1,102 @@
 # Handoff — `santander-csv-import` (slice S-10)
 
-The `/10x-new santander-csv-import` step of autonomous run `2026-10-01-m2-santander` wrote this handoff. The change
-folder exists with `change.md` (status `new`): the roadmap claims are checked against the repo, the kit bindings and
-gaps are listed, a migration is expected, and one triggered follow-up (F-03 F9) is in scope. The next agent must not
-get this wrong: the database refuses Santander today (`imports.source` check `in ('ing')`, and
-`import_ing_statement` hard-codes `'ing'`). Any fix must be expand-only, with `import_ing_statement(text,text,date,date,jsonb)`
-still callable unchanged by the live code.
+The `/10x-research santander-csv-import` step of autonomous run `2026-10-01-m2-santander` wrote this handoff.
+`research.md` answers Q1–Q7 and risks R1–R3, and `change.md` is now `preparing`.
+
+The next agent must not get this wrong: write Santander through a **new** RPC `import_statement(p_source, …)` plus a
+widened `imports_source_check`. Leave `import_ing_statement` byte-for-byte untouched, and revoke EXECUTE from
+`public, anon` explicitly. A `BEGIN … ROLLBACK` probe showed that a new function gets both grants by default.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/santander-csv-import`, cut from `main` at `1fed366` |
-| Commits | 1 on top of `1fed366`: `docs(santander-csv-import): change identity (autonomous run)` |
+| Commits | 2 on top of `1fed366`: change identity, and `docs(santander-csv-import): research` (this step) |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `new` |
+| `change.md` status | `preparing` (set by `metadata-guard.mjs mark-researched`) |
 | `## Progress` rows remaining | n/a: no `plan.md` yet |
-| Working tree | clean after the commit (`tree-clean.sh` printed `CLEAN` before this step's writes) |
+| Working tree | clean after the commit, except for files this step did not touch |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/santander-csv-import/change.md` | Change identity: scope, migration-expected verdict, kit bindings/gaps table, "roadmap claim, repo now, correction" table, triggered follow-ups, autonomous decisions, open risks R1–R3 |
+| `context/changes/santander-csv-import/research.md` | Source-backed research. Q1 parser and detection (R3), Q2 schema/RPC (option A vs B, local-DB proof), Q3 payload, Lp and `accountName` (R2), Q4 R1 on the real exports (aggregates only), Q5 patterns contract, Q6 kit copy gaps (K26), Q7 F-03 F9 fix. Ends with five open questions for the plan |
+| `context/changes/santander-csv-import/change.md` | Frontmatter only: `status: new → preparing`, `updated` |
 | `context/changes/santander-csv-import/handoff.md` | This file |
 
 ## 3. Verification
 
-| Command | Result |
+| Command | Result (observed in this step) |
 | --- | --- |
 | `git branch --show-current` | `feat/santander-csv-import` |
-| `.claude/skills/10x-autonomous-run/scripts/tree-clean.sh` (before writing) | `CLEAN` |
-| Uniqueness: `context/changes/santander-csv-import`, `context/archive/*santander-csv-import` | absent before creation |
-| `grep Trigger:` over `context/archive/*/follow-ups/review-fixes.md` | one hit for S-10 (F-03 F9) |
-| `node` over `test/fixtures/santander/expected.json` | main file: 187 rows, 0 with an operation or booking date outside the period. Kinds: card 163, transfer 8, other 7, atm 3, blik 3, blik-withdrawal 2, card-refund 1 |
+| Aggregate node script over the real exports (contract symlink dir, sandbox off) | Both files: valid UTF-8, no BOM, no CR, 9 fields on 100% of rows, header col 7 == row count. PLN: 483 rows (466 debits). Operation date or booking date before the header start: **0** in both files. Either date after the export date: 0 in both. Earliest operation date − start = 0 days in both. Earliest booking date − start = +2 / +7 days. Longest col 2 ≤ 95 characters, col 3 ≤ 88. No row has both col 2 and col 3 empty |
+| `npm run fixture:shape:santander -- <symlink dir>` (before the F9 fix) | "No structural differences" for PLN and for USD |
+| Local DB, `pg_constraint` / `pg_proc` read inside `BEGIN … ROLLBACK` | `imports_source_check` = `CHECK (source = 'ing')`. `import_ing_statement` ACL: authenticated, service_role, postgres |
+| Local DB probe inside `BEGIN … ROLLBACK` | Widening the check to `('ing','santander')` works. A new `public` function gets EXECUTE for PUBLIC **and anon**. After `ROLLBACK`, a re-query showed the probe function gone (count 0) and the check back to `'ing'` only |
+| `node` over `test/fixtures/santander/expected.json` | `patterns` resolvedBy: normalization 25, import 8, user-merge 1. 37 distinct lower-cased raw merchants among imported rows. 0 imported rows with an `OPERATORS` name in `rawMerchant` |
 
-No product code changed, so lint, astro check, vitest, build, pgTAP and smoke were not run. Baseline per the contract
-(inherited, unverified in this step): lint 0, astro check 0 (137 files), fixture:check OK, vitest 256, build OK,
-pgTAP 102, smoke 140/0.
+No product code was changed, so lint, astro check, vitest, build, pgTAP and smoke were not run. The baseline in the
+contract (lint 0, astro check 0 (137 files), fixture:check OK, vitest 256, build OK, pgTAP 102, smoke 140/0) is
+inherited and unverified in this step.
 
 ## 4. Next command
 
-`/10x-research santander-csv-import`
+`/10x-plan santander-csv-import`
 
 ## 5. Open
 
-- **R1** (`change.md` § Open risks): is an operation date ever before the header start date? `importPayloadSchema`
-  `.refine` (transaction date outside the import period) and `import_ing_statement`'s 22023 check would reject the
-  whole file.
-  - Research answers this abstractly from the real PLN export, using the symlink dir in the agent contract with the
-    sandbox off. Counts only.
-- **R2**: what to store in `account_name` for Santander. Header col 3 is the owner's personal name; avoid storing it.
-- **R3**: format detection versus encodings. ING `looksLikeUtf8` in `src/lib/import/ing.ts` versus Santander UTF-8.
-- **Schema**: `importPayloadSchema` `bankTxId` regex `^\d{18}$` blocks Santander. Lp must not go into `bank_tx_id`
-  (`transactions_bank_tx_key` spans imports).
-- **Patterns**: `src/lib/patterns/merchant.ts` `rawMerchant` reads `counterparty`. Santander card rows have an empty
-  col 3, so the reader must store the rule-5 tail there.
-- **DESIGN-GAPs to add in implement:**
-  - K26 (copy): `importFlow.supported` and `importErrors.unknownFormat` still say "Santander wkrótce". Per-bank
-    `formatRecognised`, `bankName` and `accountLabel` in `copyExtra.imports`.
-  - Possibly G38, if the plan changes step 2 for one-account files.
-- **Follow-up in scope:** F-03 F9, `scripts/fixture-santander-shape.mjs` `same`
-  (`context/archive/2026-10-01-synthetic-santander-fixture/follow-ups/review-fixes.md`).
-- **Accepted risk for S-11:** re-keying Santander card patterns when S-11 normalises the tails.
+- **R1, resolved.** On both real exports, 0 operation dates fall before the header start. Keep the whole-file reject,
+  with a unit case `→ unknown-format`. Add an R1 share metric to `scripts/fixture-santander-shape.mjs` `shape` in the
+  F9 phase.
+- **R2 (plan decides wording; part of K26).**
+  - Santander `accountName` is a neutral `copyExtra` label plus the account tail. Never header col 3.
+  - `copyExtra.imports.accountLabel` becomes per-source.
+  - `src/pages/imports/index.astro` and `result.astro` must select `source`.
+- **R3, resolved as a design.** In `ImportWizard.tsx` `readStatement`, try strict UTF-8 plus rule 1 on line 1 for
+  Santander first. Otherwise call the unchanged `parseIngStatement`. Neither matching → `unknown-format`.
+- **Payload.**
+  - `src/lib/import/schema.ts` `importTransactionSchema` gets `source` and a conditional `bankTxId`: 18 digits for
+    ING, null for Santander.
+  - A missing `source` defaults to `ing` (stale tabs during deploy).
+  - Lp is not persisted. `bank_tx_id` stays null.
+- **Patterns.** The Santander reader stores the rule-5 raw merchant in `counterparty`
+  (`src/lib/patterns/merchant.ts` `rawMerchant` reads only that). Unit tests assert per-row `rawMerchant`, not the
+  34-pattern partition (that partition is S-11's oracle).
+- **Proof to plan.**
+  - pgTAP: extend `domain_rls.test.sql` (source accepted and rejected), and extend `import_rpc.test.sql` or add a new
+    file for `import_statement`.
+  - Smoke: a new Santander payload step; ING steps untouched.
+  - Run `npm run db:types`.
+- **DESIGN-GAP to add in implement:** K26 (copy) in `context/foundation/design-kit.md`. It covers both-banks
+  `importFlow.supported` / `importErrors.unknownFormat` via `copyExtra`, and per-bank `formatRecognised`, `bankName`,
+  `accountLabel` and the Santander account label. **No G38**: the wizard already preselects one account at step 2.
+- **Follow-up in scope:** F-03 F9 in `scripts/fixture-santander-shape.mjs` `same` / `shape`
+  (`context/archive/2026-10-01-synthetic-santander-fixture/follow-ups/review-fixes.md`). Re-run the comparator on the
+  symlink dir after the fix.
+- **Accepted risk for S-11:** Santander pattern keys change when S-11 normalises card tails.
 
 ## 6. Autonomous decisions
 
-1. **Next = `/10x-research`, not `/10x-plan`.**
-   - Why: the slice spans the parser dialect, a backward-compatible schema/RPC, the patterns' `counterparty`
-     contract, five views' copy, and R1.
-   - What would change it: the orchestrator's chain mandating plan next. `change.md` is enough to plan from.
-2. **Migration expand-only.**
-   - Chosen: widen the `imports.source` check and add a Santander-capable write path.
-   - Rejected: re-signing or renaming `import_ing_statement`.
-   - Why: the deploy window runs old code on the new schema.
-   - What would change it: nothing in this slice.
-3. **Step 2 stays for one-account files**, with the single account preselected.
-   - The ING wizard always goes 1 → 2 → 3 (`setStep(2)` in `ImportWizard.tsx`). Skipping step 2 needs a kit state
-     that does not exist.
-   - What would change it: the kit author adding a single-account state, or the plan finding a kit-backed skip.
-4. **S-10 stores raw card merchants; normalisation stays in S-11.**
-   - What would change it: the plan judging the S-11 re-key of user decisions unacceptable.
-5. **F-03 F9 is in scope as a small separate phase.**
-   - What would change it: the plan finding the parser phase too large, in which case F9 moves to S-11 with its
-     trigger rewritten.
-6. **The real exports were not opened in this step** (contract privacy rules).
-   - R1 goes to research.
+1. **Option A (new `import_statement` RPC) recommended over option B (defaulted `p_source` on
+   `import_ing_statement`).**
+   - Why: option B either creates an overload that PostgREST named-arg calls cannot disambiguate, or needs a
+     drop/recreate of the live function. Option A leaves old code untouched during the deploy window.
+   - What would change it: the plan proving that option B is safe on this PostgREST version, with a local HTTP test.
+2. **R1: keep the reject, do not clamp.**
+   - Why: 0 violations on the real exports, the fixture enforces the same invariant, and the PRD is silent.
+   - What would change it: a real export with an operation date before the header start, which the new shape metric
+     would flag.
+3. **Lp not persisted; a deviation from import-formats rule 7's wording.**
+   - Why: nothing reads it, and FR-005 rejects ranges instead of deduplicating.
+   - What would change it: a feature needing per-row identity.
+4. **No G38.**
+   - Why: `ImportWizard.tsx` never auto-skips step 2, and it already handles one account (preselected, "1 rachunek"
+     lead).
+   - What would change it: the plan deciding to skip step 2 for single-account files.
+5. **Research scope derived from `change.md` with no interview.** Three parallel read-only workers (schema/RPC,
+   kit/copy, parser/patterns/F9); R1 and the DB probes were done by the parent.
+   - What would change it: nothing. This was the standard autonomous mode.
+6. **The real exports were read for aggregates only.** No value, name or number from them went into any artifact.
    - What would change it: nothing.

@@ -1,7 +1,9 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
+import { DEMO_EMAIL } from "astro:env/server";
 import { createClient } from "@/lib/supabase";
 import { MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
+import { DEMO_ERROR, isDemoEmail } from "@/lib/demo";
 
 export const prerender = false;
 
@@ -23,6 +25,11 @@ export const POST: APIRoute = async (context) => {
   } = await supabase.auth.getUser();
   if (!user) {
     return context.redirect("/reset/new?state=expired");
+  }
+  // S-09: the demo account is shared and public — any signed-in session reaches this form, so a new password
+  // here would lock every other reviewer out just like /api/auth/password.
+  if (isDemoEmail(user.email, DEMO_EMAIL)) {
+    return context.redirect(DEMO_ERROR.resetNew);
   }
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) {

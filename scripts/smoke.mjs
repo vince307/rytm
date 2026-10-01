@@ -784,7 +784,8 @@ const steps = [
   [
     "demo first import is accepted (or already present)",
     () => request("/api/imports", { method: "POST", form: { payload: importPayload } }),
-    { status: 302, location: "/imports/" },
+    // Accepted prefixes, not just "/imports/": a failed or invalid import must not pass as "present".
+    { status: 302, location: ["/imports/result", "/imports/new?error=demo"] },
   ],
   // The guard runs before the RPC, so the same range answers `demo`, not `overlap`.
   [
@@ -805,6 +806,12 @@ const steps = [
         form: { current: demo.password, password: password2, confirm: password2 },
       }),
     { status: 302, location: "/settings?error=demo-password" },
+  ],
+  // /reset/new accepts any signed-in session, not only a recovery one, so it needs the same guard.
+  [
+    "demo password reset (/reset/new) is refused",
+    () => request("/api/auth/reset/new", { method: "POST", form: { password: password2, confirm: password2 } }),
+    { status: 302, location: "/reset/new?error=demo" },
   ],
   [
     "demo account deletion is refused",
@@ -829,7 +836,8 @@ const steps = [
 let failed = 0;
 for (const [name, run, expected] of steps) {
   const actual = await run();
-  // `contains` accepts a single needle or an array of needles that must all be present (S-06: a `/fixed` step
+  // `location` accepts a single prefix or an array of accepted prefixes (S-09 review F6: the demo's first import
+  // is either created or already present, but never failed). `contains` accepts a single needle or an array of needles that must all be present (S-06: a `/fixed` step
   // proves two facts from one GET — e.g. a row's name and its section header — rather than splitting into two
   // named steps just to fit a single-needle assertion). `notContains` is symmetric (S-07 plan review F2: a /home
   // step needs two negative needles — e.g. neither delta amount after an exclusion — from one GET).
@@ -837,14 +845,15 @@ for (const [name, run, expected] of steps) {
   const antiNeedles = expected.notContains === undefined ? [] : [expected.notContains].flat();
   const ok =
     actual.status === expected.status &&
-    (expected.location === undefined || actual.location.startsWith(expected.location)) &&
+    (expected.location === undefined ||
+      [expected.location].flat().some((prefix) => actual.location.startsWith(prefix))) &&
     needles.every((needle) => actual.body.includes(needle)) &&
     antiNeedles.every((needle) => !actual.body.includes(needle));
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
     console.log(
-      `      expected ${expected.status} ${expected.location ?? ""} ${needles.join(" & ")} ${
+      `      expected ${expected.status} ${[expected.location ?? ""].flat().join(" | ")} ${needles.join(" & ")} ${
         antiNeedles.length ? `notContains:${antiNeedles.join(" & ")}` : ""
       }`,
     );

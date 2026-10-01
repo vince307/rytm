@@ -13,8 +13,8 @@ original quoting text.
 | --- | --- |
 | Branch | `feat/synthetic-santander-fixture`, cut from `main` at `5e61822` |
 | Commits | 13 on the branch. The last two are `a936cfd` (`fix(...)`: review fixes) and the `docs(...)` commit for this review (report, follow-ups, plan rows, change status, this handoff). |
-| Pushed / PR / merged | no / none / no |
-| `change.md` status | `impl_reviewed` |
+| Pushed / PR / merged | ship step: archived here, then pushed, PR opened and merged — PR/CI/merge/deploy recorded in `context/runs/2026-10-01-m2-santander/run-log.md` |
+| `change.md` status | `archived` (folder moved to `context/archive/2026-10-01-synthetic-santander-fixture/`) |
 | `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`): 3.9 `[human]` |
 | Working tree | clean after the docs commit |
 
@@ -58,7 +58,7 @@ fixture:check OK, vitest 256/15, build OK, pgTAP 5/102 PASS, smoke 140/0.
 
 ## 4. Next command
 
-`/10x-archive synthetic-santander-fixture`, then ship. There is no UI in this slice, so there is no visual gate.
+`none — shipped`. The next slice is S-10 `santander-csv-import` (`/10x-new santander-csv-import`); its triggers are restated in §5 and in the roadmap `## Backlog Handoff`.
 
 ## 5. Open
 

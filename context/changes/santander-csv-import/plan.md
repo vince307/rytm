@@ -732,12 +732,12 @@ These are recorded in place of the skill's user questions (no human in the loop,
 
 #### Automated
 
-- [ ] 4.1 `npm test` + parser and detector cases, 0 failed; ING parser test unchanged except `source`
-- [ ] 4.2 New import modules have no Node imports
-- [ ] 4.3 Deliberate break 1: col 3 before the card tail turns the `counterparty` test red; restored → green
-- [ ] 4.4 Deliberate break 2: strict bare-field quote turns the ST15 case red; restored → green
-- [ ] 4.5 Deliberate break 3: ING-first fall-through turns the USD case red; restored → green
-- [ ] 4.6 Full local gate vs baseline
+- [x] 4.1 `npm test` + parser and detector cases, 0 failed; ING parser test unchanged except `source`
+- [x] 4.2 New import modules have no Node imports
+- [x] 4.3 Deliberate break 1: col 3 before the card tail turns the `counterparty` test red; restored → green
+- [x] 4.4 Deliberate break 2: strict bare-field quote turns the ST15 case red; restored → green
+- [x] 4.5 Deliberate break 3: ING-first fall-through turns the USD case red; restored → green
+- [x] 4.6 Full local gate vs baseline
 
 #### Manual
 

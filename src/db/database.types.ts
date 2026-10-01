@@ -164,6 +164,17 @@ export type Database = {
         };
         Returns: string;
       };
+      import_statement: {
+        Args: {
+          p_account_name: string;
+          p_account_number: string;
+          p_period_end: string;
+          p_period_start: string;
+          p_source: string;
+          p_transactions: Json;
+        };
+        Returns: string;
+      };
     };
     Enums: {
       [_ in never]: never;

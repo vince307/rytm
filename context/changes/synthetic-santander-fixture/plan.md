@@ -451,13 +451,13 @@ Recorded in place of the skill's user questions (no human in the loop, run contr
 
 #### Automated
 
-- [ ] 1.1 `npm run fixture:santander` exits 0 and writes exactly 4 files to `test/fixtures/santander/`
-- [ ] 1.2 Determinism: a second run leaves the fixture dir unchanged
-- [ ] 1.3 Deliberate break: changed `SEED` turns `git diff --exit-code test/fixtures/santander` red; restored → clean
-- [ ] 1.4 Shape smoke via `node -e`: no BOM, no `\r`, trailing LF, 9 fields per line, header col 7 == rows, PLN/USD headers
-- [ ] 1.5 Git plumbing: CSVs not ignored; `text` attribute unset for the fixture dir
-- [ ] 1.6 ING untouched: no diff vs `main` in ING scripts and `test/fixtures/ing`
-- [ ] 1.7 Full local gate vs baseline (Δ0; `fixture:check` still ING only)
+- [x] 1.1 `npm run fixture:santander` exits 0 and writes exactly 4 files to `test/fixtures/santander/`
+- [x] 1.2 Determinism: a second run leaves the fixture dir unchanged
+- [x] 1.3 Deliberate break: changed `SEED` turns `git diff --exit-code test/fixtures/santander` red; restored → clean
+- [x] 1.4 Shape smoke via `node -e`: no BOM, no `\r`, trailing LF, 9 fields per line, header col 7 == rows, PLN/USD headers
+- [x] 1.5 Git plumbing: CSVs not ignored; `text` attribute unset for the fixture dir
+- [x] 1.6 ING untouched: no diff vs `main` in ING scripts and `test/fixtures/ing`
+- [x] 1.7 Full local gate vs baseline (Δ0; `fixture:check` still ING only)
 
 #### Manual
 

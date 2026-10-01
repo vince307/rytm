@@ -41,7 +41,7 @@ Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stał
 
 | ID   | Change ID                   | Outcome (user can …)                                                                                                        | Prerequisites | PRD refs                       | Status   |
 | ---- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------ | -------- |
-| F-03 | synthetic-santander-fixture | (foundation) w repozytorium jest syntetyczny eksport Santander PLN z pułapkami formatu i opisów oraz plik USD do odrzucenia | —             | FR-018, FR-014, NFR prywatność | planning |
+| F-03 | synthetic-santander-fixture | (foundation) w repozytorium jest syntetyczny eksport Santander PLN z pułapkami formatu i opisów oraz plik USD do odrzucenia | —             | FR-018, FR-014, NFR prywatność | in-progress |
 | S-10 | santander-csv-import        | wgrać plik CSV z Santandera i zobaczyć wynik importu na tych samych zasadach co ING                                         | F-03          | FR-018, FR-004, FR-005         | proposed |
 | S-11 | santander-card-merchants    | zobaczyć transakcje kartowe z Santandera we właściwych wzorcach sprzedawców, wspólnych z ING                                | S-10, F-03    | FR-018, FR-006, FR-007         | proposed |
 
@@ -73,7 +73,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Czy płatności BLIK przez operatorów (PayU, PayPro…) w eksporcie Santandera niosą domenę sprzedawcy, jak w ING (D3)? — Owner: user. Block: no (sprawdzane na prawdziwym eksporcie przy kształtowaniu fixture).
 - **Risk:** Najpierw, bo cel `quality` wymaga mierzenia parsera i grupowania na znanych pułapkach, a prywatność wyklucza prawdziwy wyciąg w repo; ryzyko — fixture zbyt czysty względem prawdziwych opisów, łagodzone kształtowaniem z prawdziwego eksportu.
-- **Status:** planning
+- **Status:** in-progress
 
 ## Slices
 

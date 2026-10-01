@@ -32,7 +32,7 @@ export interface ExistingImport {
 }
 
 export interface WizardServerError {
-  kind: "overlap" | "invalid" | "failed";
+  kind: "overlap" | "invalid" | "failed" | "demo";
   /** The colliding import's range; missing when the endpoint could not read it back. */
   from?: string;
   to?: string;
@@ -223,6 +223,9 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
         <Headline text={errors.unknownFormat} />
       ) : pageError?.kind === "failed" ? (
         labels.genericError
+      ) : pageError?.kind === "demo" ? (
+        // DESIGN-GAP: G37 — the kit has no state for an import refused on the shared demo account (S-09).
+        x.demoLocked
       ) : null;
 
     return (

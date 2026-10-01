@@ -1,5 +1,5 @@
 ---
-// DESIGN-GAP: G23 (in-app password form), G24 (delete/password result states)
+// DESIGN-GAP: G23 (in-app password form), G24 (delete/password result states), G37 (demo account refusal)
 import AppLayout from "@/layouts/AppLayout.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
 import Panel from "@/components/app/Panel.astro";
@@ -21,7 +21,21 @@ const passwordChanged = params.get("password") === "changed";
 // roadmap: change e-mail parked — kit button not rendered
 const email = Astro.locals.user?.email;
 const passwordError =
-  error === "current-password" ? x.currentPasswordWrong : error === "password" ? xa.resetNewError : null;
+  error === "current-password"
+    ? x.currentPasswordWrong
+    : error === "password"
+      ? xa.resetNewError
+      : error === "demo-password"
+        ? x.demoLocked
+        : null;
+const deleteError =
+  error === "delete-password"
+    ? x.currentPasswordWrong
+    : error === "delete"
+      ? x.deleteError
+      : error === "demo-delete"
+        ? x.demoLocked
+        : null;
 ---
 
 <AppLayout title={s.title} active="settings">
@@ -72,7 +86,7 @@ const passwordError =
     </div>
     <DeleteAccountDialog
       client:load
-      serverError={error === "delete-password" ? x.currentPasswordWrong : error === "delete" ? x.deleteError : null}
+      serverError={deleteError}
       labels={{
         trigger: s.deleteTitle,
         eyebrow: x.deleteDialogEyebrow,

@@ -52,7 +52,7 @@ jobs:
         run: |
           source supabase.env
           test -n "$API_URL" && test -n "$ANON_KEY" || { echo "local Supabase did not expose API_URL/ANON_KEY"; exit 1; }
-          printf 'SUPABASE_URL=%s\nSUPABASE_KEY=%s\n' "$API_URL" "$ANON_KEY" > .env
+          printf 'SUPABASE_URL=%s\nSUPABASE_KEY=%s\nDEMO_EMAIL=demo@rytm.local\n' "$API_URL" "$ANON_KEY" > .env
       - run: npm run build
       - name: Run smoke test against the dev server
         env:

@@ -14,8 +14,11 @@
 // contributing nothing while the newer month still appears on the axis, every month recomputing once the pattern
 // is restored, the accent stat card's delta foot hidden with one month of data and shown once a previous month
 // exists, and the "Koszty stałe" card's total and "podrożała" count — pure GETs inserted between existing steps,
-// no new payload.
+// no new payload — and the S-09 demo guard (the seeded demo account refused a second import, an undo, a password
+// change and a deletion).
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
+
+import { randomUUID } from "node:crypto";
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
 const email = `smoke-${Date.now()}@example.com`;
@@ -23,6 +26,8 @@ const password = "Smoke-Test-Passw0rd!";
 const password2 = "Smoke-Test-Passw0rd-2!";
 // Seeded by supabase/seed.sql on every `supabase start` / `db reset` (local and CI).
 const seeded = { email: "test@rytm.local", password: "Rytm-Test-Passw0rd!" };
+// Shared demo account (S-09), also seeded; the dev server's .env sets DEMO_EMAIL to this address.
+const demo = { email: "demo@rytm.local", password: "Rytm-Demo-Passw0rd!" };
 // Small synthetic import (2 debits) for the POST /api/imports steps; the smoke user is deleted later, which
 // cascades the import away.
 const importPayload = JSON.stringify({
@@ -768,6 +773,50 @@ const steps = [
     () => request("/api/auth/delete", { method: "POST", form: { current: password, confirm: "USUŃ" } }),
     { status: 302, location: "/login?deleted=1" },
   ],
+  // S-09 demo guard: the seeded demo account (DEMO_EMAIL) is refused a second import, an import undo, a password
+  // change and a deletion; the seeded test user's steps below prove other accounts are unaffected.
+  [
+    "demo user signs in",
+    () => request("/api/auth/signin", { method: "POST", form: demo }),
+    { status: 302, location: "/home" },
+  ],
+  // Only guarantees the account has an import: the first run creates it, later local runs are refused.
+  [
+    "demo first import is accepted (or already present)",
+    () => request("/api/imports", { method: "POST", form: { payload: importPayload } }),
+    { status: 302, location: "/imports/" },
+  ],
+  // The guard runs before the RPC, so the same range answers `demo`, not `overlap`.
+  [
+    "demo second import is refused",
+    () => request("/api/imports", { method: "POST", form: { payload: importPayload } }),
+    { status: 302, location: "/imports/new?error=demo" },
+  ],
+  [
+    "demo import undo is refused",
+    () => request("/api/imports/delete", { method: "POST", form: { id: randomUUID() } }),
+    { status: 302, location: "/imports?error=demo" },
+  ],
+  [
+    "demo password change is refused",
+    () =>
+      request("/api/auth/password", {
+        method: "POST",
+        form: { current: demo.password, password: password2, confirm: password2 },
+      }),
+    { status: 302, location: "/settings?error=demo-password" },
+  ],
+  [
+    "demo account deletion is refused",
+    () => request("/api/auth/delete", { method: "POST", form: { current: demo.password, confirm: "USUŃ" } }),
+    { status: 302, location: "/settings?error=demo-delete" },
+  ],
+  [
+    "demo user still signs in with its password",
+    () => request("/api/auth/signin", { method: "POST", form: demo }),
+    { status: 302, location: "/home" },
+  ],
+  ["signout demo user", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   [
     "seeded test user signs in",
     () => request("/api/auth/signin", { method: "POST", form: seeded }),

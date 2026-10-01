@@ -1,6 +1,8 @@
 import type { APIRoute } from "astro";
+import { DEMO_EMAIL } from "astro:env/server";
 import { createClient } from "@/lib/supabase";
 import { importPayloadSchema } from "@/lib/import/schema";
+import { DEMO_ERROR, demoImportAllowed, isDemoEmail } from "@/lib/demo";
 
 export const prerender = false;
 
@@ -19,6 +21,13 @@ export const POST: APIRoute = async (context) => {
   } = await supabase.auth.getUser();
   if (!user) {
     return context.redirect("/login");
+  }
+  // S-09: the demo account is shared and public — only its first (seeding) import passes; a failed count fails closed.
+  if (isDemoEmail(user.email, DEMO_EMAIL)) {
+    const { count, error: countError } = await supabase.from("imports").select("id", { count: "exact", head: true });
+    if (countError || !demoImportAllowed(count ?? 1)) {
+      return context.redirect(DEMO_ERROR.import);
+    }
   }
 
   let json: unknown;

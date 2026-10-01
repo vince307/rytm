@@ -167,6 +167,9 @@ export const copyExtra = {
     deleting: "Usuwanie…",
     deleteError: "Nie udało się usunąć importu. Spróbuj ponownie.",
     deleteMissing: "Nie znaleziono tego importu — mógł zostać już usunięty.",
+    // DESIGN-GAP: G37 — the kit has no state for an action refused on the shared demo account (S-09, FR-014):
+    // shown for `/imports?error=demo` and the wizard's `?error=demo`.
+    demoLocked: "To jest wspólne konto demo — dodawanie i cofanie importów jest wyłączone.",
   },
   patterns: {
     eyebrow: "Wzorce wydatków",
@@ -299,6 +302,9 @@ export const copyExtra = {
     currentPasswordWrong: "Obecne hasło jest nieprawidłowe.",
     deleteError: "Nie udało się usunąć konta. Spróbuj ponownie.",
     deleting: "Usuwanie…",
+    // DESIGN-GAP: G37 — the kit has no state for an action refused on the shared demo account (S-09, FR-014):
+    // shown for `?error=demo-password` and `?error=demo-delete`.
+    demoLocked: "To jest wspólne konto demo — zmiana hasła i usunięcie konta są wyłączone.",
   },
   app: {
     exit: "Wyjdź",

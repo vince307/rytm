@@ -61,6 +61,7 @@ Commits `4b27098` (swap) and `aaad9c9` (framework preset), then this file.
 | ------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Vercel env                      | `SUPABASE_URL`                       | production, preview (encrypted)                                                                                                                                                                                                                                                         |
 | Vercel env                      | `SUPABASE_KEY`                       | production, preview (`--sensitive`: cannot be read back with `vercel env pull`)                                                                                                                                                                                                         |
+| Vercel env                      | `DEMO_EMAIL`                         | production only; not a secret (it is published in the README), but added and changed only by the human like every Vercel env var; unset = no demo account (S-09, see Demo account below)                                                                                                |
 | GitHub secrets                  | `SUPABASE_URL`, `SUPABASE_KEY`       | used by the `ci` build step                                                                                                                                                                                                                                                             |
 | GitHub secrets                  | `VERCEL_TOKEN`                       | account token `rytm-github-actions`, scope kamilp's projects — created in the dashboard, used by `deploy`                                                                                                                                                                               |
 | GitHub secrets                  | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | from `.vercel/project.json`                                                                                                                                                                                                                                                             |
@@ -160,6 +161,43 @@ Recommendation (not a blocker): authenticate an owned domain in Brevo (DKIM/DMAR
 - Local proof (`context/changes/ci-db-push/reviews/local-push-failure.md`): a failing `db push --yes` without a TTY exits 1 and rolls back the failing file. The CLI prints JSON only with `--output-format json` (or when it detects an AI agent), so the ledger step passes it explicitly; the dry-run and push steps print text. Both push steps use `--skip-vault` (impl-review F1, F7).
 - Migrations must be backward-compatible with the deploy in production (hard rule in `CLAUDE.md`).
 - First run (2026-09-30): merge `98a306c` (PR #10), run https://github.com/vince307/rytm/actions/runs/36756578942 . Attempt 1 failed at `Link hosted Supabase` — `Invalid access token format` (the secret held something other than the token; the CLI requires `^sbp_(oauth_|v0_)?[a-f0-9]{40}$`); Vercel was skipped and production stayed on the previous deploy. After re-setting `SUPABASE_ACCESS_TOKEN`, attempt 2 was green end to end: `Finished supabase link.`, dry-run and push both `Remote database is up to date.`, ledger 6 local = 6 remote up to `20260928120000` (`hosted-ledger.sh` → `LEDGER OK (0 new: none)`), then `vercel deploy --prod`; `https://rytm-phi.vercel.app/login` answers 200.
+
+## Demo account (S-09)
+
+One shared account that reviewers sign in to on `https://rytm-phi.vercel.app`; credentials are in `README.md` § Demo. The server recognises it by `DEMO_EMAIL` (trimmed, case-insensitive; `src/lib/demo.ts`). No script, migration or agent writes demo data to production — seeding and reset are owner steps in the app and the Supabase dashboard.
+
+- **Env var**: `DEMO_EMAIL` on Vercel, production environment only. Human only, like every `vercel env add/rm` (operating model below); a change takes effect with the next production deploy.
+- **Data rule**: only the synthetic fixture `test/fixtures/ing/Lista_transakcji_nr_0000123456_010926.csv` is ever imported into this account — never a real statement, the account is shared.
+
+### Seeding (in order)
+
+1. Pick the demo address (a real inbox — production requires e-mail confirmation, e.g. a Gmail `+` alias) and a strong password; both get published.
+2. `vercel env add DEMO_EMAIL production` with that address.
+3. Deploy: merge to `main` and wait for the green `deploy` job (or wait for the next one, if the code is already live).
+4. On `https://rytm-phi.vercel.app/register`: sign up with the address and password.
+5. Confirm the e-mail from the link in the inbox, then sign in.
+6. `/imports/new`: import the fixture in the wizard with its default account „Rachunek Firmowy Główny” (not „Rachunek VAT”). Expected: 206 debits, 01.09.2025–31.08.2026; `/patterns`, `/fixed` and `/home` show the synthetic data.
+
+### What the guard refuses
+
+For the demo account only; every other account behaves as before.
+
+| Action                                      | Redirect                        |
+| ------------------------------------------- | ------------------------------- |
+| Password change (`/api/auth/password`)      | `/settings?error=demo-password` |
+| Account deletion (`/api/auth/delete`)       | `/settings?error=demo-delete`   |
+| Undo an import (`/api/imports/delete`)      | `/imports?error=demo`           |
+| Any import while the account has ≥ 1 import | `/imports/new?error=demo`       |
+
+Thresholds, pattern decisions (merge, exclude, type, name) and fixed-cost pinning stay usable, so visitors drift the demo state over time; there is no automatic reset.
+
+### Reset
+
+1. Supabase dashboard → project `rytm` → Authentication → Users: delete the demo user. The cascade removes its imports, transactions and pattern data.
+2. Sign up again with the same address and password, confirm the e-mail, sign in.
+3. Import the fixture again (step 6 above) — allowed, because the account is empty.
+
+`DEMO_EMAIL` stays as it is; no deploy is needed.
 
 ## Manual steps still open
 

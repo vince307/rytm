@@ -24,9 +24,10 @@ const existing: ExistingImport[] = (data ?? []).map((i) => ({
   periodEnd: i.period_end,
 }));
 
-// ?error= from POST /api/imports; overlap carries the colliding range unless the endpoint could not read it.
+// ?error= from POST /api/imports; overlap carries the colliding range unless the endpoint could not read it;
+// demo is the shared demo account's refusal (S-09).
 const params = Astro.url.searchParams;
-const kind = z.enum(["overlap", "invalid", "failed"]).safeParse(params.get("error"));
+const kind = z.enum(["overlap", "invalid", "failed", "demo"]).safeParse(params.get("error"));
 const isoDate = (value: string | null) => {
   const parsed = z.iso.date().safeParse(value);
   return parsed.success ? parsed.data : undefined;

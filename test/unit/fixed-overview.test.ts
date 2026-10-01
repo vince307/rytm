@@ -214,7 +214,8 @@ describe("fixedOverview — F-02 fixture (case 16)", () => {
     const result = parseIngStatement(new Uint8Array(readFileSync(new URL(MAIN, FIXTURES))));
     if (!result.ok) throw new Error(result.error);
     return buildImportPayload(result.statement, MAIN_ACCOUNT).transactions.map((t) => ({
-      id: t.bankTxId,
+      // ING always carries a bankTxId (S-10 widened the type to string | null only for Santander, rule 7).
+      id: t.bankTxId ?? "",
       amountMinor: t.amountMinor,
       counterparty: t.counterparty,
       title: t.title,

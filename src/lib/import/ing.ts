@@ -193,6 +193,7 @@ export function buildImportPayload(statement: IngStatement, accountNumber: strin
   const account = statement.accounts.find((a) => a.number === accountNumber);
   if (!account) throw new Error(`account ${accountNumber} is not in the statement`);
   return {
+    source: "ing",
     accountNumber,
     accountName: account.name,
     periodStart: statement.period.start,

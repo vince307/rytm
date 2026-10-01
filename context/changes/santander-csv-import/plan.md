@@ -718,11 +718,11 @@ These are recorded in place of the skill's user questions (no human in the loop,
 
 #### Automated
 
-- [ ] 3.1 `npm test` baseline + schema cases, 0 failed
-- [ ] 3.2 Smoke baseline + 5 PASS, 0 FAIL; smoke diff is additions only
-- [ ] 3.3 Deliberate break: endpoint forwards a wrong `p_source` → Santander save step red; restored → green
-- [ ] 3.4 Deliberate break: removed source refine → "ING with null id" case red; restored → green
-- [ ] 3.5 Full local gate vs baseline
+- [x] 3.1 `npm test` baseline + schema cases, 0 failed
+- [x] 3.2 Smoke baseline + 5 PASS, 0 FAIL; smoke diff is additions only
+- [x] 3.3 Deliberate break: endpoint forwards a wrong `p_source` → Santander save step red; restored → green
+- [x] 3.4 Deliberate break: removed source refine → "ING with null id" case red; restored → green
+- [x] 3.5 Full local gate vs baseline
 
 #### Manual
 

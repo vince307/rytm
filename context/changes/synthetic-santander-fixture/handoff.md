@@ -1,107 +1,112 @@
 # Handoff — `synthetic-santander-fixture` (slice F-03)
 
-Written by the `/10x-implement … phase 2` step (autonomous run, implement step). Phase 2 (Santander check and the
-two-bank gate) is implemented, gated green and committed. The next agent must not change `fixture:check`'s
-semantics or its CLI output format (`fixture:check <bank> OK`) without re-checking CI expectations, and must treat
-`scripts/fixture-ing*.mjs` / `test/fixtures/ing/` as still untouched (byte-exact, unchanged this phase too).
+Written by the `/10x-implement … phase 3` step (autonomous run, final phase). Phase 3 (shape comparator, format doc,
+seam sweep) is implemented, gated green and committed; `change.md` is now `implemented`. All automated Progress rows
+are `[x]`; six manual rows (`[reviewer]`/`[human]`, carried from Phases 1–2 plus Phase 3's own) are still `[ ]` —
+unticked on purpose, not verified by this step.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/synthetic-santander-fixture`, cut from `main` at `5e61822` |
-| Commits | 8 on the branch (`24ad875` identity, `1d7c4d5` research, `0b514cb` plan, `56f48e5` plan review, `5301ea4` phase-1 implementation, phase-1 handoff commit, `c9efa9a` this step's phase-2 implementation, plus this handoff commit) |
+| Commits | 11 on the branch: `24ad875` identity, `1d7c4d5` research, `0b514cb` plan, `56f48e5` plan review, `5301ea4` phase-1 impl, phase-1 handoff, `c9efa9a` phase-2 impl, `509627b` phase-2 handoff, `f28cf54` this step's phase-3 implementation, `8fa3415` this step's epilogue commit |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `implementing` (unchanged) |
-| `## Progress` rows remaining | 10 (`grep -c '^- \[ \]' plan.md`): 2 Phase 1 `[reviewer]` (unchanged from phase 1) + 1 Phase 2 `[reviewer]` + 9 Phase 3 |
-| Working tree | clean after this step's two commits (phase-2 commit + this handoff commit) |
+| `change.md` status | `implemented` (flipped by this step's epilogue commit) |
+| `## Progress` rows remaining | 6 (`grep -c '^- \[ \]' plan.md`): 1.8, 1.9 (Phase 1, `[reviewer]`), 2.8 (Phase 2, `[reviewer]`), 3.7, 3.8 (Phase 3, `[reviewer]`), 3.9 (Phase 3, `[human]`) — all manual, none of them mine to tick |
+| Working tree | clean after this step's two commits (`f28cf54` phase-3 + `8fa3415` epilogue); `git status --porcelain` empty |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `scripts/fixture-santander-check.mjs` | `export async function check()`; also exports `parseLine`, `toMinor`, `DMY`/`YMD`, `CARD`, `rawMerchantOf` for Phase 3's shape comparator. Byte-compares disk against `generate()`; independently re-reads each CSV (UTF-8, LF, 9-field lines, header/data-row quoting, header invariants — opening/closing, Lp 1 unique max booking date + adjacent inversion above a 10-row threshold, file-name ↔ header col 0/col 2); re-derives D2 (debits-only) and rule 5 (`rawMerchant`) from the parsed rows against `expected.json`; runs the D5 fixed/frequent check; confirms every `ST01`–`ST14` id has ≥ 1 row; confirms the `pizzeria-trzy-sery` `crossBank` entry exists in both this fixture's `patterns[]` and the ING oracle's, with matching `type`; confirms the USD file trips only `reason: currency` and the PLN file trips none |
-| `scripts/fixture-check.mjs` | Aggregator: imports `check` from both per-bank scripts, runs both unconditionally, prints `fixture:check <bank> OK` or that bank's error list, exits 1 if either bank has errors |
-| `package.json` | `"fixture:check"` repointed from `node scripts/fixture-ing-check.mjs` to `node scripts/fixture-check.mjs`; `fixture:ing`/`fixture:santander`/`fixture:shape` unchanged |
-| `context/changes/synthetic-santander-fixture/plan.md` | Phase 2 `#### Automated` rows 2.1–2.7 ticked with sha `c9efa9a` (written in this handoff commit, same chicken-and-egg reason as Phase 1) |
-| `context/changes/synthetic-santander-fixture/handoff.md` | This file |
+| `scripts/fixture-santander-shape.mjs` | New. `npm run fixture:shape:santander [-- dir]` (default `data/`, empty-string arg never resolves to cwd). Local-only, never a CI gate: exits 0 with a message when the dir or `historia_*.csv` files are absent. Reuses `parseLine`/`toMinor`/`DMY`/`YMD`/`CARD` imported from `fixture-santander-check.mjs` (no second reader). Groups sides by currency — `fixture PLN`/`fixture USD` (from `expected.json`) and `real N (<CUR>)` (position-only label, currency sniffed from the file's own header, never the file name) — and diffs structure-only metrics within each currency group: BOM/CR/final-newline/UTF-8-validity, `""` count, masked header, field-count and quoting-signature distributions, description-kind distribution, card-tail ASCII/single-space/token-count/`*` shares, distinct card-mask count, BLIK `:<11 digits>` suffix share, booking-vs-operation date shares, adjacent inversion share, credits share, col3/col4 fill-by-kind, col4 masks, header col7==rows, header col6==Lp1 balance. Tolerance 5 percentage points, same style as `fixture-ing-shape.mjs`. Never prints a file name or a raw value — proven by a deliberate break (below) |
+| `package.json` | `+"fixture:shape:santander": "node scripts/fixture-santander-shape.mjs"` |
+| `context/foundation/import-formats.md` (Santander section) | Corrected per research.md § Real export: `Lp` 1..N ascending in file order (not "malejąco"), rows ≈ newest-first with adjacent inversions (not strict); header's two date formats (`YYYY-MM-DD` col 0, `DD-MM-YYYY` col 1) + grouped `'`-account mask spelled out; col 6 (balance) added to the quoted-amount rule; card-tail ASCII/no-diacritics + single-space/2–7-token note; `Wypłata BLIK` row + the `:<11 digits>` suffix on both BLIK kinds; free-title transfer shape (comma → quoted); `Oplata za …` recurring debit (explicitly **not** asserted as a bank fee); col 4 (counterparty account) grouping shape; the ATM regex line + import rule 5 reworded so `rawMerchant` = address text and the "bankomat" pattern name is only an S-11 normalization result, matching the fixture manifest; a new "Niezmienniki nagłówka" paragraph listing the balance-chain/unique-max-date/filename invariants the check script enforces, with an explicit note that the file carries no file-order balance chain; a pointer to `test/fixtures/santander/README.md` for the full ST01–ST14 trap list. `updated: 2026-10-02`. No value from the real exports |
+| `CLAUDE.md` | One new Commands bullet: `fixture:ing`/`fixture:santander` (regenerate), `fixture:check` (both banks, CI), `fixture:shape`/`fixture:shape:santander` (local-only, never a gate) |
+| `context/changes/synthetic-santander-fixture/plan.md` | Phase 3 `#### Automated` rows 3.1–3.6 ticked with sha `f28cf54` |
+| `context/changes/synthetic-santander-fixture/change.md` | `status: implementing` → `implemented`, `updated: 2026-10-02` (epilogue commit `8fa3415`) |
 
-Not touched this phase (confirmed via `git status --porcelain` before staging): `change.md`, `scripts/fixture-ing*.mjs`, `scripts/fixture-santander.mjs`, `test/fixtures/**`, `.github/workflows/ci.yml`, `context/foundation/roadmap.md` (F-03 was already flipped to `in-progress` in Phase 1).
+Not touched this phase: `scripts/fixture-santander.mjs` (generator), `scripts/fixture-santander-check.mjs` (check),
+`scripts/fixture-ing*.mjs`, `test/fixtures/**` (no regeneration needed a code change — see Verification), CI
+workflow, `supabase/**`.
 
 ## 3. Verification
 
 | Command | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/synthetic-santander-fixture` (observed) |
-| `node scripts/fixture-santander-check.mjs` (standalone) | exit 0, `fixture:check (santander) OK …` (observed) |
-| `node scripts/fixture-check.mjs` (standalone, == `npm run fixture:check`) | exit 0, `fixture:check ing OK` + `fixture:check santander OK` (observed) |
-| Deliberate break 1 (bytes, criterion 2.2): flipped one digit byte inside a card-amount description in the main Santander CSV | red — santander FAILED with both the byte-diff line and an independent `description amount != |col 5|` finding; ing stayed OK; file restored from a pre-break copy → clean (`fixture:check` exit 0 again) (observed). Meta-check: the independent re-read catches the same break two ways (byte compare + format re-derivation), neither path trusts the generator |
-| Deliberate break 2 (semantics, criterion 2.3): in `scripts/fixture-santander.mjs`'s `rowToManifest`, forced the ST08 refund row to `imported: true, skipReason: null` and regenerated (byte-identical disk/generator, since both came from the same edited generator) | red — santander FAILED on exactly the D2 re-derivation (`imported/skipReason true/null, D2 gives false/credit` + the pattern-must-be-set-for-imported-rows check), while the byte-equality check passed; `git checkout -- scripts/fixture-santander.mjs` + regenerate restored byte-for-byte clean fixture → `fixture:check` exit 0 (observed). Meta-check: proves the check re-derives D2 independently of the generator's own manifest output — the exact failure mode a byte-compare-only check would miss |
-| Deliberate break 3 (aggregation, criterion 2.4): flipped one byte in the middle of the ING main CSV (`Lista_transakcji_nr_0000123456_010926.csv`) | red — `fixture:check ing FAILED` (byte-diff), `fixture:check santander OK` printed alongside it in the same run (proves both banks always run, one's failure never short-circuits the other); file restored from a pre-break copy → both OK again (observed) |
-| `node scripts/fixture-ing-check.mjs` (standalone, criterion 2.5) | exit 0, unchanged message (observed) |
-| `git diff --exit-code -- .github/workflows/ci.yml` (criterion 2.6) | exit 0, no diff (observed) |
-| `git diff --exit-code main -- scripts/fixture-ing.mjs scripts/fixture-ing-check.mjs scripts/fixture-ing-shape.mjs test/fixtures/ing` | exit 0, no diff (observed) |
-| `npm run lint` | 0 errors (observed; prettier auto-fix only on the new check script, no real lint findings — baseline Δ0) |
-| `npx astro check` | 0 errors, 136 files (baseline-after-phase-1 134; +2 is the two new `.mjs` files — astro check doesn't lint them but the count line moved, same as phase 1's note) (observed) |
-| `npm run fixture:check` | OK for both banks (observed; this is the phase's own gate, now Δ0-stable going forward) |
-| `npm test` | 256 passed, 15 files (observed, baseline Δ0 — no new Vitest file this phase per plan) |
+| `node scripts/fixture-santander-shape.mjs` (no arg) | exit 0, "no historia_\*.csv in …/data" (observed; data/ has none) |
+| `npm run fixture:shape:santander -- ""` | exit 0, same message — confirms empty-string arg does not resolve to cwd (observed) |
+| Privacy smoke: copied the fixture's main CSV into a scratch dir renamed `historia_2026-01-01_<26 invented digits>.csv`, ran the tool against that dir | exit 0; output grepped for `[0-9]{26}` and `historia_` — no match (observed). Output showed "No structural differences" for PLN (the copy is byte-identical to the fixture it's compared against) and a one-sided USD section, exactly as expected |
+| Deliberate break (criterion 3.3): edited the real-file label line in `fixture-santander-shape.mjs` to interpolate the (unprinted) file name, re-ran against the same scratch dir | red — the same privacy grep now matched the leaked `historia_2026-01-01_…csv` string in the output (observed, `GATE break-check: PASS`); restored the file from a pre-edit scratchpad backup (`cp`, not git — the file was untracked at that point) and re-ran → grep clean again (observed). Meta-check: proves the grep catches a real leak, not merely that the tool happens not to leak one |
+| Real-export run (contract-mandated: "run it against the real PLN export … output that is counts/shapes") | **Could not complete** — `readdirSync`/`ls` against `/Users/kamilp/Downloads/historia_cvs_2026-09-18/` returns `EPERM: operation not permitted` even with the Bash sandbox disabled (direct `readFileSync` of a named file in that dir *does* succeed, so this is a macOS directory-listing/TCC restriction on this host, not the Claude Code sandbox and not a tool bug — see `ARTIFACT GAP` below). The scratch-copy test above exercises the same code path (reader + masking + diffing) end-to-end and proves no name/value leak; only the live comparison against the real file's own shape differences is unverified |
+| `npm run fixture:santander` (regenerate, no generator change this phase) | exit 0, `git status --porcelain test/fixtures/santander` empty after — determinism unaffected (observed) |
+| `npm run fixture:check` | `fixture:check ing OK` + `fixture:check santander OK` (observed; unaffected by this phase, no generator/check files touched) |
+| `npm run lint` | 0 errors (observed; baseline Δ0 — one eslint --fix pass on the new script before commit, no findings left) |
+| `npx astro check` | 0 errors, 137 files (observed; baseline-after-phase-2 136, +1 is the new `.mjs` file in the count, same pattern as phases 1–2) |
+| `npm test` | 256 passed, 15 files (observed, baseline Δ0 — no new Vitest file per plan) |
 | `npm run build` | OK (observed, baseline Δ0) |
-| `npx supabase db reset && npx supabase test db` | pgTAP Files=5, Tests=102, Result PASS (observed, baseline Δ0; sandbox disabled per contract for Docker/`127.0.0.1`) |
-| `astro dev --port 4398` + `npm run smoke` | all smoke steps passed (observed, baseline Δ0; sandbox disabled per contract); port 4398 killed afterward, confirmed clear |
+| `npx supabase db reset && npx supabase test db` | pgTAP Files=5, Tests=102, Result PASS (observed, baseline Δ0; sandbox disabled per contract) |
+| `astro dev --port 4398` + `npm run smoke` | all smoke steps passed (observed, baseline Δ0; sandbox disabled per contract); port 4398 killed afterward, confirmed clear (`lsof -ti :4398` empty) |
 
 ## 4. Next command
 
-`/10x-implement synthetic-santander-fixture phase 3`
+`/10x-impl-review synthetic-santander-fixture`
 
 ## 5. Open
 
-- Manual-only Progress rows, left untouched (not verified by this step, `[reviewer]`): 1.8, 1.9 (carried from
-  Phase 1, unchanged) and 2.8 ("check rules assert only facts the real export has" — Phase 2's own manual row).
-- Phase 3 rows (9) remain pending as planned; no Phase-3 work started.
-- The "Lp 1 unique maximum booking date + ≥ 1 adjacent inversion" check applies the inversion half only to files
-  with more than 10 data rows (`INVERSION_ROW_THRESHOLD` in `fixture-santander-check.mjs`) — an autonomous call,
-  see §6; the USD reject file (3 rows, strictly descending by design) is correctly exempted, the 180-row main
-  file is correctly held to it.
-- The check's `crossBank` validation reads the ING oracle (`test/fixtures/ing/expected.json`) by the path named
-  in the Santander `expected.json`'s `crossBank[].oracle` field, not a hard-coded path — Phase 3's shape tool
-  should not need to touch this.
-- Known risks from `plan.md § Known risks` (S-10 partial-overlap fixture, cleaner balance chain than the real
-  export) are unchanged by this phase — still open for S-10/3.7.
-- No `DESIGN-GAP`, no migration, no follow-ups file (unchanged from Phase 1's handoff).
+- **`ARTIFACT GAP`**: the manual step "run `fixture:shape:santander` against the real export dir, sandbox disabled"
+  (plan § Manual Testing Steps item 3, feeding reviewer row 3.7) could not be executed from this session —
+  `readdirSync('/Users/kamilp/Downloads/historia_cvs_2026-09-18')` and plain `ls` both return `EPERM` even with
+  `dangerouslyDisableSandbox: true`, while `readFileSync` of an individual named file in the same directory
+  succeeds. This points at a macOS per-directory TCC restriction on this host/process (Downloads folder
+  protection), not Claude Code's own sandbox and not a defect in `fixture-santander-shape.mjs` — the tool's logic
+  was proven end-to-end against a scratch copy of the fixture CSV (§3). Whoever does the real-export comparison
+  (reviewer row 3.7, or a human with Full Disk Access / Terminal Downloads permission) can run
+  `npm run fixture:shape:santander -- /Users/kamilp/Downloads/historia_cvs_2026-09-18` directly; no code change
+  should be needed.
+- Manual-only Progress rows, left untouched (not verified by this step): 1.8, 1.9 (Phase 1, `[reviewer]`), 2.8
+  (Phase 2, `[reviewer]`), 3.7, 3.8 (Phase 3, `[reviewer]`), 3.9 (Phase 3, `[human]`, product-owner confirmation of
+  `Wypłata BLIK`/ST03/`Oplata za …` oracle calls).
+- `change.md` is now `implemented` even though those six manual rows are open — per this run's explicit instruction
+  ("run the epilogue → status implemented, even with [reviewer]/[visual]/[human] rows open"); see §6.
+- Known risks from `plan.md § Known risks` (S-10 partial-overlap fixture; the real export's balance chain is
+  cleaner in the fixture by construction) are unchanged by this phase — still open for S-10.
+- No `DESIGN-GAP`, no migration, no follow-ups file (unchanged from Phases 1–2).
+- Next slice per the run contract: S-10 `santander-csv-import`.
 
 ## 6. Autonomous decisions
 
-- **Implemented Phase 2 directly in this session rather than delegating to a subagent.** Chosen: direct
-  implementation. Rejected: the skill's recommended subagent delegation. Why: same reasoning as Phase 1 — the
-  format-contract checks, D2/D5 re-derivation and the crossBank cross-file lookup are tightly coupled to the exact
-  shapes the Phase 1 generator produced; a fresh subagent would have had to re-derive that grounding from the plan
-  text alone. What would change it: a phase with more independent, loosely-coupled changes.
-- **Adjacent-inversion check gated on `rows.length > 10`, not on the file name.** Chosen: a row-count threshold.
-  Rejected: hard-coding the main file's name, or requiring the inversion check on every file. Why: the plan's own
-  criterion parenthetically scopes this to "(main file)"; the USD reject file is deliberately built strictly
-  descending (`orderSimple`, no inversions possible at 3 rows) so a universal requirement would make the reject
-  file illegal. A row-count threshold expresses the real distinguishing property (enough rows to need the
-  real-export's noisy ordering) without naming a specific file, keeping the check honest if a future phase adds a
-  second small reject file. What would change it: a future fixture adding a second *large* reject file that is
-  legitimately strictly ordered — the threshold would then need an explicit per-file override.
-- **`crossBank` entries are checked for matching `type` between the two oracles' `patterns[]`, not for a `type`
-  field on the `crossBank` entry itself.** Chosen: look up `patterns[].type` on both sides by `key`. Rejected: a
-  literal reading of Phase 1's plan text ("the `crossBank` entry records `"type": "frequent"`"), which would
-  require a `type` field directly on the `crossBank` array entry. Why: the Phase 1 generator (already committed,
-  gated green, reviewed) does not emit such a field on `crossBank` entries — only on `patterns[]` — and Phase 1's
-  own handoff §3 already describes the check as "matches the ING oracle's" via `patterns[]`, confirming this
-  reading was the intended one. Re-deriving via `patterns[]` matches the committed data; adding a `type` field to
-  `crossBank` now would be an undiscussed generator change outside this phase's scope. What would change it: the
-  maintainer deciding the `crossBank` schema itself should carry `type` — that edit belongs to the generator
-  (Phase 1 territory) plus a regeneration, not this check.
-- **Extra re-derivation of `kind` and `card` on manifest rows, beyond what Phase 2's plan text lists.** Chosen:
-  independently derive `kind` (via the `CARD` regex / `Zakup BLIK` / `Wypłata BLIK` / `Przelew` prefixes) and
-  `card` (last 4 of the matched mask) and compare against `expected.json`'s `rows[].kind`/`.card`. Rejected:
-  checking only the fields the plan's bullet list names (lp/bookedOn/occurredOn/amountMinor/rawMerchant/imported/
-  skipReason/pattern). Why: cheap, format-contract-derivable, independent-of-the-generator checks in the same
-  spirit as the rest of this script; they passed clean against the already-reviewed Phase 1 fixture with no
-  adjustment needed, so no risk was taken on. What would change it: a future hand-edit of `expected.json`'s `kind`
-  field for a legitimate reason this derivation doesn't anticipate — would need either fixing the derivation or
-  dropping this extra check.
-- **The SHA suffix on Phase 2's Progress rows (`c9efa9a`) is written back in this handoff commit, not the phase
-  commit itself** — same chicken-and-egg reason, and same precedent, as Phase 1's handoff §6.
+- **Implemented Phase 3 directly in this session rather than delegating to a subagent.** Chosen: direct
+  implementation. Rejected: the skill's recommended subagent delegation. Why: same reasoning as Phases 1–2 — the
+  shape tool's metrics and the doc corrections are tightly coupled to the exact format contract Phase 2 already
+  encoded (`DMY`/`YMD`/`CARD` regexes, the header-invariant list) and to research.md's real-export findings; a
+  fresh subagent would have had to re-derive that grounding from scratch. What would change it: a phase with more
+  independent, loosely-coupled changes.
+- **Skipped every `AskUserQuestion` prompt the skill specifies (exec-mode choice, commit-message approval, dirty-path
+  prompt, next-phase decision, stragglers-at-epilogue).** Chosen: decide and proceed, record here. Why: the run
+  contract's hard rule 1 forbids `AskUserQuestion` in this run; this task's own instructions name the epilogue
+  stragglers case explicitly ("even with [reviewer]/[visual]/[human] rows open"). What would change it: a future
+  run contract that re-enables human-in-the-loop prompts.
+- **Treated the real-export shape-comparison run as a best-effort verification step, not a hard blocker, when it
+  hit an OS-level `EPERM` outside the Claude Code sandbox.** Chosen: record as `ARTIFACT GAP`, proceed with the
+  phase (the scratch-copy test already proves the tool's logic and its privacy guarantee end-to-end). Rejected:
+  blocking the whole phase on an environment permission this session cannot grant itself, or weakening the privacy
+  test to work around it. Why: the automated Phase 3 success criteria (3.1–3.6) do not require reading the real
+  directory; only the `[reviewer]`-tagged manual row 3.7 does, and that row was never going to be ticked by this
+  step regardless. What would change it: Full Disk Access (or equivalent) granted to the process running these
+  Bash commands, or the real export copied to a path the sandbox/TCC already permits (the run contract does not
+  authorize moving it, so this step did not attempt that).
+- **`Oplata za …` stays an unlabeled recurring debit in the corrected doc, not called a "bank fee."** Chosen: match
+  research.md's own finding ("not provable from shape"). Rejected: adopting `change.md`'s earlier "bank fee"
+  framing. Why: plan § Changes Required #4 explicitly requires this ("change.md claims that the plan refined
+  (`Oplata za` "bank fee") not repeated in the new docs"); carried forward unchanged from the plan's own decision
+  table. What would change it: a product owner confirming the fee framing (feeds reviewer row 3.9, already
+  deferred).
+- **Shape-comparator currency grouping uses the real file's own sniffed header currency, never the file name or a
+  hard-coded expectation.** Chosen: `currencyOf()` reads and parses just the first line's col 4. Rejected: assuming
+  one real PLN file and one real USD file by position (the plan's two named exports) or reading the file name's
+  date to infer anything. Why: keeps the tool honest if a reviewer points it at a directory with a different mix,
+  and never needs the file name for anything. What would change it: a future requirement to compare more than two
+  currencies at once, which this grouping already supports without change.

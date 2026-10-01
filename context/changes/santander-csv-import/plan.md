@@ -689,11 +689,11 @@ These are recorded in place of the skill's user questions (no human in the loop,
 
 #### Automated
 
-- [x] 1.1 Comparator on a renamed fixture copy exits 0, prints the R1 metrics, leaks no `\d{26}` / `historia_`
-- [x] 1.2 A one-sided variant under 5% is reported as a difference
-- [x] 1.3 Deliberate break: old `same` tolerance hides the variant (red); restored → reported
-- [x] 1.4 `fixture:check` OK; ING shape script and fixtures unchanged vs `main`
-- [x] 1.5 Full local gate vs baseline (Δ0)
+- [x] 1.1 Comparator on a renamed fixture copy exits 0, prints the R1 metrics, leaks no `\d{26}` / `historia_` — b7880c3
+- [x] 1.2 A one-sided variant under 5% is reported as a difference — b7880c3
+- [x] 1.3 Deliberate break: old `same` tolerance hides the variant (red); restored → reported — b7880c3
+- [x] 1.4 `fixture:check` OK; ING shape script and fixtures unchanged vs `main` — b7880c3
+- [x] 1.5 Full local gate vs baseline (Δ0) — b7880c3
 
 #### Manual
 

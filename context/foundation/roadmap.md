@@ -42,7 +42,7 @@ Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stał
 | ID   | Change ID                   | Outcome (user can …)                                                                                                        | Prerequisites | PRD refs                       | Status   |
 | ---- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------ | -------- |
 | F-03 | synthetic-santander-fixture | (foundation) w repozytorium jest syntetyczny eksport Santander PLN z pułapkami formatu i opisów oraz plik USD do odrzucenia | —             | FR-018, FR-014, NFR prywatność | done     |
-| S-10 | santander-csv-import        | wgrać plik CSV z Santandera i zobaczyć wynik importu na tych samych zasadach co ING                                         | F-03          | FR-018, FR-004, FR-005         | proposed |
+| S-10 | santander-csv-import        | wgrać plik CSV z Santandera i zobaczyć wynik importu na tych samych zasadach co ING                                         | F-03          | FR-018, FR-004, FR-005         | planning |
 | S-11 | santander-card-merchants    | zobaczyć transakcje kartowe z Santandera we właściwych wzorcach sprzedawców, wspólnych z ING                                | S-10, F-03    | FR-018, FR-006, FR-007         | proposed |
 
 ## Baseline
@@ -88,7 +88,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Jak kreator i lista importów pokazują bank i pomijają wybór rachunku przy pliku z jednym rachunkiem, skoro kit zapowiada Santandera tylko jako „wkrótce”? — Owner: user. Block: no (luka kitu w `design-kit.md`, rozstrzygana w planie).
 - **Risk:** Przed gwiazdą przewodnią, bo bez zaimportowanych danych nie ma czego grupować; ryzyko — import ING musi działać bez zmian po uogólnieniu zapisu importu (migracja wstecznie zgodna, smoke ING bez zmian).
-- **Status:** proposed
+- **Status:** planning
 
 ### S-11: Transakcje kartowe Santandera we właściwych wzorcach
 

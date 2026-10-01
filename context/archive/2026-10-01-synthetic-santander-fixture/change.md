@@ -1,10 +1,10 @@
 ---
 change_id: synthetic-santander-fixture
 title: Synthetic Santander PLN export with format traps and a USD reject file
-status: impl_reviewed
+status: archived
 created: 2026-10-01
 updated: 2026-10-02
-archived_at: null
+archived_at: 2026-10-01T22:25:42Z
 ---
 
 ## Notes

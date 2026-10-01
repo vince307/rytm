@@ -3,7 +3,7 @@ project: Rytm
 version: 2
 status: draft
 created: 2026-09-21
-updated: 2026-10-01
+updated: 2026-10-02
 prd_version: 1
 main_goal: quality
 top_blocker: none
@@ -41,7 +41,7 @@ Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stał
 
 | ID   | Change ID                   | Outcome (user can …)                                                                                                        | Prerequisites | PRD refs                       | Status   |
 | ---- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------ | -------- |
-| F-03 | synthetic-santander-fixture | (foundation) w repozytorium jest syntetyczny eksport Santander PLN z pułapkami formatu i opisów oraz plik USD do odrzucenia | —             | FR-018, FR-014, NFR prywatność | in-progress |
+| F-03 | synthetic-santander-fixture | (foundation) w repozytorium jest syntetyczny eksport Santander PLN z pułapkami formatu i opisów oraz plik USD do odrzucenia | —             | FR-018, FR-014, NFR prywatność | done     |
 | S-10 | santander-csv-import        | wgrać plik CSV z Santandera i zobaczyć wynik importu na tych samych zasadach co ING                                         | F-03          | FR-018, FR-004, FR-005         | proposed |
 | S-11 | santander-card-merchants    | zobaczyć transakcje kartowe z Santandera we właściwych wzorcach sprzedawców, wspólnych z ING                                | S-10, F-03    | FR-018, FR-006, FR-007         | proposed |
 
@@ -73,7 +73,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Czy płatności BLIK przez operatorów (PayU, PayPro…) w eksporcie Santandera niosą domenę sprzedawcy, jak w ING (D3)? — Owner: user. Block: no (sprawdzane na prawdziwym eksporcie przy kształtowaniu fixture).
 - **Risk:** Najpierw, bo cel `quality` wymaga mierzenia parsera i grupowania na znanych pułapkach, a prywatność wyklucza prawdziwy wyciąg w repo; ryzyko — fixture zbyt czysty względem prawdziwych opisów, łagodzone kształtowaniem z prawdziwego eksportu.
-- **Status:** in-progress
+- **Status:** done
 
 ## Slices
 
@@ -104,11 +104,11 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Backlog Handoff
 
-| Roadmap ID | Change ID                   | Suggested issue title                                    | Ready for `/10x-plan` | Notes                                       |
-| ---------- | --------------------------- | -------------------------------------------------------- | --------------------- | ------------------------------------------- |
-| F-03       | synthetic-santander-fixture | Syntetyczny eksport Santander PLN z pułapkami + plik USD | yes                   | Run `/10x-plan synthetic-santander-fixture` |
-| S-10       | santander-csv-import        | Import CSV z Santander Bank Polska                       | no                    | Czeka na F-03                               |
-| S-11       | santander-card-merchants    | Transakcje kartowe Santandera we właściwych wzorcach     | no                    | Czeka na S-10                               |
+| Roadmap ID | Change ID                   | Suggested issue title                                    | Ready for `/10x-plan` | Notes                                                                                                                                                                                                                                                                                       |
+| ---------- | --------------------------- | -------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F-03       | synthetic-santander-fixture | Syntetyczny eksport Santander PLN z pułapkami + plik USD | done                  | Zarchiwizowane → `context/archive/2026-10-01-synthetic-santander-fixture/`                                                                                                                                                                                                                  |
+| S-10       | santander-csv-import        | Import CSV z Santander Bank Polska                       | yes                   | F-03 done. Parser wg `parseLine` z `scripts/fixture-santander-check.mjs` (nie ścisłe RFC 4180: `"` w polu bez cudzysłowu, pułapka ST15); kol. 4 grupowana 2+6×4; follow-up F9 (`fixture-santander-shape.mjs`, porównanie jednostronnych wariantów) — Trigger: S-10; plik główny 187 wierszy |
+| S-11       | santander-card-merchants    | Transakcje kartowe Santandera we właściwych wzorcach     | no                    | Czeka na S-10                                                                                                                                                                                                                                                                               |
 
 ## Open Roadmap Questions
 
@@ -153,3 +153,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **S-06: Użytkownik może zobaczyć, które wzorce stałe zmieniły kwotę względem ostatniego wystąpienia (każda zmiana, także w tolerancji) i które są nowe względem poprzedniego miesiąca kalendarzowego; przy danych z jednego miesiąca widzi komunikat o braku miesiąca do porównania.** — Archived 2026-09-28 → `context/archive/2026-09-28-fixed-cost-changes/`. Lesson: —.
 - **S-07: Użytkownik może zobaczyć sumę „ponad progiem” dla każdego miesiąca obecnego w danych, liczoną według dzisiejszych progów; zmiana lub usunięcie progu przelicza wszystkie miesiące, miesiąc bez nadwyżki pokazuje 0.** — Archived 2026-09-28 → `context/archive/2026-09-28-over-limit-trend/`. Lesson: —.
 - **S-09: Użytkownik (recenzent) może wejść na publiczną instancję, zalogować się na konto demo i zobaczyć zaimportowany syntetyczny wyciąg z wzorcami; żaden prawdziwy wyciąg nie trafia do repozytorium ani na publiczny URL.** — Archived 2026-10-01 → `context/archive/2026-09-30-public-demo-seed/`. Lesson: —.
+- **F-03: (foundation) w repozytorium jest syntetyczny eksport Santander PLN z pułapkami formatu i opisów oraz plik USD do odrzucenia** — Archived 2026-10-02 → `context/archive/2026-10-01-synthetic-santander-fixture/`. Lesson: —.

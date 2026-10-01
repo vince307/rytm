@@ -122,7 +122,7 @@ Status: **po pierwszym przepływie ING** (D4). Uwaga: w rozmowach ten bank bywa�
 |---|---|
 | Kodowanie | UTF-8, bez BOM, LF |
 | Separator | `,` |
-| Cudzysłów pól | `"` — przy kwocie (kol. 5) **i** saldzie po operacji (kol. 6), bo przecinek dziesiętny; w kol. 2/kol. 3 tylko gdy zawierają przecinek (bez escapowania `"` — jeden cudzysłów w polu jest naruszeniem formatu, nie `""`) |
+| Cudzysłów pól | `"` — przy kwocie (kol. 5) **i** saldzie po operacji (kol. 6), bo przecinek dziesiętny; w kol. 2/kol. 3 tylko gdy zawierają przecinek. Bez escapowania `""`. **Nie ściśle RFC 4180:** `"` otwiera pole w cudzysłowie tylko na początku pola; pole **bez** cudzysłowu może zawierać `"` w środku (nazwa sprzedawcy w cudzysłowie w końcówce opisu kartowego, ≈ 2% wierszy, różne odstępy: `"X"`, `" X"`, `"X Y"`) — parser nie może takiego wiersza odrzucić (fixture: ST15) |
 | Pułapka | Nr rachunku w wierszu nagłówka (kol. 2) z wiodącym `'`, w grupach (2 + 6×4 cyfry, 26 cyfr łącznie, spacje między grupami) |
 | Kwota | `"-24,31"` — przecinek dziesiętny, bez separatora tysięcy, minus = obciążenie |
 | Daty | `DD-MM-YYYY` w wierszach danych; kol. 0 = data księgowania, kol. 1 = data operacji (**używana**; różnią się w ~90% wierszy — karty księgują z opóźnieniem 1–3 dni; kol. 0 ≥ kol. 1 na każdym wierszu). Nagłówek ma **dwa różne formaty** w jednym wierszu: kol. 0 (data eksportu) `YYYY-MM-DD`, kol. 1 (początek zakresu) `DD-MM-YYYY` |
@@ -164,7 +164,7 @@ Oplata za <coś> (ten sam kontrahent/rachunek/tytuł co miesiąc, stała kwota) 
                                                                                                **nie** zakładać, że to opłata bankowa (nieudowadnialne z samego kształtu)
 ```
 
-Końcówka opisu kartowego (sprzedawca/adres) jest **ASCII, bez polskich znaków diakrytycznych**, z pojedynczymi spacjami (2–7 tokenów) — istotne dla łączenia sprzedawców między bankami (S-11). Kwota w opisie ma kropkę dziesiętną, w kol. 5 przecinek; są zgodne (0 rozjazdów na 438 kart). Na jednym rachunku mogą być **dwie karty** (różne końcówki) — numer karty nie jest częścią sprzedawcy. Kol. 3/kol. 4 są puste na każdym wierszu kartowym (w tym bankomatowym); dla BLIK i przelewów kol. 4 (nr rachunku kontrahenta), gdy wypełniona, jest grupowana po 4 cyfry, bez cudzysłowu i bez wiodącego `'` (w przeciwieństwie do nagłówkowego kol. 2).
+Końcówka opisu kartowego (sprzedawca/adres) jest **ASCII, bez polskich znaków diakrytycznych**, z pojedynczymi spacjami (2–7 tokenów) — istotne dla łączenia sprzedawców między bankami (S-11). Kwota w opisie ma kropkę dziesiętną, w kol. 5 przecinek; są zgodne (0 rozjazdów na 438 kart). Na jednym rachunku mogą być **dwie karty** (różne końcówki) — numer karty nie jest częścią sprzedawcy. Kol. 3/kol. 4 są puste na każdym wierszu kartowym (w tym bankomatowym); dla BLIK i przelewów kol. 4 (nr rachunku kontrahenta), gdy wypełniona, jest grupowana tak jak nagłówkowa kol. 2 (2 + 6×4 cyfry, spacje między grupami), ale bez cudzysłowu i bez wiodącego `'`.
 
 ### Reguły importu Santander
 
@@ -181,7 +181,7 @@ Końcówka opisu kartowego (sprzedawca/adres) jest **ASCII, bez polskich znaków
 - Ta sama sieć z różnymi numerami placówek w opisie kartowym.
 - Ten sam sprzedawca zapisany dwojako przez operatora kart (`MARKA *Marka App` vs `Marka Apps Miasto`).
 - Wypłata z bankomatu (nie jest sprzedawcą w sensie reguły — użytkownik wyklucza przez FR-009 albo seed pokazuje ją jako wzorzec „częsty”).
-- Pełna lista pułapek (ST01–ST14) z liniami w fixture: `test/fixtures/santander/README.md` (generowany przez
+- Pełna lista pułapek (ST01–ST15) z liniami w fixture: `test/fixtures/santander/README.md` (generowany przez
   `npm run fixture:santander`, zawsze aktualny po regeneracji).
 
 ## Wykrywanie formatu

@@ -2,7 +2,7 @@
 // test/fixtures/santander/. Shapes come from context/foundation/import-formats.md plus an aggregate,
 // values-never-printed comparison with real exports (field masks, quoting, counts, booleans only) — every
 // name, address, account number, card mask and amount below is invented, nothing is copied from a real
-// statement. Traps ST01-ST14 are declared as data; one run builds both CSV files, expected.json and the
+// statement. Traps ST01-ST15 are declared as data; one run builds both CSV files, expected.json and the
 // README together, so the answer key cannot drift from the files.
 // Zero dependencies on purpose, no clock, seeded PRNG. Run: npm run fixture:santander (writes
 // test/fixtures/santander/). Other scripts import { generate } to get the same files in memory
@@ -76,6 +76,10 @@ export const TRAPS = {
     "okres = kol. 1 nagłówka → kol. 0 nagłówka (D7)",
   ],
   ST14: ["Plik rachunku walutowego USD", "plik odrzucony, reason currency"],
+  ST15: [
+    'Cudzysłów `"` wewnątrz pola bez cudzysłowu (nazwa sprzedawcy w cudzysłowie w końcówce kartowej, bez przecinka)',
+    "wiersz parsowany normalnie (parser nie jest ściśle RFC); rawMerchant zawiera cudzysłowy, normalizacja S-11 je usuwa",
+  ],
 };
 
 function mulberry32(seed) {
@@ -111,7 +115,7 @@ function formatAmountDot(absMinor) {
 const collapse = (s) => s.trim().replace(/\s+/g, " ");
 
 // Counts top-level comma-separated fields, treating a quoted field's internal commas as not separators
-// (quote-aware, like the real reader will be in Phase 2) — a naive `line.split(",")` would miscount a line
+// (quote-aware, like parseLine in scripts/fixture-santander-check.mjs) — a naive `line.split(",")` would miscount a line
 // whose quoted field legitimately contains a comma (ST07/ST09).
 function countFields(line) {
   let count = 1;
@@ -129,9 +133,13 @@ function assertAscii(s) {
   }
 }
 
-// RFC-style quoting: never a literal `"` inside a field (no "" escapes); `,`/CR/LF never inside a bare field.
+// Santander quoting (not strict RFC 4180): never a "" escape; a quoted field never holds `"`; `,`/CR/LF never
+// inside a bare field. A bare field MAY hold `"` anywhere but at its start — the real export carries merchant
+// names in quotes inside an unquoted card description (ST15) — so `"` opens a quoted field only at field start.
 const bare = (value) => {
-  if (/[",\r\n]/.test(value)) throw new Error(`bare field cannot hold a comma or quote: ${JSON.stringify(value)}`);
+  if (/[,\r\n]/.test(value) || value.startsWith('"')) {
+    throw new Error(`bare field cannot hold a comma or start with a quote: ${JSON.stringify(value)}`);
+  }
   return value;
 };
 const quoted = (value) => {
@@ -141,19 +149,16 @@ const quoted = (value) => {
 // col 2 / col 3: bare unless the value contains a comma, in which case quoted (ST07/ST09 traps exercise this).
 const maybeQuoted = (value) => (value.includes(",") ? quoted(value) : bare(value));
 
-// Header col 2 shape: `'` + 2 digits + six groups of 4 (26 digits total), spaces between groups.
-function groupAccount(digits26) {
+// 26-digit account number grouped 2 + six groups of 4, spaces between groups (the real export's grouping in
+// both header col 2 and data-row col 4).
+function groupDigits(digits26) {
   if (!/^\d{26}$/.test(digits26)) throw new Error(`account must be 26 digits: ${digits26}`);
   const groups = [digits26.slice(0, 2)];
   for (let i = 2; i < 26; i += 4) groups.push(digits26.slice(i, i + 4));
-  return `'${groups.join(" ")}`;
-}
-// Data-row col 4: the same digits, grouped by 4, bare — no leading `'` (unlike the header's col 2).
-function groupDigits(digits) {
-  const groups = [];
-  for (let i = 0; i < digits.length; i += 4) groups.push(digits.slice(i, i + 4));
   return groups.join(" ");
 }
+// Header col 2: the grouped number with a leading `'`; data-row col 4 is the same grouping, bare, no `'`.
+const groupAccount = (digits26) => `'${groupDigits(digits26)}`;
 const invented26 = (n) => String(n).padStart(26, "0");
 
 const cardLast4 = (cardNo) => cardNo.slice(-4);
@@ -697,19 +702,20 @@ function buildST10() {
 }
 
 function buildST11() {
-  const counterparty = "SANTANDER BANK POLSKA S.A.";
+  // Invented counterparty: the doc does not assert `Oplata za …` is a bank fee, so neither does the fixture.
+  const counterparty = "WSPOLNOTA MIESZKANIOWA PRZYKLAD";
   const account = invented26(1100000000001);
   const months = [3, 4, 5, 6, 7, 8];
   return months.map((m) =>
     transfer({
       traps: ["ST11"],
-      title: "Oplata za prowadzenie konta",
+      title: "Oplata za miejsce postojowe",
       counterparty,
       counterpartyAccount: account,
       amountMinor: -1000,
       bookingOn: d(m, 3),
       occurredOn: d(m, 3),
-      pattern: "oplata-za-prowadzenie-konta",
+      pattern: "wspolnota-mieszkaniowa-przyklad",
       resolvedBy: "import",
       expectType: "fixed",
       kind: "other",
@@ -717,10 +723,71 @@ function buildST11() {
   );
 }
 
+// ST15: a merchant name in quotes inside the bare card description (real export ≈ 2 % of rows; quote spacing
+// varies — `"X"`, `" X"`, `"X Y"`). rawMerchant keeps the quotes (rule 5 regex tail); S-11 normalizes them away.
+function buildST15() {
+  return [
+    card({
+      traps: ["ST15"],
+      card: CARDS[0],
+      tail: 'PUB "POD KOGUTEM" KRAKOW',
+      amountAbs: 4600,
+      bookingOn: d(4, 14),
+      occurredOn: d(4, 12),
+      pattern: "pub-pod-kogutem",
+      resolvedBy: "normalization",
+    }),
+    card({
+      traps: ["ST15"],
+      card: CARDS[1],
+      tail: 'PUB "POD KOGUTEM" KRAKOW',
+      amountAbs: 7900,
+      bookingOn: d(6, 20),
+      occurredOn: d(6, 18),
+      pattern: "pub-pod-kogutem",
+      resolvedBy: "normalization",
+    }),
+    card({
+      traps: ["ST15"],
+      card: CARDS[0],
+      tail: 'KINO " NOVA" SALA DUZA GDANSK',
+      amountAbs: 3800,
+      bookingOn: d(7, 9),
+      occurredOn: d(7, 8),
+      pattern: "kino-nova",
+      resolvedBy: "normalization",
+    }),
+  ];
+}
+
+// One-off card merchants (one row each, fixed dates, outside the seeded noise so the RNG sequence is unchanged):
+// they widen the card-tail token count to the real export's 2–7 range (pool tails are 3–4 tokens) — a 2-token
+// tail is the over-strip guard for S-11's city stripping, the 6–7-token ones end in a two-word city.
+const ONE_OFF_CARD = [
+  ["ANTYKWARIAT OPOLE", "antykwariat", 3500, d(3, 17)],
+  ["PRACOWNIA CERAMIKI MALY PIEC TORUN", "pracownia-ceramiki-maly-piec", 12900, d(5, 6)],
+  ["SKLEP DLA ZWIERZAT AZOR ZIELONA GORA", "sklep-dla-zwierzat-azor", 5400, d(6, 2)],
+  ["BAR MLECZNY POD ZIELONA GORKA NOWY SACZ", "bar-mleczny-pod-zielona-gorka", 2700, d(8, 11)],
+];
+
+function oneOffCards() {
+  return ONE_OFF_CARD.map(([tail, pattern, amountAbs, bookingOn], i) =>
+    card({
+      card: CARDS[i % 2],
+      tail,
+      amountAbs,
+      bookingOn,
+      occurredOn: addDays(bookingOn, -1),
+      pattern,
+      resolvedBy: "normalization",
+    }),
+  );
+}
+
 // --- Noise -------------------------------------------------------------------------------------------------
-// Card merchants dominate (D-analogue of the real export's ~87% card share). Two merchants share a trailing
-// city token ("… WARSZAWA") and one has a two-word city tail ("SUCHA BESKIDZKA") — over-merge guards for
-// S-11's city-stripping (plan review F3): each stays its own pattern here.
+// Card merchants dominate (D-analogue of the real export's ~87% card share). Several merchants share a
+// trailing city token ("… WARSZAWA") and two have a two-word city tail ("SUCHA BESKIDZKA", "BIALA PODLASKA")
+// — over-merge guards for S-11's city-stripping (plan review F3): each stays its own pattern here.
 const CARD_NOISE_POOL = [
   ["KAWIARNIA PRZYKLAD WARSZAWA", "kawiarnia-przyklad", 800, 2500],
   ["RESTAURACJA POD GORA WARSZAWA", "restauracja-pod-gora", 2500, 6000],
@@ -731,7 +798,14 @@ const CARD_NOISE_POOL = [
   ["STACJA PALIW PRZYKLAD KRAKOW", "stacja-paliw-przyklad", 8000, 25000],
   ["ABONAMENT SIEC PRZYKLAD WARSZAWA", "abonament-siec-przyklad", 2999, 3099],
   ["SIEC SPOZYWCZA DELTA WARSZAWA", "siec-spozywcza-delta", 1000, 8000],
-  ["MYJNIA SAMOCHODOWA PRZYKLAD KRAKOW", "myjnia-samochodowa-przyklad", 3000, 9000],
+  ["MYJNIA SAMOCHODOWA PRZYKLAD BIALA PODLASKA", "myjnia-samochodowa-przyklad", 3000, 9000],
+  // 2- and 5-token tails: the real export's card tails spread over 2–7 tokens (≈ 11 % two, ≈ 22 % five);
+  // without these the pool would only exercise 3–4-token tails.
+  ["PIEKARNIA ZAKOPANE", "piekarnia", 600, 2500],
+  ["KWIACIARNIA GDYNIA", "kwiaciarnia", 2000, 9000],
+  ["SALON OPTYCZNY JASNE OKO WROCLAW", "salon-optyczny-jasne-oko", 5000, 40000],
+  ["SKLEP OGRODNICZY ZIELONY KAT POZNAN", "sklep-ogrodniczy-zielony-kat", 1500, 12000],
+  ["BISTRO POD CZERWONYM PARASOLEM GDYNIA", "bistro-pod-czerwonym-parasolem", 2500, 9000],
 ];
 const OTHER_NOISE_POOL = [
   ["USLUGI KOMPUTEROWE BAJT", "uslugi-komputerowe-bajt"],
@@ -972,6 +1046,8 @@ function buildMainFile() {
     ...buildST09(),
     ...buildST10(),
     ...buildST11(),
+    ...buildST15(),
+    ...oneOffCards(),
   ];
   // Anchors: the unique booking-date extremes (see orderMain/computeBalances); counted as ordinary noise
   // merchant occurrences so they also contribute to those patterns.
@@ -1043,12 +1119,13 @@ function buildMainFile() {
   return { name: MAIN_FILE, bytes: new TextEncoder().encode(text), fileEntry, manifestRows, order };
 }
 
+// Shape of the real USD export: one card, two-token tails (one with `*`, one with `_`).
 function buildUsdFile() {
   const rows = [
     card({
       traps: ["ST14"],
       card: CARDS[0],
-      tail: "SHOP*ONLINE NEW YORK",
+      tail: "SHOP*ONLINE SEATTLE",
       amountAbs: 5000,
       bookingOn: "2026-08-20",
       occurredOn: "2026-08-18",
@@ -1056,7 +1133,7 @@ function buildUsdFile() {
     }),
     card({
       traps: ["ST14"],
-      card: CARDS[1],
+      card: CARDS[0],
       tail: "STORE_EXAMPLE BOSTON",
       amountAbs: 3200,
       bookingOn: "2026-08-10",
@@ -1066,7 +1143,7 @@ function buildUsdFile() {
     card({
       traps: ["ST14"],
       card: CARDS[0],
-      tail: "SAMPLE SHOP CHICAGO",
+      tail: "SAMPLESHOP CHICAGO",
       amountAbs: 2100,
       bookingOn: "2026-08-03",
       occurredOn: "2026-08-01",
@@ -1128,7 +1205,8 @@ function readme(expected) {
     "  w cudzysłowie, liczba wierszy danych;",
     "- dane: data księgowania, data operacji (**używana** jako `occurredOn`), opis, kontrahent, nr rachunku",
     "  kontrahenta, kwota w cudzysłowie, saldo po operacji w cudzysłowie, `Lp`, (puste); kol. 2/3 w cudzysłowie",
-    '  tylko gdy zawierają przecinek, bez escapowania `"`;',
+    '  tylko gdy zawierają przecinek, bez escapowania `""`; pole bez cudzysłowu może mieć `"` w środku (ST15);',
+    "  nr rachunku kontrahenta (kol. 4) w grupach 2 + 6×4 cyfry, bez `'`;",
     "- opis kartowy: `DOP. VISA <maska> PŁATNOŚĆ KARTĄ <kwota.> <WALUTA> <końcówka ASCII>` (też ZWROT i",
     "  WYPŁATA Z BANKOMATU); `Zakup BLIK`/`Wypłata BLIK <tekst>:<11 cyfr>`; przelewy i `Oplata za …`;",
     "- `Lp` 1..N rosnąco w kolejności pliku, wiersze ≈ od najnowszej daty księgowania z nielicznymi inwersjami;",
@@ -1179,7 +1257,14 @@ export function generate() {
     schema: 1,
     bank: "santander",
     tolerance: TOLERANCE,
-    crossBank: [{ pattern: "pizzeria-trzy-sery", oracle: "test/fixtures/ing/expected.json", traps: ["ST10"] }],
+    crossBank: [
+      {
+        pattern: "pizzeria-trzy-sery",
+        type: "frequent",
+        oracle: "test/fixtures/ing/expected.json",
+        traps: ["ST10"],
+      },
+    ],
     files: { [main.name]: main.fileEntry, [usd.name]: usd.fileEntry },
     rows: [...main.manifestRows, ...usd.manifestRows],
     patterns: buildPatterns(main.manifestRows, main.order),

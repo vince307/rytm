@@ -21,18 +21,21 @@ const FIXTURE_DIR = path.resolve(import.meta.dirname, "../test/fixtures/santande
 export const YMD = /^\d{4}-\d{2}-\d{2}$/;
 export const DMY = /^\d{2}-\d{2}-\d{4}$/;
 const AMOUNT = /^-?\d+,\d{2}$/;
+const GROUPED_ACCOUNT = /^\d{2}( \d{4}){6}$/;
 const HEADER_ACCOUNT = /^'\d{2}( \d{4}){6}$/;
 const FILENAME_RE = /^historia_(\d{4}-\d{2}-\d{2})_(\d{26})\.csv$/;
 // Card description (rule 5's regex): mask, action, amount with a dot, currency, ASCII tail.
 export const CARD =
   /^DOP\. VISA (\d{6}\*{6}\d{4}) (PŁATNOŚĆ KARTĄ|ZWROT PŁATNOŚCI KARTĄ|WYPŁATA Z BANKOMATU KARTĄ) (\d+\.\d{2}) ([A-Z]{3}) (.+)$/;
-// Over this many data rows, the file must show the ST12 adjacent-inversion trait (the real export's shape);
-// the small reject file (3 rows, strictly descending by design) never does and is not held to it.
+// Over this many data rows, the file must show the main-file traits of the real export — the ST12 adjacent
+// inversion and two card masks (ST01); the small reject file (3 rows, one card, strictly descending, like the
+// real USD export) is not held to them.
 const INVERSION_ROW_THRESHOLD = 10;
 
-// One CSV line in the Santander dialect: `,` separator, `"` quote char, RFC-style (no `""` escape — the
-// generator refuses a value containing `"`, so any quote inside a quoted field, or a bare field holding a
-// quote, is a format violation here, not an escape to decode). Returns [{ value, quoted }] or throws.
+// One CSV line in the Santander dialect: `,` separator, `"` quote char, NOT strict RFC 4180: a `"` opens a
+// quoted field only at field start; a bare field may hold `"` elsewhere (merchant names in quotes inside an
+// unquoted card description, ST15 — seen on ≈ 2 % of real rows). No `""` escape exists: a quote inside a
+// quoted field that does not close it is a format violation. Returns [{ value, quoted }] or throws.
 export function parseLine(line) {
   const fields = [];
   let i = 0;
@@ -56,7 +59,6 @@ export function parseLine(line) {
     } else {
       const end = line.indexOf(",", i);
       const value = line.slice(i, end === -1 ? line.length : end);
-      if (value.includes('"')) throw new Error("quote inside a bare field");
       fields.push({ value, quoted: false });
       i = end === -1 ? line.length : end;
     }
@@ -85,13 +87,8 @@ export function rawMerchantOf(description, counterparty) {
   return collapse(description);
 }
 
-// Data-row col 4: grouped digits, bare — groups of 4 except a shorter final group, never a leading `'`.
-function isGroupedDigits(value) {
-  const groups = value.split(" ");
-  return groups.every(
-    (g, i) => /^\d+$/.test(g) && (i === groups.length - 1 ? g.length <= 4 && g.length >= 1 : g.length === 4),
-  );
-}
+// Data-row col 4: the 26-digit number grouped like header col 2 (2 + six groups of 4), bare, never a leading `'`.
+const isGroupedDigits = (value) => GROUPED_ACCOUNT.test(value);
 
 const median = (values) => {
   const s = [...values].sort((a, b) => a - b);
@@ -233,14 +230,15 @@ function readStatement(name, bytes, errors) {
         (r, i) => i < rows.length - 1 && r.bookingOn && rows[i + 1].bookingOn && r.bookingOn < rows[i + 1].bookingOn,
       );
       if (!hasInversion) err("no adjacent booking-date inversion found (expected real-export shape, ST12)");
+      // Two cards on one account is a main-file trait (ST01); the real USD export carries a single card.
+      const cardIds = new Set(rows.map((r) => r.card).filter(Boolean));
+      if (cardIds.size < 2) err(`fewer than 2 distinct card masks (${cardIds.size})`);
     }
     if (toMinor(h[6]) !== first.balanceAfter) err("header col 6 (closing) != Lp 1's col 6");
     const openingMinor = toMinor(h[5]);
     const sum = rows.reduce((s, r) => s + r.amountMinor, 0);
     if (openingMinor + sum !== toMinor(h[6])) err("opening + Σ amounts != closing");
     if (last.balanceAfter - last.amountMinor !== openingMinor) err("Lp N's col 6 - col 5 != opening");
-    const cardIds = new Set(rows.map((r) => r.card).filter(Boolean));
-    if (cardIds.size < 2) err(`fewer than 2 distinct card masks (${cardIds.size})`);
   }
 
   return { header: h, headerFields: hf, rows, currency: h[4] };
@@ -357,7 +355,11 @@ function checkPatterns(importedRows, expected, errors) {
 // Every crossBank entry's pattern must exist in both this fixture's patterns[] and the ING oracle's, with the
 // same D5 `type` on both sides (Phase 1 handoff: observed "frequent" on both for pizzeria-trzy-sery).
 function checkCrossBank(expected, errors) {
-  for (const cb of expected.crossBank ?? []) {
+  if (!Array.isArray(expected.crossBank) || expected.crossBank.length === 0) {
+    errors.push("crossBank: missing or empty (ST10 needs at least one shared pattern)");
+    return;
+  }
+  for (const cb of expected.crossBank) {
     const santanderPattern = expected.patterns.find((p) => p.key === cb.pattern);
     if (!santanderPattern) errors.push(`crossBank ${cb.pattern}: not found in santander patterns[]`);
     let ingExpected;
@@ -369,10 +371,11 @@ function checkCrossBank(expected, errors) {
     }
     const ingPattern = ingExpected.patterns?.find((p) => p.key === cb.pattern);
     if (!ingPattern) errors.push(`crossBank ${cb.pattern}: not found in ING oracle patterns[]`);
-    if (santanderPattern && ingPattern && santanderPattern.type !== ingPattern.type) {
-      errors.push(
-        `crossBank ${cb.pattern}: type ${santanderPattern.type} (santander) != ${ingPattern.type} (ing oracle)`,
-      );
+    if (santanderPattern && santanderPattern.type !== cb.type) {
+      errors.push(`crossBank ${cb.pattern}: entry type ${cb.type} != santander pattern type ${santanderPattern.type}`);
+    }
+    if (ingPattern && ingPattern.type !== cb.type) {
+      errors.push(`crossBank ${cb.pattern}: entry type ${cb.type} != ING oracle pattern type ${ingPattern.type}`);
     }
   }
 }

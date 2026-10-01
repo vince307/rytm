@@ -17,8 +17,13 @@ const BANKS = [
 export async function checkAll() {
   const results = [];
   for (const [bank, check] of BANKS) {
-    const errors = await check();
-    results.push([bank, errors]);
+    // A check that throws (missing dir, unreadable manifest, generator assertion) still yields a per-bank
+    // result, so the other bank is reported too.
+    try {
+      results.push([bank, await check()]);
+    } catch (e) {
+      results.push([bank, [`check threw: ${e instanceof Error ? e.message : String(e)}`]]);
+    }
   }
   return results;
 }

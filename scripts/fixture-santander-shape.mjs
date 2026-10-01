@@ -128,6 +128,10 @@ function shape(bytes) {
 
   const kinds = rowFields.map((f) => kindOf(v(f, 2)));
   put("description kind", distribution(kinds));
+  put(
+    "rows with a quote inside a bare field",
+    share((f) => f.some((x) => !x.quoted && x.value.includes('"'))),
+  );
 
   const cardRows = rowFields.filter((f) => CARD.test(v(f, 2)));
   const cardMasks = new Set(cardRows.map((f) => CARD.exec(v(f, 2))[1]));
@@ -173,12 +177,14 @@ function shape(bytes) {
   put("col4 masks", distribution(rowFields.map((f) => (v(f, 4) ? mask(v(f, 4)) : "<empty>"))));
 
   if (h && /^\d+$/.test(h[7] ?? "")) {
-    put("header col 7 == row count", Number(h[7]) === n ? "yes" : "no");
+    // Against every data line, parsed or not — an unparseable line is still a row the header counts.
+    put("header col 7 == row count", Number(h[7]) === lines.length - 1 ? "yes" : "no");
   } else {
     put("header col 7 == row count", "n/a");
   }
-  if (h && AMOUNT.test(h[6]) && rowFields[0] && AMOUNT.test(v(rowFields[0], 6))) {
-    put("header col 6 == Lp 1 balance", toMinor(h[6]) === toMinor(v(rowFields[0], 6)) ? "yes" : "no");
+  const lp1 = parsed[1]; // file line 2 itself, never the first line that happened to parse
+  if (h && AMOUNT.test(h[6]) && lp1 && AMOUNT.test(v(lp1, 6))) {
+    put("header col 6 == Lp 1 balance", toMinor(h[6]) === toMinor(v(lp1, 6)) ? "yes" : "no");
   } else {
     put("header col 6 == Lp 1 balance", "n/a");
   }
@@ -211,15 +217,27 @@ function render(value) {
   return value;
 }
 
+// The path is never echoed: a real export's path (or a file passed by mistake) embeds the account number.
 if (!existsSync(dir)) {
   console.log(
-    `fixture:shape:santander: directory ${dir} does not exist — nothing to compare (local-only, not a CI gate).`,
+    "fixture:shape:santander: the given directory does not exist — nothing to compare (local-only, not a CI gate).",
   );
   process.exit(0);
 }
-const realFiles = readdirSync(dir).filter((f) => /^historia_.*\.csv$/.test(f));
+let realFiles;
+try {
+  realFiles = readdirSync(dir).filter((f) => /^historia_.*\.csv$/.test(f));
+} catch (e) {
+  // ENOTDIR / EACCES / EPERM messages carry the full path; report only the code.
+  console.error(
+    `fixture:shape:santander: cannot list the given directory (${e instanceof Error && "code" in e ? String(e.code) : "error"})`,
+  );
+  process.exit(1);
+}
 if (!realFiles.length) {
-  console.log(`fixture:shape:santander: no historia_*.csv in ${dir} — nothing to compare (local-only, not a CI gate).`);
+  console.log(
+    "fixture:shape:santander: no historia_*.csv in the given directory — nothing to compare (local-only, not a CI gate).",
+  );
   process.exit(0);
 }
 

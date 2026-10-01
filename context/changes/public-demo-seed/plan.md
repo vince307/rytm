@@ -403,12 +403,12 @@ means unsetting `DEMO_EMAIL` on Vercel and redeploying. The demo account then be
 
 #### Automated
 
-- [x] 3.1 Merge run green for `ci`, `smoke`, `deploy`
-- [x] 3.2 Production `/login` answers 200
+- [x] 3.1 Merge run green for `ci`, `smoke`, `deploy` — e04e6f0
+- [x] 3.2 Production `/login` answers 200 — e04e6f0
 
 #### Manual
 
-- [x] 3.3 `DEMO_EMAIL` set on Vercel production before the merge
-- [x] 3.4 Demo account on production shows one import of 206 debits and the synthetic patterns
-- [x] 3.5 The four refusals work on production
-- [x] 3.6 README credentials work from a private window
+- [x] 3.3 `DEMO_EMAIL` set on Vercel production before the merge — e04e6f0
+- [x] 3.4 Demo account on production shows one import of 206 debits and the synthetic patterns — e04e6f0
+- [x] 3.5 The four refusals work on production — e04e6f0
+- [x] 3.6 README credentials work from a private window — e04e6f0

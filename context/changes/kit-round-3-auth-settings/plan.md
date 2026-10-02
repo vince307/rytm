@@ -676,11 +676,11 @@ are collected in the Phase 8 `[human]` row.
 
 #### Automated
 
-- [x] 1.1 npm test: baseline, 0 failed
-- [x] 1.2 Smoke baseline + 3 PASS, 0 FAIL, no existing assertion edited
-- [x] 1.3 No copyExtra.landing / howItWorks / forWho reader left in src
-- [x] 1.4 Deliberate break: footer link removed turns the footer smoke step red while the header keeps Dla kogo, restored, meta-check recorded
-- [x] 1.5 Full local gate vs baseline, smoke + 3
+- [x] 1.1 npm test: baseline, 0 failed — 464bfef
+- [x] 1.2 Smoke baseline + 3 PASS, 0 FAIL, no existing assertion edited — 464bfef
+- [x] 1.3 No copyExtra.landing / howItWorks / forWho reader left in src — 464bfef
+- [x] 1.4 Deliberate break: footer link removed turns the footer smoke step red while the header keeps Dla kogo, restored, meta-check recorded — 464bfef
+- [x] 1.5 Full local gate vs baseline, smoke + 3 — 464bfef
 
 #### Manual
 

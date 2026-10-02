@@ -1030,6 +1030,12 @@ const steps = [
     // Accepted prefixes, not just "/imports/": a failed or invalid import must not pass as "present".
     { status: 302, location: ["/imports/result", "/imports/new?error=demo"] },
   ],
+  // S-13 P5: the demo account owns an import now (created above or earlier), so the wizard is locked up front.
+  [
+    "demo import wizard shows the demo note",
+    () => request("/imports/new"),
+    { status: 200, contains: ">Na wspólnym koncie demo dodawanie i cofanie importów jest wyłączone.<" },
+  ],
   // The guard runs before the RPC, so the same range answers `demo`, not `overlap`.
   [
     "demo second import is refused",
@@ -1071,6 +1077,11 @@ const steps = [
     "seeded test user signs in",
     () => request("/api/auth/signin", { method: "POST", form: seeded }),
     { status: 302, location: "/home" },
+  ],
+  [
+    "test user import wizard has no demo note",
+    () => request("/imports/new"),
+    { status: 200, notContains: ">Na wspólnym koncie demo dodawanie i cofanie importów jest wyłączone.<" },
   ],
   ["patterns renders empty view", () => request("/patterns"), { status: 200, contains: "Wgraj pierwszy wyciąg" }],
   ["signout seeded user", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],

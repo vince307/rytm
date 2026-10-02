@@ -10,6 +10,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode, Ref } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ServerError } from "@/components/auth/ServerError";
+import { InfoAlert } from "@/components/app/InfoAlert";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { Stepper } from "@/components/app/Stepper";
 import { Glyph } from "@/components/Glyph";
@@ -39,6 +40,7 @@ export interface ImportWizardLabels {
     | "importButton"
     | "waiting"
     | "back"
+    | "demoImportBlocked"
   > & {
     /** `importFlow.debitForms` — content.json types it `string[]`; the page hands over the three plural forms. */
     debitForms: readonly [string, string, string];
@@ -70,6 +72,8 @@ interface Props {
   /** The caller's own imports (RLS) — step 3 checks the chosen account's range against them. */
   existing: ExistingImport[];
   serverError?: WizardServerError;
+  /** The shared demo account that already has an import: the server refuses a second one, so step 1 is disabled up front. */
+  demoLocked?: boolean;
 }
 
 type Step = 1 | 2 | 3;
@@ -144,7 +148,7 @@ function StepTitle({
   );
 }
 
-export default function ImportWizard({ labels, existing, serverError }: Props) {
+export default function ImportWizard({ labels, existing, serverError, demoLocked = false }: Props) {
   const { flow, kit, imports: x, errors } = labels;
   const [step, setStep] = useState<Step>(1);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
@@ -178,7 +182,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
   }, [step, loaded, chosen]);
 
   async function handleFile(file: File | undefined) {
-    if (!file) return;
+    if (!file || demoLocked) return;
     setPageError(null);
     setStep(1);
     const result = await readStatement(file, x.santanderAccountName);
@@ -252,8 +256,10 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
       ) : pageError?.kind === "failed" ? (
         labels.genericError
       ) : pageError?.kind === "demo" ? (
-        // DESIGN-GAP: G37 — the kit has no state for an import refused on the shared demo account (S-09).
-        x.demoLocked
+        // Shown once: when the page is already locked, the InfoAlert above the drop zone carries the sentence.
+        demoLocked ? null : (
+          flow.demoImportBlocked
+        )
       ) : null;
 
     return (
@@ -274,6 +280,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
             {errors.back}
           </a>
         </ServerError>
+        {demoLocked && <InfoAlert className="mb-[15px] max-w-[760px]">{flow.demoImportBlocked}</InfoAlert>}
         <section
           className={cn(
             panel,
@@ -292,7 +299,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
           </div>
           <h2 className="mt-[22px] mb-2 text-[23px] tracking-[-0.04em]">{kit.dropTitle}</h2>
           <p className="text-muted mb-[22px] text-[13px]">{flow.supported}</p>
-          <Button type="button" variant="primary" onClick={openPicker}>
+          <Button type="button" variant="primary" onClick={openPicker} disabled={demoLocked}>
             {kit.choose}
           </Button>
           {loaded && (

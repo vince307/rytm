@@ -135,9 +135,6 @@ export const copyExtra = {
     overlapTail: "Wybierz inny plik albo wróć do importów.",
     // DESIGN-GAP: K19 — content.json has no key for the delete dialog eyebrow (kit modal('deleteImport')).
     deleteDialogEyebrow: "Cofnij import",
-    // DESIGN-GAP: G37 — the kit has no state for an action refused on the shared demo account (S-09, FR-014):
-    // shown for the wizard's `?error=demo` (P5 rebinds it).
-    demoLocked: "To jest wspólne konto demo — dodawanie i cofanie importów jest wyłączone.",
   },
   patterns: {
     eyebrow: "Wzorce wydatków",

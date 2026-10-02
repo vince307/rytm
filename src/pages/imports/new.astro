@@ -2,11 +2,13 @@
 // New import (S-01) — steps 1–3 run in the ImportWizard island (prototype app.js:57–61). The page hands it the
 // caller's own import ranges (RLS, FR-002) for the step-3 overlap check and the error of a rejected POST.
 import { z } from "zod";
+import { DEMO_EMAIL } from "astro:env/server";
 import AppLayout from "@/layouts/AppLayout.astro";
 import ImportWizard from "@/components/imports/ImportWizard";
 import type { ExistingImport, WizardServerError } from "@/components/imports/ImportWizard";
 import { copy, copyExtra } from "@/content/copy";
 import { createClient } from "@/lib/supabase";
+import { demoImportAllowed, isDemoEmail } from "@/lib/demo";
 
 const f = copy.importFlow;
 
@@ -23,6 +25,10 @@ const existing: ExistingImport[] = (data ?? []).map((i) => ({
   periodStart: i.period_start,
   periodEnd: i.period_end,
 }));
+
+// The shared demo account may import only while empty (S-09). A read error fails closed like the endpoint's
+// `count ?? 1`: `existing` is `data ?? []`, so `existing.length` alone would be 0 and fail open.
+const demoLocked = isDemoEmail(Astro.locals.user?.email, DEMO_EMAIL) && !demoImportAllowed(error ? 1 : existing.length);
 
 // ?error= from POST /api/imports; overlap carries the colliding range unless the endpoint could not read it;
 // demo is the shared demo account's refusal (S-09).
@@ -53,6 +59,7 @@ const serverError: WizardServerError | undefined = kind.success
         debitForms: f.debitForms as [string, string, string],
         waiting: f.waiting,
         back: f.back,
+        demoImportBlocked: f.demoImportBlocked,
       },
       kit: copy.imports,
       imports: copyExtra.imports,
@@ -61,5 +68,6 @@ const serverError: WizardServerError | undefined = kind.success
     }}
     existing={existing}
     serverError={serverError}
+    demoLocked={demoLocked}
   />
 </AppLayout>

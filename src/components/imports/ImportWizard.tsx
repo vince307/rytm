@@ -387,7 +387,12 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
       <section className={cn(panel, "max-w-[760px]")}>
         <dl className="mb-6 grid grid-cols-2 gap-[21px] max-[899px]:grid-cols-1">
           {[
-            [x.summary.account, `${fill(x.accountLabel, { name: chosen.name })} · ${formatAccountTail(chosen.number)}`],
+            [
+              x.summary.account,
+              // ING only until the wizard reads the detector's bank (Phase 6); the fixed key keeps this
+              // compiling against copy.ts's new per-bank `accountLabel` shape.
+              `${fill(x.accountLabel.ing, { name: chosen.name })} · ${formatAccountTail(chosen.number)}`,
+            ],
             [x.summary.range, formatRangeShort(period.start, period.end)],
             [x.summary.debits, `${chosen.debits} ${plural(chosen.debits, x.transactionForms)}`],
             [x.summary.skipped, `${chosen.credits} ${plural(chosen.credits, x.transactionForms)}`],

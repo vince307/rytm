@@ -822,6 +822,14 @@ const steps = [
     () => request(santanderResultPath),
     { status: 200, contains: "Dodaliśmy 2 obciążenia." },
   ],
+  // S-10 Phase 5: per-bank account label (copyExtra.imports.accountLabel, K26) on the list and the result —
+  // plain server-rendered text, no island, so the rendered node and the bare text are the same string.
+  ["imports list names the bank", () => request("/imports"), { status: 200, contains: ">Santander · Rachunek<" }],
+  [
+    "santander import result names the bank",
+    () => request(santanderResultPath),
+    { status: 200, contains: "Santander · Rachunek" },
+  ],
   [
     "patterns lists the santander merchant",
     () => request("/patterns"),

@@ -113,7 +113,12 @@ export const copyExtra = {
     newImport: "+ Nowy import",
     // Imports table (prototype imports(), app.js:56) — column headers and the account cell.
     table: { importedOn: "Data importu", account: "Rachunek", range: "Zakres dat", debits: "Obciążenia" },
-    accountLabel: "ING · {name}",
+    // DESIGN-GAP: K26 — the kit has only the single ING account label; the app adds a per-bank template
+    // (S-10 Phase 5), filled through `accountLabel()` so an unknown source never crashes the row.
+    accountLabel: { ing: "ING · {name}", santander: "Santander · {name}" },
+    // DESIGN-GAP: K26 — the Santander export has no account name column (the owner's name, header col 3, is
+    // never stored, R2); "Rachunek" is the kit's own word for the column, used as a neutral stand-in.
+    santanderAccountName: "Rachunek",
     // Result screen (prototype importResult(), app.js:63).
     resultEyebrow: "Import gotowy",
     toPatterns: "Zobacz wzorce",

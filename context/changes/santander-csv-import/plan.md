@@ -747,11 +747,11 @@ These are recorded in place of the skill's user questions (no human in the loop,
 
 #### Automated
 
-- [ ] 5.1 `npm test` + label helper cases, 0 failed
-- [ ] 5.2 Smoke: list and result name Santander (baseline + 7 PASS, 0 FAIL)
-- [ ] 5.3 Deliberate break: list ignores `source` → list step red; restored → green
-- [ ] 5.4 `DESIGN-GAP: K26` comments present in `copy.ts`
-- [ ] 5.5 Full local gate vs baseline
+- [x] 5.1 `npm test` + label helper cases, 0 failed
+- [x] 5.2 Smoke: list and result name Santander (baseline + 7 PASS, 0 FAIL)
+- [x] 5.3 Deliberate break: list ignores `source` → list step red; restored → green
+- [x] 5.4 `DESIGN-GAP: K26` comments present in `copy.ts`
+- [x] 5.5 Full local gate vs baseline
 
 #### Manual
 

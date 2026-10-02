@@ -1,29 +1,27 @@
 # Handoff — `kit-round-3-auth-settings` (slice S-12)
 
-Written by the `/10x-implement … phase 5` step of run `2026-10-02-kit-round-3`. Phases 1–5 are committed and green. The next agent must not miss that `copyExtra.settings` still holds `deleting`, `close`, the dialog eyebrow/title/body (read by `settings.astro`) and `demoLocked` (for `reset/new.astro`, P7); `copyExtra.settings.{currentPassword,deleteError}` are gone and the `/settings` page no longer reads `copyExtra.auth.passwordPlaceholder` or `settings.confirmation`; no existing smoke assertion may be edited.
+Written by the `/10x-implement … phase 6` step of run `2026-10-02-kit-round-3`. Phases 1–6 are committed and green. The next agent must not miss that `copyExtra.auth` still holds `registerVisual`, `resetVisual` and `passwordPlaceholder` (read by `confirm-email.astro` / `reset/new.astro`, remove in P7 once unread) and `copyExtra.settings.demoLocked` (P7); no existing smoke assertion may be edited.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-auth-settings`, cut from `main` at `60e92e1` (after S-13) |
-| Commits | 14 on the branch: identity, research, plan, plan review, p1 (464bfef), p1 handoff, p2 (b10c8d9), p2 handoff, p3 (42430cc), p3 handoff, p4 (4688697), p4 handoff, p5 `feat(…): Delete dialog on kit round 3 (p5)` (9edcdf5), this handoff |
+| Commits | 16 on the branch: identity, research, plan, plan review, p1–p5 with handoffs, p6 `feat(…): Login, register, reset and field styling (p6)` (40d78f6), this handoff |
 | Pushed / PR / merged | no / none / no |
 | `change.md` status | `implementing` |
-| `## Progress` rows remaining | 27 (`grep -c '^- \[ \]' plan.md`) |
+| `## Progress` rows remaining | 21 (`grep -c '^- \[ \]' plan.md`) |
 | Working tree | clean after the handoff commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `src/components/settings/DeleteAccountDialog.tsx` | kit `modal('deleteAccount')`: no `serverError`/G24, closed by default, `demo` prop, confirm line split at `USUŃ` (`aria-describedby` target), `paper`/8 px input, `deleteDisabledHelp`, `InfoAlert` demo note |
-| `src/components/auth/FormField.tsx` | optional `disabled` prop (+ muted disabled style) |
-| `src/components/ui/dialog.tsx` | `DialogContent` `max-h-[calc(100vh-32px)] overflow-auto` (kit round-3 `.modal`) |
-| `src/pages/settings.astro` | `demo` from `isDemoEmail`, new labels (`deleteButton`, `deleteConfirm`, `deletePassword`, `deleteDisabledHelp`, `demoDeleteBlocked`), `deleteError` const removed |
-| `src/content/copy.ts` | `copyExtra.settings.{currentPassword,deleteError}` removed |
-| `scripts/smoke.mjs` | +3 steps: delete error, wrong-password delete error, demo delete refusal (anchored `>…<`) |
-| `plan.md`, `handoff.md` | Progress rows 5.1–5.6 ticked with SHA |
+| `src/pages/login.astro`, `register.astro`, `reset.astro` | rebound to `copy.auth.*` (visual, placeholders, links, terms, optional) and `copy.confirmEmail.{eyebrow,title}`; `?deleted=1` reads `copy.settings.deletedNotice` |
+| `src/components/auth/FormField.tsx` | input `rounded-[8px] bg-paper` |
+| `src/content/copy.ts` | removed from `copyExtra.auth`: `loginVisual`, `optional`, `namePlaceholder`, `emailPlaceholder`, `forgotPassword`, `terms`, `noAccount`, `createIt`, `haveAccount`, `resetEyebrow`, `sendInstructions`, `backToLogin`, `checkInboxEyebrow/Title`, `deletedLogin` (+ G24 comment) |
+| `scripts/smoke.mjs` | +1 step `login shows the full deleted notice` (anchored `>…<`) |
+| `plan.md`, `handoff.md` | Progress rows 6.1–6.5 ticked with SHA |
 
 ## 3. Verification
 
@@ -32,25 +30,25 @@ Written by the `/10x-implement … phase 5` step of run `2026-10-02-kit-round-3`
 | `npm run lint` | 0 errors (baseline 0) |
 | `npx astro check` | 0 errors, 3 hints |
 | `npm run fixture:check` | ing OK, santander OK |
-| `npm test` | 353 passed / 23 files (baseline 352, +1 from P3, P5 Δ0) |
+| `npm test` | 353 passed / 23 files (P5 count 353, Δ0; run baseline 352) |
 | `npm run build` | OK |
 | `npx supabase db reset` + `test db` | Files=6, Tests=119 PASS (Δ0) |
-| `npm run smoke` (port 4398) | 180 PASS / 0 FAIL (post-p4 177, +3; run baseline 166, +14) |
-| Deliberate break A | temp steps requesting `/settings` without `?error=demo-delete`: bare needle PASS (the text sits in the serialized `demoNote` prop), anchored `>…<` needle FAIL; temp steps reverted. Meta-check: proves why the anchor is mandatory; the real step requests the param and is anchored |
-| Deliberate break B | `api/auth/delete.ts` confirm `.refine` made always true: `delete without confirm word is rejected` red (302 `/login?deleted=1`, plus a cascade of later steps because the smoke user got deleted); restored with `git checkout`, `db reset`, full gate green. Meta-check: the server `USUŃ` check is the guard, independent of the client lock (red came from the endpoint, not the UI) |
+| `npm run smoke` (port 4398) | 181 PASS / 0 FAIL (P5 180, +1; run baseline 166, +15) |
+| `grep "bg-white\|rounded-lg" FormField.tsx` | empty |
+| Deliberate break | `login.astro` `?deleted=1` mapped to `settings.deleteSuccess`: `login shows the full deleted notice` FAIL, old `login shows the deleted state` PASS; restored with `git checkout`, `db reset`, full gate green. Meta-check: shows the old substring step cannot detect this rebind; the new anchored step does |
 
 ## 4. Next command
 
-`/10x-implement kit-round-3-auth-settings phase 6`
+`/10x-implement kit-round-3-auth-settings phase 7`
 
 ## 5. Open
 
 - Manual rows, as a checklist:
-  - [ ] [reviewer] rows 1.6, 2.6, 3.7, 4.5, 5.7, 6.6, 7.8, 8.7 (5.7: `src/pages/api/auth/delete.ts` untouched in the final diff; demo flag from the page only; `aria-describedby` on `#delete-confirm` names the confirm line and the help while shown)
-  - [ ] [visual] 8.6 (all states, desktop + ~400 px, incl. pattern-actions dialog `max-h` and the delete dialog in demo/locked/unlocked states)
-  - [ ] [human] 8.8: accept header sign-out removal, collapsed password form, dialog closed on error (alert on the page), short demo strip text, redirect `/` vs PRD, longer deleted notice; send K34 to the kit author
-- P6 may delete `copyExtra.auth.passwordPlaceholder` once its last reader is gone (`/settings` no longer reads it); P7 owns `demoLocked`.
-- `FormField` disabled styling is Tailwind-only (kit defines none); no DESIGN-GAP added.
+  - [ ] [reviewer] rows 1.6, 2.6, 3.7, 4.5, 5.7, 6.6, 7.8, 8.7 (6.6: login/register/reset read only `copy.*` plus K11 keys; no other `bg-white` field in the slice's components — note `src/components/settings/*` and `NewPasswordForm` use `FormField`)
+  - [ ] [visual] 8.6 (all states, desktop + ~400 px)
+  - [ ] [human] 8.8: accept header sign-out removal, collapsed password form, dialog closed on error, short demo strip text, redirect `/` vs PRD, longer deleted notice; send K34 to the kit author
+- P7 owns removal of `copyExtra.auth.{registerVisual,resetVisual,passwordPlaceholder}` once `confirm-email.astro` and `reset/new.astro` read kit keys, and `settings.demoLocked`.
+- `/settings` reads `copy.auth.passwordPlaceholder` (kit key, not `copyExtra`).
 - Follow-ups for P8 in `follow-ups/review-fixes.md` as in plan; known risks as in plan § Known risks.
 - Invariants: never `npm run format`, never stage `design/**` or `src/styles/brand.css`, never touch `checkOrigin`.
 - Roadmap item S-12 not flipped (orchestrator owns roadmap).
@@ -74,3 +72,7 @@ Written by the `/10x-implement … phase 5` step of run `2026-10-02-kit-round-3`
 15. **`FormField` disabled style `disabled:opacity-60 disabled:cursor-not-allowed` (kit gives no disabled field style; Tailwind-only, no DESIGN-GAP row).** Would change: the reviewer wanting a gap row.
 16. **Deliberate break B removed the whole `.refine` (to `() => true`) rather than only the word.** Meta-check: the red cascade (10 FAIL) is the broken delete actually deleting the smoke user, subsequent steps losing their session; the targeted step `delete without confirm word is rejected` is red. Restored by `git checkout`, `db reset` run. Would change: nothing.
 17. **Smoke +3 (177 → 180), not +14: the +14 in row 5.6 is the plan's cumulative total from the run baseline 166 (166+14=180).** Would change: the orchestrator expecting a different count.
+18. **Implemented in this context, commit message as proposed; ran only `eslint --fix` on touched files.** Would change: nothing.
+19. **Kept `copyExtra.auth.{registerVisual,resetVisual,passwordPlaceholder}`** because `confirm-email.astro` / `reset/new.astro` still read them (plan: remove in P7); `reset.astro` itself now reads kit `copy.auth.resetVisual` (identical text). Would change: P7 scope.
+20. **Deliberate break needed a live smoke run (two runs: first output truncated by my grep, rerun captured the red).** Would change: nothing.
+21. **Smoke +1 (180 → 181) = plan's +15 from run baseline 166; no kit-contract unit cases added (plan assigns them to P7 row 7.1).** Would change: the orchestrator expecting a unit delta now.

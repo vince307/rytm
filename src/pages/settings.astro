@@ -8,6 +8,8 @@ import InlineAlert from "@/components/app/InlineAlert.astro";
 import SettingsPasswordRow from "@/components/settings/SettingsPasswordRow";
 import DeleteAccountDialog from "@/components/settings/DeleteAccountDialog";
 import { buttonVariants } from "@/components/ui/button";
+import { DEMO_EMAIL } from "astro:env/server";
+import { isDemoEmail } from "@/lib/demo";
 import { copy, copyExtra } from "@/content/copy";
 import { DELETE_CONFIRM_WORD, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 
@@ -35,15 +37,7 @@ const notice: { kind: "success" | "error" | "info"; text: string } | null =
             : error === "demo-delete"
               ? { kind: "info", text: s.demoDeleteBlocked }
               : null;
-// The dialog keeps its own error line until P5 rebinds it.
-const deleteError =
-  error === "delete-password"
-    ? s.passwordInvalid
-    : error === "delete"
-      ? s.deleteError
-      : error === "demo-delete"
-        ? s.demoDeleteBlocked
-        : null;
+const demo = isDemoEmail(Astro.locals.user?.email, DEMO_EMAIL);
 ---
 
 <AppLayout title={s.title} active="settings">
@@ -99,17 +93,19 @@ const deleteError =
     </div>
     <DeleteAccountDialog
       client:load
-      serverError={deleteError}
+      demo={demo}
       labels={{
-        trigger: s.deleteTitle,
+        trigger: s.deleteButton,
         eyebrow: x.deleteDialogEyebrow,
         title: x.deleteDialogTitle,
         body: x.deleteDialogBody,
-        confirmationHint: s.confirmation,
+        confirmationHint: s.deleteConfirm,
         placeholder: DELETE_CONFIRM_WORD,
-        currentPassword: x.currentPassword,
+        currentPassword: s.deletePassword,
         passwordPlaceholder: copy.auth.passwordPlaceholder,
-        confirm: s.deleteTitle,
+        confirm: s.deleteButton,
+        disabledHelp: s.deleteDisabledHelp,
+        demoNote: s.demoDeleteBlocked,
         pending: x.deleting,
         close: x.close,
       }}

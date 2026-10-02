@@ -313,6 +313,21 @@ const steps = [
     () => request("/settings?error=demo-password"),
     { status: 200, contains: ">Na wspólnym koncie demo zmiana hasła jest wyłączona.<" },
   ],
+  [
+    "settings shows the delete error",
+    () => request("/settings?error=delete"),
+    { status: 200, contains: ">Nie udało się usunąć konta. Spróbuj ponownie.<" },
+  ],
+  [
+    "settings shows the wrong-password delete error",
+    () => request("/settings?error=delete-password"),
+    { status: 200, contains: ">Obecne hasło jest nieprawidłowe.<" },
+  ],
+  [
+    "settings shows the demo delete refusal",
+    () => request("/settings?error=demo-delete"),
+    { status: 200, contains: ">Na wspólnym koncie demo usunięcie konta jest wyłączone.<" },
+  ],
   ["settings renders account e-mail", () => request("/settings"), { status: 200, contains: email }],
   [
     "settings password form starts closed",

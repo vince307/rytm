@@ -259,9 +259,6 @@ export const copyExtra = {
     deleteDialogTitle: "Usunąć konto bez śladu?",
     deleteDialogBody: "Ta decyzja usunie wszystkie importy, wzorce i progi.",
     close: "Zamknij",
-    // Dialog copy rebound to `settings.*` in P5.
-    currentPassword: "Obecne hasło",
-    deleteError: "Nie udało się usunąć konta. Spróbuj ponownie.",
     deleting: "Usuwanie…",
     // DESIGN-GAP: G37 — shared demo account refusal on /reset/new (the /settings refusals use the kit's
     // `settings.demoPasswordBlocked` / `demoDeleteBlocked`).

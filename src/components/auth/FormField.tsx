@@ -14,6 +14,7 @@ interface FormFieldProps {
   error?: string;
   hint?: ReactNode;
   endContent?: ReactNode;
+  disabled?: boolean;
 }
 
 export function FormField({
@@ -29,6 +30,7 @@ export function FormField({
   error,
   hint,
   endContent,
+  disabled,
 }: FormFieldProps) {
   return (
     <div className="my-[15px] grid gap-2">
@@ -43,13 +45,14 @@ export function FormField({
           type={type}
           value={value}
           autoComplete={autoComplete}
+          disabled={disabled}
           aria-invalid={error ? true : undefined}
           onChange={(e) => {
             onChange(e.target.value);
           }}
           placeholder={placeholder}
           className={cn(
-            "text-ink placeholder:text-muted/70 focus:border-ink focus:ring-ink/8 w-full rounded-lg border bg-white px-3.5 py-[13px] transition-colors outline-none focus:ring-[3px]",
+            "text-ink placeholder:text-muted/70 focus:border-ink focus:ring-ink/8 w-full rounded-lg border bg-white px-3.5 py-[13px] transition-colors outline-none focus:ring-[3px] disabled:cursor-not-allowed disabled:opacity-60",
             error ? "border-excess-text" : "border-line",
             endContent && "pr-11",
           )}

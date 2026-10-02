@@ -732,12 +732,12 @@ are collected in the Phase 8 `[human]` row.
 
 #### Automated
 
-- [ ] 5.1 npm test: Phase 4 count, 0 failed
-- [ ] 5.2 Smoke Phase 4 count + 3 PASS, 0 FAIL, existing delete steps unchanged and green
-- [ ] 5.3 No G24 / serverError left in DeleteAccountDialog.tsx
-- [ ] 5.4 Deliberate break: bare-text demo-delete needle shown to pass without the param, anchored needle red without it, meta-check recorded
-- [ ] 5.5 Deliberate break: server USUŃ check removed turns delete without confirm word is rejected red, restored, db reset
-- [ ] 5.6 Full local gate vs baseline, smoke + 14
+- [x] 5.1 npm test: Phase 4 count, 0 failed — 9edcdf5
+- [x] 5.2 Smoke Phase 4 count + 3 PASS, 0 FAIL, existing delete steps unchanged and green — 9edcdf5
+- [x] 5.3 No G24 / serverError left in DeleteAccountDialog.tsx — 9edcdf5
+- [x] 5.4 Deliberate break: bare-text demo-delete needle shown to pass without the param, anchored needle red without it, meta-check recorded — 9edcdf5
+- [x] 5.5 Deliberate break: server USUŃ check removed turns delete without confirm word is rejected red, restored, db reset — 9edcdf5
+- [x] 5.6 Full local gate vs baseline, smoke + 14 — 9edcdf5
 
 #### Manual
 

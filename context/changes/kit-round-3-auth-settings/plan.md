@@ -704,12 +704,12 @@ are collected in the Phase 8 `[human]` row.
 
 #### Automated
 
-- [ ] 3.1 npm test: Phase 2 count + new kit-contract cases, 0 failed
-- [ ] 3.2 Smoke Phase 2 count + 4 PASS, 0 FAIL, signout steps still 302 /
-- [ ] 3.3 No DESIGN-GAP in settings.astro, no copyExtra.app reader in src
-- [ ] 3.4 Deliberate break: error=password back to resetNewError turns the save-error step red, restored
-- [ ] 3.5 Deliberate break: Sesja form removed turns the sign-out step red, restored, meta-check recorded
-- [ ] 3.6 Full local gate vs baseline, smoke + 10
+- [x] 3.1 npm test: Phase 2 count + new kit-contract cases, 0 failed
+- [x] 3.2 Smoke Phase 2 count + 4 PASS, 0 FAIL, signout steps still 302 /
+- [x] 3.3 No DESIGN-GAP in settings.astro, no copyExtra.app reader in src
+- [x] 3.4 Deliberate break: error=password back to resetNewError turns the save-error step red, restored
+- [x] 3.5 Deliberate break: Sesja form removed turns the sign-out step red, restored, meta-check recorded
+- [x] 3.6 Full local gate vs baseline, smoke + 10
 
 #### Manual
 

@@ -7,7 +7,7 @@
 import { describe, expect, it } from "vitest";
 
 import { copy, copyExtra } from "@/content/copy";
-import { MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
+import { DELETE_CONFIRM_WORD, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 import { MAX_DEBITS, MAX_FILE_BYTES } from "@/lib/import/schema";
 import { tableHeaders } from "@/lib/patterns/table-columns";
 
@@ -69,5 +69,27 @@ describe("kit contract (content.json as the app reads it)", () => {
     expect(copy.importFlow.importButton).toContain("{debits}");
     // new.astro casts `importFlow.debitForms` to a 3-tuple for `plural()`.
     expect(copy.importFlow.debitForms).toHaveLength(3);
+  });
+
+  it("keeps the settings keys /settings reads (S-12 P3)", () => {
+    const s = copy.settings;
+    for (const key of [
+      "logout",
+      "passwordSuccess",
+      "passwordInvalid",
+      "saveError",
+      "demoPasswordBlocked",
+      "demoDeleteBlocked",
+      "deleteError",
+      "deletePassword",
+      "deleteConfirm",
+      "deleteButton",
+      "deleteDisabledHelp",
+      "deletedNotice",
+    ] as const) {
+      expect(s[key].length, key).toBeGreaterThan(0);
+    }
+    // The dialog's confirmation hint must name the word the server compares against.
+    expect(s.deleteConfirm).toContain(DELETE_CONFIRM_WORD);
   });
 });

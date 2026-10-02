@@ -301,6 +301,18 @@ const steps = [
     () => request("/home"),
     { status: 200, notContains: ">Wspólne konto demo — niektóre działania są wyłączone.<" },
   ],
+  ["settings offers sign-out", () => request("/settings"), { status: 200, contains: ">Wyloguj się<" }],
+  ["home header has no exit button", () => request("/home"), { status: 200, notContains: ">Wyjdź<" }],
+  [
+    "settings shows the save error",
+    () => request("/settings?error=password"),
+    { status: 200, contains: ">Nie udało się zapisać zmian. Spróbuj ponownie.<" },
+  ],
+  [
+    "settings shows the demo password refusal",
+    () => request("/settings?error=demo-password"),
+    { status: 200, contains: ">Na wspólnym koncie demo zmiana hasła jest wyłączona.<" },
+  ],
   ["settings renders account e-mail", () => request("/settings"), { status: 200, contains: email }],
   [
     "settings fills the password minimum",

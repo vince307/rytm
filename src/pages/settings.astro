@@ -1,5 +1,5 @@
 ---
-// DESIGN-GAP: G23 (in-app password form), G24 (delete/password result states), G37 (demo account refusal)
+// Round 3: copy from `settings.*` (K32); loginData/dataLabel/dangerEyebrow/dialog copy stay in copyExtra (K15).
 import AppLayout from "@/layouts/AppLayout.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
 import Panel from "@/components/app/Panel.astro";
@@ -7,68 +7,75 @@ import SettingsRow from "@/components/app/SettingsRow.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
 import NewPasswordForm from "@/components/auth/NewPasswordForm";
 import DeleteAccountDialog from "@/components/settings/DeleteAccountDialog";
+import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
 import { DELETE_CONFIRM_WORD, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 
 const s = copy.settings;
 const a = copy.authStates;
+const f = copy.auth.fields;
 const x = copyExtra.settings;
-const xa = copyExtra.auth;
 const params = Astro.url.searchParams;
 const error = params.get("error");
-const passwordChanged = params.get("password") === "changed";
 // The middleware only lets a signed-in user reach /settings, so the address is always there.
 // roadmap: change e-mail parked — kit button not rendered
 const email = Astro.locals.user?.email;
-const passwordError =
-  error === "current-password"
-    ? x.currentPasswordWrong
-    : error === "password"
-      ? xa.resetNewError
-      : error === "demo-password"
-        ? x.demoLocked
-        : null;
+// One result alert per request (kit `settings()` shows one notice between the title and the first panel).
+const notice: { kind: "success" | "error" | "info"; text: string } | null =
+  params.get("password") === "changed"
+    ? { kind: "success", text: s.passwordSuccess }
+    : error === "current-password" || error === "delete-password"
+      ? { kind: "error", text: s.passwordInvalid }
+      : error === "password"
+        ? { kind: "error", text: s.saveError }
+        : error === "demo-password"
+          ? { kind: "info", text: s.demoPasswordBlocked }
+          : error === "delete"
+            ? { kind: "error", text: s.deleteError }
+            : error === "demo-delete"
+              ? { kind: "info", text: s.demoDeleteBlocked }
+              : null;
+// The dialog keeps its own error line until P5 rebinds it.
 const deleteError =
   error === "delete-password"
-    ? x.currentPasswordWrong
+    ? s.passwordInvalid
     : error === "delete"
-      ? x.deleteError
+      ? s.deleteError
       : error === "demo-delete"
-        ? x.demoLocked
+        ? s.demoDeleteBlocked
         : null;
 ---
 
 <AppLayout title={s.title} active="settings">
-  <PageTitle eyebrow={x.eyebrow} title={s.title} lead={x.lead} />
-  {passwordChanged && (
+  <PageTitle eyebrow={s.eyebrow} title={s.title} lead={s.lead} />
+  {notice && (
     <div class="mb-[15px] max-w-[800px]">
-      <InlineAlert kind="success">{x.passwordChanged}</InlineAlert>
+      <InlineAlert kind={notice.kind}>{notice.text}</InlineAlert>
     </div>
   )}
   <Panel class="max-w-[800px]">
     <div class="mb-5 flex items-start justify-between">
       <h2 class="m-0 text-[17px] tracking-[-0.03em]">{x.loginData}</h2>
     </div>
-    <SettingsRow label={x.emailLabel}>
+    <SettingsRow label={f.email}>
       <strong>{email}</strong>
     </SettingsRow>
-    <SettingsRow label={x.passwordLabel}>
+    <SettingsRow label={f.password}>
       <div class="max-w-[390px]">
         <NewPasswordForm
           client:load
           action="/api/auth/password"
-          current={{ label: x.currentPassword }}
-          serverError={passwordError}
+          current={{ label: s.currentPassword }}
           labels={{
-            password: xa.newPassword,
-            confirm: xa.repeatPassword,
-            passwordPlaceholder: xa.passwordPlaceholder,
+            password: s.newPassword,
+            confirm: s.repeatPassword,
+            passwordPlaceholder: copy.auth.passwordPlaceholder,
             showPassword: a.showPassword,
             hidePassword: a.hidePassword,
-            submit: x.changePassword,
-            pending: xa.saving,
+            submit: s.changePassword,
+            pending: copyExtra.auth.saving,
             passwordTooShort: a.passwordTooShort.replace("{n}", String(MIN_PASSWORD_LENGTH)),
-            passwordsDiffer: xa.passwordsDiffer,
+            passwordsDiffer: a.passwordMismatch,
             currentRequired: a.passwordRequired,
           }}
         />
@@ -76,6 +83,13 @@ const deleteError =
     </SettingsRow>
     <SettingsRow label={x.dataLabel}>
       <p>{s.data}</p>
+    </SettingsRow>
+    <SettingsRow label={x.session} class="border-t border-line">
+      <form method="POST" action="/api/auth/signout" class="col-start-2 col-end-[-1] max-[899px]:col-start-1">
+        <button type="submit" class:list={buttonVariants({ variant: "ghost" })}>
+          {s.logout}
+        </button>
+      </form>
     </SettingsRow>
   </Panel>
   <Panel variant="danger" class="mt-[15px] max-w-[800px]">
@@ -95,7 +109,7 @@ const deleteError =
         confirmationHint: s.confirmation,
         placeholder: DELETE_CONFIRM_WORD,
         currentPassword: x.currentPassword,
-        passwordPlaceholder: xa.passwordPlaceholder,
+        passwordPlaceholder: copy.auth.passwordPlaceholder,
         confirm: s.deleteTitle,
         pending: x.deleting,
         close: x.close,

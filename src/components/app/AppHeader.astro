@@ -1,7 +1,5 @@
 ---
 import Brand from "@/components/Brand.astro";
-import { buttonVariants } from "@/components/ui/button";
-import { copyExtra } from "@/content/copy";
 import { formatMonthYear } from "@/lib/format";
 
 const month = formatMonthYear();
@@ -11,10 +9,5 @@ const month = formatMonthYear();
   <Brand href="/home" />
   <div class="flex items-center gap-4">
     <span class="text-sm text-muted">{month}</span>
-    <form method="POST" action="/api/auth/signout">
-      <button type="submit" class:list={buttonVariants({ variant: "ghost" })}>
-        {copyExtra.app.exit}
-      </button>
-    </form>
   </div>
 </header>

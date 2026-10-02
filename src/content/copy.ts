@@ -247,30 +247,22 @@ export const copyExtra = {
     noComparison: "Nie ma poprzedniego miesiąca do porównania.",
   },
   settings: {
-    eyebrow: "Ustawienia / konto",
-    lead: "Sprawdź dane i ustawienia prywatności.",
     loginData: "Dane logowania",
-    emailLabel: "E-mail",
-    passwordLabel: "Hasło",
     dataLabel: "Przetwarzanie danych",
-    changePassword: "Zmień hasło",
+    // K15 note: the kit's settings() draws the „Sesja” row label of `.logout-row`; content.json has no key for it.
+    session: "Sesja",
     dangerEyebrow: "Strefa destrukcyjna",
     deleteDialogEyebrow: "Usunięcie konta",
     deleteDialogTitle: "Usunąć konto bez śladu?",
     deleteDialogBody: "Ta decyzja usunie wszystkie importy, wzorce i progi.",
     close: "Zamknij",
-    // DESIGN-GAP: G23/G24 — states the kit does not define
+    // Dialog copy rebound to `settings.*` in P5.
     currentPassword: "Obecne hasło",
-    passwordChanged: "Hasło zostało zmienione.",
-    currentPasswordWrong: "Obecne hasło jest nieprawidłowe.",
     deleteError: "Nie udało się usunąć konta. Spróbuj ponownie.",
     deleting: "Usuwanie…",
-    // DESIGN-GAP: G37 — the kit has no state for an action refused on the shared demo account (S-09, FR-014):
-    // shown for `?error=demo-password` and `?error=demo-delete`.
+    // DESIGN-GAP: G37 — shared demo account refusal on /reset/new (the /settings refusals use the kit's
+    // `settings.demoPasswordBlocked` / `demoDeleteBlocked`).
     demoLocked: "To jest wspólne konto demo — zmiana hasła i usunięcie konta są wyłączone.",
-  },
-  app: {
-    exit: "Wyjdź",
   },
   // DESIGN-GAP: K11 — the empty-view paragraph is in the prototype but not in content.json (round 3).
   emptyViews: { body: "Jeden plik CSV wystarczy, aby Rytm mógł rozpoznać Twój rytm wydatków." },

@@ -443,11 +443,11 @@ Recorded in place of the skill's questions (run contract rule 1).
 
 #### Automated
 
-- [x] 1.1 `npm test` baseline + pin / F3 / F4 cases, 0 failed
-- [x] 1.2 Deliberate break 1: dashed `merchantKey` → partition green, ING pin red; restored → green
-- [x] 1.3 Deliberate break 2: old `accountLabel` replace → `$&` case red; restored → green
-- [x] 1.4 No rule, fixture or script changed vs `main`
-- [x] 1.5 Full local gate vs baseline (vitest + delta, others Δ0)
+- [x] 1.1 `npm test` baseline + pin / F3 / F4 cases, 0 failed — 35f89ae
+- [x] 1.2 Deliberate break 1: dashed `merchantKey` → partition green, ING pin red; restored → green — 35f89ae
+- [x] 1.3 Deliberate break 2: old `accountLabel` replace → `$&` case red; restored → green — 35f89ae
+- [x] 1.4 No rule, fixture or script changed vs `main` — 35f89ae
+- [x] 1.5 Full local gate vs baseline (vitest + delta, others Δ0) — 35f89ae
 
 #### Manual
 

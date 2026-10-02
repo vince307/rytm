@@ -1,13 +1,13 @@
-// Format detection (S-10): the one entry point the wizard will call (wired in Phase 6). Pure module, no Node
-// imports. Santander is tried first — a strict UTF-8 decode plus rule 1 on line 1 (9 fields, col 0
-// YYYY-MM-DD, col 2 starts with `'`) — otherwise `parseIngStatement` runs unchanged. Once rule 1 matches, a
-// later Santander failure (unknown-format / wrong-currency) is final and never falls through to the ING
-// reader: a Santander file re-saved as cp1250 fails the strict decode and is rejected as unknown-format, the
-// same way a re-saved ING file is, instead of being misread as ING (import-formats.md § Wykrywanie formatu,
-// plan Critical Implementation Details).
+// Format detection (S-10): the one entry point the wizard calls (wired in Phase 6, ImportWizard.tsx
+// readStatement). Pure module, no Node imports. Santander is tried first — a strict UTF-8 decode plus rule 1
+// on line 1 (9 fields, col 0 YYYY-MM-DD, col 2 starts with `'`) — otherwise `parseIngStatement` runs
+// unchanged. Once rule 1 matches, a later Santander failure (unknown-format / wrong-currency) is final and
+// never falls through to the ING reader: a Santander file re-saved as cp1250 fails the strict decode and is
+// rejected as unknown-format, the same way a re-saved ING file is, instead of being misread as ING
+// (import-formats.md § Wykrywanie formatu, plan Critical Implementation Details).
 import type { ParseError } from "@/lib/import/common";
 import { buildImportPayload, parseIngStatement, type IngStatement } from "@/lib/import/ing";
-import type { ImportPayload } from "@/lib/import/schema";
+import { MAX_FILE_BYTES, type ImportPayload } from "@/lib/import/schema";
 import {
   buildSantanderPayload,
   looksLikeSantander,
@@ -34,4 +34,28 @@ export function buildPayload(detected: Extract<DetectResult, { ok: true }>, acco
   return detected.bank === "ing"
     ? buildImportPayload(detected.statement, accountNumber)
     : buildSantanderPayload(detected.statement, accountNumber);
+}
+
+/** A file-level decision the wizard shows to the user — one step wider than `ParseError`: `empty` is not a
+ * parse failure (the file is a well-formed statement with no debits, D2), and the oversized-file case never
+ * reaches a reader at all (DESIGN-GAP: G27, the kit has no message for either). */
+export type FileError = "unknownFormat" | "wrongCurrency" | "empty";
+
+/**
+ * The wizard's file-level classification (S-10 Phase 6), moved out of `ImportWizard.tsx` so it is
+ * unit-tested — the wizard itself has no component tests. `ImportWizard.tsx`'s `readStatement` checks
+ * `file.size` on the `File` object before ever calling `file.arrayBuffer()`, so an oversized file is never
+ * read into memory; this function repeats the check on `bytes.length` so it has the same contract when
+ * called directly with a byte array (as the tests do).
+ */
+export function readImportFile(
+  bytes: Uint8Array,
+  opts: { santanderAccountName: string },
+): { detected: Extract<DetectResult, { ok: true }> } | { error: FileError } {
+  // DESIGN-GAP: G27 — the kit has no message for a file over the size limit; `unknownFormat` stands in.
+  if (bytes.length > MAX_FILE_BYTES) return { error: "unknownFormat" };
+  const result = detectStatement(bytes, opts);
+  if (!result.ok) return { error: result.error === "wrong-currency" ? "wrongCurrency" : "unknownFormat" };
+  if (result.statement.accounts.every((a) => a.debits === 0)) return { error: "empty" };
+  return { detected: result };
 }

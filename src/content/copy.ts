@@ -119,6 +119,10 @@ export const copyExtra = {
     // DESIGN-GAP: K26 — the Santander export has no account name column (the owner's name, header col 3, is
     // never stored, R2); "Rachunek" is the kit's own word for the column, used as a neutral stand-in.
     santanderAccountName: "Rachunek",
+    // DESIGN-GAP: K26 — the kit announces Santander as "wkrótce" (`importFlow.supported`). The app's wizard
+    // (new.astro) overrides the kit's `supported`/`unknownFormat` with these both-bank versions.
+    supported: "Obsługujemy wyciągi ING Bank Śląski i Santander Bank Polska w PLN.",
+    unknownFormat: "Nieznany format pliku. Obsługujemy: ING Bank Śląski i Santander Bank Polska.",
     // Result screen (prototype importResult(), app.js:63).
     resultEyebrow: "Import gotowy",
     toPatterns: "Zobacz wzorce",
@@ -130,7 +134,9 @@ export const copyExtra = {
     resultTitle: "Dodaliśmy {n} {debits}.",
     debitForms: ["obciążenie", "obciążenia", "obciążeń"],
     // Import wizard (prototype importsNew/uploadReady/importAccount/importSummary, app.js:57–61).
-    formatRecognised: "rozpoznano format ING",
+    // DESIGN-GAP: K26 — the kit's chip only ever says "rozpoznano format ING"; the app adds the Santander
+    // form, filled by the bank the detector found (S-10 Phase 6).
+    formatRecognised: { ing: "rozpoznano format ING", santander: "rozpoznano format Santander" },
     next: "Dalej",
     stepBack: "Wstecz",
     stepEyebrow: "Nowy import · krok {n} z 3",
@@ -139,7 +145,9 @@ export const copyExtra = {
     accountLead: "Ten plik zawiera {n} {accounts}. Domyślnie zaznaczyliśmy ten z największą liczbą transakcji.",
     accountForms: ["rachunek", "rachunki", "rachunków"],
     selected: "wybrane",
-    bankName: "ING Bank Śląski",
+    // DESIGN-GAP: K26 — the kit's step 2 `<small>` only ever says "ING Bank Śląski"; the app adds the
+    // Santander form, filled by the bank the detector found (S-10 Phase 6).
+    bankName: { ing: "ING Bank Śląski", santander: "Santander Bank Polska" },
     summaryTitle: "Sprawdź przed importem.",
     summary: {
       account: "Rachunek",

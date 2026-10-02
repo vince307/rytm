@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-import { buildPayload, detectStatement } from "@/lib/import/detect";
+import { buildPayload, detectStatement, readImportFile } from "@/lib/import/detect";
+import { MAX_FILE_BYTES } from "@/lib/import/schema";
 
 const INGFIX = new URL("../fixtures/ing/", import.meta.url);
 const STFIX = new URL("../fixtures/santander/", import.meta.url);
@@ -67,5 +68,45 @@ describe("buildPayload", () => {
     expect(payload.source).toBe("santander");
     expect(payload.transactions).toHaveLength(184);
     expect(payload.transactions.every((t) => t.bankTxId === null)).toBe(true);
+  });
+});
+
+// The wizard's file-level classification (S-10 Phase 6) — what ImportWizard.tsx's readStatement calls after its
+// own File-level MAX_FILE_BYTES check; readImportFile repeats that check on bytes.length so it is testable here
+// without a File object.
+describe("readImportFile", () => {
+  it("classifies the Santander main fixture as santander", () => {
+    const result = readImportFile(bytesOf(STFIX, SANTANDER_MAIN), { santanderAccountName: SANTANDER_ACCOUNT_NAME });
+    expect("detected" in result).toBe(true);
+    expect("detected" in result && result.detected.bank).toBe("santander");
+  });
+
+  it("classifies the ING main fixture as ing", () => {
+    const result = readImportFile(bytesOf(INGFIX, ING_MAIN), { santanderAccountName: SANTANDER_ACCOUNT_NAME });
+    expect("detected" in result).toBe(true);
+    expect("detected" in result && result.detected.bank).toBe("ing");
+  });
+
+  it("maps the Santander USD fixture to wrongCurrency", () => {
+    expect(readImportFile(bytesOf(STFIX, SANTANDER_USD), { santanderAccountName: SANTANDER_ACCOUNT_NAME })).toEqual({
+      error: "wrongCurrency",
+    });
+  });
+
+  it("rejects an oversized buffer as unknownFormat before any parsing", () => {
+    const oversized = new Uint8Array(MAX_FILE_BYTES + 1);
+    expect(readImportFile(oversized, { santanderAccountName: SANTANDER_ACCOUNT_NAME })).toEqual({
+      error: "unknownFormat",
+    });
+  });
+
+  it("maps a Santander file whose rows are all credits to empty", () => {
+    // A minimal, well-formed Santander statement (rule 1–3 satisfied) with one data row, a positive amount
+    // (a credit, D2) — synthetic, no value from the real exports (run contract).
+    const text =
+      '2026-08-31,01-08-2026,\'61 1090 1234 0001 1112 2223 3334,Jan Kowalski,PLN,"1000,00","1500,00",1,\n' +
+      '15-08-2026,15-08-2026,Przelew przychodzący,,,"500,00","1500,00",1,\n';
+    const bytes = new TextEncoder().encode(text);
+    expect(readImportFile(bytes, { santanderAccountName: SANTANDER_ACCOUNT_NAME })).toEqual({ error: "empty" });
   });
 });

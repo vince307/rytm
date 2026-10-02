@@ -1,8 +1,11 @@
-// Import wizard (S-01) — prototype importsNew / uploadReady / importAccount / importSummary (app.js:57–61).
-// The file is parsed here, in the browser, and never leaves it: step 3 posts only the debits of the chosen
-// account (buildImportPayload) as JSON to /api/imports. Steps 2–3 live in this island's state on /imports/new,
-// so a refresh starts over at step 1. The overlap check in step 3 is UX only — imports_no_overlap in the
-// database is the guarantee (FR-005); a rejected POST comes back as ?error= and is shown in step 1.
+// Import wizard (S-01, S-10) — prototype importsNew / uploadReady / importAccount / importSummary
+// (app.js:57–61). The file is parsed here, in the browser, and never leaves it: step 3 posts only the debits
+// of the chosen account (buildPayload, dispatching to the ING or Santander builder) as JSON to /api/imports.
+// Steps 2–3 live in this island's state on /imports/new, so a refresh starts over at step 1. The overlap
+// check in step 3 is UX only — imports_no_overlap in the database is the guarantee (FR-005); a rejected POST
+// comes back as ?error= and is shown in step 1. The bank is read once, from `detectStatement` (ING vs
+// Santander, import-formats.md § Wykrywanie formatu) — every later render (steps 1–3) just looks it up, never
+// re-detects it.
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode, Ref } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -11,8 +14,8 @@ import { SubmitButton } from "@/components/auth/SubmitButton";
 import { Stepper } from "@/components/app/Stepper";
 import { Glyph } from "@/components/Glyph";
 import type { copy, copyExtra } from "@/content/copy";
-import { buildImportPayload, parseIngStatement } from "@/lib/import/ing";
-import type { IngParseResult, IngStatement } from "@/lib/import/ing";
+import { accountLabel } from "@/lib/import/banks";
+import { buildPayload, readImportFile, type DetectResult, type FileError } from "@/lib/import/detect";
 import { MAX_DEBITS, MAX_FILE_BYTES, importPayloadSchema } from "@/lib/import/schema";
 import { formatAccountTail, formatRangeLong, formatRangeShort, plural } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -46,10 +49,9 @@ interface Props {
 }
 
 type Step = 1 | 2 | 3;
-type FileError = "unknownFormat" | "wrongCurrency" | "empty";
 interface Loaded {
   fileName: string;
-  statement: IngStatement;
+  detected: Extract<DetectResult, { ok: true }>;
 }
 
 const fill = (template: string, values: Record<string, string | number>) =>
@@ -62,18 +64,19 @@ const flowActions = "mt-[25px] flex flex-wrap justify-end gap-2.5";
 // Prototype .import-errors .text-button
 const textButton = "text-excess-text ml-1.5 inline cursor-pointer p-0 text-xs font-extrabold underline";
 
-async function readStatement(file: File): Promise<{ statement: IngStatement } | { error: FileError }> {
+async function readStatement(
+  file: File,
+  santanderAccountName: string,
+): Promise<{ detected: Extract<DetectResult, { ok: true }> } | { error: FileError }> {
   // DESIGN-GAP: G27 — the kit has no message for a file over the size limit; `unknownFormat` stands in.
+  // Checked on the `File` object, before `file.arrayBuffer()`, so an oversized file is never read into
+  // memory; `readImportFile` repeats the check on the decoded bytes so it can be unit-tested without a File.
   if (file.size > MAX_FILE_BYTES) return { error: "unknownFormat" };
-  let result: IngParseResult;
   try {
-    result = parseIngStatement(new Uint8Array(await file.arrayBuffer()));
+    return readImportFile(new Uint8Array(await file.arrayBuffer()), { santanderAccountName });
   } catch {
     return { error: "unknownFormat" };
   }
-  if (!result.ok) return { error: result.error === "wrong-currency" ? "wrongCurrency" : "unknownFormat" };
-  if (result.statement.accounts.every((a) => a.debits === 0)) return { error: "empty" };
-  return { statement: result.statement };
 }
 
 /** Kit error copy leads with a bold sentence („<strong>Nieznany format pliku.</strong> Obsługujemy: …”). */
@@ -142,29 +145,29 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
     headingRef.current?.focus();
   }, [step]);
 
-  const statement = loaded?.statement;
+  const statement = loaded?.detected.statement;
   const chosen = statement?.accounts.find((a) => a.number === account);
   // The endpoint validates with the same schema; checking here keeps a file that breaks it (e.g. a bank
   // transaction number that is not 18 digits) from reaching a ready step 3 and failing only after the POST.
   const { payload, payloadValid } = useMemo(() => {
-    if (step !== 3 || !statement || !chosen) return { payload: "", payloadValid: false };
-    const built = buildImportPayload(statement, chosen.number);
+    if (step !== 3 || !loaded || !chosen) return { payload: "", payloadValid: false };
+    const built = buildPayload(loaded.detected, chosen.number);
     return { payload: JSON.stringify(built), payloadValid: importPayloadSchema.safeParse(built).success };
-  }, [step, statement, chosen]);
+  }, [step, loaded, chosen]);
 
   async function handleFile(file: File | undefined) {
     if (!file) return;
     setPageError(null);
     setStep(1);
-    const result = await readStatement(file);
+    const result = await readStatement(file, x.santanderAccountName);
     if ("error" in result) {
       setLoaded(null);
       setFileError(result.error);
       return;
     }
     setFileError(null);
-    setLoaded({ fileName: file.name, statement: result.statement });
-    setAccount(result.statement.defaultAccountNumber);
+    setLoaded({ fileName: file.name, detected: result.detected });
+    setAccount(result.detected.statement.defaultAccountNumber);
   }
 
   function openPicker() {
@@ -214,7 +217,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
     />
   );
 
-  if (step === 1 || !statement || !chosen) {
+  if (step === 1 || !loaded || !statement || !chosen) {
     const serverMessage =
       pageError?.kind === "overlap" ? (
         overlapMessage(pageError.from, pageError.to)
@@ -271,7 +274,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
             <div className="bg-paper-soft text-muted mt-[25px] flex items-center gap-[9px] rounded-lg px-3.5 py-[11px] text-xs">
               <Glyph name="success" className="text-green" />
               <span className="min-w-0 [overflow-wrap:anywhere]">
-                {loaded.fileName} · {x.formatRecognised}
+                {loaded.fileName} · {x.formatRecognised[loaded.detected.bank]}
               </span>
               <button
                 type="button"
@@ -295,6 +298,8 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
       </>
     );
   }
+
+  const bank = loaded.detected.bank;
 
   if (step === 2) {
     const n = statement.accounts.length;
@@ -326,7 +331,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
                     {a.name} · {formatAccountTail(a.number)}
                   </strong>
                   <small className="text-muted mt-1 block text-xs">
-                    {x.bankName} · {a.rows} {plural(a.rows, x.transactionForms)}
+                    {x.bankName[bank]} · {a.rows} {plural(a.rows, x.transactionForms)}
                   </small>
                 </span>
                 {a.number === account && <b className="text-green text-[11px]">{x.selected}</b>}
@@ -389,9 +394,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
           {[
             [
               x.summary.account,
-              // ING only until the wizard reads the detector's bank (Phase 6); the fixed key keeps this
-              // compiling against copy.ts's new per-bank `accountLabel` shape.
-              `${fill(x.accountLabel.ing, { name: chosen.name })} · ${formatAccountTail(chosen.number)}`,
+              `${accountLabel(x.accountLabel, bank, chosen.name)} · ${formatAccountTail(chosen.number)}`,
             ],
             [x.summary.range, formatRangeShort(period.start, period.end)],
             [x.summary.debits, `${chosen.debits} ${plural(chosen.debits, x.transactionForms)}`],

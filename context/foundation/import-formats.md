@@ -10,7 +10,7 @@ banks:
     status: mvp
   - id: santander
     name: "Santander Bank Polska"
-    status: after-ing-flow
+    status: mvp
 ---
 
 # Formaty importu — Rytm
@@ -116,7 +116,7 @@ Odwzorowane w syntetycznym fixture `test/fixtures/ing/` — identyfikatory puła
 
 ## Santander Bank Polska — `historia_<YYYY-MM-DD>_<nr rachunku>.csv`
 
-Status: **po pierwszym przepływie ING** (D4). Uwaga: w rozmowach ten bank bywał nazywany „Erste” — kod banku w IBAN (`1090`) i układ pliku wskazują na Santander Bank Polska.
+Status: **MVP** (S-10, po pierwszym przepływie ING jak zakładało D4). Uwaga: w rozmowach ten bank bywał nazywany „Erste” — kod banku w IBAN (`1090`) i układ pliku wskazują na Santander Bank Polska.
 
 | Cecha | Wartość |
 |---|---|
@@ -174,7 +174,7 @@ Końcówka opisu kartowego (sprzedawca/adres) jest **ASCII, bez polskich znaków
 4. Pomiń kwoty ≥ 0 (D2).
 5. Sprzedawca surowy: regex powyżej dla `DOP. VISA …` (dla WYPŁATA Z BANKOMATU KARTĄ to tekst adresu — wzorzec „bankomat” pojawia się dopiero po normalizacji S-11, nie w tej regule); inaczej kol. 3, a gdy pusta — kol. 2.
 6. Zakres importu: start = kol. 1 nagłówka, koniec = kol. 0 nagłówka (D7).
-7. Brak ID: klucz wewnętrzny = `(import_id, lp)`.
+7. Brak ID: `Lp` **nie jest** przechowywane (S-10 decyzja 4 — restartuje się per eksport, a `bank_tx_id` jest `null` dla Santandra). FR-005 (odrzucenie nachodzących zakresów importu per rachunek) jest wystarczającą ochroną bez klucza per wiersz.
 
 ### Kształty do seeda (dodatkowe)
 
@@ -190,7 +190,12 @@ Końcówka opisu kartowego (sprzedawca/adres) jest **ASCII, bez polskich znaków
 |---|---|
 | Pierwszy wiersz zaczyna się od `"Lista transakcji"` (po dekodowaniu cp1250) | ING |
 | Pierwszy wiersz: 9 pól rozdzielonych `,`, pole 0 = `YYYY-MM-DD`, pole 2 zaczyna się od `'` | Santander |
-| Inaczej | odrzuć: „Nieznany format pliku. Obsługiwane: eksport CSV z ING Bank Śląski” (+ Santander po D4) |
+| Inaczej | odrzuć: „Nieznany format pliku. Obsługujemy: ING Bank Śląski i Santander Bank Polska.” (S-10) |
+
+Santander jest sprawdzany pierwszy (ścisły UTF-8 + reguła 1 na wierszu 1); dopiero gdy nie pasuje, próbowany jest
+czytnik ING bez zmian. Po dopasowaniu reguły 1 późniejszy błąd Santandra (`unknown-format` / `wrong-currency`) jest
+ostateczny i nigdy nie wpada do czytnika ING: plik Santandra zapisany ponownie w cp1250 zostaje odrzucony jako
+`unknown-format` — tak samo jak ponownie zapisany plik ING — a nie błędnie odczytany jako ING.
 
 ## Co pozostaje otwarte
 

@@ -463,13 +463,13 @@ the kit-text departures are collected in the Phase 3 `[human]` row.
 
 #### Automated
 
-- [x] 2.1 npm test: Phase 1 count + kit-contract cases, 0 failed
-- [x] 2.2 Smoke baseline + 6 PASS, 0 FAIL; smoke diff only added lines
-- [x] 2.3 Deliberate break: dropping patterns.columns[3] turns kit-contract and table-columns red, restored
-- [x] 2.4 Deliberate break: home.astro back to stats[2] — meta-check recorded (no automated reader-side guard), restored
-- [x] 2.5 Deliberate break: raw fixedCosts.new turns the /fixed smoke step red, restored
-- [x] 2.6 No K18 in src; DESIGN-GAP count = baseline − 4
-- [x] 2.7 Full local gate vs baseline, smoke + 6
+- [x] 2.1 npm test: Phase 1 count + kit-contract cases, 0 failed — 3507260
+- [x] 2.2 Smoke baseline + 6 PASS, 0 FAIL; smoke diff only added lines — 3507260
+- [x] 2.3 Deliberate break: dropping patterns.columns[3] turns kit-contract and table-columns red, restored — 3507260
+- [x] 2.4 Deliberate break: home.astro back to stats[2] — meta-check recorded (no automated reader-side guard), restored — 3507260
+- [x] 2.5 Deliberate break: raw fixedCosts.new turns the /fixed smoke step red, restored — 3507260
+- [x] 2.6 No K18 in src; DESIGN-GAP count = baseline − 4 — 3507260
+- [x] 2.7 Full local gate vs baseline, smoke + 6 — 3507260
 
 #### Manual
 

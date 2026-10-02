@@ -63,7 +63,6 @@ const tableCopy: PatternsTableCopy = {
   {"error" in result ? (
     <>
       <PageTitle eyebrow={x.eyebrow} title={copy.patterns.title} lead={copy.patterns.description} />
-      {/* DESIGN-GAP: K18 — the kit has no copy for a failed read of a list; `components.error` stands in. */}
       <InlineAlert kind="error">{copy.components.error}</InlineAlert>
     </>
   ) : items.length === 0 ? (

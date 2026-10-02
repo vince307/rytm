@@ -225,6 +225,21 @@ const steps = [
   ["login renders", () => request("/login"), { status: 200, contains: "Zaloguj się" }],
   ["login offers password reset", () => request("/login"), { status: 200, contains: "Nie pamiętam hasła" }],
   [
+    "reset page uses the round-3 copy",
+    () => request("/reset"),
+    { status: 200, contains: [">Odzyskaj dostęp.<", "Podaj e-mail, którego używasz w Rytmie."] },
+  ],
+  [
+    "login error shows the restored kit message",
+    () => request("/login?error=1"),
+    { status: 200, contains: ">Nie rozpoznaliśmy tego e-maila i hasła. Spróbuj ponownie.<" },
+  ],
+  [
+    "register fills the password minimum",
+    () => request("/register"),
+    { status: 200, contains: "co najmniej 6 znaków", notContains: "{n}" },
+  ],
+  [
     "login shows e-mail confirmed state",
     () => request("/login?confirmed=1"),
     { status: 200, contains: "E-mail potwierdzony" },
@@ -279,6 +294,11 @@ const steps = [
     { status: 200, contains: ">Koszty stałe pojawią się po pierwszym imporcie.<", notContains: ">Zmieniły kwotę<" },
   ],
   ["settings renders account e-mail", () => request("/settings"), { status: 200, contains: email }],
+  [
+    "settings fills the password minimum",
+    () => request("/settings"),
+    { status: 200, contains: "co najmniej 6 znaków", notContains: "{n}" },
+  ],
   [
     "import is saved and shows its result",
     async () => {
@@ -370,6 +390,11 @@ const steps = [
   ],
   ["patterns list the re-imported merchant", () => request("/patterns"), { status: 200, contains: "Kawiarnia smoke" }],
   [
+    "patterns table keeps the Ponad progiem header",
+    () => request("/patterns"),
+    { status: 200, contains: ">Ponad progiem<" },
+  ],
+  [
     "home shows the trend without a threshold",
     () => request("/home"),
     {
@@ -387,6 +412,11 @@ const steps = [
     "fixed with one month lists no change",
     () => request("/fixed"),
     { status: 200, contains: ">Żaden koszt stały nie zmienił kwoty w tym miesiącu.<" },
+  ],
+  [
+    "fixed fills the month in the new section title",
+    () => request("/fixed"),
+    { status: 200, contains: ">Nowe w maju<", notContains: "{month}" },
   ],
   [
     "fixed with one month lists unchanged patterns",

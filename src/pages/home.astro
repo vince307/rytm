@@ -78,7 +78,6 @@ const risenFootFor = (n: number) => h.risen.replace("{n}", String(n)).replace("{
   {"error" in result ? (
     <>
       <PageTitle eyebrow={copy.dashboard.eyebrow} title={copy.dashboard.greetingNoName} />
-      {/* DESIGN-GAP: K18 — the kit has no copy for a failed read; `components.error` stands in (patterns.astro / fixed.astro precedent). */}
       <InlineAlert kind="error">{copy.components.error}</InlineAlert>
     </>
   ) : result.referenceMonth === null ? (

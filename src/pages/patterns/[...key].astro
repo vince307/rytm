@@ -191,7 +191,6 @@ const decisionAlert = params.get("merged")
     )}
   </div>
   {readError ? (
-    // DESIGN-GAP: K18 — no kit copy for a failed read; reused from /patterns.
     <InlineAlert kind="error">{copy.components.error}</InlineAlert>
   ) : !pattern ? (
     <InlineAlert kind="info">{x.detailMissing}</InlineAlert>

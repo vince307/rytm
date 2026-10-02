@@ -53,7 +53,6 @@ const deltaClass = (deltaMinor: number) =>
   {"error" in result ? (
     <>
       <PageTitle eyebrow={x.eyebrow} title={copy.fixedCosts.title} lead={x.lead} />
-      {/* DESIGN-GAP: K18 — the kit has no copy for a failed read of a list; `components.error` stands in (patterns.astro precedent). */}
       <InlineAlert kind="error">{copy.components.error}</InlineAlert>
     </>
   ) : "referenceMonth" in result ? (

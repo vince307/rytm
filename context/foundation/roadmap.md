@@ -41,7 +41,7 @@ Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stał
 
 | ID   | Change ID                  | Outcome (user can …)                                                                                                                               | Prerequisites | PRD refs                                 | Status  |
 | ---- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------- | ------- |
-| F-04 | kit-round-3-intake         | (foundation) runda 3 kitu jest w `design/rytm-os/`, aplikacja na nowym `content.json` i tokenach działa bez regresji                               | —             | — (kit)                                  | pending |
+| F-04 | kit-round-3-intake         | (foundation) runda 3 kitu jest w `design/rytm-os/`, aplikacja na nowym `content.json` i tokenach działa bez regresji                               | —             | — (kit)                                  | planning |
 | S-12 | kit-round-3-auth-settings  | przejść logowanie, rejestrację, reset hasła i ustawienia konta (zmiana hasła, usunięcie, wylogowanie, konto demo) w wersji rundy 3 kitu            | F-04          | FR-001, FR-019                           | pending |
 | S-13 | kit-round-3-imports        | wgrać plik z ING lub Santandera, zobaczyć wynik, odrzucenia i historię importów (z cofnięciem) w wersji rundy 3 kitu                               | F-04          | FR-003, FR-004, FR-005, FR-018           | pending |
 | S-14 | kit-round-3-patterns       | przeglądać wzorce, szczegół z progiem i dialog akcji (scal, zmień nazwę, typ, wyklucz) we wszystkich stanach rundy 3 kitu                         | F-04          | FR-007, FR-008, FR-009, FR-010, FR-011   | pending |
@@ -70,7 +70,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Najpierw, bo `copy.ts` importuje `content.json` wprost z kitu — podmiana plików i utrzymanie aplikacji na zielono muszą wejść jednym merge'em; ryzyko — cicha regresja copy na ekranach (klucz istnieje, ale zmienił znaczenie), łagodzone smoke + przeglądem ekranów, których dotykają zmienione klucze.
-- **Status:** pending
+- **Status:** planning
 
 ## Slices
 

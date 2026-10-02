@@ -1,27 +1,29 @@
 # Handoff — `kit-round-3-intake` (slice F-04)
 
-Written by the `/10x-research` step: research is on disk, no product or kit file touched. The next agent must not
-treat `copy.dashboard.stats[2]` / `patterns.columns` as caught by `astro check` — JSON arrays type as `T[]`, so the
-index breaks are runtime-only; and the 4 `authStates` texts have NO round-3 key (a sub-agent claim that they were
-"folded into resetNew/confirmEmail" was checked and rejected).
+Written by the `/10x-plan` step: `plan.md` (3 code phases, `## Progress` 24 rows) and `plan-brief.md` are on disk, no
+product or kit file touched. The next agent must not accept a kit-only Phase 1: `copy.ts` imports the kit JSON
+directly and smoke asserts the filled trend sentence, so kit swap and app adaptation are one phase by design
+(decision 9); and `astro check` does not catch JSON index reads (`stats[2]`) — only the kit-contract test/grep do.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-intake`, cut from `main` at `577b163` (+ roadmap commit `78386c1`) |
-| Commits this step | 1 (`docs(kit-round-3-intake): research`) on top of `a92237e` |
+| Commits this step | 1 (`docs(kit-round-3-intake): plan`) on top of `305a261` |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `preparing` (set by `metadata-guard.mjs mark-researched`) |
-| `## Progress` rows remaining | n/a — no `plan.md` yet |
-| Working tree | clean after commit (only the files below written) |
+| `change.md` status | `planned` (`metadata-guard.mjs mark-planned`) |
+| `## Progress` rows remaining | 24 (`grep -c '^- \[ \]' plan.md`) |
+| Working tree | clean after commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/kit-round-3-intake/research.md` | breaks + minimal fixes, round-2→3 key diff, `copyExtra`→round-3 map, file-copy mechanics, K/G register matrix, kit-vs-PRD contradictions |
-| `context/changes/kit-round-3-intake/change.md` | frontmatter only: `status: preparing`, `updated` |
+| `context/changes/kit-round-3-intake/plan.md` | full plan: P1 kit + intake patch + token sync + reader fixes (`fillMonthLocative`, `tableHeaders`); P2 kit-contract test, smoke +6, K18 comments; P3 `design-kit.md` round 3, follow-ups, seam sweep, screenshots; `## Autonomous decisions` (11) |
+| `context/changes/kit-round-3-intake/plan-brief.md` | two-page brief |
+| `context/changes/kit-round-3-intake/change.md` | `status: planned` |
+| `context/foundation/roadmap.md` | F-04 status `pending` → `planning` (At a glance + body) |
 | `context/changes/kit-round-3-intake/handoff.md` | this file |
 
 ## 3. Verification
@@ -29,29 +31,30 @@ index breaks are runtime-only; and the 4 `authStates` texts have NO round-3 key 
 | Command | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/kit-round-3-intake` |
-| Node diff of old vs delivery `content.json` (arrays of scalars = 1 leaf) | 197 → 385 leaves; 20 removed (10 keys, 5 used-by-app reads in 4 keys + `stats[2]`); 18 changed |
-| Node map of 216 `copyExtra` leaves vs delivery | 127 verbatim (71 same path, 56 other key), 16 same name/new wording, 73 no counterpart |
-| `grep -o copy.<path>` over `src/` | every kit access path listed; readers of changed keys in research.md §1 |
-| `diff` src/styles/brand.css vs sed(kit brand.css) | in sync → sync-kit adds only the 8 tokens |
-| `diff -rq` assets / prototype / brand-pack | assets identical; prototype +32 views +README, 3 changed; brand-pack 1 file (`karta-stylu.md`) |
-| lint / astro check / tests / build / pgTAP / smoke | not run — research only, no code changed (baseline in agent contract, inherited, unverified) |
+| `grep -rnE "stats\[|columns|amountColumn|fixedCosts\.new|tooShort|passwordTooShort|genericError|K18|loginError|resetTitle|resetBody|checkInbox" src` | every reader named in the plan found; `DESIGN-GAP: K18` at 4 sites (`home.astro`, `patterns.astro`, `fixed.astro`, `patterns/[...key].astro`) — research said 6, plan uses the observed 4 |
+| Node read of delivery `content.json` | `patterns.columns` 7 (Kwota idx 3), `dashboard.stats` 2 labels, `trend.minimumMonths` 3, `authStates.passwordMinLength` 6, `fixedCosts.new` „Nowe w {month}”; `authStates` has no `loginError/resetTitle/resetBody/checkInbox` |
+| `diff -rq` delivery `react-kit/docs` and `rytm-os` vs repo | content.json, routes.md differ, copy-map.md new; brand-pack only `karta-stylu.md` |
+| Plan Success Criteria ↔ Progress | 1:1 (P1 8, P2 8, P3 8) |
+| lint / astro check / tests / build / pgTAP / smoke | not run — plan only, no code changed (baseline in agent contract, inherited, unverified) |
 
 ## 4. Next command
 
-`/10x-plan kit-round-3-intake`
+`/10x-plan-review kit-round-3-intake`
 
 ## 5. Open
 
-- Plan must cover (research.md §3): restore `authStates.loginError/resetTitle/resetBody/checkInbox` (readers `login.astro`, `reset.astro`); `home.astro` `StatCard` → `stats[1].label`, keep `copyExtra.home.risen` feet (kit „{n} {items} podrożały” wrong for n=1; smoke `>1 pozycja podrożała<`); `PatternsTable.tsx` header from 7 kit labels mapped to current body order (Suma before Kwota), drop `copyExtra.patterns.amountColumn`; fill `{month}` in `fixed.astro` `copy.fixedCosts.new` (locative), `{n}` in `copy.trend.tooShort` (`trend.minimumMonths`), `passwordTooShort` + `resetNew.lead` (`MIN_PASSWORD_LENGTH`); wizard `genericError` → new `copyExtra.imports.saveError` „Nie udało się zapisać importu. Spróbuj ponownie.” (round-3 `app.js` `status==='error'`); remove `DESIGN-GAP: K18` comments at the 6 read-failure sites.
-- Pre-commit prettier reformats `design/**/*.{json,css,md}` — compare delivery vs kit by parsed JSON; run `sync-kit.sh` after the kit file is in place so `src/styles/brand.css` matches.
-- `design-kit.md`: `kit_round: 3`, matrix in research.md § Register matrix; new K-rows for: stats foot grammar, import save-failure copy not in `content.json`, `authStates` dropped twice (K12 partial), rename limit 60 vs app/DB 100 (`decision-form.ts` `parseDisplayName`, migration CHECK) → S-14, „w wrześniu” locative (pre-existing in `copyExtra.patterns.monthsLocative`), new duplicate keys; G36 closed (C5).
-- Follow-ups from change.md § Open follow-ups unchanged (Badge `new` tint → S-15; field radius / panel radius not fired).
-- No `DESIGN-GAP` added. Migration expected: no.
+- Manual Progress rows (human checklist): 1.8 `[reviewer]` kit equals delivery except 4 strings; 2.8 `[reviewer]` kit-contract assertions map to real reads; 3.6 `[visual]` screenshots desktop + ~400 px (`/login?error=1`, `/reset`, `/reset?sent=1`, `/register` short password, `/home`, `/patterns`, `/fixed`, `/settings` short password); 3.7 `[reviewer]` seam sweep / register / follow-ups; 3.8 `[human]` accept kit-text deviations (`fillMonthLocative` „we wrześniu”, `tableHeaders` body order, `copyExtra.imports.saveError`, 4 `authStates` restored in kit) and send round-4 K-rows to the author.
+- Known unguarded seam (recorded in plan P2 break 2): reader-side index reads in `home.astro` `StatCard` — guarded only by grep + kit-contract `stats[1]` pin + visual row.
+- The delivery folder is outside git; if missing at implement time → `ARTIFACT GAP`.
+- Follow-ups are created in Phase 3 (`follow-ups/review-fixes.md`, Triggers S-12/S-14/S-15). No `DESIGN-GAP` added. Migration: no.
 
 ## 6. Autonomous decisions
 
-1. **Scope derived from change.md without asking** — five questions (breaks, 55/90 claim, authStates restore, file copy, register matrix). Would change: a human scoping F-04 differently (e.g. migrating `copyExtra` in F-04).
-2. **Recommend keeping change.md decision 2 (intake patch for the 4 `authStates`)** over `copyExtra.auth`. Why: no round-3 key holds the texts, the round-3 prototype still renders them, K12 precedent, readers unchanged. Would change: the plan requiring `design/rytm-os/` to stay byte-faithful to the delivery → `copyExtra.auth`.
-3. **Recommend index-mapped table header (no visual change) in F-04, kit column order in S-14.** Why: F-04 is "no redesign"; reordering body cells is K17 adoption. Would change: the plan judging a two-cell swap trivial enough to take the kit order now.
-4. **Wizard save failure uses the prototype's „Nie udało się zapisać importu…” via `copyExtra`** rather than `authStates.genericError` / `settings.saveError`. Why: exact meaning, verbatim kit text. Would change: the author adding a `content.json` key.
-5. **Rejected the sub-agent's "do not adopt `trend.tooShort`"** — the app already shows it only as a note beside all bars (FR-013 satisfied), unchanged since round 2. Would change: a reading of FR-013 that forbids the note.
+1. **0 questions, MEDIUM** — research recommended a minimal fix per break. Would change: a product owner available.
+2. **Intake patch for the 4 `authStates`** (not `copyExtra.auth`). Would change: a byte-faithful-kit rule.
+3. **`tableHeaders` maps kit labels to the current body order**; kit order left to S-14. Would change: S-14 dropped from the run.
+4. **Shared `fillMonthLocative` with „we wrześniu”**, applied to `/fixed` and the pattern detail (`sumLabel`, `overInMonth`) — deviates from the kit's literal „w wrześniu” (kit text, not PRD; `[human]` 3.8). Would change: the author fixing the template.
+5. **`{n}` from `trend.minimumMonths` and `MIN_PASSWORD_LENGTH`**, kit numbers pinned equal by the kit-contract test. Would change: PRD changing the trend minimum, or kit/app disagreement (app wins).
+6. **Kit swap + app adaptation in one phase, commit `feat(…): … (p1)`** instead of the round-2 separate `design:` commit. Would change: nothing short of `copy.ts` no longer importing the kit JSON.
+7. **Index-read guard = unit test + grep**, not `noUncheckedIndexedAccess`. Would change: a repo-wide hardening change.
+8. No decision departs from the PRD's literal text; kit-text departures are grouped in `[human]` 3.8.

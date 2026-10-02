@@ -10,7 +10,7 @@ Written by the `/10x-implement … phase 6` step of run `2026-10-02-kit-round-3`
 | Commits | 16 on the branch: identity, research, plan, plan review, p1–p5 with handoffs, p6 `feat(…): Login, register, reset and field styling (p6)` (40d78f6), this handoff |
 | Pushed / PR / merged | no / none / no |
 | `change.md` status | `implementing` |
-| `## Progress` rows remaining | 21 (`grep -c '^- \[ \]' plan.md`) |
+| `## Progress` rows remaining | 22 (`grep -c '^- \[ \]' plan.md`) |
 | Working tree | clean after the handoff commit |
 
 ## 2. Artifacts

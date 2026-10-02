@@ -580,12 +580,12 @@ the kit-text departures are collected in the Phase 6 `[human]` row.
 
 #### Automated
 
-- [x] 1.1 npm test: baseline + import-presentation and kit-contract cases, detect oversized case tooLarge, 0 failed
-- [x] 1.2 Smoke baseline + 2 PASS, 0 FAIL, no existing assertion edited
-- [x] 1.3 No G27/K26 comment left in import code
-- [x] 1.4 Deliberate break: size → unknownFormat in readImportFile turns detect test red, restored, meta-check recorded
-- [x] 1.5 Deliberate break: invalid → unknownFormat turns the ?error=invalid smoke step red, restored
-- [x] 1.6 Full local gate vs baseline, smoke + 2
+- [x] 1.1 npm test: baseline + import-presentation and kit-contract cases, detect oversized case tooLarge, 0 failed — bf10335
+- [x] 1.2 Smoke baseline + 2 PASS, 0 FAIL, no existing assertion edited — bf10335
+- [x] 1.3 No G27/K26 comment left in import code — bf10335
+- [x] 1.4 Deliberate break: size → unknownFormat in readImportFile turns detect test red, restored, meta-check recorded — bf10335
+- [x] 1.5 Deliberate break: invalid → unknownFormat turns the ?error=invalid smoke step red, restored — bf10335
+- [x] 1.6 Full local gate vs baseline, smoke + 2 — bf10335
 
 #### Manual
 

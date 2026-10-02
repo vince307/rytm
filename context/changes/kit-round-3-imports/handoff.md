@@ -1,76 +1,83 @@
 # Handoff — `kit-round-3-imports` (slice S-13)
 
-Written by the `/10x-plan-review` step. Verdict PROCEED: 0 critical, 4 warnings (all fixed in `plan.md`),
-4 observations (recorded). `change.md` is `plan_reviewed`; no product code touched. The one thing the next agent
-must not get wrong: smoke needles on island content need the leading `>` (rendered node) — the island's serialized
-props contain the same kit strings (plan review F1), and the five smoke rewrites (P3 ×3, P4 ×2) are the only
-existing assertions allowed to change.
+Written by the `/10x-implement … phase 1` step. Phase 1 is committed (`bf10335`) and green; `change.md` is
+`implementing`. The one thing the next agent must not get wrong: smoke needles on island content need the leading `>`
+(rendered node), and `ImportWizardLabels` now carries `kit` (= `copy.imports`) next to the `copyExtra` placeholders
+`imports` — steps 2–3 still read `x` (= `labels.imports`) for strings P2 rebinds.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-imports`, cut from `main` at `2a8f89d` (F-04 merged) |
-| Commits | 4 on the branch: `6e369ff` identity, `8720f42` research, `60f4fae` plan, + `docs(kit-round-3-imports): plan review` (this step) |
+| Commits | `6e369ff` identity, `8720f42` research, `60f4fae` plan, `ef3aee2` plan review, `bf10335` Phase 1, + this handoff/Progress-SHA commit |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `plan_reviewed` |
-| `## Progress` rows remaining | 40 of 40 (`grep -c '^- \[ \]' plan.md`) |
-| Working tree | clean after the commit, except the maintainer allow-list (`tree-clean.sh`) |
+| `change.md` status | `implementing` |
+| `## Progress` rows remaining | 34 of 40 (`grep -c '^- \[ \]' plan.md`) |
+| Working tree | clean after the commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/kit-round-3-imports/reviews/plan-review.md` | Review report: grounding, 8 findings with decisions, `VERDICT: PROCEED` |
-| `context/changes/kit-round-3-imports/plan.md` | Fixes F1–F4 in place; new `## Known risks` (F5, F6); K33 contract and `[human]` 6.8 text extended (F7, F8) |
-| `context/changes/kit-round-3-imports/plan-brief.md` | Phase 5 row: step 3 unreachable when locked |
-| `context/changes/kit-round-3-imports/change.md` | `status: planned → plan_reviewed` |
-| `context/changes/kit-round-3-imports/handoff.md` | This file |
+| `src/lib/import/presentation.ts` | new: `fillTemplate`, `bankDisplayName`, `accountDisplay`, `fileErrorMessage`, `tooManyMessage` |
+| `src/lib/import/detect.ts` | `FileError` gains `tooLarge`; G27 comments removed |
+| `src/components/imports/ImportWizard.tsx` | step 1 from `labels.kit`; `readStatement` → `tooLarge`; `Headline` of `fileErrorMessage` / `tooManyMessage` / `errors.inconsistent`; local `fill` = `fillTemplate` |
+| `src/pages/imports/new.astro` | kit `supported`, `copy.importErrors` unmodified, `kit: copy.imports` (K26 override dropped) |
+| `src/pages/home.astro` | CTA = `copy.imports.choose` |
+| `src/content/copy.ts` | removed from `copyExtra.imports`: `newEyebrow`, `newLead`, `back`, `dropTitle`, `choose`, `supported`, `unknownFormat`, `formatRecognised` |
+| `test/unit/import-presentation.test.ts` | new, 7 cases |
+| `test/unit/detect.test.ts`, `test/unit/kit-contract.test.ts` | oversized → `tooLarge`; +1 contract case (limits, placeholders, bank names) |
+| `scripts/smoke.mjs` | +2 steps (`>Obsługujemy pliki CSV…<`, `>Plik jest niespójny:`) after "import result renders the debit count" |
+| `context/changes/kit-round-3-imports/plan.md`, `change.md`, `handoff.md` | Progress 1.1–1.6 ticked with SHA; status; this file |
 
 ## 3. Verification
 
-| Command | Result |
+| Command | Result (observed this step) |
 | --- | --- |
-| `git branch --show-current` | `feat/kit-round-3-imports` |
-| Path/symbol grounding (`ls`, grep of `ImportWizard.tsx`, `new.astro`, `detect.ts`, `banks.ts`, `demo.ts`, `format.ts`, `ServerError.tsx`, smoke pins) | 9/9 paths, 14/14 symbols, all kit keys present in `content.json`; `G38`/`K33` free in `design-kit.md` |
-| Progress↔Phase check | 6 phases, 40 rows, one `## Progress`, unchanged by the review |
-| Follow-up `Trigger:` sweep (`context/archive/*/follow-ups/review-fixes.md`) | no `Trigger: S-13`; fired/near-fired entries covered by `change.md` table + plan P6 (F8) |
-| lint / astro check / vitest / build / pgTAP / smoke | not run: review-only step, no code changed. Baseline (contract, inherited, unverified): lint 0, astro check 0/152, vitest 347/22, build OK, pgTAP 6/119, smoke 157/0 — Phase 1 measures it on the branch |
+| `npm run lint` | 0 errors (baseline 0) |
+| `npx astro check` | 0 errors (baseline 0) |
+| `npm run fixture:check` | ing OK, santander OK |
+| `npm test` | 355 passed / 23 files (baseline 347 / 22, +8: 7 presentation, 1 kit-contract; detect case reworded) |
+| `npm run build` | OK |
+| `npx supabase db reset && npx supabase test db` | Files=6, Tests=119, PASS (Δ0) |
+| `npm run smoke` (port 4398) | 159 PASS / 0 FAIL (baseline 157, +2); no existing assertion edited |
+| `grep "G27\|K26" src/components/imports src/lib/import src/pages/imports` | empty |
+| Break 1: `readImportFile` size → `unknownFormat` | `detect.test.ts` 1 failed → restored → 11 passed. Meta-check: proves the library path only; the wizard's own `file.size` check has no unit test (reviewer 1.7) |
+| Break 2: wizard `invalid` → `errors.unknownFormat` | smoke `import wizard shows the inconsistent-file message…` FAIL → restored → green. Meta-check: proves the rendered server-error node; the break was in `ImportWizard.tsx` (not `new.astro`, which no longer maps the kind) |
 
 ## 4. Next command
 
-`/10x-implement kit-round-3-imports phase 1`
+`/10x-implement kit-round-3-imports phase 2`
 
 ## 5. Open
 
-- **Phases** (each implemented by a fresh agent): P1 helpers + step 1 + rejections; P2 wizard steps 2–3; P3 history +
-  dialog (+ `InfoAlert`); P4 result + G38; P5 demo note on wizard step 1; P6 register, seam sweep, visual gate.
-- **Binding review fixes** (in `plan.md`): demo gating `error ? 1 : existing.length` in `new.astro` (fail closed);
-  dialog demo note = `copy.imports.demoDeleteBlocked`; overlap smoke needle `>Ten zakres nachodzi…`; no step-3 demo
-  change (unreachable).
-- **New gap ids:** `G38` (no desktop `.result-layout`/`.result-meta` in kit CSS; row + `DESIGN-GAP` in P4), `K33`
-  (kit-author list; row in P6, now also lists the `app.js` demo-note wording, „5 000”, unreachable step-3 note).
-- **Manual-only rows (human checklist):** [reviewer] 1.7, 2.7, 3.7, 4.6, 5.5, 6.7; [visual] 6.6 (every listed
-  state desktop + ~400 px; too-many via scratchpad CSV or N/A); [human] 6.8 accept S-13 kit deviations incl. dropped
-  skipped-credits cell and 200 not-found, send G38 + K33 to the kit author.
-- **Risks** (`plan.md` `## Known risks` + Phase notes): `ImportWizard` `submitting` has no bfcache reset; `>Bank<`
-  short needle; React SSR `<!-- -->` splitting; closed Radix dialog not in SSR (visual-only proof); F8 dialog
-  `max-h` at 400 px.
-- **Follow-ups:** none yet; P6 creates `follow-ups/review-fixes.md` only if it defers something.
+- **Manual-only rows (human checklist):** [reviewer] 1.7 (`readStatement` returns `tooLarge` before reading; removed
+  `copyExtra` keys have no reader — `grep` done here, none left), 2.7, 3.7, 4.6, 5.5, 6.7; [visual] 6.6; [human] 6.8.
+- **Still to rebind (later phases):** `ImportWizard` `x.stepBack`, `x.summary.*`, `x.confirm/importing`,
+  `x.overlapPrefix/overlapTail`, `x.bankName`, `accountLabel()`, `x.demoLocked` (G37 comment, P5); `index.astro` /
+  `result.astro` still read `copyExtra.imports` (P3/P4).
+- **Roadmap:** S-13 row in `context/foundation/roadmap.md` still `planning`; not touched by this step (orchestrator-owned).
+- **Risks:** unchanged (`plan.md` `## Known risks`: `submitting` has no bfcache reset; `>Bank<` short needle in P3).
+- **Follow-ups:** none; `follow-ups/review-fixes.md` not created.
+- **Pre-existing:** `npx prettier --check src` warns on `src/styles/brand.css` (generated by `sync-kit.sh`, untouched).
 
 ## 6. Autonomous decisions
 
-1. **Verdict PROCEED, not RETHINK.**
-   - Why: the approach is grounded in code; findings were narrow wording/edge gaps.
-   - Would change: a kit key the plan relies on missing, or a server change being needed.
-2. **F4: drop the step-3 demo-locked UI instead of building it.**
-   - Rejected: building it for kit parity (dead, untestable code; a visual state nobody can produce).
-   - Would change: a path that reaches step 3 while locked (e.g. gating moved off step 1).
-3. **F8: product-visible choices (skipped-credits cell dropped, 200 not-found) kept, added to `[human]` 6.8.**
-   - Why: neither contradicts FR-003/FR-004/FR-005/FR-018; the kit draws both.
-   - Would change: the owner reading FR-003 as requiring the skipped count on the summary.
-4. **F5/F6 to Known risks, not fixed.**
-   - Why: F5 is pre-existing and out of scope; F6 is resolved by the deliberate break already in P3.
-   - Would change: the visual gate reproducing the stuck button (then fix in P6 or follow-up with `Trigger:`).
-5. **Plan-time decisions 1–13 in `plan.md` upheld unchanged.**
-   - Would change: as listed in that table.
+1. **Execution mode: implemented in this context, not delegated.**
+   - Why: the run is already one fresh agent per step; no human to ask.
+   - Would change: a phase too large for the ~300k context budget.
+2. **Skipped the manual-confirmation gate and commit-message prompt; used the plan's phase title as subject.**
+   - Why: contract rule 1; `[reviewer]` row 1.7 left unticked for the reviewer.
+   - Would change: a maintainer present to confirm.
+3. **`labels.kit` added as a new field instead of replacing `labels.imports`.**
+   - Rejected: replacing — steps 2–3 still need the `copyExtra` placeholders until P2–P5.
+   - Would change: P2 finishing the rebind (then `imports` can shrink to K11/K28 keys only).
+4. **`tooManyMessage` exported from `presentation.ts` (plan allowed helper or `fillTemplate`).**
+   - Why: one tested place for the step-3 message.
+   - Would change: nothing material.
+5. **Kept `copyExtra.imports.santanderAccountName` (wizard reads it) but dropped its stale K26 comment.**
+   - Would change: kit `imports.santanderAccountName` adopted by the wizard in a later phase.
+6. **Roadmap item not flipped to `in-progress`.**
+   - Why: its status is `planning`, set by the autonomous-run orchestrator which owns roadmap bookkeeping.
+   - Would change: the orchestrator asking the implement step to do it.

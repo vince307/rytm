@@ -83,8 +83,6 @@ interface Loaded {
   detected: Extract<DetectResult, { ok: true }>;
 }
 
-const fill = fillTemplate;
-
 // Prototype .panel
 const panel = "border-line bg-paper rounded-xl border p-[22px] max-[559px]:p-[17px]";
 // Prototype .flow-actions — wraps on a phone so two ghost buttons never push the page sideways.
@@ -307,7 +305,7 @@ export default function ImportWizard({ labels, existing, serverError, demoLocked
             <div className="bg-paper-soft text-muted mt-[25px] flex items-center gap-[9px] rounded-lg px-3.5 py-[11px] text-xs">
               <Glyph name="success" className="text-green" />
               <span className="min-w-0 [overflow-wrap:anywhere]">
-                {loaded.fileName} · {fill(kit.formatRecognised, { bank: kit.bankName[loaded.detected.bank] })}
+                {loaded.fileName} · {fillTemplate(kit.formatRecognised, { bank: kit.bankName[loaded.detected.bank] })}
               </span>
               <button
                 type="button"
@@ -340,9 +338,9 @@ export default function ImportWizard({ labels, existing, serverError, demoLocked
       <>
         {fileInput}
         <StepTitle
-          eyebrow={fill(x.stepEyebrow, { n: 2 })}
+          eyebrow={fillTemplate(x.stepEyebrow, { n: 2 })}
           title={x.accountTitle}
-          lead={fill(x.accountLead, { n, accounts: plural(n, x.accountForms) })}
+          lead={fillTemplate(x.accountLead, { n, accounts: plural(n, x.accountForms) })}
           headingRef={headingRef}
         />
         <section className={cn(panel, "max-w-[700px]")}>
@@ -413,7 +411,7 @@ export default function ImportWizard({ labels, existing, serverError, demoLocked
     <>
       {fileInput}
       <StepTitle
-        eyebrow={fill(x.stepEyebrow, { n: 3 })}
+        eyebrow={fillTemplate(x.stepEyebrow, { n: 3 })}
         title={x.summaryTitle}
         lead={flow.oneAccount}
         headingRef={headingRef}
@@ -471,7 +469,7 @@ export default function ImportWizard({ labels, existing, serverError, demoLocked
                 {flow.back}
               </Button>
               <SubmitButton size="default" pendingText={flow.waiting} pending={submitting}>
-                {fill(flow.importButton, { n: chosen.debits, debits: plural(chosen.debits, flow.debitForms) })}
+                {fillTemplate(flow.importButton, { n: chosen.debits, debits: plural(chosen.debits, flow.debitForms) })}
               </SubmitButton>
             </div>
           </form>

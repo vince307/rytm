@@ -10,7 +10,7 @@ import InlineAlert from "@/components/app/InlineAlert.astro";
 import Panel from "@/components/app/Panel.astro";
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
-import { accountDisplay, bankDisplayName } from "@/lib/import/presentation";
+import { accountDisplay, bankDisplayName, fillTemplate } from "@/lib/import/presentation";
 import { createClient } from "@/lib/supabase";
 import { formatRangeShort, plural } from "@/lib/format";
 
@@ -49,7 +49,7 @@ if (imported && parsedId.success) {
   n = count ?? 0;
 }
 
-const title = x.resultTitle.replace("{n}", String(n)).replace("{debits}", plural(n, x.debitForms));
+const title = fillTemplate(x.resultTitle, { n, debits: plural(n, x.debitForms) });
 const meta = imported
   ? [
       [flow.bank, bankDisplayName(k.bankName, imported.source)],

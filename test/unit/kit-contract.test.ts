@@ -60,4 +60,14 @@ describe("kit contract (content.json as the app reads it)", () => {
     expect(copy.imports.bankName.ing.length).toBeGreaterThan(0);
     expect(copy.imports.bankName.santander.length).toBeGreaterThan(0);
   });
+
+  it("keeps the import templates and plural forms the wizard and the delete dialog fill (S-13 review F1)", () => {
+    // ImportWizard splits `overlap` at `{range}` — without it the range link would silently vanish.
+    expect(copy.importErrors.overlap.split("{range}")).toHaveLength(2);
+    expect(copy.imports.deleteTitle).toContain("{range}");
+    expect(copy.importFlow.importButton).toContain("{n}");
+    expect(copy.importFlow.importButton).toContain("{debits}");
+    // new.astro casts `importFlow.debitForms` to a 3-tuple for `plural()`.
+    expect(copy.importFlow.debitForms).toHaveLength(3);
+  });
 });

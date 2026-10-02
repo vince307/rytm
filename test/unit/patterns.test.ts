@@ -236,6 +236,69 @@ describe("derivePatterns — F-02 oracle with the fixture decisions (S-05)", () 
   });
 });
 
+// S-11 Phase 1 safety net: pins ING key TEXT before the Santander step is added to `rawMerchant`. The F-02
+// partition test above only sees the grouping (sets of bankTxId), never the key string, so a consistent rename of
+// every ING key would stay green there while silently orphaning saved `pattern_thresholds` / `pattern_decisions`
+// rows. `ING_KEYS` is generated — not hand-typed — from `merchantKey(rawMerchant(counterparty, title))` run on this
+// branch before Phase 2 (= `main` 9f63fd9), one entry per distinct oracle `rawMerchant` of the ING main fixture.
+describe("ING merchant keys — text pin (S-11)", () => {
+  const ING_KEYS: Record<string, string> = {
+    "STACJA PALIW DROGOWSKAZ UL. DROGOWA 1 KRAKÓW": "stacja paliw drogowskaz",
+    "RESTAURACJA POD PRZYKŁADEM UL. SMACZNA 2 WROCŁAW": "restauracja pod przykładem",
+    "URZĄD SKARBOWY W PRZYKŁADOWIE": "urząd skarbowy w przykładowie",
+    "PIZZERIA TRZY SERY UL. MAKOWA 9 KRAKÓW": "pizzeria trzy sery",
+    "SKLEP ZOOLOGICZNY PAZUREK UL. PSIA 6 KRAKÓW": "sklep zoologiczny pazurek",
+    "KINOTEKA SP. Z O.O. UL. EKRANOWA 21 WARSZAWA": "kinoteka",
+    "MINIMARKET PRZYSTANEK 1187 AL. ŚWIERKOWA 5 KRAKÓW": "minimarket przystanek",
+    "KINO ŚWIATŁO UL. FILMOWA 2 KRAKÓW": "kino światło",
+    "JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO": "jan przykładowy",
+    "ZAKŁAD UBEZPIECZEŃ SPOŁECZNYCH": "zakład ubezpieczeń społecznych",
+    "MUZYKALNIA SP. Z O.O. UL. NUTOWA 4 WARSZAWA": "muzykalnia",
+    "ADAM TESTOWY": "adam testowy",
+    "SIŁOWNIA RUCH UL. MOCNA 10 KRAKÓW": "siłownia ruch",
+    "PAYPAL EUROPE S.A.R.L. ET CIE S.C.A LUXEMBOURG": "paypal europe",
+    "kawa-testowa.pl": "kawa-testowa.pl",
+    "ALLEGRO SP. Z O.O. UL. PRZYKŁADOWA 5 POZNAŃ": "allegro",
+    "PIEKARNIA KŁOSEK PIEKARNIA KŁOSEK ŁÓDŹ": "piekarnia kłosek łódź",
+    "PIOTR FIKCYJNY": "piotr fikcyjny",
+    "SPORTOWO SP. Z O.O. ul. Biegowa 7 Gdynia": "sportowo",
+    "ksiegarnia-przyklad.pl": "ksiegarnia-przyklad.pl",
+    "KAWIARNIA FILIŻANKA UL. RYNEK 3 KRAKÓW": "kawiarnia filiżanka",
+    "MINIMARKET PRZYSTANEK 0412 UL. TORUŃSKA 12 KRAKÓW": "minimarket przystanek",
+    "RACHUNEK VAT PRZYKŁADOWA FIRMA": "rachunek vat przykładowa firma",
+    "apteka-przyklad.pl": "apteka-przyklad.pl",
+    "PRZYKŁADOWA FIRMA JAN PRZYKŁADOWY UL. TESTOWA 1A 00-001 PRZYKŁADOWO": "przykładowa firma jan przykładowy",
+    "MARIA PRZYKŁADOWA": "maria przykładowa",
+    "sportowo.pl UL. BIEGOWA 7 GDYNIA": "sportowo.pl",
+    'PHU "PRZYKŁAD" JAN TESTOWY UL. LEŚNA 3 PRZYKŁADOWO': 'phu "przykład" jan testowy',
+    "https://www.bilety-przyklad.pl": "bilety-przyklad.pl",
+    "DROGERIA LAWENDA UL. KWIATOWA 14 KRAKÓW": "drogeria lawenda",
+    "AUTOPAY S.A. UL. PRZYKŁADOWA 9 SOPOT": "autopay",
+    "kurs-przyklad.pl": "kurs-przyklad.pl",
+  };
+
+  it("covers every distinct oracle raw merchant exactly once (no missing, no extra)", () => {
+    const distinctRaws = new Set(
+      expected.rows
+        .filter((r) => r.file === MAIN && r.imported)
+        .map((r) => r.rawMerchant)
+        .filter((raw): raw is string => raw != null),
+    );
+    expect(Object.keys(ING_KEYS).sort()).toEqual([...distinctRaws].sort());
+  });
+
+  it("merchantKey(rawMerchant(counterparty, title)) matches the pin for every imported row", () => {
+    const sources = fixtureSources();
+    const byId = new Map(sources.map((s) => [s.id, s]));
+    for (const row of expected.rows.filter((r) => r.file === MAIN && r.imported)) {
+      if (row.rawMerchant == null) continue;
+      const source = byId.get(row.bankTxId);
+      if (!source) throw new Error(`no source for ${row.bankTxId}`);
+      expect(merchantKey(rawMerchant(source.counterparty, source.title))).toBe(ING_KEYS[row.rawMerchant]);
+    }
+  });
+});
+
 describe("rawMerchant — rule 7 / D3", () => {
   it("takes the domain after Nr transakcji for an operator (T04)", () => {
     expect(rawMerchant("PayU S.A.", "Płatność Nr transakcji 123456789 kawa-testowa.pl")).toBe("kawa-testowa.pl");
@@ -277,6 +340,10 @@ describe("normalizeMerchant", () => {
     ["PIEKARNIA KŁOSEK PIEKARNIA KŁOSEK ŁÓDŹ", "PIEKARNIA KŁOSEK ŁÓDŹ"],
     ["  ADAM    TESTOWY  ", "ADAM TESTOWY"],
     ["BAR 12 KRAKÓW", "BAR 12 KRAKÓW"],
+    // merchant-patterns follow-ups F3: a standalone `S.C.A` legal form (not inside the `S.A.R.L. ET CIE S.C.A`
+    // combination above) and an `http://` (not `https://`) scheme.
+    ["FIRMA S.C.A JAN I ANNA", "FIRMA"],
+    ["http://www.sklep-testowy.pl/", "sklep-testowy.pl"],
   ])("%s → %s", (raw, name) => {
     expect(normalizeMerchant(raw)).toBe(name);
   });

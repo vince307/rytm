@@ -16,5 +16,7 @@ export function isBankSource(value: string): value is BankSource {
  */
 export function accountLabel(templates: Record<BankSource, string>, source: string, name: string): string {
   const template = isBankSource(source) ? templates[source] : templates.ing;
-  return template.replace("{name}", name);
+  // A function replacement (not a string) so an account name containing `$&` / `$1` renders verbatim instead of
+  // being interpreted as a String.replace substitution pattern (S-10 follow-up F4).
+  return template.replace("{name}", () => name);
 }

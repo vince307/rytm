@@ -1,10 +1,10 @@
 ---
 change_id: santander-csv-import
 title: Santander Bank Polska CSV import on the same rules as ING
-status: impl_reviewed
+status: archived
 created: 2026-10-02
 updated: 2026-10-02
-archived_at: null
+archived_at: 2026-10-02T00:50:21Z
 ---
 
 ## Notes

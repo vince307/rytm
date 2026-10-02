@@ -487,6 +487,6 @@ the kit-text departures are collected in the Phase 3 `[human]` row.
 
 #### Manual
 
-- [ ] 3.6 [visual] Screenshots desktop + ~400 px of every listed state, compared with the kit views
+- [x] 3.6 [visual] Screenshots desktop + ~400 px of every listed state, compared with the kit views — reviews/visual-review.md (VISUAL: PASS), register fix 0bb4588
 - [x] 3.7 [reviewer] Seam sweep complete; register matches research matrix; follow-ups carry Trigger lines — impl review, fixes d279eef
 - [ ] 3.8 [human] Accept F-04 kit-text deviations and send the round-4 K-rows to the kit author

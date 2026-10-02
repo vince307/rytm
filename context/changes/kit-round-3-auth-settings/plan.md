@@ -761,13 +761,13 @@ are collected in the Phase 8 `[human]` row.
 
 #### Automated
 
-- [x] 7.1 npm test: Phase 6 count + new kit-contract cases, 0 failed
-- [x] 7.2 Smoke Phase 6 count + 3 PASS, 0 FAIL
-- [x] 7.3 No demoLocked / passwordsDiffer / DESIGN-GAP: G37 left in src
-- [x] 7.4 Deliberate break: resendCountdown placeholder pin turns kit-contract red, restored, meta-check recorded
-- [x] 7.5 Deliberate break: expired branch without the eyebrow turns the expired step red, restored
-- [x] 7.6 Deliberate break: ResendButton old template turns the countdown smoke step red, restored, meta-check recorded
-- [x] 7.7 Full local gate vs baseline, smoke + 18
+- [x] 7.1 npm test: Phase 6 count + new kit-contract cases, 0 failed — df93ec3
+- [x] 7.2 Smoke Phase 6 count + 3 PASS, 0 FAIL — df93ec3
+- [x] 7.3 No demoLocked / passwordsDiffer / DESIGN-GAP: G37 left in src — df93ec3
+- [x] 7.4 Deliberate break: resendCountdown placeholder pin turns kit-contract red, restored, meta-check recorded — df93ec3
+- [x] 7.5 Deliberate break: expired branch without the eyebrow turns the expired step red, restored — df93ec3
+- [x] 7.6 Deliberate break: ResendButton old template turns the countdown smoke step red, restored, meta-check recorded — df93ec3
+- [x] 7.7 Full local gate vs baseline, smoke + 18 — df93ec3
 
 #### Manual
 

@@ -1,59 +1,66 @@
 # Handoff — `kit-round-3-auth-settings` (slice S-12)
 
-Written by the `/10x-implement … phase 6` step of run `2026-10-02-kit-round-3`. Phases 1–6 are committed and green. The next agent must not miss that `copyExtra.auth` still holds `registerVisual`, `resetVisual` and `passwordPlaceholder` (read by `confirm-email.astro` / `reset/new.astro`, remove in P7 once unread) and `copyExtra.settings.demoLocked` (P7); no existing smoke assertion may be edited.
+Written by the `/10x-implement … phase 7` step of run `2026-10-02-kit-round-3`. Phases 1–7 are committed and green. The next agent must not miss that phase 8 owns the gap register, the seam sweep and the visual gate, and that no existing smoke assertion may be edited.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-auth-settings`, cut from `main` at `60e92e1` (after S-13) |
-| Commits | 16 on the branch: identity, research, plan, plan review, p1–p5 with handoffs, p6 `feat(…): Login, register, reset and field styling (p6)` (40d78f6), this handoff |
+| Commits | 18 on the branch: identity, research, plan, plan review, p1–p6 with handoffs, p7 `feat(…): Confirm-email, reset/new and the resend countdown (p7)` (df93ec3), this handoff |
 | Pushed / PR / merged | no / none / no |
 | `change.md` status | `implementing` |
-| `## Progress` rows remaining | 22 (`grep -c '^- \[ \]' plan.md`) |
+| `## Progress` rows remaining | 15 (`grep -c '^- \[ \]' plan.md`) |
 | Working tree | clean after the handoff commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `src/pages/login.astro`, `register.astro`, `reset.astro` | rebound to `copy.auth.*` (visual, placeholders, links, terms, optional) and `copy.confirmEmail.{eyebrow,title}`; `?deleted=1` reads `copy.settings.deletedNotice` |
-| `src/components/auth/FormField.tsx` | input `rounded-[8px] bg-paper` |
-| `src/content/copy.ts` | removed from `copyExtra.auth`: `loginVisual`, `optional`, `namePlaceholder`, `emailPlaceholder`, `forgotPassword`, `terms`, `noAccount`, `createIt`, `haveAccount`, `resetEyebrow`, `sendInstructions`, `backToLogin`, `checkInboxEyebrow/Title`, `deletedLogin` (+ G24 comment) |
-| `scripts/smoke.mjs` | +1 step `login shows the full deleted notice` (anchored `>…<`) |
-| `plan.md`, `handoff.md` | Progress rows 6.1–6.5 ticked with SHA |
+| `src/pages/confirm-email.astro` | own visual `copyExtra.auth.confirmEmailVisual`; passes `countdown={c.resendCountdown}` |
+| `src/components/auth/ResendButton.tsx` | new `countdown` prop, renders the `{seconds}` template |
+| `src/pages/reset/new.astro` | `resetNewVisual`; kit expired layout (eyebrow, h1, lead, alert, button); `?error=demo` -> `copy.settings.demoPasswordBlocked`; labels from `authStates.*`; placeholder from `copy.auth.passwordPlaceholder` |
+| `src/pages/register.astro` | visual rebound to kit `copy.auth.registerVisual` (it still read the `copyExtra` copy) |
+| `src/content/copy.ts` | added `copyExtra.auth.{confirmEmailVisual,resetNewVisual,expiredEyebrow,expiredLead,expiredAlert}`; removed `registerVisual`, `resetVisual`, `passwordPlaceholder`, `newPassword`, `repeatPassword`, `passwordsDiffer`, `settings.demoLocked` (+ G37 comment) |
+| `test/unit/kit-contract.test.ts` | +1 `it` (resendCountdown `{seconds}`, authStates keys) |
+| `scripts/smoke.mjs` | +3 steps: `reset/new expired shows the kit layout`, `confirm-email shows its own panel`, `confirm-email resent shows the kit countdown` |
+| `plan.md`, `handoff.md` | Progress rows 7.1–7.7 ticked with SHA |
 
 ## 3. Verification
 
 | Command | Result |
 | --- | --- |
 | `npm run lint` | 0 errors (baseline 0) |
-| `npx astro check` | 0 errors, 3 hints |
+| `npx astro check` | 0 errors, 3 hints (155 files baseline; 157 now) |
 | `npm run fixture:check` | ing OK, santander OK |
-| `npm test` | 353 passed / 23 files (P5 count 353, Δ0; run baseline 352) |
+| `npm test` | 354 passed / 23 files (P6 353, +1; run baseline 352, +2) |
 | `npm run build` | OK |
 | `npx supabase db reset` + `test db` | Files=6, Tests=119 PASS (Δ0) |
-| `npm run smoke` (port 4398) | 181 PASS / 0 FAIL (P5 180, +1; run baseline 166, +15) |
-| `grep "bg-white\|rounded-lg" FormField.tsx` | empty |
-| Deliberate break | `login.astro` `?deleted=1` mapped to `settings.deleteSuccess`: `login shows the full deleted notice` FAIL, old `login shows the deleted state` PASS; restored with `git checkout`, `db reset`, full gate green. Meta-check: shows the old substring step cannot detect this rebind; the new anchored step does |
+| `npm run smoke` (port 4398) | 184 PASS / 0 FAIL (P6 181, +3; run baseline 166, +18) |
+| `grep G37 / settings.demoLocked / x.passwordsDiffer src` | empty (the plan's bare `demoLocked\|passwordsDiffer` grep also matches the unrelated `ImportWizard` prop `demoLocked` and the `NewPasswordForm` label `passwordsDiffer`, which are not copy keys) |
+| Break 1 | kit-contract assertion pointed at `{n}`: new `it` red (1 failed), restored. Meta-check: proves the template key only, not `ResendButton` rendering |
+| Break 2 | expired branch without `{x.expiredEyebrow}`: `reset/new expired shows the kit layout` FAIL, restored. Meta-check: the old `Ten link już wygasł.` step stays green, the new anchored step catches it |
+| Break 3 | `ResendButton` back to `${label} (${left}s)`: `confirm-email resent shows the kit countdown` FAIL, restored. Meta-check: proves the SSR initial state; the tick-down is client-only (visual row) |
+| After breaks | `git checkout` restored, `db reset` run, dev server on 4398 killed |
 
 ## 4. Next command
 
-`/10x-implement kit-round-3-auth-settings phase 7`
+`/10x-implement kit-round-3-auth-settings phase 8`
 
 ## 5. Open
 
 - Manual rows, as a checklist:
-  - [ ] [reviewer] rows 1.6, 2.6, 3.7, 4.5, 5.7, 6.6, 7.8, 8.7 (6.6: login/register/reset read only `copy.*` plus K11 keys; no other `bg-white` field in the slice's components — note `src/components/settings/*` and `NewPasswordForm` use `FormField`)
+  - [ ] [reviewer] rows 1.6, 2.6, 3.7, 4.5, 5.7, 6.6, 7.8, 8.7 (7.8: `/reset/new?error=demo` shows `demoPasswordBlocked`; countdown reads „Wyślij ponownie za 60 s” at load on `?resent=1` and ticks down)
   - [ ] [visual] 8.6 (all states, desktop + ~400 px)
   - [ ] [human] 8.8: accept header sign-out removal, collapsed password form, dialog closed on error, short demo strip text, redirect `/` vs PRD, longer deleted notice; send K34 to the kit author
-- P7 owns removal of `copyExtra.auth.{registerVisual,resetVisual,passwordPlaceholder}` once `confirm-email.astro` and `reset/new.astro` read kit keys, and `settings.demoLocked`.
-- `/settings` reads `copy.auth.passwordPlaceholder` (kit key, not `copyExtra`).
+- DESIGN-GAP comments added in `copyExtra.auth` (K13 visuals, K11 expired strings); P8 owns the gap-register rows in `context/foundation/design-kit.md`.
+- `copyExtra.auth.{newPassword,repeatPassword,passwordsDiffer}` are gone; `NewPasswordForm` still takes a `passwordsDiffer` label, now fed `authStates.passwordMismatch` on both pages.
 - Follow-ups for P8 in `follow-ups/review-fixes.md` as in plan; known risks as in plan § Known risks.
 - Invariants: never `npm run format`, never stage `design/**` or `src/styles/brand.css`, never touch `checkOrigin`.
 - Roadmap item S-12 not flipped (orchestrator owns roadmap).
 
 ## 6. Autonomous decisions
+
 
 1. **Implemented in this context, no subagent; commit message approved as proposed.** Why: contract forbids questions; the phase was small. Would change: a phase touching many files.
 2. **Strip dot as an inline `span` (`size-[7px] rounded-full bg-green`) directly before the text instead of a CSS `:before`.** Rejected: a global stylesheet rule. Why: Tailwind-only, kit dimensions kept. Would change: the visual gate showing misalignment.
@@ -76,3 +83,7 @@ Written by the `/10x-implement … phase 6` step of run `2026-10-02-kit-round-3`
 19. **Kept `copyExtra.auth.{registerVisual,resetVisual,passwordPlaceholder}`** because `confirm-email.astro` / `reset/new.astro` still read them (plan: remove in P7); `reset.astro` itself now reads kit `copy.auth.resetVisual` (identical text). Would change: P7 scope.
 20. **Deliberate break needed a live smoke run (two runs: first output truncated by my grep, rerun captured the red).** Would change: nothing.
 21. **Smoke +1 (180 → 181) = plan's +15 from run baseline 166; no kit-contract unit cases added (plan assigns them to P7 row 7.1).** Would change: the orchestrator expecting a unit delta now.
+22. **Implemented in this context, commit message as proposed; ran only `eslint --fix` on touched files.** Would change: nothing.
+23. **`register.astro` rebound to `copy.auth.registerVisual` (kit, identical text) because removing the `copyExtra` key broke `astro check`; handoff P6 had listed only `confirm-email` as its reader.** Would change: nothing.
+24. **Row 7.3 ticked on the intent (no copy key or G37 comment left), not on the literal grep, which also hits the unrelated `ImportWizard` `demoLocked` prop and `NewPasswordForm` `passwordsDiffer` label.** Would change: the reviewer wanting those renamed.
+25. **Smoke +3 (181 -> 184) = plan's +18 from run baseline 166; the expired step asserts the lead node too, as an array `contains`.** Would change: the orchestrator expecting a different count.

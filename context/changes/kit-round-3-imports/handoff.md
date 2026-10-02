@@ -1,6 +1,7 @@
 # Handoff — `kit-round-3-imports` (slice S-13)
 
-The visual gate step wrote this handoff. The gate ran: `VISUAL: PASS`. F7 and F8 were reproduced and fixed, and the
+Final pre-merge state, written by the archive + ship step (the archived copy must not be stale). Earlier: the
+visual gate step wrote this handoff. The gate ran: `VISUAL: PASS`. F7 and F8 were reproduced and fixed, and the
 `.dash-title` stacking below 560 px was fixed as well (`5707d1a`). [visual] 6.6 is ticked. Only [human] 6.8 is
 still open. The next agent must not miss that `PageTitle.astro` (shared) changed in this slice. `/home`,
 `/patterns`, `/fixed` and `/settings` now stack the title action below 560 px, as the round-3 kit does. Those views
@@ -11,9 +12,9 @@ were checked at 400 px, but the PR description should say it.
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-imports`, cut from `main` at `2a8f89d` (F-04 merged) |
-| Commits | `6e369ff` … `74029c7` (docs, P1–P6, epilogue, review fix + docs), `5707d1a` fix (visual gate), + this docs commit |
-| Pushed / PR / merged | no / no / no |
-| `change.md` status | `impl_reviewed` (unchanged; archive sets the next status) |
+| Commits | `6e369ff` … `74029c7` (docs, P1–P6, epilogue, review fix + docs), `5707d1a` fix (visual gate), `e26eea8` docs (visual gate), + final handoff docs + `chore(archive): close kit-round-3-imports` |
+| Pushed / PR / merged | PR/CI/merge/deploy recorded in `context/runs/2026-10-02-kit-round-3/run-log.md` |
+| `change.md` status | `archived` (folder → `context/archive/2026-10-02-kit-round-3-imports/`) |
 | `## Progress` rows remaining | 1 of 40 (`grep -c '^- \[ \]' plan.md` = 1): [human] 6.8 |
 | Working tree | clean after the commit |
 
@@ -53,7 +54,7 @@ restore, which headless Playwright does not perform.
 
 ## 4. Next command
 
-`/10x-archive kit-round-3-imports then ship (no migrations)`
+none — shipped
 
 ## 5. Open
 
@@ -65,7 +66,8 @@ restore, which headless Playwright does not perform.
   at 400 px (`visual-review.md` fix 3). The diff in `context/foundation/design-kit.md` is mostly Prettier table
   re-padding.
 - **Follow-ups** (`follow-ups/review-fixes.md`): F3 (`result.astro` `imported` select error unlogged) remains
-  deferred with its `Trigger:`. F7 and F8 are resolved.
+  deferred. Restated trigger — `Trigger: next change touching src/pages/imports/result.astro, or an observability
+  audit` (grep `context/archive/2026-10-02-kit-round-3-imports/follow-ups/review-fixes.md`). F7 and F8 are resolved.
 - **DESIGN-GAP:** none added. G38 and K33 stay open for round 4.
 - **Observations** (`visual-review.md`): the kit's static step-3 progress bar is not built; alert tints are token
   approximations; the G38 result placeholder remains.
@@ -93,3 +95,9 @@ restore, which headless Playwright does not perform.
 6. **Error query states opened by URL.** Why: they are the redirect targets of the POST endpoints and render the
    same page. Provoking `failed` or `invalid` server-side would need a broken DB or a crafted payload. Would change:
    a state whose rendering depends on more than the query string.
+7. **Archive despite one open [human] row (6.8) and one SHA-less row (6.6).** Rejected: holding the archive until
+   the owner accepts the kit-text deviations. Why: 6.8 is an owner decision (accept deviations, send G38/K33 to the
+   kit author) that no code change depends on; it goes to the PR's „Do decyzji właściciela produktu” list as a
+   post-run checklist. 6.6 is a [visual] row whose fix commit is `5707d1a`; SHA-less is a soft signal. No SHA
+   repoint: the branch merges with `--merge`, so every Progress SHA stays in `main`'s history. Would change: the
+   owner rejecting a deviation (then a new change, not a reopened archive).

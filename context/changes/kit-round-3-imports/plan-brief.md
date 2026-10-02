@@ -63,7 +63,7 @@ Pages compute the demo flag from `isDemoEmail` / `demoImportAllowed` and pass it
 | 2. Wizard steps 2–3 | 4-cell summary, kit button and overlap template | Step 3 is client-only (visual proof) |
 | 3. History + dialog | Bank column, tail, kit statuses, `InfoAlert`, demo dialog | Closed dialog not in SSR HTML |
 | 4. Result page | `result-meta`, not-found state, `accountLabel()` retired, G38 | Smoke rewrites must stay deliberate |
-| 5. Demo notes in wizard | Up-front note, disabled picker/drop/button | Must not block the seed's first import |
+| 5. Demo notes in wizard | Up-front note, disabled picker/drop (step 3 unreachable when locked) | Must not block the seed's first import |
 | 6. Register + seam sweep + visual | Register statuses, K33, greps, screenshots | Many states to capture |
 
 **Prerequisites:** F-04 merged (`2a8f89d`); local Supabase; branch `feat/kit-round-3-imports`.

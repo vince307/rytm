@@ -54,7 +54,7 @@ Source: `research.md` (§1–§8, Code References) and `change.md` (claims table
   `demoDeleteBlocked`; dialog „Usunąć import z zakresu 01.05–31.05.2026?”, kit body, demo note + disabled button.
 - `/imports/result`: icon, eyebrow „Import gotowy.”, h1 „Dodaliśmy N obciążeń.”, `result-meta` panel Bank /
   Rachunek / Zakres dat / Transakcje, actions; a malformed or unknown id renders the kit not-found state (200).
-- Demo account with ≥ 1 import: info note + disabled picker on step 1, disabled import button + note on step 3.
+- Demo account with ≥ 1 import: info note + disabled picker (and blocked drop) on step 1, so step 3 is never reached.
 - `copyExtra.imports` holds only K11 / K19 / K28 placeholders, each with a register note; no stale `DESIGN-GAP`
   for K16, K19 (except the eyebrow), K20, K26, G25, G26, G27, G30, G37 in import code; one new `G38` row + comment.
 
@@ -103,7 +103,9 @@ template at `{range}` and render the range (`formatRangeLong`, unchanged) as `<a
 
 **Demo gating.** Wizard note = `isDemoEmail(Astro.locals.user?.email, DEMO_EMAIL) &&
 !demoImportAllowed(existingCount)` where `existingCount` is the length of `new.astro`'s `existing`, and on a read
-error fail closed (`count ?? 1`, as the endpoint does). Delete dialog note = `isDemoEmail(...)` only (undo is always
+error fail closed (the endpoint's `count ?? 1`; `existing` is `data ?? []`, so `existing.length` alone would be 0
+and fail OPEN — use `error ? 1 : existing.length`). When `demoLocked` and `?error=demo` coincide, show the sentence
+once (the `InfoAlert`; no second copy in `ServerError`). Delete dialog note = `isDemoEmail(...)` only (undo is always
 refused). The server guards remain the protection; the UI only disables. Drag & drop must also be blocked when the
 note shows (the drop zone calls `handleFile`).
 
@@ -229,7 +231,8 @@ and `debitForms` only if `index.astro` / `result.astro` no longer read them — 
 **File**: `scripts/smoke.mjs`
 
 **Contract**: +1: `/imports/new?error=overlap&from=2026-05-01&to=2026-05-31` contains
-`Ten zakres nachodzi na istniejący import:` and the rendered link node `>1 maja – 31 maja 2026<` (what
+`>Ten zakres nachodzi na istniejący import:` (the `ServerError` `<span>` node — the bare text also sits in the
+island's serialized `importErrors.overlap` prop, so it must carry the leading `>`) and the rendered link node `>1 maja – 31 maja 2026<` (what
 `formatRangeLong` returns for that range; if React SSR splits the sentence with `<!-- -->` markers, assert the two
 nodes separately, never loosen to bare text that the island's props also contain).
 
@@ -291,7 +294,7 @@ Remove the `G30` / `G37` comments.
 
 **Contract**: labels from `imports.delete/deleteTitle/deleteBody/deleteWaiting/deleteClose` (+ `copyExtra`
 `deleteDialogEyebrow`, K19 partial); title via `fillTemplate(title, { range })`; new props `demo: boolean` and
-`labels.demoNote` → `InfoAlert` between body and form, danger button `disabled` when `demo`.
+`labels.demoNote` = `copy.imports.demoDeleteBlocked` (kit `modal('deleteImport')` text) → `InfoAlert` between body and form, danger button `disabled` when `demo`.
 
 #### 4. Copy and smoke
 
@@ -389,7 +392,7 @@ not-found” (`/imports/result?id=nope`, 200, `>Nie znaleziono importu.<`) (+2).
 
 ### Overview
 
-Up-front demo state on step 1 and step 3, kit copy for the post-refusal message. Reuses `InfoAlert`; no new
+Up-front demo state on step 1 (step 3 is unreachable when locked — plan review F4), kit copy for the post-refusal message. Reuses `InfoAlert`; no new
 component.
 
 ### Changes Required:
@@ -406,8 +409,9 @@ component.
 **File**: `src/components/imports/ImportWizard.tsx`
 
 **Contract**: when `demoLocked`: step 1 shows `InfoAlert` with `importFlow.demoImportBlocked` above the drop zone,
-„Wybierz plik” disabled, `onDrop` ignores the file; step 3 import button disabled with the same `InfoAlert` below
-the grid. `pageError.kind === "demo"` → `importFlow.demoImportBlocked` (remove `G37` comment). Delete
+„Wybierz plik” disabled, `onDrop` ignores the file. Step 3 is not changed: with the picker and drop blocked a
+locked demo user cannot reach it (and an unlocked one must not be blocked), so the kit's step-3 demo note has no
+reachable state — recorded in K33 (P6), not built. `pageError.kind === "demo"` → `importFlow.demoImportBlocked` (remove `G37` comment). Delete
 `copyExtra.imports.demoLocked` (settings' own `demoLocked` untouched).
 
 #### 3. Smoke
@@ -429,7 +433,7 @@ the grid. `pageError.kind === "demo"` → `importFlow.demoImportBlocked` (remove
 
 #### Manual Verification:
 
-- [reviewer] A fresh demo account (0 imports) still sees an enabled wizard; drag & drop is blocked when locked
+- [reviewer] A fresh demo account (0 imports) still sees an enabled wizard; drag & drop is blocked when locked; a select error fails closed (`error ? 1 : existing.length`)
 
 ---
 
@@ -451,7 +455,9 @@ screenshot gate. No product behaviour change.
 `importFlow.accountLabel` and `imports.santanderAccountName`. K11 note lists the kept `copyExtra.imports` keys.
 New row `K33` for the kit author: `formatRecognised {bank}` has no short bank name; `app.js` `importSummary()`
 overlap branch still pre-C6 („ING · Konto główne”, „Pominięte wpływy / zwroty”); `accountLead` text wrong for a
-one-account file; eyebrow „Import gotowy” vs `importFlow.result` „Import gotowy.”. Round-4 list gains G38 and K33.
+one-account file; eyebrow „Import gotowy” vs `importFlow.result` „Import gotowy.”; `app.js` step-1 demo note „dodawanie importów”
+vs `importFlow.demoImportBlocked` „dodawanie i cofanie importów”; `app.js` „ponad 5 000” vs `limits` rendering
+„5000”; step-3 demo note unreachable once step 1 is locked. Round-4 list gains G38 and K33.
 
 #### 2. Seam sweep
 
@@ -484,9 +490,9 @@ clipping it does not fix).
 
 #### Manual Verification:
 
-- [visual] Screenshots at 1280 px and ~400 px on `astro dev` :4399 (test account, ING main + Santander fixtures imported, deleted afterwards; demo account for demo states), compared with kit views: `/imports` list with an ING and a Santander row (`imports.html`), empty list (`imports-empty.html`), `?deleted=1` (`imports-deleted.html`), `?error=delete` (`imports-delete-error.html`), `?error=missing` (`imports-not-found.html`), `?error=demo`; delete dialog open — normal and demo (disabled button + note, check F8 clipping at 400 px); `/imports/new` step 1 — empty, file recognised (chip), unknown format, wrong currency, empty file, too large (> 5 MB file), too many (generated > 5000-debit CSV in the scratchpad, never committed; else record N/A with the unit pin), `?error=invalid` (inconsistent), `?error=failed`, `?error=demo`, `?error=overlap&from&to`, demo locked; step 2 (account picker); step 3 — ready, overlap, demo locked; `/imports/result` — ING success, Santander success („Rachunek · •• …”), not-found; no `undefined`, no raw `{…}`, no horizontal scroll
+- [visual] Screenshots at 1280 px and ~400 px on `astro dev` :4399 (test account, ING main + Santander fixtures imported, deleted afterwards; demo account for demo states), compared with kit views: `/imports` list with an ING and a Santander row (`imports.html`), empty list (`imports-empty.html`), `?deleted=1` (`imports-deleted.html`), `?error=delete` (`imports-delete-error.html`), `?error=missing` (`imports-not-found.html`), `?error=demo`; delete dialog open — normal and demo (disabled button + note, check F8 clipping at 400 px); `/imports/new` step 1 — empty, file recognised (chip), unknown format, wrong currency, empty file, too large (> 5 MB file), too many (generated > 5000-debit CSV in the scratchpad, never committed; else record N/A with the unit pin), `?error=invalid` (inconsistent), `?error=failed`, `?error=demo`, `?error=overlap&from&to`, demo locked; step 2 (account picker); step 3 — ready, overlap (step-3 demo locked is unreachable, see P5); `/imports/result` — ING success, Santander success („Rachunek · •• …”), not-found; no `undefined`, no raw `{…}`, no horizontal scroll
 - [reviewer] Seam sweep complete; register rows match this plan; follow-ups carry `Trigger:` lines
-- [human] Accept S-13 kit deviations (kit text, not PRD): app `accountLead` kept; chip names the full bank name; eyebrow with a period from `importFlow.result`; tooMany / inconsistent shown on step 3, not step 1; save failure stays in the wizard; delete `{range}` short form; ING shows the file's account name, not „Konto główne” — and send G38 + K33 to the kit author
+- [human] Accept S-13 kit deviations (kit text, not PRD): app `accountLead` kept; chip names the full bank name; eyebrow with a period from `importFlow.result`; tooMany / inconsistent shown on step 3, not step 1; save failure stays in the wizard; delete `{range}` short form; ING shows the file's account name, not „Konto główne”; summary drops „Pominięte wpływy / zwroty” (kit round 3, decision 8); result of an unknown id is a 200 not-found page instead of the 302 (decision 5) — and send G38 + K33 to the kit author
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual
 confirmation from the human that the manual testing was successful before proceeding.
@@ -517,6 +523,15 @@ confirmation from the human that the manual testing was successful before procee
 2. Import the ING main and Santander fixtures; walk the wizard states, the list, the dialog, the result; provoke each
    rejection with a crafted file (scratchpad only).
 3. Sign in as the demo user (after its first import) for the demo states; delete test imports; kill the dev server.
+
+## Known risks
+
+- (plan review F6) `ImportWizard` has no `pageshow`/bfcache reset for `submitting` (`DeleteImportDialog` has
+  `usePageShowReset`). Back from `/imports/result` may restore a disabled „Importowanie…” button. Pre-existing, not
+  in scope; if the visual gate reproduces it, apply `usePageShowReset` in the wizard (P6) or file a follow-up with
+  `Trigger:` (matches the `2026-09-27-pattern-threshold-over-limit` follow-up condition).
+- (plan review F7) `>Bank<` (P3) is a short needle; the P3 deliberate break must show it red without the column,
+  otherwise anchor it on the header cell's rendered node.
 
 ## Performance Considerations
 

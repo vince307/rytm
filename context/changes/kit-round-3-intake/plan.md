@@ -42,14 +42,17 @@ Source: `research.md` (§1–§6, Register matrix) and `change.md` (claims table
   show the defect immediately.
 - File copy: assets byte-identical; react-kit changes `README.md`, `docs/content.json`, `docs/routes.md`,
   `styles/brand.css`, adds `docs/copy-map.md`; prototype 3 changed + 33 added (32 views + `README.md`), 0 removed;
-  brand-pack only `dokumentacja/karta-stylu.md`; `CHANGELOG.md` gains „Runda 3”. `lint-staged` runs `prettier
-  --write` on `*.{json,css,md}` including `design/**`, so committed kit bytes get reformatted (round-2 precedent
-  `2ad7d14`).
+  brand-pack only `dokumentacja/karta-stylu.md`; `CHANGELOG.md` gains „Runda 3”. The committed kit is the author's
+  bytes, NOT prettier-formatted (`npx prettier --check` warns on `prototype/styles.css`, `react-kit/styles/brand.css`,
+  `docs/content.json`, `docs/routes.md`; `src/styles/brand.css` too): the husky hook is not installed in this checkout
+  (no `core.hooksPath`, no `prepare` script, only `*.sample` in `.git/hooks`) and CI has no prettier gate. Round 2
+  (`2ad7d14`) therefore committed the delivery verbatim. `src/styles/brand.css` today = `sed(font path)` of the kit
+  `brand.css` byte for byte (plan review, `cmp`).
 
 ## Desired End State
 
-- `design/rytm-os/` = the round-3 delivery under the agent-contract mapping; the only content difference (parsed
-  JSON / prettier-normalised) is the 4 restored `authStates` keys in `react-kit/docs/content.json`.
+- `design/rytm-os/` = the round-3 delivery under the agent-contract mapping, byte for byte; the only difference is
+  the 4 restored `authStates` keys in `react-kit/docs/content.json`.
 - `scripts/sync-kit.sh` is idempotent on the committed tree (`git status` clean after a re-run);
   `src/styles/brand.css` carries the 8 new `--rytm-*` tokens; no Tailwind colour name added.
 - Every screen reading a changed key renders the right text: „Koszty stałe” card label, 7 correctly ordered table
@@ -93,12 +96,14 @@ docs and follow-ups, sweeps the seams and takes the screenshots.
 
 ## Critical Implementation Details
 
-**Order of the kit copy (prettier idempotence).** Copy the delivery → `npx prettier --write` the copied
-`design/rytm-os/**/*.{json,css,md}` → apply the intake patch → run `scripts/sync-kit.sh` → `npx prettier --write
-src/styles/brand.css`. Then the pre-commit hook changes nothing, and a re-run of `sync-kit.sh` + prettier after the
-commit leaves `git status` clean. Comparing delivery vs kit: format a scratchpad copy of the delivery with the same
-prettier and `diff -rq` it against `design/rytm-os/` per mapping (never `cmp` against the raw delivery). Ignore the
-delivery's root-level duplicates and `rytm-os-views-html/` (agent contract). The delivery lives outside git — if
+**Order of the kit copy (byte-faithful, no prettier).** Copy the delivery byte for byte (`cp`/`rsync`, skip
+`.DS_Store`) → apply the intake patch with Node (`JSON.parse` → add the 4 keys → `JSON.stringify(obj, null, 2) +
+"\n"`; verified in plan review to reproduce the delivery's `content.json` bytes exactly, so only the 4 lines change)
+→ run `scripts/sync-kit.sh`. **Never run prettier on `design/` or `src/styles/brand.css`** (`npm run format` included):
+neither is prettier-formatted today, and formatting would rewrite whole files (minified `prototype/styles.css`,
+`brand.css`) and break the „8 token lines” contract. A re-run of `sync-kit.sh` leaves `git status` clean. Comparing
+delivery vs kit: `diff -rq` the raw delivery against `design/rytm-os/` per mapping. Ignore the delivery's root-level
+duplicates and `rytm-os-views-html/` (agent contract). The delivery lives outside git — if
 `context/runs/2026-10-02-kit-round-3/kit-delivery/` is missing, report `ARTIFACT GAP` and stop.
 
 **Month preposition.** Polish uses „we” before a locative starting with „w” + consonant — of the 12 month
@@ -122,11 +127,10 @@ commit; here the app edits must ride with it to stay green).
 
 **Intent**: Bring round 3 in under the contract mapping (`kit-delivery/react-kit/{docs,styles,assets,README.md}` →
 `react-kit/`; `kit-delivery/react-kit/prototype/` → `prototype/`; `kit-delivery/rytm-os/` → `brand-pack/`;
-`kit-delivery/CHANGELOG.md` → `CHANGELOG.md`), then prettier per Critical Implementation Details. No file is
-removed (the delivery removes none). Skip `.DS_Store`.
+`kit-delivery/CHANGELOG.md` → `CHANGELOG.md`), byte for byte per Critical Implementation Details (no prettier). No
+file is removed (the delivery removes none). Skip `.DS_Store`.
 
-**Contract**: After formatting, `design/rytm-os/` equals the prettier-formatted delivery except
-`react-kit/docs/content.json`.
+**Contract**: `design/rytm-os/` equals the raw delivery byte for byte except `react-kit/docs/content.json`.
 
 #### 2. Intake patch
 
@@ -137,8 +141,9 @@ removed (the delivery removes none). Skip `.DS_Store`.
 **Contract**: `authStates.loginError` „Nie rozpoznaliśmy tego e-maila i hasła. Spróbuj ponownie.”,
 `authStates.resetTitle` „Odzyskaj dostęp.”, `authStates.resetBody` „Podaj e-mail, którego używasz w Rytmie.”,
 `authStates.checkInbox` „Jeśli konto istnieje, wysłaliśmy instrukcję zmiany hasła.” (take the exact strings from
-`git show main:design/rytm-os/react-kit/docs/content.json`). Parsed diff vs the delivery = exactly these 4 added
-leaves.
+`git show main:design/rytm-os/react-kit/docs/content.json`), written by the Node round-trip in Critical
+Implementation Details. Parsed diff vs the delivery = exactly these 4 added leaves; `diff` of the files = 4 added
+lines (+ the comma on the preceding line).
 
 #### 3. Token sync
 
@@ -193,8 +198,8 @@ Unit cases: May → „Nowe w maju”, September → „Nowe we wrześniu”, a 
 
 #### Automated Verification:
 
-- Delivery vs kit: prettier-formatted scratchpad copy of the delivery `diff -rq` against each mapped `design/rytm-os/` tree → only `react-kit/docs/content.json`; a Node parsed-JSON diff of that file → exactly the 4 added `authStates` leaves
-- `bash scripts/sync-kit.sh && npx prettier --write src/styles/brand.css && git status --porcelain -- src/styles public/rytm design` → empty after the commit (idempotent)
+- Delivery vs kit: raw delivery `diff -rq` against each mapped `design/rytm-os/` tree → only `react-kit/docs/content.json`; a Node parsed-JSON diff of that file → exactly the 4 added `authStates` leaves
+- `bash scripts/sync-kit.sh && git status --porcelain -- src/styles public/rytm design` → shows nothing beyond the files already changed in this phase, and `git diff -- src/styles/brand.css` = exactly the 8 added token lines (re-run after the commit → empty; idempotent; no prettier on these files)
 - `grep -rnE "stats\[[2-9]\]|columns\.slice|amountColumn" src` → nothing
 - `npm test`: baseline + the new `format` and `table-columns` cases, 0 failed
 - Deliberate break 1: delete `authStates.loginError` from `content.json` → `npx astro check` red at `login.astro`; restore → green (meta-check: proves `astro check` guards removed keys only — it stays green when `home.astro` reads `stats[2]`, which is why Phase 2 adds the kit-contract test)
@@ -339,6 +344,10 @@ use `fillMonthLocative`.
 - One month-locative helper: no remaining local `monthLocative` / inline `monthsLocative[...]` reads in `src/`
   outside `fillMonthLocative` callers.
 - One table-header mapping (`tableHeaders`); no `amountColumn` anywhere in `src/`.
+- Doc comments that describe changed kit values: `ImportWizard.tsx` `genericError` prop doc (says
+  `copy.components.error`; now `copyExtra.imports.saveError`), `TrendChart.astro` header comment quoting
+  `trend.current` as „bieżący, niepełny…” (round 3: „Bieżący miesiąc”; the app does not read the key — say so or
+  drop the quote).
 - No stale comment naming `stats[2]`, „Rozpoznane wydatki”, a 6-column table, `kit_round: 2` / „runda 2” as the
   current kit, or K18 as open — in `src/`, `CLAUDE.md`, `design-kit.md`; `home.astro` header comment and the
   `copy.ts` K25 comment updated if they name the third card.
@@ -386,6 +395,16 @@ use `fillMonthLocative`.
    `/reset`, `/reset?sent=1`, `/register`.
 3. Delete the import; take the screenshots listed in Phase 3; kill the dev server.
 
+## Known risks
+
+- **Git hooks inactive here, active elsewhere.** If a checkout has husky installed, `lint-staged` would run
+  `prettier --write` on staged `design/**/*.{json,css,md}` and reformat the kit on commit. Mitigation: the implement
+  step checks `git show --stat HEAD -- design src/styles` after the p1 commit (line counts ≈ delivery, `brand.css`
+  +8); a `.prettierignore` entry for `design/` + `src/styles/brand.css` is the durable fix but a tooling change
+  outside F-04 — follow-up candidate (plan review F1).
+- **Reader-side index reads** (`home.astro` `StatCard` `stats[n]`) stay unguarded by `astro check`; guard = grep +
+  kit-contract `stats[1]` pin + visual row (Phase 2 break 2).
+
 ## Performance Considerations
 
 None — string replacement at render.
@@ -428,8 +447,8 @@ the kit-text departures are collected in the Phase 3 `[human]` row.
 
 #### Automated
 
-- [ ] 1.1 Delivery vs kit diff shows only content.json, parsed diff = 4 restored authStates leaves
-- [ ] 1.2 sync-kit.sh + prettier re-run leaves the tree clean (idempotent)
+- [ ] 1.1 Raw delivery vs kit diff shows only content.json, parsed diff = 4 restored authStates leaves
+- [ ] 1.2 sync-kit.sh re-run is idempotent, brand.css diff = 8 token lines, no prettier on kit files
 - [ ] 1.3 Grep for stats[2+], columns.slice, amountColumn in src is empty
 - [ ] 1.4 npm test: baseline + format and table-columns cases, 0 failed
 - [ ] 1.5 Deliberate break: removed authStates.loginError turns astro check red, restored

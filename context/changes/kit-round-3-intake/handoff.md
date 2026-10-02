@@ -1,18 +1,19 @@
 # Handoff — `kit-round-3-intake` (slice F-04)
 
-Written by the `/10x-plan` step: `plan.md` (3 code phases, `## Progress` 24 rows) and `plan-brief.md` are on disk, no
-product or kit file touched. The next agent must not accept a kit-only Phase 1: `copy.ts` imports the kit JSON
-directly and smoke asserts the filled trend sentence, so kit swap and app adaptation are one phase by design
-(decision 9); and `astro check` does not catch JSON index reads (`stats[2]`) — only the kit-contract test/grep do.
+Written by the `/10x-plan-review` step: verdict PROCEED, `plan.md` fixed in place (byte-faithful kit copy, two stale
+comments added to the seam sweep, `## Known risks`), no product or kit file touched. The next agent must NOT run
+prettier on `design/` or `src/styles/brand.css` (neither is prettier-formatted; the husky hook is not installed here)
+— copy the delivery byte for byte and patch `content.json` with the Node `JSON.stringify(obj, null, 2) + "\n"`
+round-trip (plan § Critical Implementation Details).
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-intake`, cut from `main` at `577b163` (+ roadmap commit `78386c1`) |
-| Commits this step | 1 (`docs(kit-round-3-intake): plan`) on top of `305a261` |
+| Commits this step | 1 (`docs(kit-round-3-intake): plan review`) on top of `dcd27e8` |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `planned` (`metadata-guard.mjs mark-planned`) |
+| `change.md` status | `plan_reviewed` |
 | `## Progress` rows remaining | 24 (`grep -c '^- \[ \]' plan.md`) |
 | Working tree | clean after commit |
 
@@ -20,10 +21,10 @@ directly and smoke asserts the filled trend sentence, so kit swap and app adapta
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/kit-round-3-intake/plan.md` | full plan: P1 kit + intake patch + token sync + reader fixes (`fillMonthLocative`, `tableHeaders`); P2 kit-contract test, smoke +6, K18 comments; P3 `design-kit.md` round 3, follow-ups, seam sweep, screenshots; `## Autonomous decisions` (11) |
-| `context/changes/kit-round-3-intake/plan-brief.md` | two-page brief |
-| `context/changes/kit-round-3-intake/change.md` | `status: planned` |
-| `context/foundation/roadmap.md` | F-04 status `pending` → `planning` (At a glance + body) |
+| `context/changes/kit-round-3-intake/reviews/plan-review.md` | review report: 1 critical, 1 warning, 3 observations; `VERDICT: PROCEED` |
+| `context/changes/kit-round-3-intake/plan.md` | F1: no-prettier byte-faithful copy (Current State, End State, Critical Implementation Details, P1 §1/§2, criteria + Progress 1.1/1.2); F2: P3 seam sweep names `ImportWizard.tsx` `genericError` doc and `TrendChart.astro` header comment; new `## Known risks` |
+| `context/changes/kit-round-3-intake/plan-brief.md` | P1 risk cell updated for F1 |
+| `context/changes/kit-round-3-intake/change.md` | `status: plan_reviewed` |
 | `context/changes/kit-round-3-intake/handoff.md` | this file |
 
 ## 3. Verification
@@ -31,30 +32,29 @@ directly and smoke asserts the filled trend sentence, so kit swap and app adapta
 | Command | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/kit-round-3-intake` |
-| `grep -rnE "stats\[|columns|amountColumn|fixedCosts\.new|tooShort|passwordTooShort|genericError|K18|loginError|resetTitle|resetBody|checkInbox" src` | every reader named in the plan found; `DESIGN-GAP: K18` at 4 sites (`home.astro`, `patterns.astro`, `fixed.astro`, `patterns/[...key].astro`) — research said 6, plan uses the observed 4 |
-| Node read of delivery `content.json` | `patterns.columns` 7 (Kwota idx 3), `dashboard.stats` 2 labels, `trend.minimumMonths` 3, `authStates.passwordMinLength` 6, `fixedCosts.new` „Nowe w {month}”; `authStates` has no `loginError/resetTitle/resetBody/checkInbox` |
-| `diff -rq` delivery `react-kit/docs` and `rytm-os` vs repo | content.json, routes.md differ, copy-map.md new; brand-pack only `karta-stylu.md` |
-| Plan Success Criteria ↔ Progress | 1:1 (P1 8, P2 8, P3 8) |
-| lint / astro check / tests / build / pgTAP / smoke | not run — plan only, no code changed (baseline in agent contract, inherited, unverified) |
+| Node leaf diff round-2 kit vs delivery `content.json` | 41 changed/removed leaves; every one the app reads is covered by the plan; others unread in `src/` (grep) |
+| `diff` kit vs delivery `react-kit/styles/brand.css`; `sed(font path) kit brand.css \| cmp - src/styles/brand.css` | exactly the 8 `--rytm-*` token lines; `src/styles/brand.css` in sync byte for byte |
+| `npx prettier --check` on kit `styles.css`, `brand.css`, `content.json`, `routes.md`, `src/styles/brand.css` | all warn → not prettier-formatted (basis of F1) |
+| `git config core.hooksPath`; `.git/hooks`; `package.json` `prepare` | unset; only samples; no `prepare` → husky inactive; CI has no prettier step |
+| `JSON.stringify(JSON.parse(delivery content.json), null, 2) + "\n" === file` | true → Node patch is byte-preserving |
+| `diff` round-2 vs delivery `prototype/styles.css` \| grep radius | no field/panel radius change → field-radius / panel-radius follow-ups not fired |
+| lint / astro check / tests / build / pgTAP / smoke | not run — review only, no code changed (baseline in agent contract, inherited, unverified) |
 
 ## 4. Next command
 
-`/10x-plan-review kit-round-3-intake`
+`/10x-implement kit-round-3-intake phase 1`
 
 ## 5. Open
 
-- Manual Progress rows (human checklist): 1.8 `[reviewer]` kit equals delivery except 4 strings; 2.8 `[reviewer]` kit-contract assertions map to real reads; 3.6 `[visual]` screenshots desktop + ~400 px (`/login?error=1`, `/reset`, `/reset?sent=1`, `/register` short password, `/home`, `/patterns`, `/fixed`, `/settings` short password); 3.7 `[reviewer]` seam sweep / register / follow-ups; 3.8 `[human]` accept kit-text deviations (`fillMonthLocative` „we wrześniu”, `tableHeaders` body order, `copyExtra.imports.saveError`, 4 `authStates` restored in kit) and send round-4 K-rows to the author.
-- Known unguarded seam (recorded in plan P2 break 2): reader-side index reads in `home.astro` `StatCard` — guarded only by grep + kit-contract `stats[1]` pin + visual row.
-- The delivery folder is outside git; if missing at implement time → `ARTIFACT GAP`.
+- Manual Progress rows (human checklist): 1.8 `[reviewer]` kit equals delivery byte for byte except the 4 restored strings; 2.8 `[reviewer]` kit-contract assertions map to real reads; 3.6 `[visual]` screenshots desktop + ~400 px (`/login?error=1`, `/reset`, `/reset?sent=1`, `/register` short password, `/home`, `/patterns`, `/fixed`, `/settings` short password); 3.7 `[reviewer]` seam sweep / register / follow-ups; 3.8 `[human]` accept kit-text deviations (`fillMonthLocative` „we wrześniu”, `tableHeaders` body order, `copyExtra.imports.saveError`, 4 `authStates` restored in kit) and send round-4 K-rows to the author.
+- Known risks (plan `## Known risks`): git hooks active in another checkout would prettier-reformat staged `design/**` — check `git show --stat HEAD -- design src/styles` after the p1 commit; `.prettierignore` for `design/` + `src/styles/brand.css` is a follow-up candidate for Phase 3 `follow-ups/review-fixes.md`. Reader-side index reads in `home.astro` `StatCard` guarded only by grep + kit-contract `stats[1]` pin + visual row.
+- The delivery folder is outside git (`context/runs/2026-10-02-kit-round-3/kit-delivery/`, present at review time); if missing at implement time → `ARTIFACT GAP`.
 - Follow-ups are created in Phase 3 (`follow-ups/review-fixes.md`, Triggers S-12/S-14/S-15). No `DESIGN-GAP` added. Migration: no.
 
 ## 6. Autonomous decisions
 
-1. **0 questions, MEDIUM** — research recommended a minimal fix per break. Would change: a product owner available.
-2. **Intake patch for the 4 `authStates`** (not `copyExtra.auth`). Would change: a byte-faithful-kit rule.
-3. **`tableHeaders` maps kit labels to the current body order**; kit order left to S-14. Would change: S-14 dropped from the run.
-4. **Shared `fillMonthLocative` with „we wrześniu”**, applied to `/fixed` and the pattern detail (`sumLabel`, `overInMonth`) — deviates from the kit's literal „w wrześniu” (kit text, not PRD; `[human]` 3.8). Would change: the author fixing the template.
-5. **`{n}` from `trend.minimumMonths` and `MIN_PASSWORD_LENGTH`**, kit numbers pinned equal by the kit-contract test. Would change: PRD changing the trend minimum, or kit/app disagreement (app wins).
-6. **Kit swap + app adaptation in one phase, commit `feat(…): … (p1)`** instead of the round-2 separate `design:` commit. Would change: nothing short of `copy.ts` no longer importing the kit JSON.
-7. **Index-read guard = unit test + grep**, not `noUncheckedIndexedAccess`. Would change: a repo-wide hardening change.
-8. No decision departs from the PRD's literal text; kit-text departures are grouped in `[human]` 3.8.
+1. **F1 fixed as byte-faithful copy, not „prettier everything consistently”.** Rejected: formatting kit + `brand.css` together (idempotent too, but rewrites whole author files, breaks the „8 token lines” contract and the raw delivery diff). Would change: the maintainer installing the hook repo-wide / adding a CI prettier gate without a `design/` ignore.
+2. **`.prettierignore` not added in F-04** — tooling change outside the slice; recorded as Known risk + follow-up candidate. Would change: the p1 commit actually getting reformatted by a hook.
+3. **Verdict PROCEED, no phase split/merge** — P1 cannot be green kit-only (`copy.ts` imports the JSON, smoke pins the filled trend sentence); each phase fits one agent. Would change: P1 implement running past context hygiene (then split app adaptations from kit copy is still impossible — split helpers/tests out instead).
+4. **No product decision overturned**; kit-text deviations already in `[human]` 3.8; PRD agrees on 3 months / password length 6. Would change: PRD edit to the trend minimum or password rule.
+5. **No sub-agent for Step 3** — the riskiest claims were file-local and verified directly (leaf diff, grep, `cmp`). Would change: a plan touching shared modules with wide blast radius.

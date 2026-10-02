@@ -53,7 +53,7 @@ month preposition in one `src/lib/format.ts` helper.
 
 | Phase | What it delivers | Key risk |
 | --- | --- | --- |
-| 1. Round-3 kit in place, app adapted | Kit + patch + tokens, all reads correct, helpers with unit tests | Prettier reformat breaking `sync-kit.sh` idempotence |
+| 1. Round-3 kit in place, app adapted | Kit + patch + tokens, all reads correct, helpers with unit tests | Prettier run on `design/` / `brand.css` rewriting whole files (kit copied byte for byte, no prettier — plan review F1) |
 | 2. Regression guards and K18 cleanup | Kit-contract test, smoke +6, stale comments gone | Reader-side index reads stay unguarded (recorded) |
 | 3. Gap register round 3, follow-ups, seam sweep | `design-kit.md` round 3, follow-ups, screenshots | Register drift from the research matrix |
 

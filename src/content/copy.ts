@@ -271,14 +271,6 @@ export const copyExtra = {
   },
   app: {
     exit: "Wyjdź",
-    sidebarView: "Widok",
-    sidebarData: "Dane",
-    patternsLong: "Wzorce wydatków",
-    fixedLong: "Koszty stałe",
-    importsLong: "Importy CSV",
-    settingsLong: "Ustawienia",
-    overview: "Przegląd",
-    navLabel: "Nawigacja aplikacji",
   },
   // DESIGN-GAP: K11 — the empty-view paragraph is in the prototype but not in content.json (round 3).
   emptyViews: { body: "Jeden plik CSV wystarczy, aby Rytm mógł rozpoznać Twój rytm wydatków." },

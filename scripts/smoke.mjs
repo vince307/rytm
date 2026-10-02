@@ -296,6 +296,11 @@ const steps = [
     () => request("/fixed"),
     { status: 200, contains: ">Koszty stałe pojawią się po pierwszym imporcie.<", notContains: ">Zmieniły kwotę<" },
   ],
+  [
+    "home has no demo note for the test user",
+    () => request("/home"),
+    { status: 200, notContains: ">Wspólne konto demo — niektóre działania są wyłączone.<" },
+  ],
   ["settings renders account e-mail", () => request("/settings"), { status: 200, contains: email }],
   [
     "settings fills the password minimum",
@@ -1025,6 +1030,17 @@ const steps = [
     "demo user signs in",
     () => request("/api/auth/signin", { method: "POST", form: demo }),
     { status: 302, location: "/home" },
+  ],
+  // S-12 P2: the app shell shows the permanent demo note for the demo account only.
+  [
+    "demo home shows the demo note",
+    () => request("/home"),
+    { status: 200, contains: ">Wspólne konto demo — niektóre działania są wyłączone.<" },
+  ],
+  [
+    "demo settings shows the demo note",
+    () => request("/settings"),
+    { status: 200, contains: ">Wspólne konto demo — niektóre działania są wyłączone.<" },
   ],
   // Only guarantees the account has an import: the first run creates it, later local runs are refused.
   [

@@ -13,8 +13,8 @@ import (do not "fix" it).
 | --- | --- |
 | Branch | `feat/santander-csv-import`, cut from `main` at `1fed366` |
 | Commits | 25 on top of `1fed366` (`1fed366..HEAD`); this step: one docs commit `docs(santander-csv-import): bramka wizualna`, no fix commit |
-| Pushed / PR / merged | no / no / no |
-| `change.md` status | `impl_reviewed` (unchanged; `/10x-archive` sets the archived status) |
+| Pushed / PR / merged | PR/CI/merge/deploy recorded in `context/runs/2026-10-01-m2-santander/run-log.md` (ship step: archive → push → PR → CI → merge; the CI `deploy` job applies the migration) |
+| `change.md` status | `archived` (ship step, `/10x-archive`; folder moved to `context/archive/2026-10-02-santander-csv-import/`) |
 | `## Progress` rows remaining | 4 (`grep -c '^- \[ \]' plan.md`): 6.8–6.11 `[human]` |
 | Working tree | clean after the docs commit (`tree-clean.sh` → `CLEAN`) |
 
@@ -49,7 +49,7 @@ build OK; pgTAP Files=5 Tests=102 PASS; smoke 140/0.
 
 ## 4. Next command
 
-`/10x-archive santander-csv-import`, then ship (push, PR, CI, merge; the CI `deploy` job applies migration `20261002120000_import_statement_source.sql`).
+`none — shipped`. Open [human] rows 6.8–6.11 are the owner's post-run checklist (§5), listed in the PR under „Do decyzji właściciela produktu”; they do not block the archive. Next slice: S-11 `santander-card-merchants` (`/10x-new`).
 
 ## 5. Open
 
@@ -63,6 +63,7 @@ build OK; pgTAP Files=5 Tests=102 PASS; smoke 140/0.
   slice: the `overflow-auto` wrapper in `src/pages/imports/index.astro` is unchanged, and the kit frame overflows
   the page. The Santander list label has no account tail (row 6.10). The result h1/pattern stats are absent (G26,
   pre-existing).
+- **Restated for S-11 (Trigger: S-11):** F4 `banks.ts` `accountLabel` → `replace("{name}", () => name)`; row 6.11 re-keying of Santander card patterns (saved thresholds/decisions keyed by `merchant_key`); restated in roadmap `## Backlog Handoff` row S-11.
 - **Earlier observations still open:** F3 (`import_statement.test.sql` anon call assert proves table grants); F4
   (`banks.ts` `accountLabel` string replacement expands `$&`; switch to `() => name` when S-11 touches the file).
 - **Follow-ups:** none new; no `follow-ups/review-fixes.md`.

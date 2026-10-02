@@ -1,6 +1,7 @@
 # Handoff — `kit-round-3-intake` (slice F-04)
 
-Written by the visual-gate step. `VISUAL: PASS`: all 8 states of row 3.6 were captured at 1280 and 400 px against the
+Written by the visual-gate step; final pre-merge state written by the ship step (archive → PR → CI → merge → deploy).
+`VISUAL: PASS`: all 8 states of row 3.6 were captured at 1280 and 400 px against the
 round-3 kit frames. One doc-only fix landed in `0bb4588`: the register's `/home` row now describes the kit view.
 `change.md` stays `impl_reviewed`. Next is archive, then ship. The slice has no migrations. Never run prettier on
 `design/` or `src/styles/brand.css`.
@@ -11,8 +12,8 @@ round-3 kit frames. One doc-only fix landed in `0bb4588`: the register's `/home`
 | --- | --- |
 | Branch | `feat/kit-round-3-intake`, cut from `main` at `577b163` (+ roadmap commit `78386c1`) |
 | Commits this step | `0bb4588` `fix(kit-round-3-intake): wiersz /home w rejestrze zgodny z widokiem kitu rundy 3`, plus the `docs(kit-round-3-intake): bramka wizualna` commit |
-| Pushed / PR / merged | no / no / no |
-| `change.md` status | `impl_reviewed` (archive sets the final status) |
+| Pushed / PR / merged | PR/CI/merge/deploy recorded in context/runs/2026-10-02-kit-round-3/run-log.md |
+| `change.md` status | `archived` (ship step, `chore(archive): close kit-round-3-intake`); roadmap F-04 `done`, Backlog Handoff S-12–S-15 ready |
 | `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`): 3.8 `[human]` |
 | Working tree | clean after the docs commit; ports 4398/4399 free; local DB reset (0 `visual-%` accounts) |
 
@@ -40,7 +41,7 @@ round-3 kit frames. One doc-only fix landed in `0bb4588`: the register's `/home`
 
 ## 4. Next command
 
-`/10x-archive kit-round-3-intake then ship (no migrations)`
+`none — shipped`
 
 ## 5. Open
 
@@ -51,7 +52,8 @@ round-3 kit frames. One doc-only fix landed in `0bb4588`: the register's `/home`
   - S-12: form fields on `paper` (C3) in `FormField`.
 - F6 accepted: the `referenceMonth ?? ""` type escape in `src/pages/fixed.astro`. F7 accepted: `DESIGN-GAP: K24` in `home.astro` `leadFor`, moved to S-15.
 - Follow-ups in `follow-ups/review-fixes.md` (S-14, S-15, S-12, month templates, `.prettierignore`), each with a `Trigger:` line.
-- No migration and no new `DESIGN-GAP`. The roadmap F-04 row is untouched; archive updates it.
+- No migration and no new `DESIGN-GAP`. Archive set the roadmap F-04 row to `done`.
+- Archived with 3.8 `[human]` open: a post-run checklist item for the product owner (listed in the PR under „Do decyzji właściciela produktu”), not a blocker — it accepts deviations that are already reviewed and owned by later slices.
 
 ## 6. Autonomous decisions
 
@@ -60,3 +62,4 @@ round-3 kit frames. One doc-only fix landed in `0bb4588`: the register's `/home`
 3. **`/home`, `/patterns`, field-colour deltas against the round-3 kit judged as expected, not as discrepancies.** Plan row 3.6 requires „same layout as before the swap (no redesign)”, and each delta has an owning slice (S-12/S-14/S-15). Would change: a plan requiring round-3 layout in F-04.
 4. **Keyboard path not re-measured.** The diff adds or moves no focusable element. Would change: any markup or interaction change in the diff.
 5. **Full local gate not re-run after `0bb4588`.** It is a single markdown sentence outside `src/`. Would change: the orchestrator's gate requiring a fresh run before ship (the ship step runs CI anyway).
+6. **Archived with row 3.8 `[human]` still open** (ship step). Rejected: holding the slice, because the row is a product-owner acknowledgement of deviations already reviewed (impl review APPROVED, VISUAL: PASS) and every deviation has an owning slice and a `Trigger:` follow-up. Would change: the owner rejecting a deviation, which would open a fix slice.

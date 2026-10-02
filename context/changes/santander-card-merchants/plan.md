@@ -472,10 +472,10 @@ Recorded in place of the skill's questions (run contract rule 1).
 
 #### Automated
 
-- [ ] 3.1 `npm test` + code-token / BLIK cases, 0 failed; partition, cross-bank, ING pin green
-- [ ] 3.2 Deliberate break 1: no `NR` guard → `SKLEP NR` case red; restored → green
-- [ ] 3.3 Deliberate break 2: BLIK rule returns `Bankomat` → ST06 assertion red; restored → green
-- [ ] 3.4 Full local gate vs baseline
+- [x] 3.1 `npm test` + code-token / BLIK cases, 0 failed; partition, cross-bank, ING pin green
+- [x] 3.2 Deliberate break 1: no `NR` guard → `SKLEP NR` case red; restored → green
+- [x] 3.3 Deliberate break 2: BLIK rule returns `Bankomat` → ST06 assertion red; restored → green
+- [x] 3.4 Full local gate vs baseline
 
 #### Manual
 

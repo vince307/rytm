@@ -167,6 +167,25 @@ describe("derivePatterns — Santander F-03 oracle (S-11 Phase 2)", () => {
     expect(byName(patterns, "PUB POD KOGUTEM")).toBeDefined();
     expect(byName(patterns, "KINO NOVA SALA DUZA")).toBeDefined();
   });
+
+  // S-11 Phase 3: the BLIK_GATE in santander-card.ts must claim ST06 (Wypłata BLIK) on its own, independent of
+  // CARD_GATE/the ATM "Bankomat" rule — this pins the oracle's ST06 own-pattern contract directly against names
+  // and ids, rather than relying only on the 35-group/id-set test above to catch an accidental merge.
+  it("ST06 (Wypłata BLIK withdrawals) is its own pattern, not merged into Bankomat", () => {
+    const st06Ids = expected.rows
+      .filter((r) => r.file === MAIN && r.imported && r.traps.includes("ST06"))
+      .map((r) => String(r.lp))
+      .sort();
+    expect(st06Ids.length).toBeGreaterThan(0);
+
+    const bankomat = byName(patterns, "Bankomat");
+    expect(bankomat).toBeDefined();
+
+    const group = patterns.find((p) => [...p.transactionIds].sort().join(",") === st06Ids.join(","));
+    if (!group) throw new Error("no derived pattern matches the ST06 id set");
+    expect(group.name).not.toBe("Bankomat");
+    for (const id of st06Ids) expect(bankomat?.transactionIds).not.toContain(id);
+  });
 });
 
 describe("cross-bank — ST10 pizzeria-trzy-sery (S-11 Phase 2 oracle, crossBank)", () => {

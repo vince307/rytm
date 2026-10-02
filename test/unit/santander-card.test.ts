@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { parseIngStatement } from "@/lib/import/ing";
+import { merchantKey } from "@/lib/patterns/merchant";
 import { santanderCardMerchant } from "@/lib/patterns/santander-card";
 
 // Synthetic values only (no fixture bytes) — this pins the card gate and the rule 2/3/5 tail logic directly,
@@ -36,6 +37,60 @@ describe("santanderCardMerchant — payment kind (rules 2, 3, 5)", () => {
     const b = santanderCardMerchant("KWIACIARNIA GDYNIA", paymentTitle("KWIACIARNIA GDYNIA", "222222******2222"));
     expect(a).toBe(b);
     expect(a).toBe("KWIACIARNIA");
+  });
+});
+
+describe("santanderCardMerchant — rule 4 (code tokens)", () => {
+  it.each([
+    ["a store-code and a K.-code token are both dropped", "MARKA A12 K.3 GDYNIA", "MARKA"],
+    ["a 1-2 digit code token (no NR/NO label) is dropped", "MARKA 01 GDYNIA", "MARKA"],
+    ["a bare # token is dropped", "MARKA # GDYNIA", "MARKA"],
+    ["a 3-letter+digits token is not code-shaped, kept as-is", "FIRMA ABC12 GDYNIA", "FIRMA ABC12"],
+    ["a glued <word><digits> token loses only its digit tail", "SKLEP12345 GDYNIA", "SKLEP"],
+    ["a lone numeric tail is kept, never emptied (first-token floor)", "12345 GDYNIA", "12345"],
+    ["a code-shaped first token (brand, not a store code) is kept", "4F SKLEP GDYNIA", "4F SKLEP"],
+    ["a numeric first token (brand, not a store code) is kept", "5 SMAKOW GDYNIA", "5 SMAKOW"],
+  ])("%s: %s -> %s", (_label, merchant, expected) => {
+    expect(santanderCardMerchant(merchant, paymentTitle(merchant))).toBe(expected);
+  });
+
+  it("two different-city tails with 1-2 digit code tokens (no NR/NO label) collapse to the same result", () => {
+    const a = santanderCardMerchant("MARKA 01 GDYNIA", paymentTitle("MARKA 01 GDYNIA"));
+    const b = santanderCardMerchant("MARKA 22 KRAKOW", paymentTitle("MARKA 22 KRAKOW"));
+    expect(a).toBe(b);
+    expect(a).toBe("MARKA");
+  });
+
+  it("the NR guard protects a 1-2 digit number from being dropped as a code token", () => {
+    const a = santanderCardMerchant("SKLEP NR 12 GDYNIA", paymentTitle("SKLEP NR 12 GDYNIA"));
+    const b = santanderCardMerchant("SKLEP NR 7 GDYNIA", paymentTitle("SKLEP NR 7 GDYNIA"));
+    expect(a).toBe("SKLEP NR 12");
+    expect(b).toBe("SKLEP NR 7");
+    expect(a).not.toBe(b);
+  });
+});
+
+describe("santanderCardMerchant — BLIK withdrawal gate", () => {
+  it("matches the fixture's `:<11 digits>` end shape", () => {
+    const title = "Wypłata BLIK WYPLATA GOTOWKI:50617283940";
+    expect(santanderCardMerchant("WYPLATA BLIK GOTOWKA", title)).toBe("Wypłata BLIK");
+  });
+
+  it("also matches the real export's ` ref:<11 digits>` end shape", () => {
+    const title = "Wypłata BLIK WYPLATA GOTOWKI ref:98765432109";
+    expect(santanderCardMerchant("INNY KONTRAHENT", title)).toBe("Wypłata BLIK");
+  });
+
+  it("two BLIK withdrawal titles with different counterparties and end shapes key the same", () => {
+    const a = santanderCardMerchant("WYPLATA BLIK GOTOWKA", "Wypłata BLIK WYPLATA GOTOWKI:50617283940");
+    const b = santanderCardMerchant("INNY KONTRAHENT", "Wypłata BLIK WYPLATA GOTOWKI ref:98765432109");
+    expect(a).toBe(b);
+    expect(merchantKey(a ?? "")).toBe("wypłata blik");
+  });
+
+  it("returns null for an ING-shaped BLIK withdrawal title (no `:<11 digits>` end)", () => {
+    const title = "Wypłata BLIK 12.06.2026 Nr transakcji 123456789012345";
+    expect(santanderCardMerchant("SOME OPERATOR", title)).toBeNull();
   });
 });
 

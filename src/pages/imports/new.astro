@@ -41,7 +41,19 @@ const serverError: WizardServerError | undefined = kind.success
   <ImportWizard
     client:load
     labels={{
-      flow: { title: f.title, steps: f.steps, supported: f.supported, oneAccount: f.oneAccount },
+      flow: {
+        title: f.title,
+        steps: f.steps,
+        supported: f.supported,
+        oneAccount: f.oneAccount,
+        bank: f.bank,
+        accountLabel: f.accountLabel,
+        rangeLabel: f.rangeLabel,
+        importButton: f.importButton,
+        debitForms: f.debitForms as [string, string, string],
+        waiting: f.waiting,
+        back: f.back,
+      },
       kit: copy.imports,
       imports: copyExtra.imports,
       errors: copy.importErrors,

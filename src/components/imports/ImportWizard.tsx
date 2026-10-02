@@ -14,15 +14,35 @@ import { SubmitButton } from "@/components/auth/SubmitButton";
 import { Stepper } from "@/components/app/Stepper";
 import { Glyph } from "@/components/Glyph";
 import type { copy, copyExtra } from "@/content/copy";
-import { accountLabel } from "@/lib/import/banks";
 import { buildPayload, readImportFile, type DetectResult, type FileError } from "@/lib/import/detect";
-import { fileErrorMessage, fillTemplate, tooManyMessage } from "@/lib/import/presentation";
+import {
+  accountDisplay,
+  bankDisplayName,
+  fileErrorMessage,
+  fillTemplate,
+  tooManyMessage,
+} from "@/lib/import/presentation";
 import { MAX_DEBITS, MAX_FILE_BYTES, importPayloadSchema } from "@/lib/import/schema";
-import { formatAccountTail, formatRangeLong, formatRangeShort, plural } from "@/lib/format";
+import { formatRangeLong, formatRangeShort, plural } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export interface ImportWizardLabels {
-  flow: Pick<typeof copy.importFlow, "title" | "steps" | "supported" | "oneAccount">;
+  flow: Pick<
+    typeof copy.importFlow,
+    | "title"
+    | "steps"
+    | "supported"
+    | "oneAccount"
+    | "bank"
+    | "accountLabel"
+    | "rangeLabel"
+    | "importButton"
+    | "waiting"
+    | "back"
+  > & {
+    /** `importFlow.debitForms` — content.json types it `string[]`; the page hands over the three plural forms. */
+    debitForms: readonly [string, string, string];
+  };
   /** Kit `imports` — step-1 copy, bank names, the recognised-format chip. */
   kit: typeof copy.imports;
   /** `copyExtra.imports` — only the K11 / K28 placeholders (steps 2–3 until the later phases rebind them). */
@@ -190,18 +210,22 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
     </button>
   );
 
+  // Kit `importErrors.overlap` = „…import: {range}.”; the range is rendered as a link to the history. Without a
+  // range (the endpoint could not read it back) the sentence ends at „.” — one sentence, then the app tail.
+  const [overlapBefore = "", overlapAfter = ""] = errors.overlap.split("{range}");
   const overlapMessage = (from?: string, to?: string) =>
     from && to ? (
       <>
-        {x.overlapPrefix}{" "}
+        {overlapBefore}
         <a href="/imports" className="underline">
           {formatRangeLong(from, to)}
         </a>
-        . {x.overlapTail}
+        {overlapAfter} {x.overlapTail}
       </>
     ) : (
       <>
-        {x.overlapPrefix.replace(/:$/, ".")} {x.overlapTail}
+        {overlapBefore.replace(/:\s*$/, "")}
+        {overlapAfter} {x.overlapTail}
       </>
     );
 
@@ -328,11 +352,9 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
                   className="accent-ink"
                 />
                 <span className="min-w-0 flex-1">
-                  <strong className="block text-sm">
-                    {a.name} · {formatAccountTail(a.number)}
-                  </strong>
+                  <strong className="block text-sm">{accountDisplay(a.name, a.number)}</strong>
                   <small className="text-muted mt-1 block text-xs">
-                    {x.bankName[bank]} · {a.rows} {plural(a.rows, x.transactionForms)}
+                    {bankDisplayName(kit.bankName, bank)} · {a.rows} {plural(a.rows, x.transactionForms)}
                   </small>
                 </span>
                 {a.number === account && <b className="text-green text-[11px]">{x.selected}</b>}
@@ -347,7 +369,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
                 setStep(1);
               }}
             >
-              {x.stepBack}
+              {flow.back}
             </Button>
             <Button
               type="button"
@@ -391,13 +413,10 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
       <section className={cn(panel, "max-w-[760px]")}>
         <dl className="mb-6 grid grid-cols-2 gap-[21px] max-[899px]:grid-cols-1">
           {[
-            [
-              x.summary.account,
-              `${accountLabel(x.accountLabel, bank, chosen.name)} · ${formatAccountTail(chosen.number)}`,
-            ],
-            [x.summary.range, formatRangeShort(period.start, period.end)],
+            [flow.bank, bankDisplayName(kit.bankName, bank)],
+            [flow.accountLabel, accountDisplay(chosen.name, chosen.number)],
+            [flow.rangeLabel, formatRangeShort(period.start, period.end)],
             [x.summary.debits, `${chosen.debits} ${plural(chosen.debits, x.transactionForms)}`],
-            [x.summary.skipped, `${chosen.credits} ${plural(chosen.credits, x.transactionForms)}`],
           ].map(([term, value]) => (
             <div key={term}>
               <dt className="text-muted mb-1.5 block text-xs">{term}</dt>
@@ -418,7 +437,6 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
             </div>
           </>
         ) : (
-          // DESIGN-GAP: G25 — the kit's step 3 has no "range is free → confirm" state; placeholder button.
           <form
             method="POST"
             action="/api/imports"
@@ -442,10 +460,10 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
                   setStep(2);
                 }}
               >
-                {x.stepBack}
+                {flow.back}
               </Button>
-              <SubmitButton size="default" pendingText={x.importing} pending={submitting}>
-                {fill(x.confirm, { n: chosen.debits, debits: plural(chosen.debits, x.debitForms) })}
+              <SubmitButton size="default" pendingText={flow.waiting} pending={submitting}>
+                {fill(flow.importButton, { n: chosen.debits, debits: plural(chosen.debits, flow.debitForms) })}
               </SubmitButton>
             </div>
           </form>

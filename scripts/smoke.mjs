@@ -328,6 +328,17 @@ const steps = [
     () => request("/imports/new?error=invalid"),
     { status: 200, contains: ">Plik jest niespójny:" },
   ],
+  [
+    "import wizard renders the overlap range as a link inside the kit sentence",
+    () => request("/imports/new?error=overlap&from=2026-05-01&to=2026-05-31"),
+    {
+      status: 200,
+      contains: [
+        ">Ten zakres nachodzi na istniejący import:",
+        '<a href="/imports" class="underline">1 maja – 31 maja 2026</a>',
+      ],
+    },
+  ],
   ["patterns lists imported merchants", () => request("/patterns"), { status: 200, contains: "Kawiarnia smoke" }],
   // The rendered badge text node — a bare "stały" would also match the island's serialized copy props.
   ["patterns proposes a type", () => request("/patterns"), { status: 200, contains: ">stały<" }],

@@ -128,31 +128,17 @@ export const copyExtra = {
     resultTitle: "Dodaliśmy {n} {debits}.",
     debitForms: ["obciążenie", "obciążenia", "obciążeń"],
     next: "Dalej",
-    stepBack: "Wstecz",
     stepEyebrow: "Nowy import · krok {n} z 3",
     accountTitle: "Wybierz rachunek.",
     // The prototype spells the count as a word („trzy rachunki”); the app interpolates the number.
     accountLead: "Ten plik zawiera {n} {accounts}. Domyślnie zaznaczyliśmy ten z największą liczbą transakcji.",
     accountForms: ["rachunek", "rachunki", "rachunków"],
     selected: "wybrane",
-    // DESIGN-GAP: K26 — the kit's step 2 `<small>` only ever says "ING Bank Śląski"; the app adds the
-    // Santander form, filled by the bank the detector found (S-10 Phase 6).
-    bankName: { ing: "ING Bank Śląski", santander: "Santander Bank Polska" },
     summaryTitle: "Sprawdź przed importem.",
     summary: {
-      account: "Rachunek",
-      range: "Zakres dat",
       debits: "Obciążenia do importu",
-      skipped: "Pominięte wpływy / zwroty",
     },
     overlapTail: "Wybierz inny plik albo wróć do importów.",
-    // DESIGN-GAP: K16 — `importErrors.overlap` has the date baked in („…import: 1 marca – 31 maja 2026.”);
-    // the app interpolates the real range after this prefix (prototype importSummary, app.js:61).
-    overlapPrefix: "Ten zakres nachodzi na istniejący import:",
-    // DESIGN-GAP: G25 — step 3 has no "range is free → confirm" state in the kit; placeholder button from the
-    // pre-K8 prototype („Importuj 64 obciążenia”), plural forms in `debitForms`.
-    confirm: "Importuj {n} {debits}",
-    importing: "Importowanie…",
     // Delete action + dialog (S-02, prototype imports() / modal('deleteImport'), app.js) — verbatim from app.js.
     // DESIGN-GAP: K19 — content.json has no key for the delete action, the dialog copy or its close label; the
     // kit h2 hardcodes the month („Usunąć import z maja?”), so the app interpolates the real range instead.

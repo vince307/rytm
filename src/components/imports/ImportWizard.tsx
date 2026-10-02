@@ -5,7 +5,8 @@
 // check in step 3 is UX only — imports_no_overlap in the database is the guarantee (FR-005); a rejected POST
 // comes back as ?error= and is shown in step 1. The bank is read once, from `detectStatement` (ING vs
 // Santander, import-formats.md § Wykrywanie formatu) — every later render (steps 1–3) just looks it up, never
-// re-detects it.
+// re-detects it. Kit round 3: kit copy for every state (chip, rejections, demo note), `tooMany` / `inconsistent`
+// shown on step 3, a save failure stays in the wizard.
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode, Ref } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -47,7 +48,7 @@ export interface ImportWizardLabels {
   };
   /** Kit `imports` — step-1 copy, bank names, the recognised-format chip. */
   kit: typeof copy.imports;
-  /** `copyExtra.imports` — only the K11 / K28 placeholders (steps 2–3 until the later phases rebind them). */
+  /** `copyExtra.imports` — the K11 / K28 placeholders for wizard steps 2–3 (kit round 3 has no content.json keys for them). */
   imports: typeof copyExtra.imports;
   errors: typeof copy.importErrors;
   /** `copyExtra.imports.saveError` (kit round 3 has the text only in `app.js`; K28 in design-kit.md) — a save that failed for a reason the user cannot act on. */

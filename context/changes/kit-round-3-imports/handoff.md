@@ -1,66 +1,95 @@
 # Handoff — `kit-round-3-imports` (slice S-13)
 
-Written by the `/10x-impl-review kit-round-3-imports` step. Review is done: 0 critical, 2 warnings fixed in `e305f81`, 6 observations (3 deferred with `Trigger:`); `MERGE: CLEAR`; `change.md` is `impl_reviewed`. The one thing the next agent must not get wrong: the visual gate (6.6) has still NOT been run, and it must also decide follow-ups F7 and F8 (`follow-ups/review-fixes.md`).
+The visual gate step wrote this handoff. The gate ran: `VISUAL: PASS`. F7 and F8 were reproduced and fixed, and the
+`.dash-title` stacking below 560 px was fixed as well (`5707d1a`). [visual] 6.6 is ticked. Only [human] 6.8 is
+still open. The next agent must not miss that `PageTitle.astro` (shared) changed in this slice. `/home`,
+`/patterns`, `/fixed` and `/settings` now stack the title action below 560 px, as the round-3 kit does. Those views
+were checked at 400 px, but the PR description should say it.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-imports`, cut from `main` at `2a8f89d` (F-04 merged) |
-| Commits | `6e369ff` … `3d1b147` (docs + P1–P6 + epilogue), `e305f81` fix (review), + this docs commit |
+| Commits | `6e369ff` … `74029c7` (docs, P1–P6, epilogue, review fix + docs), `5707d1a` fix (visual gate), + this docs commit |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `impl_reviewed` |
-| `## Progress` rows remaining | 2 of 40 (`grep -c '^- \[ \]' plan.md` = 2): [visual] 6.6, [human] 6.8 |
+| `change.md` status | `impl_reviewed` (unchanged; archive sets the next status) |
+| `## Progress` rows remaining | 1 of 40 (`grep -c '^- \[ \]' plan.md` = 1): [human] 6.8 |
 | Working tree | clean after the commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/kit-round-3-imports/reviews/impl-review.md` | review report (findings F1–F8, suites, breaks, [reviewer] evidence, MERGE line) |
-| `context/changes/kit-round-3-imports/follow-ups/review-fixes.md` | deferred F3, F7, F8, each with `Trigger:` |
-| `test/unit/kit-contract.test.ts` | F1: new `it` pinning `importErrors.overlap {range}`, `imports.deleteTitle {range}`, `importFlow.importButton {n}{debits}`, `importFlow.debitForms` length 3 |
-| `src/components/imports/ImportWizard.tsx` | F2: `fill` alias removed, `fillTemplate` called directly |
-| `src/pages/imports/result.astro` | F2: `title` via `fillTemplate` instead of a `.replace` chain |
-| `context/changes/kit-round-3-imports/plan.md` | [reviewer] rows 1.7, 2.7, 3.7, 4.6, 5.5, 6.7 ticked |
-| `context/changes/kit-round-3-imports/change.md` | status `impl_reviewed` |
+| `src/components/imports/ImportWizard.tsx` | F7: `chooseOtherButton` rendered only when `!demoLocked`; F8: `usePageShowReset(() => setSubmitting(false))`; `StepTitle` stacks below 560 px |
+| `src/components/app/PageTitle.astro` | `max-[559px]:flex-col` (kit round 3 `.dash-title{flex-direction:column}` ≤560 px) |
+| `context/changes/kit-round-3-imports/reviews/visual-review.md` | gate report: method, 32 states, hand-checked numbers, fixes, observations, VISUAL line |
+| `context/changes/kit-round-3-imports/screenshots/` | 64 app PNGs (32 states × 1280/400) + 38 kit frames + `README.md` (state · desktop · mobile · how reached) |
+| `context/changes/kit-round-3-imports/follow-ups/review-fixes.md` | F7 and F8 marked **Resolved** with evidence; F3 still deferred |
+| `context/changes/kit-round-3-imports/plan.md` | [visual] 6.6 ticked |
+| `context/foundation/design-kit.md` | K33 row: added the `app.js` „Obsługujemy wyciągi …” vs `importFlow.supported` mismatch |
 
 ## 3. Verification
 
-Baseline = contract line (`main` 2a8f89d). All observed in this step, after the fixes (`e305f81`):
+Baseline = contract line (`main` 2a8f89d). Everything below was observed in this step, after `5707d1a`:
 
 | Command | Result |
 | --- | --- |
 | `npm run lint` | 0 errors (baseline 0) |
-| `npx astro check` | 0 errors, 155 files (baseline 0 / 152; +3 new files) |
+| `npx astro check` | 0 errors, 155 files (baseline 0 / 152, +3 slice files) |
 | `npm run fixture:check` | ing OK, santander OK |
-| `npm test` | 352 passed / 23 files (baseline 347 / 22, +5: +7 presentation, +1 kit-contract P1, −4 accountLabel P4, +1 kit-contract review) |
+| `npm test` | 352 passed / 23 files (baseline 347 / 22; Δ0 vs impl-review) |
 | `npm run build` | OK |
-| `npx supabase db reset && npx supabase test db` | Files=6, Tests=119, PASS (Δ0; no migration in the slice, `git diff main...HEAD -- supabase` empty) |
-| smoke, :4398, fresh reset | 166 PASS / 0 FAIL (baseline 157, +9 = plan) — run before and after fixes |
-| Leak check (live) | as test user, `/imports/result?id=<demo user's import>` vs random uuid: both 200, byte-identical bodies minus the id; anon → 302 `/login` |
-| Break 1 | `fileErrorMessage` `tooLarge` → `unknownFormat`: import-presentation red (1/7), restored green. Meta: proves the helper, wiring confirmed by reading |
-| Break 2 | `result.astro` redirect re-added for `notFound`: smoke red on the two not-found steps, restored. Meta: foreign-id branch proven by the leak check (RLS) |
-| End state | dev server on 4398 killed; DB reset + pgTAP PASS before the final smoke (smoke data left in local DB, as every smoke run) |
+| `npx supabase db reset && npx supabase test db` | Files=6, Tests=119, PASS (Δ0) |
+| smoke, :4398, fresh reset | 166 PASS / 0 FAIL (baseline 157, +9 = plan) |
+| Visual gate | 64 app PNGs: `scrollWidth` = viewport and no `undefined` / `{…}` in all; dialog not clipped at 400 px; dialog initial focus on the dialog, not the danger button; Esc returns focus to the trigger |
+| F7 before/after | Playwright `isDisabled()` of „Wybierz inny plik” on demo-locked `?error=overlap`: `false` → button absent |
+| F8 before/after (headed Chrome, Claude-in-Chrome) | Back from result → bfcache step 3 with „Importowanie…” + „Wstecz” disabled → after fix both enabled; second click → `?error=overlap` (server guard, no double import) |
+| End state | dev servers on 4398/4399 killed; `npx supabase db reset` after the final smoke (no gate or smoke data left); scratchpad CSVs never in the repo |
+
+No deliberate break this step: F7 and F8 were each observed red in the product before the fix and green after,
+which is stronger evidence than a synthetic break. There is no automated guard for either. F8 needs a real bfcache
+restore, which headless Playwright does not perform.
 
 ## 4. Next command
 
-`visual gate (kit-round-3-imports), then /10x-archive kit-round-3-imports`
+`/10x-archive kit-round-3-imports then ship (no migrations)`
 
 ## 5. Open
 
 - **Manual-only rows:**
-  - [ ] [visual] 6.6 — screenshots 1280 px / ~400 px of every state listed in `plan.md` Phase 6 (incl. F8 dialog clipping at 400 px in `DeleteImportDialog`, `ImportWizard` `submitting` after Back, demo-locked error state showing `chooseOtherButton`).
-  - [ ] [human] 6.8 — accept S-13 kit-text deviations, send G38 + K33 to the kit author.
-- **Follow-ups** (`follow-ups/review-fixes.md`): F3 `result.astro` `imported` select error unlogged → not-found; F7 `ImportWizard` `chooseOtherButton` enabled when `demoLocked`; F8 `ImportWizard` `submitting` bfcache. F7/F8 triggers are the visual gate.
-- **DESIGN-GAP:** none added; open register rows G38, K33 (round 4).
-- **PR note:** `context/foundation/design-kit.md` diff is mostly Prettier table re-padding (19 lines with `-w`).
+  - [ ] [human] 6.8: accept the S-13 kit-text deviations (list in `plan.md` Phase 6 manual criteria) and send G38
+    and K33 to the kit author. K33 now also lists the drop-zone lead mismatch.
+- **PR note:** `src/components/app/PageTitle.astro` is shared. Below 560 px the title action („+ Wgraj CSV”,
+  „+ Nowy import”) now sits under the lead on every app view. Kit round 3 does the same, and the views were checked
+  at 400 px (`visual-review.md` fix 3). The diff in `context/foundation/design-kit.md` is mostly Prettier table
+  re-padding.
+- **Follow-ups** (`follow-ups/review-fixes.md`): F3 (`result.astro` `imported` select error unlogged) remains
+  deferred with its `Trigger:`. F7 and F8 are resolved.
+- **DESIGN-GAP:** none added. G38 and K33 stay open for round 4.
+- **Observations** (`visual-review.md`): the kit's static step-3 progress bar is not built; alert tints are token
+  approximations; the G38 result placeholder remains.
 
 ## 6. Autonomous decisions
 
-1. **Read the code diff in the main context instead of the skill's two subagents.** Why: ≈600 lines of `src`/`test`, fully readable; one reader avoids inherited claims. Would change: a diff too large for the context budget.
-2. **Triage without AskUserQuestion:** WARNINGs F1/F2 fixed (cheap, no behaviour change); F3/F7/F8 deferred with `Trigger:`; F4/F5/F6 recorded. Why: contract rule 1 and the step's triage rule. Would change: a maintainer present.
-3. **F7 deferred, not fixed.** Why: UI behaviour change on a demo state the visual gate is about to capture; no server effect. Would change: the visual gate showing it, or the orchestrator wanting it in this PR.
-4. **No two-account migration test.** Why: the slice has no migration (empty `supabase/` diff); pgTAP Δ0 and the live foreign-id result check cover the one isolation question. Would change: any file under `supabase/` in the diff.
-5. **5.5 ticked on code evidence** (`onDrop` → `handleFile` early return), drag & drop not exercised in a browser. Would change: the visual gate finding the drop zone still accepts a file when locked.
-6. **MERGE: CLEAR with [visual]/[human] rows open.** Why: they are owned by the orchestrator's visual gate and the human checklist, not by this step's criteria. Would change: the orchestrator treating 6.6 as a merge criterion.
+1. **Playwright for the PNG set, Claude-in-Chrome for F8 and a cross-check.** Rejected: Chrome screenshots for
+   everything. Why: Chrome screenshots are not written to the repo, and 64 states need deterministic replays.
+   Headless Playwright never restores from bfcache, so only headed Chrome could show F8. Would change: a Chrome
+   tool that saves PNGs into the repo.
+2. **F7: hide „Wybierz inny plik” when locked rather than disable it.** Rejected: `disabled={demoLocked}`. Why: the
+   text button has no disabled style. A control that cannot do anything adds noise, and „Wróć do importów” stays.
+   Would change: the kit showing a disabled text button in a demo frame.
+3. **F8: reset only `submitting`, not the whole wizard.** Why: this is the fix the review proposed, and it mirrors
+   `DeleteImportDialog`. The server overlap guard rejects a repeat POST, which was observed. Would change: the
+   maintainer preferring a fresh step 1 after Back.
+4. **Fix `.dash-title` stacking in the shared `PageTitle`, not only in the wizard.** Rejected: a follow-up for a
+   later slice. Why: it is a global kit rule (round 3, ≤560 px) that only moves views closer to their kit frames.
+   It is two classes, and the four neighbouring views were checked at 400 px. Would change: the orchestrator
+   enforcing "no shared-component change in an imports slice". In that case revert the `PageTitle.astro` line and
+   file a follow-up with `Trigger: S-12`.
+5. **Test data via `test@rytm.local` and the demo account, not fresh accounts.** Why: the plan's [visual] row names
+   them. The demo import cannot be undone through the UI, so the step ended with `npx supabase db reset`. Would
+   change: nothing. The reset leaves the seed state.
+6. **Error query states opened by URL.** Why: they are the redirect targets of the POST endpoints and render the
+   same page. Provoking `failed` or `invalid` server-side would need a broken DB or a crafted payload. Would change:
+   a state whose rendering depends on more than the query string.

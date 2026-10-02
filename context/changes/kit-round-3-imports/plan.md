@@ -660,6 +660,6 @@ the kit-text departures are collected in the Phase 6 `[human]` row.
 
 #### Manual
 
-- [ ] 6.6 [visual] Screenshots desktop + ~400 px of every listed state, compared with the kit views
+- [x] 6.6 [visual] Screenshots desktop + ~400 px of every listed state, compared with the kit views
 - [x] 6.7 [reviewer] Seam sweep complete; register matches the plan; follow-ups carry Trigger lines — impl-review e305f81
 - [ ] 6.8 [human] Accept S-13 kit-text deviations and send G38 + K33 to the kit author

@@ -652,11 +652,11 @@ the kit-text departures are collected in the Phase 6 `[human]` row.
 
 #### Automated
 
-- [x] 6.1 Seam greps empty (accountLabel, overlapPrefix, deleteMissing, stand-in comments, stale DESIGN-GAP ids)
-- [x] 6.2 Every copyExtra.imports key has a reader
-- [x] 6.3 Phase leaves design/ untouched
-- [x] 6.4 Deliberate break: re-added copyExtra.imports.accountLabel caught by the unused-key grep, restored
-- [x] 6.5 Full local gate vs baseline, smoke + 9
+- [x] 6.1 Seam greps empty (accountLabel, overlapPrefix, deleteMissing, stand-in comments, stale DESIGN-GAP ids) — efc07cc
+- [x] 6.2 Every copyExtra.imports key has a reader — efc07cc
+- [x] 6.3 Phase leaves design/ untouched — efc07cc
+- [x] 6.4 Deliberate break: re-added copyExtra.imports.accountLabel caught by the unused-key grep, restored — efc07cc
+- [x] 6.5 Full local gate vs baseline, smoke + 9 — efc07cc
 
 #### Manual
 

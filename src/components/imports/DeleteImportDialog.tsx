@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { usePageShowReset } from "@/components/hooks/usePageShowReset";
+import { InfoAlert } from "@/components/app/InfoAlert";
+import { fillTemplate } from "@/lib/import/presentation";
 
 export interface DeleteImportLabels {
   action: string;
@@ -11,6 +13,8 @@ export interface DeleteImportLabels {
   body: string;
   pending: string;
   close: string;
+  /** Kit `imports.demoDeleteBlocked` — shown, with the danger button disabled, for the shared demo account. */
+  demoNote: string;
 }
 
 interface Props {
@@ -18,13 +22,15 @@ interface Props {
   range: string;
   describedBy: string;
   labels: DeleteImportLabels;
+  /** The shared demo account (S-09): undo is always refused, so the dialog says so and disables the button. */
+  demo: boolean;
 }
 
 // Kit modal('deleteImport') for one row (app.js) — one danger button, no cancel (close X / Esc / overlay).
 // Modelled on DeleteAccountDialog; each row gets its own dialog+form island, mirroring the list's real buttons.
-export default function DeleteImportDialog({ id, range, describedBy, labels }: Props) {
+export default function DeleteImportDialog({ id, range, describedBy, labels, demo }: Props) {
   const [pending, setPending] = useState(false);
-  const title = labels.title.replace("{range}", range);
+  const title = fillTemplate(labels.title, { range });
   // undo-import F4 / S-04 F8: a bfcache restore (back-navigation after the POST) must not leave the button stuck.
   usePageShowReset(() => {
     setPending(false);
@@ -49,6 +55,7 @@ export default function DeleteImportDialog({ id, range, describedBy, labels }: P
         <div className="text-excess-text text-xs font-extrabold tracking-[0.14em] uppercase">{labels.eyebrow}</div>
         <DialogTitle>{title}</DialogTitle>
         <DialogDescription>{labels.body}</DialogDescription>
+        {demo && <InfoAlert className="mt-[18px]">{labels.demoNote}</InfoAlert>}
         <form
           method="POST"
           action="/api/imports/delete"
@@ -64,6 +71,7 @@ export default function DeleteImportDialog({ id, range, describedBy, labels }: P
             showArrow={false}
             pendingText={labels.pending}
             pending={pending}
+            disabled={demo}
           >
             {labels.action}
           </SubmitButton>

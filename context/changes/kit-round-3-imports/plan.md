@@ -610,12 +610,12 @@ the kit-text departures are collected in the Phase 6 `[human]` row.
 
 #### Automated
 
-- [ ] 3.1 npm test: Phase 2 count, 0 failed
-- [ ] 3.2 Smoke Phase 2 count + 2 PASS (3 rewritten), 0 FAIL
-- [ ] 3.3 No import-delete G30/G37/deleteMissing/deleteDialogTitle left; settings untouched
-- [ ] 3.4 Deliberate break: account_number dropped from the select turns astro check or the tail smoke step red, restored
-- [ ] 3.5 Deliberate break: missing → deleteError turns the not-found smoke steps red, restored
-- [ ] 3.6 Full local gate vs baseline, smoke + 5
+- [x] 3.1 npm test: Phase 2 count, 0 failed
+- [x] 3.2 Smoke Phase 2 count + 2 PASS (3 rewritten), 0 FAIL
+- [x] 3.3 No import-delete G30/G37/deleteMissing/deleteDialogTitle left; settings untouched
+- [x] 3.4 Deliberate break: account_number dropped from the select turns astro check or the tail smoke step red, restored
+- [x] 3.5 Deliberate break: missing → deleteError turns the not-found smoke steps red, restored
+- [x] 3.6 Full local gate vs baseline, smoke + 5
 
 #### Manual
 

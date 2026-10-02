@@ -369,7 +369,7 @@ const steps = [
   [
     "imports shows the not-found line",
     () => request("/imports?error=missing"),
-    { status: 200, contains: "Nie znaleziono tego importu" },
+    { status: 200, contains: "Nie znaleziono importu." },
   ],
   [
     "import is deleted",
@@ -393,7 +393,7 @@ const steps = [
   [
     "imports shows the not-found line above the empty list",
     () => request("/imports?error=missing"),
-    { status: 200, contains: "Nie znaleziono tego importu" },
+    { status: 200, contains: "Nie znaleziono importu." },
   ],
   [
     "patterns drop the deleted import",
@@ -939,9 +939,18 @@ const steps = [
     () => request(santanderResultPath),
     { status: 200, contains: "Dodaliśmy 2 obciążenia." },
   ],
-  // S-10 Phase 5: per-bank account label (copyExtra.imports.accountLabel, K26) on the list and the result —
-  // plain server-rendered text, no island, so the rendered node and the bare text are the same string.
-  ["imports list names the bank", () => request("/imports"), { status: 200, contains: ">Santander · Rachunek<" }],
+  // S-13 Phase 3: the kit draws the bank in its own column and the account as `{name} · •• {tail}` (rewritten
+  // from the S-10 bank-prefixed label). Plain server-rendered cells, no island: node and bare text coincide.
+  ["imports list names the bank", () => request("/imports"), { status: 200, contains: ">Santander Bank Polska<" }],
+  ["imports list shows the account tail", () => request("/imports"), { status: 200, contains: ">Rachunek · •• 0099<" }],
+  [
+    "imports list has the bank column",
+    () => request("/imports"),
+    {
+      status: 200,
+      contains: ">Bank</th>",
+    },
+  ],
   [
     "santander import result names the bank",
     () => request(santanderResultPath),

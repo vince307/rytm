@@ -697,7 +697,7 @@ These are recorded in place of the skill's user questions (no human in the loop,
 
 #### Manual
 
-- [ ] 1.6 [reviewer] Real-export comparison prints aggregates only; R1 shares 0; differences explained
+- [x] 1.6 [reviewer] Real-export comparison prints aggregates only; R1 shares 0; differences explained — impl-review
 
 ### Phase 2: Database — widened source and `import_statement` RPC
 
@@ -712,7 +712,7 @@ These are recorded in place of the skill's user questions (no human in the loop,
 
 #### Manual
 
-- [ ] 2.7 [reviewer] Migration is expand-only and backward-compatible; header and comment explain the deploy window and grants
+- [x] 2.7 [reviewer] Migration is expand-only and backward-compatible; header and comment explain the deploy window and grants — impl-review
 
 ### Phase 3: Source-aware payload and endpoint
 
@@ -726,7 +726,7 @@ These are recorded in place of the skill's user questions (no human in the loop,
 
 #### Manual
 
-- [ ] 3.6 [reviewer] ING smoke steps byte-identical; stale-tab default covered by them
+- [x] 3.6 [reviewer] ING smoke steps byte-identical; stale-tab default covered by them — impl-review
 
 ### Phase 4: Santander reader and format detection
 
@@ -741,7 +741,7 @@ These are recorded in place of the skill's user questions (no human in the loop,
 
 #### Manual
 
-- [ ] 4.7 [reviewer] Reader matches rules 1–6 and the oracle; no real-export value in code or tests
+- [x] 4.7 [reviewer] Reader matches rules 1–6 and the oracle; no real-export value in code or tests — impl-review
 
 ### Phase 5: Bank name on the imports list and the result
 
@@ -770,7 +770,7 @@ These are recorded in place of the skill's user questions (no human in the loop,
 #### Manual
 
 - [ ] 6.6 [visual] Every wizard state (step 1 empty / Santander ready / ING ready / unknown / USD; step 2 Santander; step 3 Santander ready / overlap; result; list) at 1280 px and ~400 px vs kit
-- [ ] 6.7 [reviewer] Full Santander import locally: patterns show rule-5 tails; ING import and delete still work
+- [x] 6.7 [reviewer] Full Santander import locally: patterns show rule-5 tails; ING import and delete still work — impl-review
 - [ ] 6.8 [human] Owner imports their real Santander PLN export locally; count and range match the bank
 - [ ] 6.9 [human] Accept the rule-7 deviation: Lp not stored, no per-row Santander key
 - [ ] 6.10 [human] Accept the K26 wording, incl. "Rachunek" as the Santander account name

@@ -755,7 +755,7 @@ These are recorded in place of the skill's user questions (no human in the loop,
 
 #### Manual
 
-- [ ] 5.6 [visual] List (ING + Santander rows), Santander result, ING result at 1280 px and ~400 px vs kit
+- [x] 5.6 [visual] List (ING + Santander rows), Santander result, ING result at 1280 px and ~400 px vs kit — visual gate (1440 + 400 px, `screenshots/`)
 
 ### Phase 6: Wizard wiring, kit gaps and seam sweep
 
@@ -769,7 +769,7 @@ These are recorded in place of the skill's user questions (no human in the loop,
 
 #### Manual
 
-- [ ] 6.6 [visual] Every wizard state (step 1 empty / Santander ready / ING ready / unknown / USD; step 2 Santander; step 3 Santander ready / overlap; result; list) at 1280 px and ~400 px vs kit
+- [x] 6.6 [visual] Every wizard state (step 1 empty / Santander ready / ING ready / unknown / USD; step 2 Santander; step 3 Santander ready / overlap; result; list) at 1280 px and ~400 px vs kit — visual gate (1440 + 400 px, `screenshots/`)
 - [x] 6.7 [reviewer] Full Santander import locally: patterns show rule-5 tails; ING import and delete still work — impl-review
 - [ ] 6.8 [human] Owner imports their real Santander PLN export locally; count and range match the bank
 - [ ] 6.9 [human] Accept the rule-7 deviation: Lp not stored, no per-row Santander key

@@ -625,11 +625,11 @@ the kit-text departures are collected in the Phase 6 `[human]` row.
 
 #### Automated
 
-- [x] 4.1 npm test: Phase 3 count − 4 accountLabel cases, 0 failed
-- [x] 4.2 Smoke Phase 3 count + 2 PASS (2 rewritten), 0 FAIL
-- [x] 4.3 No accountLabel( in src or test; one DESIGN-GAP: G38 in result.astro
-- [x] 4.4 Deliberate break: 302 redirect restored for a missing row turns the not-found smoke steps red, restored, meta-check recorded
-- [x] 4.5 Full local gate vs baseline, smoke + 7
+- [x] 4.1 npm test: Phase 3 count − 4 accountLabel cases, 0 failed — 623db9e
+- [x] 4.2 Smoke Phase 3 count + 2 PASS (2 rewritten), 0 FAIL — 623db9e
+- [x] 4.3 No accountLabel( in src or test; one DESIGN-GAP: G38 in result.astro — 623db9e
+- [x] 4.4 Deliberate break: 302 redirect restored for a missing row turns the not-found smoke steps red, restored, meta-check recorded — 623db9e
+- [x] 4.5 Full local gate vs baseline, smoke + 7 — 623db9e
 
 #### Manual
 

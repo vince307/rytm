@@ -315,6 +315,12 @@ const steps = [
   ],
   ["settings renders account e-mail", () => request("/settings"), { status: 200, contains: email }],
   [
+    "settings password form starts closed",
+    () => request("/settings"),
+    { status: 200, contains: ">Zmień hasło<", notContains: 'id="current"' },
+  ],
+  // Since the form is collapsed, the next step matches the island's serialized props only (S-12 P4).
+  [
     "settings fills the password minimum",
     () => request("/settings"),
     { status: 200, contains: "co najmniej 6 znaków", notContains: "{n}" },

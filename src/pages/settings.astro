@@ -5,7 +5,7 @@ import PageTitle from "@/components/app/PageTitle.astro";
 import Panel from "@/components/app/Panel.astro";
 import SettingsRow from "@/components/app/SettingsRow.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
-import NewPasswordForm from "@/components/auth/NewPasswordForm";
+import SettingsPasswordRow from "@/components/settings/SettingsPasswordRow";
 import DeleteAccountDialog from "@/components/settings/DeleteAccountDialog";
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
@@ -60,27 +60,26 @@ const deleteError =
     <SettingsRow label={f.email}>
       <strong>{email}</strong>
     </SettingsRow>
-    <SettingsRow label={f.password}>
-      <div class="max-w-[390px]">
-        <NewPasswordForm
-          client:load
-          action="/api/auth/password"
-          current={{ label: s.currentPassword }}
-          labels={{
-            password: s.newPassword,
-            confirm: s.repeatPassword,
-            passwordPlaceholder: copy.auth.passwordPlaceholder,
-            showPassword: a.showPassword,
-            hidePassword: a.hidePassword,
-            submit: s.changePassword,
-            pending: copyExtra.auth.saving,
-            passwordTooShort: a.passwordTooShort.replace("{n}", String(MIN_PASSWORD_LENGTH)),
-            passwordsDiffer: a.passwordMismatch,
-            currentRequired: a.passwordRequired,
-          }}
-        />
-      </div>
-    </SettingsRow>
+    <SettingsPasswordRow
+      client:load
+      label={f.password}
+      masked="••••••••"
+      toggleLabel={s.changePassword}
+      cancelLabel={x.cancel}
+      current={{ label: s.currentPassword }}
+      formLabels={{
+        password: s.newPassword,
+        confirm: s.repeatPassword,
+        passwordPlaceholder: copy.auth.passwordPlaceholder,
+        showPassword: a.showPassword,
+        hidePassword: a.hidePassword,
+        submit: x.savePassword,
+        pending: copyExtra.auth.saving,
+        passwordTooShort: a.passwordTooShort.replace("{n}", String(MIN_PASSWORD_LENGTH)),
+        passwordsDiffer: a.passwordMismatch,
+        currentRequired: a.passwordRequired,
+      }}
+    />
     <SettingsRow label={x.dataLabel}>
       <p>{s.data}</p>
     </SettingsRow>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FormField } from "@/components/auth/FormField";
 import { PasswordToggle } from "@/components/auth/PasswordToggle";
 import { SubmitButton } from "@/components/auth/SubmitButton";
+import { Button } from "@/components/ui/button";
 import { ServerError } from "@/components/auth/ServerError";
 import { MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 
@@ -25,9 +26,17 @@ interface Props {
   action?: string;
   /** When set, the form asks for the current password first (the in-app change verifies it server-side). */
   current?: { label: string };
+  /** Settings toggle: a ghost button next to submit (kit `.form-actions`); `/reset/new` passes none. */
+  cancel?: { label: string; onCancel: () => void };
 }
 
-export default function NewPasswordForm({ labels, serverError, action = "/api/auth/reset/new", current }: Props) {
+export default function NewPasswordForm({
+  labels,
+  serverError,
+  action = "/api/auth/reset/new",
+  current,
+  cancel,
+}: Props) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -101,9 +110,20 @@ export default function NewPasswordForm({ labels, serverError, action = "/api/au
         placeholder={labels.passwordPlaceholder}
         error={errors.confirm}
       />
-      <div className="mt-2">
-        <SubmitButton pendingText={labels.pending}>{labels.submit}</SubmitButton>
-      </div>
+      {cancel ? (
+        <div className="mt-3 flex flex-wrap gap-[10px]">
+          <SubmitButton pendingText={labels.pending} size="default">
+            {labels.submit}
+          </SubmitButton>
+          <Button type="button" variant="ghost" onClick={cancel.onCancel}>
+            {cancel.label}
+          </Button>
+        </div>
+      ) : (
+        <div className="mt-2">
+          <SubmitButton pendingText={labels.pending}>{labels.submit}</SubmitButton>
+        </div>
+      )}
     </form>
   );
 }

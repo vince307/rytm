@@ -251,6 +251,9 @@ export const copyExtra = {
     dataLabel: "Przetwarzanie danych",
     // K15 note: the kit's settings() draws the „Sesja” row label of `.logout-row`; content.json has no key for it.
     session: "Sesja",
+    // K15 note: button labels of the kit's `settings()` password toggle, not in content.json.
+    savePassword: "Zapisz hasło",
+    cancel: "Anuluj",
     dangerEyebrow: "Strefa destrukcyjna",
     deleteDialogEyebrow: "Usunięcie konta",
     deleteDialogTitle: "Usunąć konto bez śladu?",

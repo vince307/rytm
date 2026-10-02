@@ -127,6 +127,67 @@ const santanderInvalidPayload = JSON.stringify({
   transactions: [{ ...santanderTransactions[0], bankTxId: "000000000000000009" }, santanderTransactions[1]],
 });
 let santanderResultPath = "/imports/result";
+// S-11 Phase 4: a Santander card import (two card payments to the same merchant in two cities, two ATM
+// withdrawals at two addresses) on the re-created account, disjoint (June) from the May payload above.
+const santanderCardPayload = JSON.stringify({
+  source: "santander",
+  accountNumber: "22222200000000000000000099",
+  accountName: "Rachunek",
+  periodStart: "2026-06-01",
+  periodEnd: "2026-06-30",
+  transactions: [
+    {
+      occurredOn: "2026-06-03",
+      amountMinor: 1850,
+      bankTxId: null,
+      counterparty: "PIZZERIA SMOKE KRAKOW",
+      title: "DOP. VISA 123456******1111 PŁATNOŚĆ KARTĄ 18.50 PLN PIZZERIA SMOKE KRAKOW",
+      details: "",
+    },
+    {
+      occurredOn: "2026-06-08",
+      amountMinor: 2200,
+      bankTxId: null,
+      counterparty: "PIZZERIA SMOKE WARSZAWA",
+      title: "DOP. VISA 123456******2222 PŁATNOŚĆ KARTĄ 22.00 PLN PIZZERIA SMOKE WARSZAWA",
+      details: "",
+    },
+    {
+      occurredOn: "2026-06-12",
+      amountMinor: 5000,
+      bankTxId: null,
+      counterparty: "UL SMOKOWA 5 KRAKOW",
+      title: "DOP. VISA 123456******3333 WYPŁATA Z BANKOMATU KARTĄ 50.00 PLN UL SMOKOWA 5 KRAKOW",
+      details: "",
+    },
+    {
+      occurredOn: "2026-06-18",
+      amountMinor: 10000,
+      bankTxId: null,
+      counterparty: "UL SMOKOWA 7 WARSZAWA",
+      title: "DOP. VISA 123456******4444 WYPŁATA Z BANKOMATU KARTĄ 100.00 PLN UL SMOKOWA 7 WARSZAWA",
+      details: "",
+    },
+  ],
+});
+// Same merchant on the ING side (a new account, never imported before): proves the cross-bank join (S-11) — the
+// Santander card tail and this ING counterparty's address tail both normalize to "PIZZERIA SMOKE".
+const ingPizzeriaPayload = JSON.stringify({
+  accountNumber: "11111100000000000000000097",
+  accountName: "Konto smoke",
+  periodStart: "2026-06-01",
+  periodEnd: "2026-06-30",
+  transactions: [
+    {
+      occurredOn: "2026-06-15",
+      amountMinor: 1850,
+      bankTxId: "000000000000000010",
+      counterparty: "PIZZERIA SMOKE UL. SMOKOWA 1 KRAKÓW",
+      title: "Płatność kartą",
+      details: "",
+    },
+  ],
+});
 const jar = new Map();
 
 function cookieHeader() {
@@ -846,6 +907,34 @@ const steps = [
     "santander import with a bank transaction id is rejected",
     () => request("/api/imports", { method: "POST", form: { payload: santanderInvalidPayload } }),
     { status: 302, location: "/imports/new?error=invalid" },
+  ],
+  // S-11 Phase 4: cross-bank merchant join (Santander card + ING) and the Santander ATM "Bankomat" pattern,
+  // proven end to end through the real import endpoint and the real /patterns page — reusing the re-created
+  // account's still-signed-in session, no new signup needed.
+  [
+    "santander card import is saved",
+    () => request("/api/imports", { method: "POST", form: { payload: santanderCardPayload } }),
+    { status: 302, location: "/imports/result?id=" },
+  ],
+  [
+    "ing import of the same merchant is saved",
+    () => request("/api/imports", { method: "POST", form: { payload: ingPizzeriaPayload } }),
+    { status: 302, location: "/imports/result?id=" },
+  ],
+  [
+    "patterns join the santander and ing pizzeria rows into one merchant",
+    // The rendered node, not the bare text — PatternsTable's serialized island props contain the same string.
+    () => request("/patterns"),
+    {
+      status: 200,
+      contains: ">PIZZERIA SMOKE<",
+      notContains: [">PIZZERIA SMOKE KRAKOW<", ">PIZZERIA SMOKE WARSZAWA<"],
+    },
+  ],
+  [
+    "patterns join the santander atm withdrawals into one Bankomat pattern",
+    () => request("/patterns"),
+    { status: 200, contains: ">Bankomat<", notContains: ">UL SMOKOWA 5 KRAKOW<" },
   ],
   [
     "delete re-created account (cleanup)",

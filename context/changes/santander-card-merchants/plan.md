@@ -485,11 +485,11 @@ Recorded in place of the skill's questions (run contract rule 1).
 
 #### Automated
 
-- [ ] 4.1 Smoke baseline + 4 PASS, 0 FAIL; smoke diff additions only
-- [ ] 4.2 Deliberate break: `rawMerchant` skips the Santander step → join and `Bankomat` steps red; restored → green
-- [ ] 4.3 Seam greps: one card gate in patterns, no stale S-11 future wording, no TODO
-- [ ] 4.4 ING fixtures/scripts and kit unchanged vs `main`
-- [ ] 4.5 Full local gate vs baseline (smoke + 4)
+- [x] 4.1 Smoke baseline + 4 PASS, 0 FAIL; smoke diff additions only
+- [x] 4.2 Deliberate break: `rawMerchant` skips the Santander step → join and `Bankomat` steps red; restored → green
+- [x] 4.3 Seam greps: one card gate in patterns, no stale S-11 future wording, no TODO
+- [x] 4.4 ING fixtures/scripts and kit unchanged vs `main`
+- [x] 4.5 Full local gate vs baseline (smoke + 4)
 
 #### Manual
 

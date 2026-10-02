@@ -7,6 +7,7 @@ import Panel from "@/components/app/Panel.astro";
 import ViewEmpty from "@/components/app/ViewEmpty.astro";
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
+import { accountLabel } from "@/lib/import/banks";
 import { createClient } from "@/lib/supabase";
 import { formatDate, formatRangeLong, formatRangeShort } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -20,7 +21,7 @@ const supabase = createClient(Astro.request.headers, Astro.cookies);
 const { data, error } = supabase
   ? await supabase
       .from("imports")
-      .select("id, account_name, period_start, period_end, created_at, transactions(count)")
+      .select("id, source, account_name, period_start, period_end, created_at, transactions(count)")
       .order("created_at", { ascending: false })
   : { data: null, error: null };
 if (error) {
@@ -30,7 +31,7 @@ if (error) {
 const rows = (data ?? []).map((i) => ({
   id: i.id,
   importedOn: formatDate(i.created_at),
-  account: x.accountLabel.replace("{name}", i.account_name),
+  account: accountLabel(x.accountLabel, i.source, i.account_name),
   range: formatRangeShort(i.period_start, i.period_end),
   rangeLong: formatRangeLong(i.period_start, i.period_end),
   debits: i.transactions[0]?.count ?? 0,

@@ -89,6 +89,44 @@ const importPayloadJune = JSON.stringify({
   ],
 });
 let importResultPath = "/imports/result";
+// S-10: a Santander payload on the re-created account (2 debits, no bank transaction id — rule 7),
+// `accountName: "Rachunek"` is what the wizard sends (Phase 5, copyExtra.imports.santanderAccountName).
+const santanderTransactions = [
+  {
+    occurredOn: "2026-05-06",
+    amountMinor: 1850,
+    bankTxId: null,
+    counterparty: "Santander smoke",
+    title: "Płatność kartą",
+    details: "",
+  },
+  {
+    occurredOn: "2026-05-22",
+    amountMinor: 3200,
+    bankTxId: null,
+    counterparty: "Santander smoke",
+    title: "Płatność kartą",
+    details: "",
+  },
+];
+const santanderPayload = JSON.stringify({
+  source: "santander",
+  accountNumber: "22222200000000000000000099",
+  accountName: "Rachunek",
+  periodStart: "2026-05-01",
+  periodEnd: "2026-05-31",
+  transactions: santanderTransactions,
+});
+// Same shape, but one transaction carries an ING-style 18-digit id — rejected by the schema's per-bank refine.
+const santanderInvalidPayload = JSON.stringify({
+  source: "santander",
+  accountNumber: "22222200000000000000000099",
+  accountName: "Rachunek",
+  periodStart: "2026-05-01",
+  periodEnd: "2026-05-31",
+  transactions: [{ ...santanderTransactions[0], bankTxId: "000000000000000009" }, santanderTransactions[1]],
+});
+let santanderResultPath = "/imports/result";
 const jar = new Map();
 
 function cookieHeader() {
@@ -767,6 +805,47 @@ const steps = [
     "signin re-created account",
     () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
     { status: 302, location: "/home" },
+  ],
+  // S-10 Phase 3: the Santander write path, on a fresh account, proving import_statement end to end
+  // without touching any ING step above.
+  [
+    "santander import is saved and shows its result",
+    async () => {
+      const response = await request("/api/imports", { method: "POST", form: { payload: santanderPayload } });
+      santanderResultPath = response.location;
+      return response;
+    },
+    { status: 302, location: "/imports/result?id=" },
+  ],
+  [
+    "santander import result renders the debit count",
+    () => request(santanderResultPath),
+    { status: 200, contains: "Dodaliśmy 2 obciążenia." },
+  ],
+  // S-10 Phase 5: per-bank account label (copyExtra.imports.accountLabel, K26) on the list and the result —
+  // plain server-rendered text, no island, so the rendered node and the bare text are the same string.
+  ["imports list names the bank", () => request("/imports"), { status: 200, contains: ">Santander · Rachunek<" }],
+  [
+    "santander import result names the bank",
+    () => request(santanderResultPath),
+    { status: 200, contains: "Santander · Rachunek" },
+  ],
+  [
+    "patterns lists the santander merchant",
+    () => request("/patterns"),
+    // The rendered node (`<span>{p.name}</span>`), not the bare text — PatternsTable's serialized island
+    // props contain the same string.
+    { status: 200, contains: ">Santander smoke<" },
+  ],
+  [
+    "santander import of an overlapping range is rejected",
+    () => request("/api/imports", { method: "POST", form: { payload: santanderPayload } }),
+    { status: 302, location: "/imports/new?error=overlap&from=" },
+  ],
+  [
+    "santander import with a bank transaction id is rejected",
+    () => request("/api/imports", { method: "POST", form: { payload: santanderInvalidPayload } }),
+    { status: 302, location: "/imports/new?error=invalid" },
   ],
   [
     "delete re-created account (cleanup)",

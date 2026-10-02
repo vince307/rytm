@@ -12,6 +12,7 @@ const transaction = (occurredOn = "2026-05-10"): ImportPayload["transactions"][n
 });
 
 const payload = (overrides: Partial<ImportPayload> = {}): ImportPayload => ({
+  source: "ing",
   accountNumber: "11111100000000000000000001",
   accountName: "Rachunek Firmowy Główny",
   periodStart: "2026-05-01",
@@ -64,5 +65,28 @@ describe("importPayloadSchema", () => {
   it("rejects an empty account name and over-long text fields", () => {
     expect(valid(payload({ accountName: "" }))).toBe(false);
     expect(valid(payload({ transactions: [{ ...transaction(), title: "x".repeat(501) }] }))).toBe(false);
+  });
+
+  it("parses a payload without source as ing (stale-tab default)", () => {
+    const { source, ...rest } = payload();
+    const parsed = importPayloadSchema.safeParse(rest);
+    expect(parsed.success).toBe(true);
+    expect(parsed.success && parsed.data.source).toBe("ing");
+  });
+
+  it("rejects an unknown source", () => {
+    expect(valid(payload({ source: "mbank" as unknown as ImportPayload["source"] }))).toBe(false);
+  });
+
+  it("accepts a santander payload with null bankTxId on every transaction", () => {
+    expect(valid(payload({ source: "santander", transactions: [{ ...transaction(), bankTxId: null }] }))).toBe(true);
+  });
+
+  it("rejects a santander payload carrying an 18-digit bankTxId", () => {
+    expect(valid(payload({ source: "santander", transactions: [transaction()] }))).toBe(false);
+  });
+
+  it("rejects an ing payload with a null bankTxId", () => {
+    expect(valid(payload({ transactions: [{ ...transaction(), bankTxId: null }] }))).toBe(false);
   });
 });

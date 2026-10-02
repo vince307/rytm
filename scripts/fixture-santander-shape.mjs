@@ -89,9 +89,10 @@ function shape(bytes) {
     text = new TextDecoder("utf-8", { fatal: false }).decode(bytes);
   }
   put("UTF-8 valid", utf8Valid ? "yes" : "no");
-  put('"" occurrences', String((text.match(/""/g) ?? []).length));
 
-  const lines = text.split("\n");
+  // CR is already reported separately (`contains CR`); split on \r?\n so a CRLF file's lines parse the same as an
+  // LF file's instead of surfacing a trailing \r as unrelated differences everywhere.
+  const lines = text.split(/\r?\n/);
   if (lines[lines.length - 1] === "") lines.pop();
   let unparseable = 0;
   const parsed = lines.map((line) => {
@@ -103,6 +104,12 @@ function shape(bytes) {
     }
   });
   put("unparseable lines", String(unparseable));
+  // Only an empty quoted field (`""`) parses; `""` as an escape attempt inside non-empty quoted content always
+  // throws (caught above as unparseable), so this never double-counts with "unparseable lines". The naive
+  // `text.match(/""/g)` this replaces also matched the same empty-quoted-field shape, but as an absolute count
+  // that cannot be compared across files of different sizes.
+  const quotedEmptyLines = parsed.filter((f) => f && f.some((x) => x.quoted && x.value === "")).length;
+  put('"" occurrences: share', pct(quotedEmptyLines, lines.length));
 
   const hf = parsed[0];
   const h = hf ? Array.from({ length: 9 }, (_, i) => hf[i]?.value ?? "") : null;
@@ -166,6 +173,17 @@ function shape(bytes) {
     if (dmyIso(a) < dmyIso(b)) inversions++;
   }
   put("adjacent booking-date inversion share", pct(inversions, adjacent));
+  // R1: D7 takes the import range from header col 1 (start); a row whose date falls before it would make the
+  // whole-file period check reject the import. Computed only when the header start parses.
+  const headerStartIso = h && DMY.test(h[1]) ? dmyIso(h[1]) : null;
+  put(
+    "operation date before header start: share",
+    headerStartIso ? share((f) => DMY.test(v(f, 1)) && dmyIso(v(f, 1)) < headerStartIso) : "n/a",
+  );
+  put(
+    "booking date before header start: share",
+    headerStartIso ? share((f) => DMY.test(v(f, 0)) && dmyIso(v(f, 0)) < headerStartIso) : "n/a",
+  );
   put(
     "credits share",
     share((f) => AMOUNT.test(v(f, 5)) && toMinor(v(f, 5)) > 0),
@@ -197,14 +215,21 @@ function dmyIso(dmy) {
   return `${y}-${m}-${d}`;
 }
 
-// Differences: exact for strings/lists, > TOLERANCE_PP for shares and distribution entries.
+// Differences: exact for strings/lists, > TOLERANCE_PP for shares and distribution entries — but a distribution
+// key present on only one side is always a difference, whatever its share (F9): that is exactly how a
+// parser-breaking real-only variant, present in under TOLERANCE_PP% of rows, used to print as "=".
 function same(a, b) {
   if (typeof a === "number" && typeof b === "number") return Math.abs(a - b) <= TOLERANCE_PP;
   if (Array.isArray(a) || Array.isArray(b) || typeof a !== "object" || typeof b !== "object") {
     return JSON.stringify(a) === JSON.stringify(b);
   }
   const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
-  return [...keys].every((k) => Math.abs((a[k] ?? 0) - (b[k] ?? 0)) <= TOLERANCE_PP);
+  return [...keys].every((k) => {
+    const inA = Object.hasOwn(a, k);
+    const inB = Object.hasOwn(b, k);
+    if (inA !== inB) return false;
+    return Math.abs(a[k] - b[k]) <= TOLERANCE_PP;
+  });
 }
 
 function render(value) {

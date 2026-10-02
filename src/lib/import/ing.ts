@@ -1,19 +1,13 @@
 // ING Bank Śląski statement reader (context/foundation/import-formats.md, ING rules 1–8, D1, D2, D7).
 // Pure module, no Node imports: runs in the browser (import wizard) and in Vitest. The dialect follows the
 // reference reader in scripts/fixture-ing-check.mjs (cp1250, lenient quotes for T19, searched header).
+// Its line reader is deliberately separate from santander.ts's (S-10): the two dialects differ (`;` vs `,`,
+// quote-escaping rules), so only the bank-agnostic pieces (common.ts) are shared.
+import { isDate, toMinor, type ParseError, type StatementAccount } from "@/lib/import/common";
 import type { ImportPayload } from "@/lib/import/schema";
 
-export interface IngAccount {
-  /** Name as in the `Konto` column (preamble name without ` (PLN)`). */
-  name: string;
-  /** Account number from the preamble, digits only. */
-  number: string;
-  rows: number;
-  /** Rows with amountMinor < 0 — the ones an import takes (D2). */
-  debits: number;
-  /** Rows with amountMinor >= 0 — skipped by an import (D2). */
-  credits: number;
-}
+/** Name as in the `Konto` column (preamble name without ` (PLN)`), and account number from the preamble. */
+export type IngAccount = StatementAccount;
 
 export interface IngRow {
   /** Account number (the row's `Konto` name resolved through the preamble). */
@@ -36,7 +30,7 @@ export interface IngStatement {
   rows: IngRow[];
 }
 
-export type IngParseError = "unknown-format" | "wrong-currency";
+export type IngParseError = ParseError;
 export type IngParseResult = { ok: true; statement: IngStatement } | { ok: false; error: IngParseError };
 
 const WIDTH = 21;
@@ -78,18 +72,6 @@ function parseLine(line: string): Field[] {
     if (i >= line.length) return fields;
     i++; // skip ;
   }
-}
-
-function isDate(value: string): boolean {
-  if (!DATE.test(value)) return false;
-  const [y, m, d] = value.split("-").map(Number);
-  const date = new Date(Date.UTC(y, m - 1, d));
-  return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
-}
-
-function toMinor(amount: string): number {
-  const [whole, frac] = amount.replace("-", "").split(",");
-  return (amount.startsWith("-") ? -1 : 1) * (Number(whole) * 100 + Number(frac));
 }
 
 // A cp1250 export with Polish letters is never valid UTF-8 (the bank header alone has `Ś`), so bytes that
@@ -193,6 +175,7 @@ export function buildImportPayload(statement: IngStatement, accountNumber: strin
   const account = statement.accounts.find((a) => a.number === accountNumber);
   if (!account) throw new Error(`account ${accountNumber} is not in the statement`);
   return {
+    source: "ing",
     accountNumber,
     accountName: account.name,
     periodStart: statement.period.start,

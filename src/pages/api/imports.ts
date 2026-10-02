@@ -6,11 +6,11 @@ import { DEMO_ERROR, demoImportAllowed, isDemoEmail } from "@/lib/demo";
 
 export const prerender = false;
 
-// Saves one ING import (S-01). The wizard parses the file in the browser and posts only the debits of the
-// chosen account as JSON in the `payload` field; the file itself never reaches the server. The payload is
-// validated again here, then `import_ing_statement` writes the import and its transactions atomically
-// (security invoker: RLS, the user_id default and imports_no_overlap apply). Errors go back to the wizard
-// as `/imports/new?error=<code>`.
+// Saves one ING or Santander import (S-01, S-10). The wizard parses the file in the browser and posts only the
+// debits of the chosen account as JSON in the `payload` field, tagged with `source`; the file itself never
+// reaches the server. The payload is validated again here, then `import_statement` writes the import and its
+// transactions atomically under the bank named by `p_source` (security invoker: RLS, the user_id default and
+// imports_no_overlap apply). Errors go back to the wizard as `/imports/new?error=<code>`.
 export const POST: APIRoute = async (context) => {
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
@@ -44,7 +44,8 @@ export const POST: APIRoute = async (context) => {
   }
   const p = parsed.data;
 
-  const { data: id, error } = await supabase.rpc("import_ing_statement", {
+  const { data: id, error } = await supabase.rpc("import_statement", {
+    p_source: p.source,
     p_account_number: p.accountNumber,
     p_account_name: p.accountName,
     p_period_start: p.periodStart,

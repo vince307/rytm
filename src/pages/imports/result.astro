@@ -8,6 +8,7 @@ import Icon from "@/components/Icon.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
+import { accountLabel } from "@/lib/import/banks";
 import { createClient } from "@/lib/supabase";
 import { formatRangeLong, plural } from "@/lib/format";
 
@@ -22,7 +23,7 @@ if (!supabase || !parsedId.success) {
 const id = parsedId.data;
 const { data: imported } = await supabase
   .from("imports")
-  .select("account_name, period_start, period_end")
+  .select("source, account_name, period_start, period_end")
   .eq("id", id)
   .maybeSingle();
 if (!imported) {
@@ -39,7 +40,7 @@ if (countError) {
 const n = count ?? 0;
 
 const title = x.resultTitle.replace("{n}", String(n)).replace("{debits}", plural(n, x.debitForms));
-const lead = `${x.accountLabel.replace("{name}", imported.account_name)} · ${formatRangeLong(imported.period_start, imported.period_end)}`;
+const lead = `${accountLabel(x.accountLabel, imported.source, imported.account_name)} · ${formatRangeLong(imported.period_start, imported.period_end)}`;
 ---
 
 <AppLayout title={copy.importFlow.title} active="imports">

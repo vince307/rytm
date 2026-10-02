@@ -7,7 +7,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(28);
+select plan(30);
 
 -- Setup as postgres: account A with one import + transaction, account B with the same (for FR-019).
 -- Fixed UUIDs, distinct from the seed user 11111111-….
@@ -99,6 +99,19 @@ select lives_ok(
   $$insert into public.imports (source, account_number, account_name, period_start, period_end)
     values ('ing', '44105010000000000000000004', 'Konto A2', '2026-01-01', '2026-01-31')$$,
   'import of another account in the same range is accepted'
+);
+
+-- Widened source check (S-10): a direct insert with source 'santander' is accepted, an unknown source is not.
+select lives_ok(
+  $$insert into public.imports (source, account_number, account_name, period_start, period_end)
+    values ('santander', '66105010000000000000000006', 'Rachunek', '2026-01-01', '2026-01-31')$$,
+  'a direct insert with source santander is accepted'
+);
+
+select throws_ok(
+  $$insert into public.imports (source, account_number, account_name, period_start, period_end)
+    values ('mbank', '77105010000000000000000007', 'Konto', '2026-01-01', '2026-01-31')$$,
+  '23514', null, 'a direct insert with an unknown source is rejected'
 );
 
 -- Transaction key: bank_tx_id unique per account, null allowed many times; amounts are positive.

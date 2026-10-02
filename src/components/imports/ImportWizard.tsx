@@ -15,6 +15,7 @@ import { InfoAlert } from "@/components/app/InfoAlert";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { Stepper } from "@/components/app/Stepper";
 import { Glyph } from "@/components/Glyph";
+import { usePageShowReset } from "@/components/hooks/usePageShowReset";
 import type { copy, copyExtra } from "@/content/copy";
 import { buildPayload, readImportFile, type DetectResult, type FileError } from "@/lib/import/detect";
 import {
@@ -130,7 +131,7 @@ function StepTitle({
   children?: ReactNode;
 }) {
   return (
-    <div className="mb-7 flex items-end justify-between gap-5 max-[899px]:items-start">
+    <div className="mb-7 flex items-end justify-between gap-5 max-[899px]:items-start max-[559px]:flex-col">
       <div>
         <div className="text-excess-text text-xs font-extrabold tracking-[0.14em] uppercase">{eyebrow}</div>
         <h1
@@ -157,6 +158,11 @@ export default function ImportWizard({ labels, existing, serverError, demoLocked
   // A native POST to a URL never sets useFormStatus().pending, so the lock against a double submit is ours;
   // a second POST would land on imports_no_overlap and report a successful import as an overlap.
   const [submitting, setSubmitting] = useState(false);
+  // Back from /imports/result restores this page from the bfcache with step 3 still on „Importowanie…” and both
+  // buttons disabled (visual gate, review F8) — unlock them, as DeleteImportDialog does.
+  usePageShowReset(() => {
+    setSubmitting(false);
+  });
   const inputRef = useRef<HTMLInputElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const firstRender = useRef(true);
@@ -274,7 +280,9 @@ export default function ImportWizard({ labels, existing, serverError, demoLocked
         </StepTitle>
         <Stepper steps={flow.steps} current={1} />
         <ServerError className="mb-[15px] max-w-[760px]" message={serverMessage}>
-          {chooseOtherButton}
+          {/* Locked demo account: the picker is disabled, so „Wybierz inny plik” would open it and drop the file
+              silently (visual gate, review F7) — only the way back to the history stays. */}
+          {!demoLocked && chooseOtherButton}
           <a href="/imports" className={textButton}>
             {errors.back}
           </a>

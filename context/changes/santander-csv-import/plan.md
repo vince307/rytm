@@ -761,11 +761,11 @@ These are recorded in place of the skill's user questions (no human in the loop,
 
 #### Automated
 
-- [x] 6.1 `npm test` (+ `readImportFile` cases) and smoke (+7) green
-- [x] 6.2 K26 in code (≥ 2 hits) and in `design-kit.md`
-- [x] 6.3 Seam sweep greps: one helper copy, no live `import_ing_statement` call, no `accountLabel.replace(`
-- [x] 6.4 Deliberate break: `readImportFile` bypasses the detector → Santander case red; restored → green
-- [x] 6.5 Full local gate vs baseline
+- [x] 6.1 `npm test` (+ `readImportFile` cases) and smoke (+7) green — 3971a17
+- [x] 6.2 K26 in code (≥ 2 hits) and in `design-kit.md` — 3971a17
+- [x] 6.3 Seam sweep greps: one helper copy, no live `import_ing_statement` call, no `accountLabel.replace(` — 3971a17
+- [x] 6.4 Deliberate break: `readImportFile` bypasses the detector → Santander case red; restored → green — 3971a17
+- [x] 6.5 Full local gate vs baseline — 3971a17
 
 #### Manual
 

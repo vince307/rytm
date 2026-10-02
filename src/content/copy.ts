@@ -9,27 +9,29 @@ export const copy = content;
  */
 export const copyExtra = {
   auth: {
-    registerVisual: {
-      eyebrow: "Twój rytm",
-      title: "Zacznij widzieć więcej.",
-      lead: "Jedno konto, jeden spokojny widok Twoich wydatków.",
+    // DESIGN-GAP: K13 — visual panels of confirm-email / reset-new are drawn in `app.js` but absent from content.json
+    // (verbatim `confirmEmail()` / `resetNew()`).
+    confirmEmailVisual: {
+      eyebrow: "Jeszcze jeden krok",
+      title: "Twój rytm zaczyna się od jasności.",
+      lead: "Potwierdź adres e-mail, aby dokończyć tworzenie konta.",
     },
-    resetVisual: {
+    resetNewVisual: {
       eyebrow: "Spokojnie",
       title: "Hasło można ustawić na nowo.",
-      lead: "Wyślemy Ci prostą instrukcję na adres przypisany do konta.",
+      lead: "Wybierz nowe hasło, aby wrócić do swojego rytmu.",
     },
-    passwordPlaceholder: "••••••••",
+    // DESIGN-GAP: K11 — `resetNew('expired')` strings (verbatim `app.js`), content.json has only `resetNew.expired`.
+    expiredEyebrow: "Link wygasł",
+    expiredLead: "Dla bezpieczeństwa link do zmiany hasła działa przez ograniczony czas.",
+    expiredAlert: "Wyślij nowy link, aby kontynuować.",
     // Round 2 prototype strings that content.json still lacks (design-kit.md K11, round 3):
     confirmedLogin: "E-mail potwierdzony — zaloguj się.",
     occupiedOr: "lub",
-    newPassword: "Nowe hasło",
-    repeatPassword: "Powtórz hasło",
     saveNewPassword: "Zapisz nowe hasło",
     doneEyebrow: "Gotowe",
     resetSuccessLead: "Możesz teraz zalogować się do swojego rytmu.",
     // DESIGN-GAP: K11 — states the kit names but gives no copy for.
-    passwordsDiffer: "Hasła muszą być takie same.",
     resetNewError: "Nie udało się zmienić hasła. Spróbuj ponownie.",
     saving: "Zapisywanie…",
     resent: "Wysłaliśmy link ponownie.",
@@ -240,9 +242,6 @@ export const copyExtra = {
     deleteDialogBody: "Ta decyzja usunie wszystkie importy, wzorce i progi.",
     close: "Zamknij",
     deleting: "Usuwanie…",
-    // DESIGN-GAP: G37 — shared demo account refusal on /reset/new (the /settings refusals use the kit's
-    // `settings.demoPasswordBlocked` / `demoDeleteBlocked`).
-    demoLocked: "To jest wspólne konto demo — zmiana hasła i usunięcie konta są wyłączone.",
   },
   // DESIGN-GAP: K11 — the empty-view paragraph is in the prototype but not in content.json (round 3).
   emptyViews: { body: "Jeden plik CSV wystarczy, aby Rytm mógł rozpoznać Twój rytm wydatków." },

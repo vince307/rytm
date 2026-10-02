@@ -71,6 +71,14 @@ describe("kit contract (content.json as the app reads it)", () => {
     expect(copy.importFlow.debitForms).toHaveLength(3);
   });
 
+  it("keeps the auth keys confirm-email and reset/new read (S-12 P7)", () => {
+    // ResendButton fills `{seconds}`; without it the countdown would show a static label.
+    expect(copy.confirmEmail.resendCountdown).toContain("{seconds}");
+    for (const key of ["newPassword", "repeatPassword", "passwordMismatch"] as const) {
+      expect(copy.authStates[key].length, key).toBeGreaterThan(0);
+    }
+  });
+
   it("keeps the settings keys /settings reads (S-12 P3)", () => {
     const s = copy.settings;
     for (const key of [

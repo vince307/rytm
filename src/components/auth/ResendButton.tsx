@@ -4,12 +4,14 @@ import { RESEND_COOLDOWN_SECONDS } from "@/lib/auth-rules";
 
 interface Props {
   label: string;
-  /** True right after a successful re-send: start the countdown immediately (kit: "Wyślij ponownie (59s)"). */
+  /** Kit template with a `{seconds}` placeholder (`confirmEmail.resendCountdown`). */
+  countdown: string;
+  /** True right after a successful re-send: start the countdown immediately (kit: "Wyślij ponownie za 60 s"). */
   justSent: boolean;
 }
 
 // Mirrors Supabase's one-mail-per-minute limit so the user does not hit the server error.
-export default function ResendButton({ label, justSent }: Props) {
+export default function ResendButton({ label, countdown, justSent }: Props) {
   const [left, setLeft] = useState(justSent ? RESEND_COOLDOWN_SECONDS : 0);
 
   useEffect(() => {
@@ -25,7 +27,7 @@ export default function ResendButton({ label, justSent }: Props) {
   return (
     <form method="POST" action="/api/auth/resend">
       <Button type="submit" variant="ghost" size="full" disabled={left > 0}>
-        {left > 0 ? `${label} (${left}s)` : label}
+        {left > 0 ? countdown.replace("{seconds}", String(left)) : label}
       </Button>
     </form>
   );

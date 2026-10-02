@@ -264,12 +264,30 @@ const steps = [
     () => request("/reset/new"),
     { status: 200, contains: "Ten link już wygasł." },
   ],
+  [
+    "reset/new expired shows the kit layout",
+    () => request("/reset/new"),
+    {
+      status: 200,
+      contains: [">Link wygasł<", ">Dla bezpieczeństwa link do zmiany hasła działa przez ograniczony czas.<"],
+    },
+  ],
   ["home redirects anonymous user", () => request("/home"), { status: 302, location: "/login" }],
   ["settings redirects anonymous user", () => request("/settings"), { status: 302, location: "/login" }],
   [
     "signup creates account",
     () => request("/api/auth/signup", { method: "POST", form: { email, password } }),
     { status: 302, location: "/confirm-email" },
+  ],
+  [
+    "confirm-email shows its own panel",
+    () => request("/confirm-email"),
+    { status: 200, contains: ">Jeszcze jeden krok<" },
+  ],
+  [
+    "confirm-email resent shows the kit countdown",
+    () => request("/confirm-email?resent=1"),
+    { status: 200, contains: ">Wyślij ponownie za 60 s<" },
   ],
   [
     "signin rejects wrong password",

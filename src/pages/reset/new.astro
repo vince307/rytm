@@ -1,5 +1,5 @@
 ---
-// Kit round 2 (G17): #/reset/new with ?state=expired and ?success=1. Visual panel copy: design-kit.md K13.
+// Kit round 3: #/reset/new with ?state=expired and ?success=1. Visual panel copy: design-kit.md K13.
 // The form needs the session /auth/callback created from the recovery link; without it the link counts as expired.
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
@@ -17,7 +17,7 @@ const expired = params.get("state") === "expired" || (!success && !Astro.locals.
 const hasError = params.has("error");
 ---
 
-<AuthLayout title={r.title} visual={x.resetVisual}>
+<AuthLayout title={r.title} visual={x.resetNewVisual}>
   {success ? (
     <>
       <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{x.doneEyebrow}</div>
@@ -29,8 +29,11 @@ const hasError = params.has("error");
     </>
   ) : expired ? (
     <>
+      <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{x.expiredEyebrow}</div>
+      <h1 class="mt-4 mb-2 text-[34px] tracking-[-0.06em]">{r.expired}</h1>
+      <p class="mb-7 text-sm text-muted">{x.expiredLead}</p>
       <div class="mb-[22px]">
-        <InlineAlert kind="error">{r.expired}</InlineAlert>
+        <InlineAlert kind="error">{x.expiredAlert}</InlineAlert>
       </div>
       <a href="/reset" class:list={buttonVariants({ variant: "primary", size: "full" })}>
         {r.sendNew} <span aria-hidden="true">↗</span>
@@ -43,17 +46,19 @@ const hasError = params.has("error");
       <p class="mb-7 text-sm text-muted">{r.lead.replace("{n}", String(MIN_PASSWORD_LENGTH))}</p>
       <NewPasswordForm
         client:load
-        serverError={params.get("error") === "demo" ? copyExtra.settings.demoLocked : hasError ? x.resetNewError : null}
+        serverError={
+          params.get("error") === "demo" ? copy.settings.demoPasswordBlocked : hasError ? x.resetNewError : null
+        }
         labels={{
-          password: x.newPassword,
-          confirm: x.repeatPassword,
-          passwordPlaceholder: x.passwordPlaceholder,
+          password: s.newPassword,
+          confirm: s.repeatPassword,
+          passwordPlaceholder: copy.auth.passwordPlaceholder,
           showPassword: s.showPassword,
           hidePassword: s.hidePassword,
           submit: x.saveNewPassword,
           pending: x.saving,
           passwordTooShort: s.passwordTooShort.replace("{n}", String(MIN_PASSWORD_LENGTH)),
-          passwordsDiffer: x.passwordsDiffer,
+          passwordsDiffer: s.passwordMismatch,
         }}
       />
     </>

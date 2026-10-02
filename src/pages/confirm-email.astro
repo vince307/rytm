@@ -1,5 +1,5 @@
 ---
-// Kit round 2 (G19): #/confirm-email. Visual panel copy: design-kit.md K13 (kit ships none) — reuses the register panel.
+// Kit round 3: #/confirm-email with its own visual panel (design-kit.md K13: `copyExtra.auth.confirmEmailVisual`).
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
 import ResendButton from "@/components/auth/ResendButton";
@@ -15,7 +15,7 @@ const failed = Astro.url.searchParams.has("error");
 const canResend = Boolean(Astro.cookies.get(PENDING_EMAIL_COOKIE)?.value);
 ---
 
-<AuthLayout title={c.title} visual={x.registerVisual}>
+<AuthLayout title={c.title} visual={x.confirmEmailVisual}>
   <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{c.eyebrow}</div>
   <h1 class="mt-4 mb-2 text-[34px] tracking-[-0.06em]">{c.title}</h1>
   <p class="mb-7 text-sm text-muted">{c.body}</p>
@@ -24,7 +24,7 @@ const canResend = Boolean(Astro.cookies.get(PENDING_EMAIL_COOKIE)?.value);
     {failed && <InlineAlert kind="error">{x.resendError}</InlineAlert>}
     <InlineAlert kind="info">{c.spam}</InlineAlert>
   </div>
-  {canResend && <ResendButton client:load label={c.resend} justSent={resent} />}
+  {canResend && <ResendButton client:load label={c.resend} countdown={c.resendCountdown} justSent={resent} />}
   <p class="mt-[22px] text-center text-[13px] text-muted">
     <a
       href="/login"

@@ -493,7 +493,7 @@ Recorded in place of the skill's questions (run contract rule 1).
 
 #### Manual
 
-- [ ] 4.6 [visual] `/patterns` list, filtered "pizzeria", detail `PIZZERIA TRZY SERY`, detail `Bankomat`, `/fixed` at 1280 px and ~400 px vs kit
+- [x] 4.6 [visual] `/patterns` list, filtered "pizzeria", detail `PIZZERIA TRZY SERY`, detail `Bankomat`, `/fixed` at 1280 px and ~400 px vs kit — visual-review
 - [x] 4.7 [reviewer] Seam sweep complete, rule order as specified, no real-export value in the diff — 6baf3fd
 - [ ] 4.8 [human] F-03 3.9: confirm the oracle's product calls
 - [ ] 4.9 [human] S-10 6.11: accept re-keying of Santander card patterns

@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 
 import { copy, copyExtra } from "@/content/copy";
 import { MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
+import { MAX_DEBITS, MAX_FILE_BYTES } from "@/lib/import/schema";
 import { tableHeaders } from "@/lib/patterns/table-columns";
 
 describe("kit contract (content.json as the app reads it)", () => {
@@ -47,5 +48,26 @@ describe("kit contract (content.json as the app reads it)", () => {
 
   it("has a locative for each of the 12 months", () => {
     expect(copyExtra.patterns.monthsLocative).toHaveLength(12);
+  });
+
+  it("keeps the import rejection messages, placeholders and limits the wizard fills (S-13)", () => {
+    expect(copy.importErrors.tooLarge).toContain("{maxMb}");
+    expect(copy.importErrors.tooMany).toContain("{maxTransactions}");
+    expect(copy.importErrors.limits.maxMb * 1024 * 1024).toBe(MAX_FILE_BYTES);
+    expect(copy.importErrors.limits.maxTransactions).toBe(MAX_DEBITS);
+    expect(copy.importErrors.inconsistent.length).toBeGreaterThan(0);
+    expect(copy.imports.formatRecognised).toContain("{bank}");
+    expect(copy.imports.bankName.ing.length).toBeGreaterThan(0);
+    expect(copy.imports.bankName.santander.length).toBeGreaterThan(0);
+  });
+
+  it("keeps the import templates and plural forms the wizard and the delete dialog fill (S-13 review F1)", () => {
+    // ImportWizard splits `overlap` at `{range}` — without it the range link would silently vanish.
+    expect(copy.importErrors.overlap.split("{range}")).toHaveLength(2);
+    expect(copy.imports.deleteTitle).toContain("{range}");
+    expect(copy.importFlow.importButton).toContain("{n}");
+    expect(copy.importFlow.importButton).toContain("{debits}");
+    // new.astro casts `importFlow.debitForms` to a 3-tuple for `plural()`.
+    expect(copy.importFlow.debitForms).toHaveLength(3);
   });
 });

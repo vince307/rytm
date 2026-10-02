@@ -5,23 +5,51 @@
 // check in step 3 is UX only — imports_no_overlap in the database is the guarantee (FR-005); a rejected POST
 // comes back as ?error= and is shown in step 1. The bank is read once, from `detectStatement` (ING vs
 // Santander, import-formats.md § Wykrywanie formatu) — every later render (steps 1–3) just looks it up, never
-// re-detects it.
+// re-detects it. Kit round 3: kit copy for every state (chip, rejections, demo note), `tooMany` / `inconsistent`
+// shown on step 3, a save failure stays in the wizard.
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode, Ref } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ServerError } from "@/components/auth/ServerError";
+import { InfoAlert } from "@/components/app/InfoAlert";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { Stepper } from "@/components/app/Stepper";
 import { Glyph } from "@/components/Glyph";
+import { usePageShowReset } from "@/components/hooks/usePageShowReset";
 import type { copy, copyExtra } from "@/content/copy";
-import { accountLabel } from "@/lib/import/banks";
 import { buildPayload, readImportFile, type DetectResult, type FileError } from "@/lib/import/detect";
+import {
+  accountDisplay,
+  bankDisplayName,
+  fileErrorMessage,
+  fillTemplate,
+  tooManyMessage,
+} from "@/lib/import/presentation";
 import { MAX_DEBITS, MAX_FILE_BYTES, importPayloadSchema } from "@/lib/import/schema";
-import { formatAccountTail, formatRangeLong, formatRangeShort, plural } from "@/lib/format";
+import { formatRangeLong, formatRangeShort, plural } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export interface ImportWizardLabels {
-  flow: Pick<typeof copy.importFlow, "title" | "steps" | "supported" | "oneAccount">;
+  flow: Pick<
+    typeof copy.importFlow,
+    | "title"
+    | "steps"
+    | "supported"
+    | "oneAccount"
+    | "bank"
+    | "accountLabel"
+    | "rangeLabel"
+    | "importButton"
+    | "waiting"
+    | "back"
+    | "demoImportBlocked"
+  > & {
+    /** `importFlow.debitForms` — content.json types it `string[]`; the page hands over the three plural forms. */
+    debitForms: readonly [string, string, string];
+  };
+  /** Kit `imports` — step-1 copy, bank names, the recognised-format chip. */
+  kit: typeof copy.imports;
+  /** `copyExtra.imports` — the K11 / K28 placeholders for wizard steps 2–3 (kit round 3 has no content.json keys for them). */
   imports: typeof copyExtra.imports;
   errors: typeof copy.importErrors;
   /** `copyExtra.imports.saveError` (kit round 3 has the text only in `app.js`; K28 in design-kit.md) — a save that failed for a reason the user cannot act on. */
@@ -46,6 +74,8 @@ interface Props {
   /** The caller's own imports (RLS) — step 3 checks the chosen account's range against them. */
   existing: ExistingImport[];
   serverError?: WizardServerError;
+  /** The shared demo account that already has an import: the server refuses a second one, so step 1 is disabled up front. */
+  demoLocked?: boolean;
 }
 
 type Step = 1 | 2 | 3;
@@ -53,9 +83,6 @@ interface Loaded {
   fileName: string;
   detected: Extract<DetectResult, { ok: true }>;
 }
-
-const fill = (template: string, values: Record<string, string | number>) =>
-  template.replace(/\{(\w+)\}/g, (match, key: string) => (key in values ? String(values[key]) : match));
 
 // Prototype .panel
 const panel = "border-line bg-paper rounded-xl border p-[22px] max-[559px]:p-[17px]";
@@ -68,10 +95,9 @@ async function readStatement(
   file: File,
   santanderAccountName: string,
 ): Promise<{ detected: Extract<DetectResult, { ok: true }> } | { error: FileError }> {
-  // DESIGN-GAP: G27 — the kit has no message for a file over the size limit; `unknownFormat` stands in.
   // Checked on the `File` object, before `file.arrayBuffer()`, so an oversized file is never read into
   // memory; `readImportFile` repeats the check on the decoded bytes so it can be unit-tested without a File.
-  if (file.size > MAX_FILE_BYTES) return { error: "unknownFormat" };
+  if (file.size > MAX_FILE_BYTES) return { error: "tooLarge" };
   try {
     return readImportFile(new Uint8Array(await file.arrayBuffer()), { santanderAccountName });
   } catch {
@@ -105,7 +131,7 @@ function StepTitle({
   children?: ReactNode;
 }) {
   return (
-    <div className="mb-7 flex items-end justify-between gap-5 max-[899px]:items-start">
+    <div className="mb-7 flex items-end justify-between gap-5 max-[899px]:items-start max-[559px]:flex-col">
       <div>
         <div className="text-excess-text text-xs font-extrabold tracking-[0.14em] uppercase">{eyebrow}</div>
         <h1
@@ -122,8 +148,8 @@ function StepTitle({
   );
 }
 
-export default function ImportWizard({ labels, existing, serverError }: Props) {
-  const { flow, imports: x, errors } = labels;
+export default function ImportWizard({ labels, existing, serverError, demoLocked = false }: Props) {
+  const { flow, kit, imports: x, errors } = labels;
   const [step, setStep] = useState<Step>(1);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [fileError, setFileError] = useState<FileError | null>(null);
@@ -132,6 +158,11 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
   // A native POST to a URL never sets useFormStatus().pending, so the lock against a double submit is ours;
   // a second POST would land on imports_no_overlap and report a successful import as an overlap.
   const [submitting, setSubmitting] = useState(false);
+  // Back from /imports/result restores this page from the bfcache with step 3 still on „Importowanie…” and both
+  // buttons disabled (visual gate, review F8) — unlock them, as DeleteImportDialog does.
+  usePageShowReset(() => {
+    setSubmitting(false);
+  });
   const inputRef = useRef<HTMLInputElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const firstRender = useRef(true);
@@ -156,7 +187,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
   }, [step, loaded, chosen]);
 
   async function handleFile(file: File | undefined) {
-    if (!file) return;
+    if (!file || demoLocked) return;
     setPageError(null);
     setStep(1);
     const result = await readStatement(file, x.santanderAccountName);
@@ -188,18 +219,22 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
     </button>
   );
 
+  // Kit `importErrors.overlap` = „…import: {range}.”; the range is rendered as a link to the history. Without a
+  // range (the endpoint could not read it back) the sentence ends at „.” — one sentence, then the app tail.
+  const [overlapBefore = "", overlapAfter = ""] = errors.overlap.split("{range}");
   const overlapMessage = (from?: string, to?: string) =>
     from && to ? (
       <>
-        {x.overlapPrefix}{" "}
+        {overlapBefore}
         <a href="/imports" className="underline">
           {formatRangeLong(from, to)}
         </a>
-        . {x.overlapTail}
+        {overlapAfter} {x.overlapTail}
       </>
     ) : (
       <>
-        {x.overlapPrefix.replace(/:$/, ".")} {x.overlapTail}
+        {overlapBefore.replace(/:\s*$/, "")}
+        {overlapAfter} {x.overlapTail}
       </>
     );
 
@@ -222,33 +257,37 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
       pageError?.kind === "overlap" ? (
         overlapMessage(pageError.from, pageError.to)
       ) : pageError?.kind === "invalid" ? (
-        // DESIGN-GAP: G27 — the kit has no message for a payload the server rejected; `unknownFormat` stands in.
-        <Headline text={errors.unknownFormat} />
+        <Headline text={errors.inconsistent} />
       ) : pageError?.kind === "failed" ? (
         labels.genericError
       ) : pageError?.kind === "demo" ? (
-        // DESIGN-GAP: G37 — the kit has no state for an import refused on the shared demo account (S-09).
-        x.demoLocked
+        // Shown once: when the page is already locked, the InfoAlert above the drop zone carries the sentence.
+        demoLocked ? null : (
+          flow.demoImportBlocked
+        )
       ) : null;
 
     return (
       <>
         {fileInput}
-        <StepTitle eyebrow={x.newEyebrow} title={flow.title} lead={x.newLead} headingRef={headingRef}>
+        <StepTitle eyebrow={kit.newEyebrow} title={flow.title} lead={kit.newLead} headingRef={headingRef}>
           <a
             href="/imports"
             className="text-ink inline-flex items-center gap-1.5 text-[13px] font-extrabold no-underline"
           >
-            <Glyph name="arrow-left" size={15} /> {x.back}
+            <Glyph name="arrow-left" size={15} /> {kit.back}
           </a>
         </StepTitle>
         <Stepper steps={flow.steps} current={1} />
         <ServerError className="mb-[15px] max-w-[760px]" message={serverMessage}>
-          {chooseOtherButton}
+          {/* Locked demo account: the picker is disabled, so „Wybierz inny plik” would open it and drop the file
+              silently (visual gate, review F7) — only the way back to the history stays. */}
+          {!demoLocked && chooseOtherButton}
           <a href="/imports" className={textButton}>
             {errors.back}
           </a>
         </ServerError>
+        {demoLocked && <InfoAlert className="mb-[15px] max-w-[760px]">{flow.demoImportBlocked}</InfoAlert>}
         <section
           className={cn(
             panel,
@@ -265,16 +304,16 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
           <div className="bg-ink text-paper grid size-[60px] place-items-center rounded-[13px]">
             <Glyph name="upload" size={28} />
           </div>
-          <h2 className="mt-[22px] mb-2 text-[23px] tracking-[-0.04em]">{x.dropTitle}</h2>
+          <h2 className="mt-[22px] mb-2 text-[23px] tracking-[-0.04em]">{kit.dropTitle}</h2>
           <p className="text-muted mb-[22px] text-[13px]">{flow.supported}</p>
-          <Button type="button" variant="primary" onClick={openPicker}>
-            {x.choose}
+          <Button type="button" variant="primary" onClick={openPicker} disabled={demoLocked}>
+            {kit.choose}
           </Button>
           {loaded && (
             <div className="bg-paper-soft text-muted mt-[25px] flex items-center gap-[9px] rounded-lg px-3.5 py-[11px] text-xs">
               <Glyph name="success" className="text-green" />
               <span className="min-w-0 [overflow-wrap:anywhere]">
-                {loaded.fileName} · {x.formatRecognised[loaded.detected.bank]}
+                {loaded.fileName} · {fillTemplate(kit.formatRecognised, { bank: kit.bankName[loaded.detected.bank] })}
               </span>
               <button
                 type="button"
@@ -290,7 +329,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
         </section>
         {fileError && (
           <section className="mt-[15px] grid max-w-[760px] gap-2.5">
-            <ServerError className="mb-0" message={<Headline text={errors[fileError]} />}>
+            <ServerError className="mb-0" message={<Headline text={fileErrorMessage(errors, fileError)} />}>
               {chooseOtherButton}
             </ServerError>
           </section>
@@ -307,9 +346,9 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
       <>
         {fileInput}
         <StepTitle
-          eyebrow={fill(x.stepEyebrow, { n: 2 })}
+          eyebrow={fillTemplate(x.stepEyebrow, { n: 2 })}
           title={x.accountTitle}
-          lead={fill(x.accountLead, { n, accounts: plural(n, x.accountForms) })}
+          lead={fillTemplate(x.accountLead, { n, accounts: plural(n, x.accountForms) })}
           headingRef={headingRef}
         />
         <section className={cn(panel, "max-w-[700px]")}>
@@ -327,11 +366,9 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
                   className="accent-ink"
                 />
                 <span className="min-w-0 flex-1">
-                  <strong className="block text-sm">
-                    {a.name} · {formatAccountTail(a.number)}
-                  </strong>
+                  <strong className="block text-sm">{accountDisplay(a.name, a.number)}</strong>
                   <small className="text-muted mt-1 block text-xs">
-                    {x.bankName[bank]} · {a.rows} {plural(a.rows, x.transactionForms)}
+                    {bankDisplayName(kit.bankName, bank)} · {a.rows} {plural(a.rows, x.transactionForms)}
                   </small>
                 </span>
                 {a.number === account && <b className="text-green text-[11px]">{x.selected}</b>}
@@ -346,7 +383,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
                 setStep(1);
               }}
             >
-              {x.stepBack}
+              {flow.back}
             </Button>
             <Button
               type="button"
@@ -373,18 +410,16 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
   ) : chosen.debits === 0 ? (
     <Headline text={errors.empty} />
   ) : chosen.debits > MAX_DEBITS ? (
-    // DESIGN-GAP: G27 — the kit has no message for "too many debits in one import"; `unknownFormat` stands in.
-    <Headline text={errors.unknownFormat} />
+    <Headline text={tooManyMessage(errors)} />
   ) : !payloadValid ? (
-    // DESIGN-GAP: G27 — the kit has no message for "file inconsistent with the import contract"; `unknownFormat` stands in.
-    <Headline text={errors.unknownFormat} />
+    <Headline text={errors.inconsistent} />
   ) : null;
 
   return (
     <>
       {fileInput}
       <StepTitle
-        eyebrow={fill(x.stepEyebrow, { n: 3 })}
+        eyebrow={fillTemplate(x.stepEyebrow, { n: 3 })}
         title={x.summaryTitle}
         lead={flow.oneAccount}
         headingRef={headingRef}
@@ -392,13 +427,10 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
       <section className={cn(panel, "max-w-[760px]")}>
         <dl className="mb-6 grid grid-cols-2 gap-[21px] max-[899px]:grid-cols-1">
           {[
-            [
-              x.summary.account,
-              `${accountLabel(x.accountLabel, bank, chosen.name)} · ${formatAccountTail(chosen.number)}`,
-            ],
-            [x.summary.range, formatRangeShort(period.start, period.end)],
+            [flow.bank, bankDisplayName(kit.bankName, bank)],
+            [flow.accountLabel, accountDisplay(chosen.name, chosen.number)],
+            [flow.rangeLabel, formatRangeShort(period.start, period.end)],
             [x.summary.debits, `${chosen.debits} ${plural(chosen.debits, x.transactionForms)}`],
-            [x.summary.skipped, `${chosen.credits} ${plural(chosen.credits, x.transactionForms)}`],
           ].map(([term, value]) => (
             <div key={term}>
               <dt className="text-muted mb-1.5 block text-xs">{term}</dt>
@@ -419,7 +451,6 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
             </div>
           </>
         ) : (
-          // DESIGN-GAP: G25 — the kit's step 3 has no "range is free → confirm" state; placeholder button.
           <form
             method="POST"
             action="/api/imports"
@@ -443,10 +474,10 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
                   setStep(2);
                 }}
               >
-                {x.stepBack}
+                {flow.back}
               </Button>
-              <SubmitButton size="default" pendingText={x.importing} pending={submitting}>
-                {fill(x.confirm, { n: chosen.debits, debits: plural(chosen.debits, x.debitForms) })}
+              <SubmitButton size="default" pendingText={flow.waiting} pending={submitting}>
+                {fillTemplate(flow.importButton, { n: chosen.debits, debits: plural(chosen.debits, flow.debitForms) })}
               </SubmitButton>
             </div>
           </form>

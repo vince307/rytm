@@ -313,6 +313,32 @@ const steps = [
     () => request(importResultPath),
     { status: 200, contains: "Dodaliśmy 2 obciążenia." },
   ],
+  // S-13: the wizard island is server-rendered at step 1, so these match the rendered node (leading `>`), not
+  // the bare text that the island's serialized props also contain.
+  [
+    "import wizard step 1 names both banks",
+    () => request("/imports/new"),
+    {
+      status: 200,
+      contains: ">Obsługujemy pliki CSV z ING Bank Śląski i Santander Bank Polska w PLN.<",
+    },
+  ],
+  [
+    "import wizard shows the inconsistent-file message for a rejected payload",
+    () => request("/imports/new?error=invalid"),
+    { status: 200, contains: ">Plik jest niespójny:" },
+  ],
+  [
+    "import wizard renders the overlap range as a link inside the kit sentence",
+    () => request("/imports/new?error=overlap&from=2026-05-01&to=2026-05-31"),
+    {
+      status: 200,
+      contains: [
+        ">Ten zakres nachodzi na istniejący import:",
+        '<a href="/imports" class="underline">1 maja – 31 maja 2026</a>',
+      ],
+    },
+  ],
   ["patterns lists imported merchants", () => request("/patterns"), { status: 200, contains: "Kawiarnia smoke" }],
   // The rendered badge text node — a bare "stały" would also match the island's serialized copy props.
   ["patterns proposes a type", () => request("/patterns"), { status: 200, contains: ">stały<" }],
@@ -343,7 +369,7 @@ const steps = [
   [
     "imports shows the not-found line",
     () => request("/imports?error=missing"),
-    { status: 200, contains: "Nie znaleziono tego importu" },
+    { status: 200, contains: "Nie znaleziono importu." },
   ],
   [
     "import is deleted",
@@ -367,7 +393,7 @@ const steps = [
   [
     "imports shows the not-found line above the empty list",
     () => request("/imports?error=missing"),
-    { status: 200, contains: "Nie znaleziono tego importu" },
+    { status: 200, contains: "Nie znaleziono importu." },
   ],
   [
     "patterns drop the deleted import",
@@ -375,9 +401,14 @@ const steps = [
     { status: 200, contains: "Wzorce pojawią się po pierwszym imporcie.", notContains: "Kawiarnia smoke" },
   ],
   [
-    "deleted import result goes back to the list",
+    "deleted import result shows not-found",
     () => request(importResultPath),
-    { status: 302, location: "/imports" },
+    { status: 200, contains: ">Nie znaleziono importu.<" },
+  ],
+  [
+    "import result of a malformed id shows not-found",
+    () => request("/imports/result?id=nope"),
+    { status: 200, contains: ">Nie znaleziono importu.<" },
   ],
   [
     "same range is imported again after delete",
@@ -913,13 +944,27 @@ const steps = [
     () => request(santanderResultPath),
     { status: 200, contains: "Dodaliśmy 2 obciążenia." },
   ],
-  // S-10 Phase 5: per-bank account label (copyExtra.imports.accountLabel, K26) on the list and the result —
-  // plain server-rendered text, no island, so the rendered node and the bare text are the same string.
-  ["imports list names the bank", () => request("/imports"), { status: 200, contains: ">Santander · Rachunek<" }],
+  // S-13 Phase 3: the kit draws the bank in its own column and the account as `{name} · •• {tail}` (rewritten
+  // from the S-10 bank-prefixed label). Plain server-rendered cells, no island: node and bare text coincide.
+  ["imports list names the bank", () => request("/imports"), { status: 200, contains: ">Santander Bank Polska<" }],
+  ["imports list shows the account tail", () => request("/imports"), { status: 200, contains: ">Rachunek · •• 0099<" }],
+  [
+    "imports list has the bank column",
+    () => request("/imports"),
+    {
+      status: 200,
+      contains: ">Bank</th>",
+    },
+  ],
   [
     "santander import result names the bank",
     () => request(santanderResultPath),
-    { status: 200, contains: "Santander · Rachunek" },
+    { status: 200, contains: ">Santander Bank Polska<" },
+  ],
+  [
+    "santander import result shows the account",
+    () => request(santanderResultPath),
+    { status: 200, contains: ">Rachunek · •• 0099<" },
   ],
   [
     "patterns lists the santander merchant",
@@ -985,6 +1030,12 @@ const steps = [
     // Accepted prefixes, not just "/imports/": a failed or invalid import must not pass as "present".
     { status: 302, location: ["/imports/result", "/imports/new?error=demo"] },
   ],
+  // S-13 P5: the demo account owns an import now (created above or earlier), so the wizard is locked up front.
+  [
+    "demo import wizard shows the demo note",
+    () => request("/imports/new"),
+    { status: 200, contains: ">Na wspólnym koncie demo dodawanie i cofanie importów jest wyłączone.<" },
+  ],
   // The guard runs before the RPC, so the same range answers `demo`, not `overlap`.
   [
     "demo second import is refused",
@@ -1026,6 +1077,11 @@ const steps = [
     "seeded test user signs in",
     () => request("/api/auth/signin", { method: "POST", form: seeded }),
     { status: 302, location: "/home" },
+  ],
+  [
+    "test user import wizard has no demo note",
+    () => request("/imports/new"),
+    { status: 200, notContains: ">Na wspólnym koncie demo dodawanie i cofanie importów jest wyłączone.<" },
   ],
   ["patterns renders empty view", () => request("/patterns"), { status: 200, contains: "Wgraj pierwszy wyciąg" }],
   ["signout seeded user", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],

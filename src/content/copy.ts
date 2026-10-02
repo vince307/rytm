@@ -102,90 +102,39 @@ export const copyExtra = {
     risenForms: ["pozycja podrożała", "pozycje podrożały", "pozycji podrożało"],
   },
   imports: {
-    eyebrow: "Importy CSV",
-    title: "Twoje źródła danych.",
-    lead: "Każdy import możesz cofnąć. Plik CSV nie jest przechowywany po imporcie.",
-    newEyebrow: "Nowy import",
-    newLead: "Wybierzesz jeden rachunek z pliku. Import obejmuje tylko obciążenia.",
-    back: "Wróć do importów",
-    dropTitle: "Upuść plik CSV tutaj",
-    choose: "Wybierz plik",
     // Wizard save failure (import result `status === 'error'` in round-3 `prototype/app.js`); not in `content.json`
     // (kit gap, round-4 K-row) — `components.error` is now the read-failure line.
     saveError: "Nie udało się zapisać importu. Spróbuj ponownie.",
-    newImport: "+ Nowy import",
-    // Imports table (prototype imports(), app.js:56) — column headers and the account cell.
-    table: { importedOn: "Data importu", account: "Rachunek", range: "Zakres dat", debits: "Obciążenia" },
-    // DESIGN-GAP: K26 — the kit has only the single ING account label; the app adds a per-bank template
-    // (S-10 Phase 5), filled through `accountLabel()` so an unknown source never crashes the row.
-    accountLabel: { ing: "ING · {name}", santander: "Santander · {name}" },
-    // DESIGN-GAP: K26 — the Santander export has no account name column (the owner's name, header col 3, is
-    // never stored, R2); "Rachunek" is the kit's own word for the column, used as a neutral stand-in.
+    // DESIGN-GAP: K11 — imports table headers the kit prototype draws but content.json lacks.
+    table: { importedOn: "Data importu", debits: "Obciążenia" },
+    // Santander's export has no account name column (the owner's name, header col 3, is never stored, R2);
+    // "Rachunek" is the kit's own word (`imports.santanderAccountName`), sent by the wizard as the stored name.
     santanderAccountName: "Rachunek",
-    // DESIGN-GAP: K26 — the kit announces Santander as "wkrótce" (`importFlow.supported`). The app's wizard
-    // (new.astro) overrides the kit's `supported`/`unknownFormat` with these both-bank versions.
-    supported: "Obsługujemy wyciągi ING Bank Śląski i Santander Bank Polska w PLN.",
-    unknownFormat: "Nieznany format pliku. Obsługujemy: ING Bank Śląski i Santander Bank Polska.",
-    // Result screen (prototype importResult(), app.js:63).
-    resultEyebrow: "Import gotowy",
+    // Result screen (prototype importResult()); the eyebrow is the kit's `importFlow.result`.
     toPatterns: "Zobacz wzorce",
     toOverview: "Przejdź do przeglądu",
     transactionForms: ["transakcja", "transakcje", "transakcji"],
-    // DESIGN-GAP: G26 — result screen before patterns exist (S-03): the kit h1 `importFlow.result`
-    // („Wzorce są już widoczne.”) and the pattern stats do not apply yet; placeholder h1 from the
-    // prototype lead („Dodaliśmy 64 obciążenia…”).
+    // DESIGN-GAP: K11 — the kit result panel's „Transakcje” label has no content.json key (`importFlow.transactions`
+    // is the genitive plural „transakcji”).
+    transactionsLabel: "Transakcje",
+    // DESIGN-GAP: K11 — the kit result h1 („Dodaliśmy 64 obciążenia.”) is built in the prototype script, not in
+    // content.json.
     resultTitle: "Dodaliśmy {n} {debits}.",
     debitForms: ["obciążenie", "obciążenia", "obciążeń"],
-    // Import wizard (prototype importsNew/uploadReady/importAccount/importSummary, app.js:57–61).
-    // DESIGN-GAP: K26 — the kit's chip only ever says "rozpoznano format ING"; the app adds the Santander
-    // form, filled by the bank the detector found (S-10 Phase 6).
-    formatRecognised: { ing: "rozpoznano format ING", santander: "rozpoznano format Santander" },
     next: "Dalej",
-    stepBack: "Wstecz",
     stepEyebrow: "Nowy import · krok {n} z 3",
     accountTitle: "Wybierz rachunek.",
     // The prototype spells the count as a word („trzy rachunki”); the app interpolates the number.
     accountLead: "Ten plik zawiera {n} {accounts}. Domyślnie zaznaczyliśmy ten z największą liczbą transakcji.",
     accountForms: ["rachunek", "rachunki", "rachunków"],
     selected: "wybrane",
-    // DESIGN-GAP: K26 — the kit's step 2 `<small>` only ever says "ING Bank Śląski"; the app adds the
-    // Santander form, filled by the bank the detector found (S-10 Phase 6).
-    bankName: { ing: "ING Bank Śląski", santander: "Santander Bank Polska" },
     summaryTitle: "Sprawdź przed importem.",
     summary: {
-      account: "Rachunek",
-      range: "Zakres dat",
       debits: "Obciążenia do importu",
-      skipped: "Pominięte wpływy / zwroty",
     },
     overlapTail: "Wybierz inny plik albo wróć do importów.",
-    // DESIGN-GAP: K16 — `importErrors.overlap` has the date baked in („…import: 1 marca – 31 maja 2026.”);
-    // the app interpolates the real range after this prefix (prototype importSummary, app.js:61).
-    overlapPrefix: "Ten zakres nachodzi na istniejący import:",
-    // DESIGN-GAP: G25 — step 3 has no "range is free → confirm" state in the kit; placeholder button from the
-    // pre-K8 prototype („Importuj 64 obciążenia”), plural forms in `debitForms`.
-    confirm: "Importuj {n} {debits}",
-    importing: "Importowanie…",
-    // Delete action + dialog (S-02, prototype imports() / modal('deleteImport'), app.js) — verbatim from app.js.
-    // DESIGN-GAP: K19 — content.json has no key for the delete action, the dialog copy or its close label; the
-    // kit h2 hardcodes the month („Usunąć import z maja?”), so the app interpolates the real range instead.
-    deleteAction: "Usuń import",
+    // DESIGN-GAP: K19 — content.json has no key for the delete dialog eyebrow (kit modal('deleteImport')).
     deleteDialogEyebrow: "Cofnij import",
-    deleteDialogTitle: "Usunąć import {range}?",
-    deleteDialogBody:
-      "Wzorce wykryte w tym imporcie zostaną przeliczone. Tę decyzję można cofnąć przez ponowny import.",
-    close: "Zamknij",
-    // DESIGN-GAP: K20 — the kit toast „Import usunięty w prototypie.” names the prototype; the shippable line
-    // drops „w prototypie” and, since the flow is a server redirect, is shown by InlineAlert, not a toast.
-    deleted: "Import usunięty.",
-    // DESIGN-GAP: G30 — result states of import deletion the kit does not define (toast has no repo counterpart
-    // and the flow is a server redirect → InlineAlert above the list): pending, failure and not-found copy.
-    deleting: "Usuwanie…",
-    deleteError: "Nie udało się usunąć importu. Spróbuj ponownie.",
-    deleteMissing: "Nie znaleziono tego importu — mógł zostać już usunięty.",
-    // DESIGN-GAP: G37 — the kit has no state for an action refused on the shared demo account (S-09, FR-014):
-    // shown for `/imports?error=demo` and the wizard's `?error=demo`.
-    demoLocked: "To jest wspólne konto demo — dodawanie i cofanie importów jest wyłączone.",
   },
   patterns: {
     eyebrow: "Wzorce wydatków",

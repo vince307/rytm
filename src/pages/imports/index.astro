@@ -1,4 +1,6 @@
 ---
+// Import history (FR-004) — kit round-3 `imports.html` list (bank and account in own columns), the delete dialog
+// and the `?deleted` / `?error=delete|missing|demo` states (prototype/views/imports-*.html).
 import AppLayout from "@/layouts/AppLayout.astro";
 import DeleteImportDialog from "@/components/imports/DeleteImportDialog";
 import InlineAlert from "@/components/app/InlineAlert.astro";
@@ -7,13 +9,18 @@ import Panel from "@/components/app/Panel.astro";
 import ViewEmpty from "@/components/app/ViewEmpty.astro";
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
-import { accountLabel } from "@/lib/import/banks";
+import { DEMO_EMAIL } from "astro:env/server";
+import { isDemoEmail } from "@/lib/demo";
+import { accountDisplay, bankDisplayName } from "@/lib/import/presentation";
 import { createClient } from "@/lib/supabase";
-import { formatDate, formatRangeLong, formatRangeShort } from "@/lib/format";
+import { formatDate, formatRangeShort } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const e = copy.emptyViews;
+const k = copy.imports;
+const flow = copy.importFlow;
 const x = copyExtra.imports;
+const demo = isDemoEmail(Astro.locals.user?.email, DEMO_EMAIL);
 
 // The caller's own imports only (RLS, FR-002), newest first, each with its number of saved debits.
 // Read-only list (prototype imports(), app.js:56) plus the "Usuń import" column + dialog (S-02).
@@ -21,7 +28,7 @@ const supabase = createClient(Astro.request.headers, Astro.cookies);
 const { data, error } = supabase
   ? await supabase
       .from("imports")
-      .select("id, source, account_name, period_start, period_end, created_at, transactions(count)")
+      .select("id, source, account_name, account_number, period_start, period_end, created_at, transactions(count)")
       .order("created_at", { ascending: false })
   : { data: null, error: null };
 if (error) {
@@ -31,36 +38,36 @@ if (error) {
 const rows = (data ?? []).map((i) => ({
   id: i.id,
   importedOn: formatDate(i.created_at),
-  account: accountLabel(x.accountLabel, i.source, i.account_name),
+  bank: bankDisplayName(k.bankName, i.source),
+  account: accountDisplay(i.account_name, i.account_number),
   range: formatRangeShort(i.period_start, i.period_end),
-  rangeLong: formatRangeLong(i.period_start, i.period_end),
   debits: i.transactions[0]?.count ?? 0,
 }));
 
-// Status after a delete redirect (POST /api/imports/delete) — DESIGN-GAP: G30, InlineAlert above the list/empty
+// Status after a delete redirect (POST /api/imports/delete): kit texts in an InlineAlert above the list/empty
 // view (the kit shows a toast; the flow is a server redirect, precedent /settings and /login `deleted`).
 // One status for all three states (read error, empty, table) — e.g. a second "missing" after the last delete
-// must still say so above the empty view. `demo` is the shared demo account's refusal (S-09) — DESIGN-GAP: G37.
+// must still say so above the empty view. `demo` is the shared demo account's refusal (S-09).
 const deleteErrorParam = Astro.url.searchParams.get("error");
 const status: { kind: "success" | "error"; text: string } | null = Astro.url.searchParams.has("deleted")
-  ? { kind: "success", text: x.deleted }
+  ? { kind: "success", text: k.deleteSuccess }
   : deleteErrorParam === "missing"
-    ? { kind: "error", text: x.deleteMissing }
+    ? { kind: "error", text: k.notFound }
     : deleteErrorParam === "delete"
-      ? { kind: "error", text: x.deleteError }
+      ? { kind: "error", text: k.deleteError }
       : deleteErrorParam === "demo"
-        ? { kind: "error", text: x.demoLocked }
+        ? { kind: "error", text: k.demoDeleteBlocked }
         : null;
 
 const cell = "border-b border-line px-[17px] py-4 align-middle";
 const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] whitespace-nowrap text-muted uppercase");
 ---
 
-<AppLayout title={x.title} active="imports">
+<AppLayout title={k.title} active="imports">
   {error ? (
     // A failed read must not look like "no imports yet" — show the kit's generic error instead of the empty state.
     <>
-      <PageTitle eyebrow={x.eyebrow} title={x.title} lead={x.lead} />
+      <PageTitle eyebrow={k.eyebrow} title={k.title} lead={k.lead} />
       {status && (
         <div class="mb-[15px]">
           <InlineAlert kind={status.kind}>{status.text}</InlineAlert>
@@ -70,7 +77,7 @@ const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] wh
     </>
   ) : rows.length === 0 ? (
     <>
-      <PageTitle eyebrow={x.eyebrow} title={e.imports.title} lead={e.imports.lead} />
+      <PageTitle eyebrow={k.eyebrow} title={e.imports.title} lead={e.imports.lead} />
       {status && (
         <div class="mb-[15px]">
           <InlineAlert kind={status.kind}>{status.text}</InlineAlert>
@@ -80,9 +87,9 @@ const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] wh
     </>
   ) : (
     <>
-      <PageTitle eyebrow={x.eyebrow} title={x.title} lead={x.lead}>
+      <PageTitle eyebrow={k.eyebrow} title={k.title} lead={k.lead}>
         <a href="/imports/new" class:list={buttonVariants({ variant: "primary" })}>
-          {x.newImport}
+          {k.newImport}
         </a>
       </PageTitle>
       {status && (
@@ -96,8 +103,9 @@ const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] wh
             <thead>
               <tr>
                 <th class:list={head}>{x.table.importedOn}</th>
-                <th class:list={head}>{x.table.account}</th>
-                <th class:list={head}>{x.table.range}</th>
+                <th class:list={head}>{flow.bank}</th>
+                <th class:list={head}>{flow.accountLabel}</th>
+                <th class:list={head}>{flow.rangeLabel}</th>
                 <th class:list={head}>{x.table.debits}</th>
                 <th class:list={head}></th>
               </tr>
@@ -106,6 +114,7 @@ const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] wh
               {rows.map((r) => (
                 <tr>
                   <td class:list={cell}>{r.importedOn}</td>
+                  <td class:list={cell}>{r.bank}</td>
                   <td class:list={cell}>{r.account}</td>
                   <td class:list={cell} id={`import-range-${r.id}`}>
                     {r.range}
@@ -115,15 +124,17 @@ const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] wh
                     <DeleteImportDialog
                       client:load
                       id={r.id}
-                      range={r.rangeLong}
+                      range={r.range}
+                      demo={demo}
                       describedBy={`import-range-${r.id}`}
                       labels={{
-                        action: x.deleteAction,
+                        action: k.delete,
                         eyebrow: x.deleteDialogEyebrow,
-                        title: x.deleteDialogTitle,
-                        body: x.deleteDialogBody,
-                        pending: x.deleting,
-                        close: x.close,
+                        title: k.deleteTitle,
+                        body: k.deleteBody,
+                        pending: k.deleteWaiting,
+                        close: k.deleteClose,
+                        demoNote: k.demoDeleteBlocked,
                       }}
                     />
                   </td>

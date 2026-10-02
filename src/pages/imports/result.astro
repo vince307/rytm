@@ -1,78 +1,107 @@
 ---
-// Result of a saved import (FR-003) — prototype importResult() / .result-state (app.js:63).
-// DESIGN-GAP: G26 — before patterns exist (S-03) the kit h1 `importFlow.result` and the pattern /
-// fixed-cost stats are left out: one stat (transactions) and a placeholder h1 from copyExtra.
+// Result of a saved import (FR-003) — kit round-3 importResult() `.result-layout` / `.result-meta`, and the
+// `.result-state` not-found view (prototype/views/imports-result*.html).
+// DESIGN-GAP: G38 — the kit has no desktop rule for `.result-layout` / `.result-meta`: the panel is built from
+// `Panel` + the `.summary-grid` pattern (4 columns, 2 below 560 px); the not-found view from `.result-state`.
 import { z } from "zod";
 import AppLayout from "@/layouts/AppLayout.astro";
 import Icon from "@/components/Icon.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
+import Panel from "@/components/app/Panel.astro";
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
-import { accountLabel } from "@/lib/import/banks";
+import { accountDisplay, bankDisplayName, fillTemplate } from "@/lib/import/presentation";
 import { createClient } from "@/lib/supabase";
-import { formatRangeLong, plural } from "@/lib/format";
+import { formatRangeShort, plural } from "@/lib/format";
 
 const x = copyExtra.imports;
+const k = copy.imports;
+const flow = copy.importFlow;
 
-// Read through RLS: someone else's or a missing id finds no row and goes back to the list.
+// Read through RLS: someone else's or a missing id finds no row — the kit not-found state, like a malformed id.
 const parsedId = z.uuid().safeParse(Astro.url.searchParams.get("id"));
 const supabase = createClient(Astro.request.headers, Astro.cookies);
-if (!supabase || !parsedId.success) {
+if (!supabase) {
   return Astro.redirect("/imports");
 }
-const id = parsedId.data;
-const { data: imported } = await supabase
-  .from("imports")
-  .select("source, account_name, period_start, period_end")
-  .eq("id", id)
-  .maybeSingle();
-if (!imported) {
-  return Astro.redirect("/imports");
+const imported = parsedId.success
+  ? (
+      await supabase
+        .from("imports")
+        .select("source, account_name, account_number, period_start, period_end")
+        .eq("id", parsedId.data)
+        .maybeSingle()
+    ).data
+  : null;
+const notFound = !imported;
+let n = 0;
+let countFailed = false;
+if (imported && parsedId.success) {
+  const { count, error: countError } = await supabase
+    .from("transactions")
+    .select("id", { count: "exact", head: true })
+    .eq("import_id", parsedId.data);
+  if (countError) {
+    // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
+    console.error("import result count failed", countError.code, countError.message);
+    countFailed = true;
+  }
+  n = count ?? 0;
 }
-const { count, error: countError } = await supabase
-  .from("transactions")
-  .select("id", { count: "exact", head: true })
-  .eq("import_id", id);
-if (countError) {
-  // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
-  console.error("import result count failed", countError.code, countError.message);
-}
-const n = count ?? 0;
 
-const title = x.resultTitle.replace("{n}", String(n)).replace("{debits}", plural(n, x.debitForms));
-const lead = `${accountLabel(x.accountLabel, imported.source, imported.account_name)} · ${formatRangeLong(imported.period_start, imported.period_end)}`;
+const title = fillTemplate(x.resultTitle, { n, debits: plural(n, x.debitForms) });
+const meta = imported
+  ? [
+      [flow.bank, bankDisplayName(k.bankName, imported.source)],
+      [flow.accountLabel, accountDisplay(imported.account_name, imported.account_number)],
+      [flow.rangeLabel, formatRangeShort(imported.period_start, imported.period_end)],
+      [x.transactionsLabel, `${n} ${plural(n, x.transactionForms)}`],
+    ]
+  : [];
 ---
 
-<AppLayout title={copy.importFlow.title} active="imports">
-  <section class="mx-auto my-[70px] max-w-[650px] text-center max-[559px]:my-[35px]">
-    <div class="mx-auto mb-6 grid size-[62px] place-items-center rounded-full bg-green/15 text-green">
-      <Icon name="success" size={28} />
-    </div>
-    <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{x.resultEyebrow}</div>
-    {countError ? (
-      // The import exists but its count could not be read — never claim "0 debits" for it.
-      <div class="my-[35px] text-left">
-        <InlineAlert kind="error">{copy.components.error}</InlineAlert>
+<AppLayout title={flow.title} active="imports">
+  {notFound ? (
+    <Panel class="mx-auto my-[70px] max-w-[650px] text-center max-[559px]:my-[35px]">
+      <h1 class="my-3 text-[44px] tracking-[-0.07em] max-[559px]:text-[36px]">{k.notFound}</h1>
+      <div class="mt-6 flex justify-center">
+        <a href="/imports" class:list={buttonVariants({ variant: "ghost" })}>
+          {k.back}
+        </a>
       </div>
-    ) : (
-      <>
-        <h1 class="my-3 text-[44px] tracking-[-0.07em] max-[559px]:text-[36px]">{title}</h1>
-        <p class="leading-[1.6] text-muted">{lead}</p>
-        <div class="my-[35px] flex justify-center gap-[45px] max-[559px]:gap-[22px]">
-          <div>
-            <strong class="block text-[29px] tracking-[-0.06em]">{n}</strong>
-            <span class="mt-[3px] block text-xs text-muted">{plural(n, x.transactionForms)}</span>
-          </div>
+    </Panel>
+  ) : (
+    <section class="mx-auto my-[70px] max-w-[650px] text-center max-[559px]:my-[35px]">
+      <div class="mx-auto mb-6 grid size-[62px] place-items-center rounded-full bg-green/15 text-green">
+        <Icon name="success" size={28} />
+      </div>
+      <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{flow.result}</div>
+      {countFailed ? (
+        // The import exists but its count could not be read — never claim "0 debits" for it.
+        <div class="my-[35px] text-left">
+          <InlineAlert kind="error">{copy.components.error}</InlineAlert>
         </div>
-      </>
-    )}
-    <div class="flex items-center justify-center gap-3 max-[559px]:flex-col max-[559px]:items-stretch">
-      <a href="/patterns" class:list={buttonVariants({ variant: "primary" })}>
-        {x.toPatterns} <span aria-hidden="true">↗</span>
-      </a>
-      <a href="/home" class:list={buttonVariants({ variant: "ghost" })}>
-        {x.toOverview}
-      </a>
-    </div>
-  </section>
+      ) : (
+        <>
+          <h1 class="my-3 text-[44px] tracking-[-0.07em] max-[559px]:text-[36px]">{title}</h1>
+          <Panel class="my-[35px] grid grid-cols-4 gap-[21px] text-left max-[559px]:grid-cols-2">
+            {meta.map(([label, value]) => (
+              <div>
+                <span class="mb-1.5 block text-xs text-muted">{label}</span>
+                <strong class="text-sm">{value}</strong>
+              </div>
+            ))}
+          </Panel>
+        </>
+      )}
+      <div class="flex items-center justify-center gap-3 max-[559px]:flex-col max-[559px]:items-stretch">
+        <a href="/patterns" class:list={buttonVariants({ variant: "primary" })}>
+          {x.toPatterns} <span aria-hidden="true">↗</span>
+        </a>
+        <a href="/home" class:list={buttonVariants({ variant: "ghost" })}>
+          {x.toOverview}
+        </a>
+      </div>
+    </section>
+  )}
 </AppLayout>

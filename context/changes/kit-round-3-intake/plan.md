@@ -457,7 +457,7 @@ the kit-text departures are collected in the Phase 3 `[human]` row.
 
 #### Manual
 
-- [ ] 1.8 [reviewer] Kit content equals the delivery except the 4 restored strings; nothing under design/ removed
+- [x] 1.8 [reviewer] Kit content equals the delivery except the 4 restored strings; nothing under design/ removed — impl review (diff -rq + parsed diff: 4 added leaves, byte-equal to main)
 
 ### Phase 2: Regression guards and K18 cleanup
 
@@ -473,7 +473,7 @@ the kit-text departures are collected in the Phase 3 `[human]` row.
 
 #### Manual
 
-- [ ] 2.8 [reviewer] Every kit-contract assertion maps to a real read in src/
+- [x] 2.8 [reviewer] Every kit-contract assertion maps to a real read in src/ — impl review (passwordMinLength is the deliberate drift pin of plan decision 7; overInMonth pin added in d279eef)
 
 ### Phase 3: Gap register round 3, follow-ups, seam sweep
 
@@ -488,5 +488,5 @@ the kit-text departures are collected in the Phase 3 `[human]` row.
 #### Manual
 
 - [ ] 3.6 [visual] Screenshots desktop + ~400 px of every listed state, compared with the kit views
-- [ ] 3.7 [reviewer] Seam sweep complete; register matches research matrix; follow-ups carry Trigger lines
+- [x] 3.7 [reviewer] Seam sweep complete; register matches research matrix; follow-ups carry Trigger lines — impl review, fixes d279eef
 - [ ] 3.8 [human] Accept F-04 kit-text deviations and send the round-4 K-rows to the kit author

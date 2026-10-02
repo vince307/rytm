@@ -451,7 +451,7 @@ Recorded in place of the skill's questions (run contract rule 1).
 
 #### Manual
 
-- [ ] 1.6 [reviewer] `ING_KEYS` generated from pre-change code, no real-export value
+- [x] 1.6 [reviewer] `ING_KEYS` generated from pre-change code, no real-export value — impl-review
 
 ### Phase 2: Santander card step — ATM, quotes, city
 
@@ -466,7 +466,7 @@ Recorded in place of the skill's questions (run contract rule 1).
 
 #### Manual
 
-- [ ] 2.7 [reviewer] Real-export measurement ≈ R4 (227 / 212 / 0 over), counts only
+- [x] 2.7 [reviewer] Real-export measurement ≈ R4 (227 / 212 / 0 over), counts only — impl-review
 
 ### Phase 3: Code tokens and BLIK withdrawals
 
@@ -479,7 +479,7 @@ Recorded in place of the skill's questions (run contract rule 1).
 
 #### Manual
 
-- [ ] 3.5 [reviewer] Real-export measurement ≈ R10 (193 / 179 / 0 over, ≤ 6 split), counts only
+- [x] 3.5 [reviewer] Real-export measurement ≈ R10 (193 / 179 / 0 over, ≤ 6 split), counts only — impl-review
 
 ### Phase 4: End-to-end proof, docs and seam sweep
 
@@ -494,7 +494,7 @@ Recorded in place of the skill's questions (run contract rule 1).
 #### Manual
 
 - [ ] 4.6 [visual] `/patterns` list, filtered "pizzeria", detail `PIZZERIA TRZY SERY`, detail `Bankomat`, `/fixed` at 1280 px and ~400 px vs kit
-- [ ] 4.7 [reviewer] Seam sweep complete, rule order as specified, no real-export value in the diff
+- [x] 4.7 [reviewer] Seam sweep complete, rule order as specified, no real-export value in the diff — 6baf3fd
 - [ ] 4.8 [human] F-03 3.9: confirm the oracle's product calls
 - [ ] 4.9 [human] S-10 6.11: accept re-keying of Santander card patterns
 - [ ] 4.10 [human] Owner imports the real Santander PLN export and checks the patterns (S-10 6.8)

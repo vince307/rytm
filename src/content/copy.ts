@@ -81,8 +81,8 @@ export const copyExtra = {
     // DESIGN-GAP: G35 — the kit's trend panel has no state for "no pattern has an applicable threshold at all";
     // placeholder, the author supplies the final copy.
     noThreshold: "Ustaw próg na wzorcu, a tu pojawi się suma ponad progiem.",
-    // K25 (round 3: the kit ships `dashboard.stats[].foot` templates, but no genitive months and „{n} {items} podrożały”
-    // is wrong for n = 1 — K29 in design-kit.md); the app keeps these templates until the kit foot is grammatical.
+    // DESIGN-GAP: K25 / K29 — round 3 ships `dashboard.stats[].foot` templates, but no genitive months and „{n} {items}
+    // podrożały” is wrong for n = 1 (K29 in design-kit.md); the app keeps these templates until the kit foot is grammatical.
     deltaFoot: "{delta} względem {month}",
     monthsGenitive: [
       "stycznia",

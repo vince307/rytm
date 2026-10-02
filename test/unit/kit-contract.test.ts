@@ -34,6 +34,7 @@ describe("kit contract (content.json as the app reads it)", () => {
   it("keeps the placeholders the app fills", () => {
     expect(copy.fixedCosts.new).toContain("w {month}");
     expect(copyExtra.patterns.sumLabel).toContain("w {month}");
+    expect(copyExtra.patterns.overInMonth).toContain("w {month}");
     expect(copy.trend.tooShort).toContain("{n}");
     expect(copy.authStates.passwordTooShort).toContain("{n}");
     expect(copy.resetNew.lead).toContain("{n}");

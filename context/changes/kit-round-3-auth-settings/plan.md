@@ -66,7 +66,7 @@ and `design/rytm-os/react-kit/docs/content.json`. Anchors are symbols.
 - Auth screens: `copy.auth.*` / `authStates.*` / `confirmEmail.*` / `resetNew.*`; `/login?deleted=1` shows
   `settings.deletedNotice`; confirm-email and reset/new have their own visual panels (K13 verbatim from `app.js`);
   reset/new expired = eyebrow „Link wygasł” + h1 `resetNew.expired` + lead + error alert + button; reset/new demo
-  error = `settings.demoPasswordBlocked`; resend countdown „Wyślij ponownie za 59 s”. Fields `bg-paper`, 8 px radius.
+  error = `settings.demoPasswordBlocked`; resend countdown „Wyślij ponownie za 60 s” at load, counting down. Fields `bg-paper`, 8 px radius.
 - `copyExtra` keeps only keys with a reader and a K-note: `auth.{confirmedLogin,occupiedOr,saveNewPassword,
   doneEyebrow,resetSuccessLead,resetNewError,resent,resendError,saving}` + new K13/K15 literals,
   `settings.{loginData,dataLabel,dangerEyebrow,deleteDialogEyebrow,deleteDialogTitle,deleteDialogBody,close,deleting}`
@@ -375,7 +375,9 @@ stale `G24` comment.
 
 **Contract**: page passes `demo = isDemoEmail(Astro.locals.user?.email, DEMO_EMAIL)` and the new labels
 (`settings.demoDeleteBlocked`, `settings.deleteDisabledHelp`), trigger + confirm `settings.deleteButton`, h2 stays
-`settings.deleteTitle`. `DialogContent` gains `max-h-[calc(100vh-32px)] overflow-auto` (kit round-3 `.modal`; closes
+`settings.deleteTitle`; the dialog's `passwordPlaceholder` → `copy.auth.passwordPlaceholder` and its confirm line →
+`settings.deleteConfirm` (no `copyExtra.auth.passwordPlaceholder` / `settings.confirmation` read left on `/settings`,
+so P6/P7 can delete `copyExtra.auth.passwordPlaceholder`; plan review F2). `DialogContent` gains `max-h-[calc(100vh-32px)] overflow-auto` (kit round-3 `.modal`; closes
 F8 — padding unchanged). Delete `copyExtra.settings.{currentPassword,deleteError}` if unread.
 
 #### 3. Smoke
@@ -470,7 +472,9 @@ Own visual panels (K13), the kit's expired layout, the demo refusal on `/reset/n
 **Contract**: visual = new `copyExtra.auth.confirmEmailVisual` {„Jeszcze jeden krok”, „Twój rytm zaczyna się od
 jasności.”, „Potwierdź adres e-mail, aby dokończyć tworzenie konta.”} (verbatim `app.js` `confirmEmail()`, K13
 note). `ResendButton` gains `countdown: string` (template) and renders `countdown.replace("{seconds}",
-String(left))` while counting; page passes `copy.confirmEmail.resendCountdown`.
+String(left))` while counting; page passes `copy.confirmEmail.resendCountdown`. The island server-renders its initial
+state, so on `?resent=1` with the pending cookie the SSR HTML already holds „Wyślij ponownie za 60 s”
+(`RESEND_COOLDOWN_SECONDS` = 60; plan review F1).
 
 #### 2. Reset/new
 
@@ -490,24 +494,28 @@ unread (`resetVisual`, `registerVisual`, `passwordPlaceholder` if P6 left them).
 **File**: `test/unit/kit-contract.test.ts`, `scripts/smoke.mjs`
 
 **Contract**: kit-contract: `confirmEmail.resendCountdown` contains `{seconds}`; `authStates.{newPassword,
-repeatPassword,passwordMismatch}` non-empty. Smoke +2: `reset/new expired shows the kit layout` (`/reset/new`
-without session, `>Link wygasł<` and the lead node); `confirm-email shows its own panel` (`>Jeszcze jeden krok<`).
-Existing `reset/new without a session is expired` stays.
+repeatPassword,passwordMismatch}` non-empty. Smoke +3: `reset/new expired shows the kit layout` (`/reset/new`
+without session, `>Link wygasł<` and the lead node); `confirm-email shows its own panel` (`>Jeszcze jeden krok<`);
+`confirm-email resent shows the kit countdown` (`/confirm-email?resent=1` placed right after `signup creates account`,
+while the smoke cookie jar still holds `rytm-pending-email`; `>Wyślij ponownie za 60 s<` — the serialized prop holds
+only the `{seconds}` template, so the filled node is island content, not props). Existing `reset/new without a
+session is expired` stays.
 
 ### Success Criteria:
 
 #### Automated Verification:
 
 - `npm test`: Phase 6 count + new kit-contract cases, 0 failed
-- Smoke Phase 6 count + 2 PASS, 0 FAIL
+- Smoke Phase 6 count + 3 PASS, 0 FAIL
 - `grep -rn "demoLocked\|passwordsDiffer\|DESIGN-GAP: G37" src` empty
 - Deliberate break: `confirmEmail.resendCountdown` placeholder renamed in a test copy of the object (or the assertion pointed at `{n}`) → kit-contract red; restore. Meta-check recorded: proves the template key, not `ResendButton` rendering (client-only → visual row)
 - Deliberate break: expired branch without the eyebrow → the new expired step red; restore
-- Full local gate vs baseline (smoke + 17)
+- Deliberate break: `ResendButton` back to `${label} (${left}s)` → `confirm-email resent shows the kit countdown` red; restore. Meta-check recorded: proves the SSR initial state; the tick-down stays client-only (visual row)
+- Full local gate vs baseline (smoke + 18)
 
 #### Manual Verification:
 
-- [reviewer] `/reset/new?error=demo` (recovery session on the demo account) shows `demoPasswordBlocked`; `ResendButton` countdown text = „Wyślij ponownie za 59 s” on `?resent=1`
+- [reviewer] `/reset/new?error=demo` (recovery session on the demo account) shows `demoPasswordBlocked`; `ResendButton` countdown reads „Wyślij ponownie za 60 s” at load on `?resent=1` and counts down
 
 ---
 
@@ -552,8 +560,10 @@ param→notice mapping on `/settings`; no second masked-value constant; no copy 
 **File**: `context/changes/kit-round-3-auth-settings/follow-ups/review-fixes.md` (new)
 
 **Contract**: (a) S-04 F11 remainder: `field-styles.ts` `field` → 8 px / paper, `Trigger: S-14`; (b) `DialogContent`
-kit padding 26 px / mobile 22×18 px + 12 px radius, `Trigger: S-14`; plus anything the visual gate defers, each with
-a `Trigger:` line.
+kit padding 26 px / mobile 22×18 px + 12 px radius, `Trigger: S-14`; (c) a „Resolved in S-12” note for the
+archived `2026-09-28-durable-pattern-decisions` F8 (`DialogContent` scroll, closed by P5) and S-04 F11's `FormField` /
+dialog-input part, so later trigger greps see them closed (archives stay read-only); plus anything the visual gate
+defers, each with a `Trigger:` line.
 
 ### Success Criteria:
 
@@ -563,13 +573,13 @@ a `Trigger:` line.
 - Seam greps empty in `src/`: `copyExtra.app`, `copyExtra.landing`, `copyExtra.howItWorks`, `copyExtra.forWho`, `deletedLogin`, `demoLocked`, `DESIGN-GAP: (G20|G23|G24|G32|G37)`
 - `git diff --stat main -- design/ src/styles/brand.css` empty
 - Deliberate break: re-add `copyExtra.settings.demoLocked` → the unused-key grep reports it; restore (meta-check: proves the grep guards a half-removed seam, not a test)
-- Full local gate vs baseline (smoke + 17)
+- Full local gate vs baseline (smoke + 18)
 
 #### Manual Verification:
 
-- [visual] Screenshots at 1280 px and ~400 px on `astro dev` :4399 (test account; demo account for demo states), compared with kit views: `/` (`landing.html`, footer „Dla kogo” only at 400 px, header without it), `/how-it-works`, `/for-who`; `/login`, `?confirmed=1`, `?deleted=1`, `?error=…` (login error); `/register`, `?error=occupied`; `/confirm-email` (with and without the pending cookie, `?resent=1` countdown, `?error`); `/reset`, `?sent=1`; `/reset/new` form, expired, `?success=1`; `/settings` default (form closed), form open, form open with a client validation error, `?password=changed`, `?error=current-password`, `?error=password`, `?error=delete`, `?error=delete-password`; delete dialog open — empty (help visible, button disabled), filled (button enabled), and at a ~400×640 viewport (F8 scroll); demo account: `/home` and `/settings` with the strip, `?error=demo-password`, `?error=demo-delete`, delete dialog demo state (password disabled, info note); `/imports/new` on the demo account (strip + S-13 note do not clash); no `undefined`, no raw `{…}`, no horizontal scroll at 360 px header tier
+- [visual] Screenshots at 1280 px and ~400 px on `astro dev` :4399 (test account; demo account for demo states), compared with kit views: `/` (`landing.html`, footer „Dla kogo” only at 400 px, header without it), `/how-it-works`, `/for-who`; `/login`, `?confirmed=1`, `?deleted=1`, `?error=…` (login error); `/register`, `?error=occupied`; `/confirm-email` (with and without the pending cookie, `?resent=1` countdown, `?error`); `/reset`, `?sent=1`; `/reset/new` form, expired, `?success=1`; `/settings` default (form closed), form open, form open with a client validation error, `?password=changed`, `?error=current-password`, `?error=password`, `?error=delete`, `?error=delete-password`; delete dialog open — empty (help visible, button disabled), filled (button enabled), and at a ~400×640 viewport (F8 scroll); demo account: `/home` and `/settings` with the strip, `?error=demo-password`, `?error=demo-delete`, delete dialog demo state (password disabled, info note); `/imports/new` on the demo account (strip + S-13 note do not clash); `max-h` regression check at 400 px: one import delete dialog and the pattern-actions dialog with the merge picker revealed; no `undefined`, no raw `{…}`, no horizontal scroll at 360 px header tier
 - [reviewer] Seam sweep complete; register rows match this plan; follow-ups carry `Trigger:` lines
-- [human] Accept S-12 product-visible choices: header „Wyjdź” removed (sign-out only on `/settings`, decision 3); password form collapsed behind „Zmień hasło” (decision 2); delete dialog closes on a server error and the alert shows on the page (decision 4); demo strip shows the short `app.demoNotice`, not the kit `app.js` sentence listing the blocked actions (decision 5); sign-out still redirects to `/` despite the PRD `## Access Control` line (decision 7); `/login?deleted=1` shows the longer `settings.deletedNotice` — and send K34 to the kit author
+- [human] Accept S-12 product-visible choices: header „Wyjdź” removed (sign-out only on `/settings`, decision 3); password form collapsed behind „Zmień hasło”, so it needs JavaScript (decision 2, Known risks); delete dialog closes on a server error and the alert shows on the page (decision 4); demo strip shows the short `app.demoNotice`, not the kit `app.js` sentence listing the blocked actions (decision 5); sign-out still redirects to `/` despite the PRD `## Access Control` line (decision 7); `/login?deleted=1` shows the longer `settings.deletedNotice` — and send K34 to the kit author
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual
 confirmation from the human that the manual testing was successful before proceeding.
@@ -587,7 +597,7 @@ confirmation from the human that the manual testing was successful before procee
 
 ### Integration Tests:
 
-- Smoke: + 17 net (P1 +3, P2 +3, P3 +4, P4 +1, P5 +3, P6 +1, P7 +2), no existing assertion edited; server-contract
+- Smoke: + 18 net (P1 +3, P2 +3, P3 +4, P4 +1, P5 +3, P6 +1, P7 +3), no existing assertion edited; server-contract
   steps (signout `/`, delete guards, demo refusals) unchanged.
 - pgTAP unchanged (no schema change).
 
@@ -604,8 +614,15 @@ confirmation from the human that the manual testing was successful before procee
   password minimum` then matches serialized props only) — accepted; P4 adds the closed-state step, the visual gate
   covers the open state.
 - `DialogContent` max-height applies to the S-13/S-14 dialogs too; invisible unless content overflows (kit-backed
-  rule). The visual gate checks one import dialog at 400 px for regressions.
+  rule). The visual gate checks one import dialog and the pattern-actions dialog with the merge picker revealed (the
+tallest shared dialog) at 400 px for regressions (plan review F5).
 - P3 shows a delete error twice (page alert + reopened dialog) until P5 lands — intermediate only, never shipped.
+- Without JavaScript the collapsed password form cannot be opened (today it degrades to a plain POST); the delete
+  dialog was already JS-only (S-08 impl-review). Accepted as the kit's own toggle behaviour; sign-out stays a plain
+  POST form that works without JS. Product-visible → part of `[human]` row 8.8 (plan review F3).
+- `?error=current-password` and `?error=delete-password` render the same page alert („Obecne hasło jest
+  nieprawidłowe.”) with no hint which form failed — kit copy has one string for both; recorded, not changed (plan
+  review F4).
 
 ## Performance Considerations
 
@@ -745,15 +762,16 @@ are collected in the Phase 8 `[human]` row.
 #### Automated
 
 - [ ] 7.1 npm test: Phase 6 count + new kit-contract cases, 0 failed
-- [ ] 7.2 Smoke Phase 6 count + 2 PASS, 0 FAIL
+- [ ] 7.2 Smoke Phase 6 count + 3 PASS, 0 FAIL
 - [ ] 7.3 No demoLocked / passwordsDiffer / DESIGN-GAP: G37 left in src
 - [ ] 7.4 Deliberate break: resendCountdown placeholder pin turns kit-contract red, restored, meta-check recorded
 - [ ] 7.5 Deliberate break: expired branch without the eyebrow turns the expired step red, restored
-- [ ] 7.6 Full local gate vs baseline, smoke + 17
+- [ ] 7.6 Deliberate break: ResendButton old template turns the countdown smoke step red, restored, meta-check recorded
+- [ ] 7.7 Full local gate vs baseline, smoke + 18
 
 #### Manual
 
-- [ ] 7.7 [reviewer] reset/new demo error shows demoPasswordBlocked; resend countdown reads Wyślij ponownie za 59 s
+- [ ] 7.8 [reviewer] reset/new demo error shows demoPasswordBlocked; resend countdown reads Wyślij ponownie za 60 s at load
 
 ### Phase 8: Gap register, seam sweep and visual gate
 
@@ -763,10 +781,10 @@ are collected in the Phase 8 `[human]` row.
 - [ ] 8.2 Seam greps empty (copyExtra.app/landing/howItWorks/forWho, deletedLogin, demoLocked, stale DESIGN-GAP ids)
 - [ ] 8.3 Phase leaves design/ and brand.css untouched
 - [ ] 8.4 Deliberate break: re-added copyExtra.settings.demoLocked caught by the unused-key grep, restored
-- [ ] 8.5 Full local gate vs baseline, smoke + 17
+- [ ] 8.5 Full local gate vs baseline, smoke + 18
 
 #### Manual
 
 - [ ] 8.6 [visual] Screenshots desktop + ~400 px of every listed state, compared with the kit views
 - [ ] 8.7 [reviewer] Seam sweep complete; register matches the plan; follow-ups carry Trigger lines
-- [ ] 8.8 [human] Accept S-12 product-visible choices (header sign-out removed, collapsed password form, dialog closes on error, short demo strip text, redirect / vs PRD Access Control, longer deleted notice) and send K34 to the kit author
+- [ ] 8.8 [human] Accept S-12 product-visible choices (header sign-out removed, collapsed password form (JS-only), dialog closes on error, short demo strip text, redirect / vs PRD Access Control, longer deleted notice) and send K34 to the kit author

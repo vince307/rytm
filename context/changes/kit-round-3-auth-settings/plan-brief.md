@@ -65,7 +65,7 @@ Page-level param → content-key mapping (as S-13 did); the shell computes the d
 | 8. Register, sweep, visual gate | K34, follow-ups, seam greps, screenshots | Missed seams |
 
 **Prerequisites:** F-04 and S-13 merged (done); local Supabase running; baseline from the contract re-measured.
-**Estimated effort:** ~8 implement sessions (one fresh agent per phase), smoke + 17 net.
+**Estimated effort:** ~8 implement sessions (one fresh agent per phase), smoke + 18 net (plan review F1 added the SSR countdown step).
 
 ## Open Risks & Assumptions
 

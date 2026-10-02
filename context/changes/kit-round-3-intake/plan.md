@@ -479,11 +479,11 @@ the kit-text departures are collected in the Phase 3 `[human]` row.
 
 #### Automated
 
-- [x] 3.1 design-kit.md says kit_round: 3 and every register id has a round-3 status
-- [x] 3.2 Seam greps (monthsLocative[, amountColumn, stats[2], Rozpoznane wydatki, K18) empty
-- [x] 3.3 Phase 3 leaves design/ untouched
-- [x] 3.4 Deliberate break: re-added amountColumn caught by the seam grep, restored
-- [x] 3.5 Full local gate vs baseline, smoke + 6
+- [x] 3.1 design-kit.md says kit_round: 3 and every register id has a round-3 status — d54c0e3
+- [x] 3.2 Seam greps (monthsLocative[, amountColumn, stats[2], Rozpoznane wydatki, K18) empty — d54c0e3
+- [x] 3.3 Phase 3 leaves design/ untouched — d54c0e3
+- [x] 3.4 Deliberate break: re-added amountColumn caught by the seam grep, restored — d54c0e3
+- [x] 3.5 Full local gate vs baseline, smoke + 6 — d54c0e3
 
 #### Manual
 

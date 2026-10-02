@@ -1,60 +1,62 @@
 # Handoff — `kit-round-3-intake` (slice F-04)
 
-Written by the `/10x-implement … phase 2` step: Phase 2 is committed (`3507260`), Progress rows 2.1–2.7 ticked with the SHA, 2.8 `[reviewer]` and 1.8 `[reviewer]` left open. The next agent must NOT run prettier on `design/` or `src/styles/brand.css` (byte-faithful kit).
+Written by the `/10x-implement … phase 3` step (last phase): Phase 3 is committed (`d54c0e3`), rows 3.1–3.5 ticked with the SHA, `change.md` status `implemented`. Rows 1.8, 2.8, 3.6, 3.7, 3.8 are manual and NOT ticked. Do not run prettier on `design/` or `src/styles/brand.css`.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-intake`, cut from `main` at `577b163` (+ roadmap commit `78386c1`) |
-| Commits this step | `3507260` `feat(kit-round-3-intake): Straże regresji i sprzątanie K18 (p2)` (+ this handoff commit, which also carries the SHA suffixes on rows 2.1–2.7) |
+| Commits this step | `d54c0e3` `feat(kit-round-3-intake): Rejestr braków rundy 3, follow-upy, sprzątanie szwów (p3)` + one epilogue/handoff commit |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `implementing` |
-| `## Progress` rows remaining | 10 (`grep -c '^- \[ \]' plan.md`): 1.8 `[reviewer]`, 2.8 `[reviewer]`, all 8 of Phase 3 |
+| `change.md` status | `implemented` |
+| `## Progress` rows remaining | 5 (`grep -c '^- \[ \]' plan.md`): 1.8 `[reviewer]`, 2.8 `[reviewer]`, 3.6 `[visual]`, 3.7 `[reviewer]`, 3.8 `[human]` |
 | Working tree | clean after the handoff commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `test/unit/kit-contract.test.ts` | new: 6 cases pinning the 4 `authStates` keys, `stats` ≥ 2 with `stats[1]` = „Koszty stałe”, 7 `patterns.columns` + `tableHeaders`, `{month}`/`{n}` placeholders, `trend.minimumMonths` = 3, `passwordMinLength` = `MIN_PASSWORD_LENGTH`, 12 `monthsLocative` |
-| `scripts/smoke.mjs` | +6 steps, added lines only (reset copy, login error, register `{n}`, settings `{n}`, fixed „Nowe w maju”, patterns „Ponad progiem”) |
-| `src/pages/{home,patterns,fixed}.astro`, `src/pages/patterns/[...key].astro` | 4 `DESIGN-GAP: K18` comments removed |
-| `CLAUDE.md` | `npm test` line names the kit-contract test |
-| `context/changes/kit-round-3-intake/{plan.md,handoff.md}` | Progress 2.1–2.7 ticked + SHA |
+| `context/foundation/design-kit.md` | `kit_round: 3`, kit contents updated, new § „Runda 3 — status rejestru” (K11–K26, G20, G23–G37), new rows K27–K32, § „Do rundy 4” replaces „Do rundy 3” |
+| `context/changes/kit-round-3-intake/follow-ups/review-fixes.md` | new: 4 entries (S-14, S-15, S-12, month templates), each with `Trigger:` |
+| `src/components/imports/ImportWizard.tsx` | `genericError` doc now names `copyExtra.imports.saveError` (K28) |
+| `src/components/home/TrendChart.astro` | header comment: round-3 `trend.current`, C4 |
+| `src/components/patterns/PatternsTable.tsx` | header comment: „Pokaż więcej” is S-14 |
+| `src/content/copy.ts`, `src/pages/home.astro` | K25 comments reworded (templates kept until kit foot is grammatical, K29) |
+| `context/changes/kit-round-3-intake/{plan.md,change.md,handoff.md}` | Progress 3.1–3.5 + SHA, status, this file |
 
 ## 3. Verification
 
 | Command | Result |
 | --- | --- |
 | `npm run lint` | 0 errors |
-| `npx astro check` | 0 errors (152 files; baseline 149; p1 151, +1 new test file) |
-| `npm run fixture:check` | OK |
-| `npm test` | 347 passed / 22 files (baseline 335 / 20; +12 tests, +2 files in total; p2 alone +6 / +1) |
+| `npx astro check` | 0 errors (152 files; p2 152, Δ0) |
+| `npm run fixture:check` | OK (ing + santander) |
+| `npm test` | 347 passed / 22 files (baseline 335 / 20; Δ0 vs p2) |
 | `npm run build` | OK |
 | `npx supabase db reset && npx supabase test db` | Files=6, Tests=119 PASS (Δ0) |
-| `npm run smoke` on :4398 | 157 PASS / 0 FAIL (baseline 151, +6); dev server killed |
-| `grep -rn K18 src`; `grep -rn DESIGN-GAP src \| wc -l` | empty; 52 (was 56, −4) |
-| `git diff main -- scripts/smoke.mjs` | 0 removed lines |
-| Break 1: drop „Kwota” from `patterns.columns` in `content.json` | kit-contract (7 columns) and `table-columns` red; restored via `git checkout` → green. Meta-check: both fail on the column count/order, which is exactly what the break removes |
-| Break 2: `home.astro` `stats[1].label` → `stats[2].label` | `astro check` 0 errors and kit-contract 6/6 green, as predicted: nothing automated guards the reader-side index; the guard is the Phase 1 grep `stats\[[2-9]\]`, the `stats[1]` pin of the kit and the visual row; restored |
-| Break 3: `fixed.astro` section title → raw `copy.fixedCosts.new` | smoke `fixed fills the month in the new section title` FAIL (only that step); restored → all steps pass. Meta-check: `fixed.astro` is plain Astro, so the needle is not satisfiable by island props |
+| `npm run smoke` on :4398 | 157 PASS / 0 FAIL (baseline 151, +6, Δ0 vs p2); server killed |
+| Seam grep `monthsLocative\[\|amountColumn\|stats\[2\]\|Rozpoznane wydatki\|K18` in `src` | empty |
+| Register id check (K11–K26, G20, G23–G37 each have a row starting with a round-3 status) | no MISSING |
+| `git diff --stat 7188f7f -- design` | empty (design/ untouched in p2–p3) |
+| Break: `amountColumn: "Kwota"` re-added to `copyExtra.patterns` | seam grep reported it; restored via `git checkout`, grep empty. Meta-check: `astro check` would not flag an extra key; the grep is the only guard against a half-removed seam |
 
 ## 4. Next command
 
-`/10x-implement kit-round-3-intake phase 3`
+`/10x-impl-review kit-round-3-intake`
 
 ## 5. Open
 
-- Manual rows: 1.8 `[reviewer]`; 2.8 `[reviewer]` (every kit-contract assertion maps to a real read: `login.astro`/`reset.astro` authStates, `home.astro` stats, `PatternsTable.tsx` columns, `fixed.astro`/`[...key].astro` `{month}`, trend `tooShort`/`minimumMonths`, `register.astro`/`settings.astro`/`reset/new.astro` `{n}` — I checked, not ticked); 3.6 `[visual]`; 3.7 `[reviewer]`; 3.8 `[human]`.
-- The `/settings` smoke step asserts the password-minimum text from island props (no rendered node exists until typing); same for `/register`.
-- Phase 3 to do: gap register round 3 (`context/foundation/design-kit.md` `kit_round: 3`), follow-ups, seam sweep (stale comments in `home.astro` K25 header, `copy.ts` K25, `PatternsTable.tsx` header, `ImportWizard.tsx` `genericError` doc, `TrendChart.astro` header); `.prettierignore` for `design/` + `brand.css` stays a follow-up candidate.
-- No `DESIGN-GAP` added; no migration. Roadmap F-04 row untouched (status `planning`).
+- Manual rows: 1.8 `[reviewer]`, 2.8 `[reviewer]`, 3.6 `[visual]` (screenshots desktop + ~400 px of the listed states — not taken in this step), 3.7 `[reviewer]` (seam sweep + register vs research matrix + follow-up `Trigger:` lines — done, not ticked), 3.8 `[human]` (accept kit-text deviations: „we wrześniu” (K30), header order until S-14, `copyExtra.imports.saveError` (K28), 4 restored `authStates` (K27); send K27–K32 to the kit author).
+- `home.astro`/`copy.ts` still carry `DESIGN-GAP: K24` comment (kit now delivers `dashboard.descriptionNoName`; S-15 adopts). `.prettierignore` for `design/` + `brand.css` remains a follow-up candidate.
+- Design-kit.md register row bodies for K/G ids were not rewritten per row; the round-3 status lives in the new table (the old rows keep their history).
+- No migration, no new `DESIGN-GAP`. Roadmap F-04 row untouched (archive updates it).
 
 ## 6. Autonomous decisions
 
-1. **Execution mode: in this context, no subagent** (AskUserQuestion forbidden). Rejected: delegate. Would change: context nearing 300k.
+1. **Execution mode: in this context**, no subagent (AskUserQuestion forbidden). Would change: context nearing 300k.
 2. **Commit message approved as drafted** (Polish). Would change: a maintainer-specified subject.
-3. **Smoke `/register` step placed after the anonymous login steps** (signed-in users are redirected from `/register`). Would change: smoke order restructuring.
-4. **K18 comments deleted outright**, not replaced by a non-gap comment (surrounding code is self-explanatory). Would change: a reviewer asking for a pointer to `components.error`.
-5. **Rows 2.1–2.7 ticked, 2.8 left** per the `[reviewer]` rule. Break 3 was run against the live `astro dev` (HMR) rather than a restart.
+3. **Round-3 status as a new table in `design-kit.md`**, not edits inside each wide legacy row. Rejected: per-row edits (huge cells, noisy diff). Would change: a reviewer wanting status in the original rows.
+4. **New K-rows numbered K27–K32** (a)–(f) in plan order. Would change: the author's own numbering in round 4.
+5. **content.json size stated as 414 JSON leaves** (measured in this step; research's 385 counted the raw delivery differently). Would change: an agreed counting convention.
+6. **Epilogue run with 5 manual rows open** per the step instruction; status `implemented`.

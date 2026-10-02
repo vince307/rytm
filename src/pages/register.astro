@@ -3,6 +3,7 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
 import SignUpForm from "@/components/auth/SignUpForm";
 import InlineAlert from "@/components/app/InlineAlert.astro";
 import { copy, copyExtra } from "@/content/copy";
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 
 const error = Astro.url.searchParams.get("error");
 // Kit round 2: #/register?error=occupied — the address already has an account (links: sign in / reset password).
@@ -48,7 +49,7 @@ const x = copyExtra.auth;
       submit: a.register.title,
       pending: s.creating,
       emailRequired: s.emailRequired,
-      passwordTooShort: s.passwordTooShort,
+      passwordTooShort: s.passwordTooShort.replace("{n}", String(MIN_PASSWORD_LENGTH)),
     }}
   />
   <p class="mt-[22px] text-center text-[13px] text-muted">

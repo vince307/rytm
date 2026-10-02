@@ -9,6 +9,7 @@ import { Glyph } from "@/components/Glyph";
 import { formatMoney, plural } from "@/lib/format";
 import { merchantMark } from "@/components/patterns/merchant-mark";
 import { patternHref } from "@/lib/patterns/path";
+import { tableHeaders } from "@/lib/patterns/table-columns";
 import { cn } from "@/lib/utils";
 import type { PatternListItem, Threshold } from "@/types";
 
@@ -20,9 +21,8 @@ export interface PatternsTableCopy {
   /** `copy.patterns.sortOptions` — labels for suma / liczba / nazwa, in that order. */
   sortOptions: readonly string[];
   sortPrefix: string;
-  /** `copy.patterns.columns`: Sprzedawca, Typ, Wystąpienia, Suma, Próg, Ponad progiem. */
+  /** `copy.patterns.columns` (round 3): Sprzedawca, Typ, Wystąpienia, Kwota, Suma, Próg, Ponad progiem. */
   columns: readonly string[];
-  amountColumn: string;
   typeLabels: { fixed: string; frequent: string };
   footer: string;
   patternForms: readonly [string, string, string];
@@ -110,14 +110,7 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
           <table className="w-full border-collapse text-[13px]">
             <thead>
               <tr>
-                {copy.columns.slice(0, 4).map((label) => (
-                  <th key={label} className={head}>
-                    {label}
-                  </th>
-                ))}
-                {/* DESIGN-GAP: K17 — FR-007 amount of a fixed pattern; the kit table has no such column. */}
-                <th className={head}>{copy.amountColumn}</th>
-                {copy.columns.slice(4, 6).map((label) => (
+                {tableHeaders(copy.columns).map((label) => (
                   <th key={label} className={head}>
                     {label}
                   </th>

@@ -113,7 +113,7 @@ const risenFootFor = (n: number) => h.risen.replace("{n}", String(n)).replace("{
           foot={result.stats.previous ? deltaFootFor(result.stats.previous) : undefined}
         />
         <StatCard
-          label={copy.dashboard.stats[2].label}
+          label={copy.dashboard.stats[1].label}
           value={formatMoney(result.stats.fixedTotalMinor)}
           foot={risenFootFor(result.stats.fixedRisen)}
         />
@@ -127,7 +127,11 @@ const risenFootFor = (n: number) => h.risen.replace("{n}", String(n)).replace("{
           ariaLabel={copy.trend.title}
           bars={barsFor(result.trend)}
           legend={copy.trend.legend}
-          note={result.trend.months.length < 3 ? copy.trend.tooShort : undefined}
+          note={
+            result.trend.months.length < copy.trend.minimumMonths
+              ? copy.trend.tooShort.replace("{n}", String(copy.trend.minimumMonths))
+              : undefined
+          }
           hint={!result.trend.hasThreshold ? h.noThreshold : undefined}
         />
       </Panel>

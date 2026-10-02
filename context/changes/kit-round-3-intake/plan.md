@@ -447,13 +447,13 @@ the kit-text departures are collected in the Phase 3 `[human]` row.
 
 #### Automated
 
-- [ ] 1.1 Raw delivery vs kit diff shows only content.json, parsed diff = 4 restored authStates leaves
-- [ ] 1.2 sync-kit.sh re-run is idempotent, brand.css diff = 8 token lines, no prettier on kit files
-- [ ] 1.3 Grep for stats[2+], columns.slice, amountColumn in src is empty
-- [ ] 1.4 npm test: baseline + format and table-columns cases, 0 failed
-- [ ] 1.5 Deliberate break: removed authStates.loginError turns astro check red, restored
-- [ ] 1.6 Deliberate break: fillMonthLocative without „we” turns September cases red, restored
-- [ ] 1.7 Full local gate vs baseline, smoke Δ0
+- [x] 1.1 Raw delivery vs kit diff shows only content.json, parsed diff = 4 restored authStates leaves
+- [x] 1.2 sync-kit.sh re-run is idempotent, brand.css diff = 8 token lines, no prettier on kit files
+- [x] 1.3 Grep for stats[2+], columns.slice, amountColumn in src is empty
+- [x] 1.4 npm test: baseline + format and table-columns cases, 0 failed
+- [x] 1.5 Deliberate break: removed authStates.loginError turns astro check red, restored
+- [x] 1.6 Deliberate break: fillMonthLocative without „we” turns September cases red, restored
+- [x] 1.7 Full local gate vs baseline, smoke Δ0
 
 #### Manual
 

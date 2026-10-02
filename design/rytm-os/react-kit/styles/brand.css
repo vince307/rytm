@@ -15,6 +15,14 @@
   --rytm-muted: #606E7C;
   --rytm-line: #CED3D5;
   --rytm-green: #2E5C50;
+  --rytm-accent: var(--rytm-excess);
+  --rytm-field: var(--rytm-paper);
+  --rytm-focus-ring: rgba(32, 47, 64, .12);
+  --rytm-sequence: var(--rytm-muted);
+  --rytm-sequence-soft: var(--rytm-line);
+  --rytm-merchant-mark: var(--rytm-paper-soft);
+  --rytm-badge-soft: rgba(199, 157, 98, .18);
+  --rytm-danger-line: var(--rytm-line);
   --rytm-font: "Manrope", system-ui, sans-serif;
 }
 

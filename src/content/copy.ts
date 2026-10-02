@@ -110,6 +110,9 @@ export const copyExtra = {
     back: "Wróć do importów",
     dropTitle: "Upuść plik CSV tutaj",
     choose: "Wybierz plik",
+    // Wizard save failure (import result `status === 'error'` in round-3 `prototype/app.js`); not in `content.json`
+    // (kit gap, round-4 K-row) — `components.error` is now the read-failure line.
+    saveError: "Nie udało się zapisać importu. Spróbuj ponownie.",
     newImport: "+ Nowy import",
     // Imports table (prototype imports(), app.js:56) — column headers and the account cell.
     table: { importedOn: "Data importu", account: "Rachunek", range: "Zakres dat", debits: "Obciążenia" },
@@ -192,8 +195,6 @@ export const copyExtra = {
     sortPrefix: "Sortuj: ",
     footer: "{n} {patterns} · wszystkie miesiące",
     patternForms: ["wzorzec", "wzorce", "wzorców"],
-    // DESIGN-GAP: K17 — the kit table has no "kwota dla stałych" column (FR-007); placeholder header.
-    amountColumn: "Kwota",
     // DESIGN-GAP: K21 — detail / threshold-editor / list strings the prototype renders that content.json still
     // lacks (round 3); taken verbatim from app.js patternDetail() / thresholdEditor() / patternRows() / showToast().
     detailEyebrow: " wzorzec",

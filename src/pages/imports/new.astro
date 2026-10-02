@@ -47,7 +47,7 @@ const serverError: WizardServerError | undefined = kind.success
       flow: { title: f.title, steps: f.steps, supported: copyExtra.imports.supported, oneAccount: f.oneAccount },
       imports: copyExtra.imports,
       errors: { ...copy.importErrors, unknownFormat: copyExtra.imports.unknownFormat },
-      genericError: copy.components.error,
+      genericError: copyExtra.imports.saveError,
     }}
     existing={existing}
     serverError={serverError}

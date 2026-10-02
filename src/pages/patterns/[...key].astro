@@ -17,7 +17,7 @@ import PatternActionsDialog, { type PatternActionsCopy } from "@/components/patt
 import RestoreForm from "@/components/patterns/RestoreForm.astro";
 import { ThresholdEditor, type ThresholdEditorCopy } from "@/components/patterns/ThresholdEditor";
 import { copy, copyExtra } from "@/content/copy";
-import { formatIsoDate, formatMoney, formatMonthShort, plural } from "@/lib/format";
+import { fillMonthLocative, formatIsoDate, formatMoney, formatMonthShort, plural } from "@/lib/format";
 import { loadPatternData } from "@/lib/patterns/load";
 import { referenceMonth } from "@/lib/patterns/over-limit";
 import { keyFromPath, patternHref } from "@/lib/patterns/path";
@@ -75,12 +75,11 @@ if (pattern && "rows" in dataResult) {
   monthOptions = detail.months.map((m) => ({ value: m, label: formatMonthShort(m) }));
 }
 
-const monthLocative = (m: string) => x.monthsLocative[Number(m.slice(5, 7)) - 1];
-const sumLabel = detail ? x.sumLabel.replace("{month}", monthLocative(month)) : "";
+const sumLabel = detail ? fillMonthLocative(x.sumLabel, month, x.monthsLocative) : "";
 const overLabel = detail
   ? month === refMonth
     ? copy.dashboard.stats[0].label
-    : x.overInMonth.replace("{month}", monthLocative(month))
+    : fillMonthLocative(x.overInMonth, month, x.monthsLocative)
   : "";
 const rawDescription = (t: { counterparty: string; title: string }) =>
   t.title ? `${t.counterparty} · ${t.title}` : t.counterparty;

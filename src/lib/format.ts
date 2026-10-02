@@ -93,3 +93,15 @@ export function formatSignedMoney(minor: number): string {
   if (minor === 0) return formatMoney(0);
   return `${minor > 0 ? "+" : "−"}${formatMoney(Math.abs(minor))}`;
 }
+
+/**
+ * Fills a kit month template (`"Nowe w {month}"`, `"Suma w {month}"`) with the month's locative. Polish writes „we"
+ * before „wrześniu" (kit templates say „w {month}" — F-04 intake, round-4 K-row); `yearMonth` is `YYYY-MM`.
+ */
+export function fillMonthLocative(template: string, yearMonth: string, locatives: readonly string[]): string {
+  const locative = locatives[Number(yearMonth.slice(5, 7)) - 1];
+  const preposition = locative === "wrześniu" ? "we" : "w";
+  return template.includes("w {month}")
+    ? template.replace("w {month}", `${preposition} ${locative}`)
+    : template.replace("{month}", locative);
+}

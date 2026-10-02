@@ -24,7 +24,7 @@ export interface ImportWizardLabels {
   flow: Pick<typeof copy.importFlow, "title" | "steps" | "supported" | "oneAccount">;
   imports: typeof copyExtra.imports;
   errors: typeof copy.importErrors;
-  /** `copy.components.error` — a save that failed for a reason the user cannot act on. */
+  /** `copyExtra.imports.saveError` (kit round 3 has the text only in `app.js`; K28 in design-kit.md) — a save that failed for a reason the user cannot act on. */
   genericError: string;
 }
 

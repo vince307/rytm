@@ -2,12 +2,12 @@
 project: "Rytm"
 context_type: greenfield
 created: 2026-09-18
-updated: 2026-09-25
-kit_round: 2
+updated: 2026-10-02
+kit_round: 3
 kit_changelog: "design/rytm-os/CHANGELOG.md"
 design_system: "Rytm — Oś"
 kit_location: "design/rytm-os/"
-kit_source: "wygenerowany 2026-09-16 z innym LLM (brand designer / ilustrator); dostarczany przez autora; runda 1 braków dostarczona 2026-09-18; runda 2 dostarczona 2026-09-21"
+kit_source: "wygenerowany 2026-09-16 z innym LLM (brand designer / ilustrator); dostarczany przez autora; runda 1 braków dostarczona 2026-09-18; runda 2 dostarczona 2026-09-21; runda 3 dostarczona 2026-10-02 (przyjęcie: slice F-04 `kit-round-3-intake`)"
 authority: kit-is-source-of-truth
 gap_policy: report-do-not-invent
 ---
@@ -31,10 +31,12 @@ Reguły dla każdego, kto implementuje UI (człowiek lub agent):
 
 | Katalog        | Co zawiera                                                                                                                                                                                                                                                                                                                                                                                      | Rola                                                                                                                                                                                                                                                                                             |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `react-kit/`   | handoff do React: `assets/` (brand SVG, ikona app, favicony, ilustracja pustego stanu, OG, font Manrope Variable + OFL, **`icons/ui/ui.svg` — sprite 19 ikon liniowych 16/20 px**), `styles/brand.css` (tokeny + **klasy `.rytm-badge--*` i `.rytm-icon`**) + `rytm-tokens.css`, `docs/content.json` (copy widoków, 103 klucze), `docs/routes.md` (18 tras), `docs/asset-map.json`, `README.md` | **Główne źródło** dla implementacji — assets i tokeny kopiowane do aplikacji przy bootstrapie                                                                                                                                                                                                    |
+| `react-kit/`   | handoff do React: `assets/` (brand SVG, ikona app, favicony, ilustracja pustego stanu, OG, font Manrope Variable + OFL, **`icons/ui/ui.svg` — sprite 19 ikon liniowych 16/20 px**), `styles/brand.css` (tokeny + **klasy `.rytm-badge--*` i `.rytm-icon`**) + `rytm-tokens.css`, `docs/content.json` (copy widoków, 414 liści JSON po łatce przyjęcia), `docs/copy-map.md` (runda 3: mapa kluczy copy → widoki), `docs/routes.md` (runda 3: 52 wiersze tabel tras), `docs/asset-map.json`, `README.md` | **Główne źródło** dla implementacji — assets i tokeny kopiowane do aplikacji przy bootstrapie                                                                                                                                                                                                    |
 | `brand-pack/`  | pakiet identyfikacji: te same SVG + eksporty PNG, plansza poglądowa, `dokumentacja/karta-stylu.md` (paleta z kontrastami, typografia, pole ochronne, geometria znaku)                                                                                                                                                                                                                           | Dokumentacja marki i fallbacki PNG                                                                                                                                                                                                                                                               |
-| `prototype/`   | `index.html` + `app.js` + `styles.css` + `assets/` — działający prototyp **20 widoków** (vanilla JS, hash routing); `views/*.html` — te same widoki jako osobne pliki (wymagają `../styles.css`, `../app.js`, `../assets/`)                                                                                                                                                                     | **Jedyna specyfikacja layoutu i komponentów** — wzorce CSS (`.btn`, `.stat-card`, `.panel`, `.list-item`, `.field`, `.import-panel`, `.badge`, `.table-panel`, `.threshold-*`, `.import-flow`, `.modal`, `.toast`, `.mobile-nav`, siatki, breakpointy 900/560 px) do przeniesienia na komponenty |
-| `CHANGELOG.md` | dziennik dostaw od autora (runda 1: A1–A7, nowe widoki, świadome pominięcia)                                                                                                                                                                                                                                                                                                                    | Historia kitu                                                                                                                                                                                                                                                                                    |
+| `prototype/`   | `index.html` + `app.js` + `styles.css` + `assets/` — działający prototyp (vanilla JS, hash routing); `views/*.html` — te same widoki jako osobne pliki (runda 3: 58 stron widoków + `index.html`, 60 plików z `views/README.md`) (wymagają `../styles.css`, `../app.js`, `../assets/`)                                                                                                                                                                     | **Jedyna specyfikacja layoutu i komponentów** — wzorce CSS (`.btn`, `.stat-card`, `.panel`, `.list-item`, `.field`, `.import-panel`, `.badge`, `.table-panel`, `.threshold-*`, `.import-flow`, `.modal`, `.toast`, `.mobile-nav`, siatki, breakpointy 900/560 px) do przeniesienia na komponenty |
+| `CHANGELOG.md` | dziennik dostaw od autora (runda 1: A1–A7, nowe widoki, świadome pominięcia; runda 3: § „Runda 3 — spójność kitu i brakujące stany aplikacji”, decyzje C1–C6)                                                                                                                                                                                                                                                                                                                    | Historia kitu                                                                                                                                                                                                                                                                                    |
+
+Łatka przyjęcia rundy 3 (F-04, precedens `2ad7d14`): do `content.json` przywrócono 4 klucze `authStates` (`loginError`, `resetTitle`, `resetBody`, `checkInbox`), które dostawa usunęła drugi raz (K27); poza tym kit = dostawa.
 
 Pominięte przy kopiowaniu: identyczne duplikaty pakietów w dostawie, pliki `.DS_Store` oraz (decyzja 2026-09-18) 9 plansz eksploracji logo z pierwszej sesji — archiwum procesu, nie kit.
 
@@ -175,38 +177,67 @@ Prompt dla autora: `design/prompts/2026-09-20-gaps-round-2.md` (runda 1: `design
 
 Wynik przyjęcia: 1–10 i 12 dostarczone (`tabs` z pkt 7 świadomie pominięte), **11 (K11) nie** — zostaje otwarte. Nowe konflikty z dostawy: K12 (regresja kluczy, naprawiona przy przyjęciu), K13 (puste panele wizualne), K14 (zdublowane klucze).
 
-### Do rundy 3
+### Runda 3 — status rejestru (dostarczona 2026-10-02, przyjęcie F-04 `kit-round-3-intake`)
 
-1. **K11** — copy z `app.js` do `content.json` (lista kluczy w `design/prompts/2026-09-20-gaps-round-2.md`, część C).
-2. **K12** — przywrócić u źródła 8 kluczy rundy 1.
-3. **K13** — copy paneli wizualnych `#/reset/new` i `#/confirm-email`.
-4. **K14** — usunąć zdublowane klucze `auth.confirmEmail*`, `auth.resetNew*`, `auth.resetExpired`.
-5. **G20** — decyzja: czy „Dla kogo” ma być osiągalne z telefonu (np. w stopce), skoro znika z nagłówka < 560 px.
-6. **K15** — copy `/settings` i modalu usunięcia konta do `content.json`, token dla obramowania `.danger-panel` (`#d9c2a0`), decyzja o wylogowaniu w ekranie ustawień (G11).
-7. **G23** — układ wiersza „Hasło” z formularzem zmiany hasła w aplikacji i etykieta „Obecne hasło”.
-8. **G24** — copy i wygląd stanów wyniku: zmiana hasła (sukces / zły current / błąd), usunięcie konta (błąd, nota na `/login`), zablokowany przycisk potwierdzenia (margines boczny modalu na 400 px zamknięty w aplikacji — S-05 faza 5).
-9. **G25** — stan „zakres wolny” kroku 3 importu: przycisk potwierdzenia „Importuj N obciążeń”, stan oczekiwania, „Wstecz”.
-10. **G26** — ekran wyniku importu przed wzorcami (S-01): h1 i układ bez statystyk wzorców.
-11. **G27** — copy: plik za duży, za dużo obciążeń, plik niespójny.
-12. **K16** — `importErrors.overlap` z placeholderem zakresu zamiast zaszytej daty; usunąć nieaktualne `importFlow.overlap`.
-13. **K17** — kolumna i klucz „kwota dla stałych” w tabeli wzorców (FR-007).
-14. **K18** — ogólne copy nieudanego odczytu listy (zamiast „sprawdź plik CSV”).
-15. **G28** — tabela wzorców przed progami / szczegółem / wykluczeniem (S-03) oraz token dla tła `.merchant-mark` (`#e5e9e8`).
-16. **K19** — copy akcji usunięcia importu i modalu do `content.json`, h2 z placeholderem zakresu zamiast zaszytego miesiąca.
-17. **K20** — finalny tekst sukcesu usunięcia importu (zamiast placeholdera „Import usunięty.”).
-18. **G30** — decyzja toast-vs-inline i copy dla stanów wyniku usunięcia importu (oczekiwanie, błąd, nie znaleziono).
-19. **K21** — copy szczegółu wzorca / edytora progu / listy z `app.js` do `content.json`; `patternDetail.sumLabel` z placeholderem `{month}` i tabelą odmiany lokatywnej miesięcy zamiast zaszytego „maju”.
-20. **G31** — stany szczegółu wzorca i edytora progu, których kit nie definiuje (nie znaleziono, miesiąc bez wystąpień, podsumowanie sekwencji dla czytników ekranu, etykieta „ponad progiem” poza miesiącem referencyjnym), oraz token dla kolorów `.seq` `#728393` / `#aebbc1`.
-21. **G32** — token tła pól formularza (kit `--white` `#fff`) albo decyzja „pola na `paper`”.
-22. **K22** — copy dialogu „Akcje na wzorcu” do `content.json` (eyebrow, h2, lead, toasty zmiany typu / wykluczenia, `aria-label` zamknięcia, tekst przełącznika sekcji „Wykluczone”).
-23. **G33** — layout dialogu „Akcje na wzorcu” poza czterema przyciskami: selektor scalania, pole zmiany nazwy, stany oczekiwania/błędu, lista scalonych wariantów, ewentualna osobna podstrona „ustawienia wzorca”.
-24. **K23** — copy wierszy/liczników „Koszty stałe” do `content.json`; prawdziwa forma mnoga licznika zamiast kitowej niespójności („3 pozycje” nad dwoma wierszami).
-25. **G34** — puste sekcje „Koszty stałe”, kolor obniżki, komunikat braku miesiąca porównawczego, ewentualny osobny token dla `Badge` `new`/`changed` (kit realnie renderuje je na bursztynie — K9).
-26. **K24** — klucz `content.json` dla leadu „no-name” dashboardu (`{month}` zamiast zaszytego „maju”).
-27. **G35** — decyzja, czy oznaczenie „niepełny”/`trend.current` wraca (obecnie: PRD wygrywa — brak), token dla szarości słupka/siatki wykresu trendu, finalny tekst podpowiedzi braku progu.
-28. **K25** — szablonowe klucze `content.json` dla stopek stat-cardów (`{delta} względem {month}`, `{n} {items}`) zamiast samych przykładowych wartości.
-29. **G36** — reguła (albo trwałe pominięcie) figur „Rozpoznane wydatki” i „Co wraca najczęściej” na dashboardzie; ewentualna decyzja o innej wartości „Koszty stałe” niż Σ `/fixed`.
-30. **K26** — klucze `content.json` dla obu banków (`importFlow.supported`, `importErrors.unknownFormat`) i usunięcie „Santander wkrótce” z `app.js` `importsNew()`.
+Źródło: `design/rytm-os/CHANGELOG.md` § „Runda 3” (decyzje C1–C6), `react-kit/docs/copy-map.md`, `react-kit/docs/routes.md`, `prototype/views/*.html`. Status w rundzie 3: `delivered` · `partial` · `resolved-by-decision` · `delivered (luka aplikacji)`. Kolumna „Slice” wskazuje slice M-3, który przyjmuje pozycję (F-04 = już przyjęte przy intake).
+
+| ID  | Status w rundzie 3 | Dowód (klucz / widok / decyzja) | Slice |
+| --- | --- | --- | --- |
+| K11 | partial | większość przestrzeni `copyExtra` dostarczona; brak: pasma „jak to działa”, leadu `/fixed`, części ciągów kreatora i wzorców | S-12…S-15 wg ekranu |
+| K12 | partial | `patternActions.merge/changeType/rename/exclude` wróciły; 4 klucze `authStates` usunięte ponownie — przywrócone przy przyjęciu (łatka F-04) | F-04 |
+| K13 | partial | panele rysowane w `app.js` `confirmEmail()`/`resetNew()`, copy nie w `content.json` | S-12 |
+| K14 | delivered | `auth.confirmEmail*`/`resetNew*`/`resetExpired` usunięte; `copy-map.md` | S-12 |
+| K15 | partial | `--rytm-danger-line`, `settings.dangerBorder`, `settings.logout` (C2); „Dane logowania”, „Strefa destrukcyjna” itd. tylko w `app.js` | S-12 |
+| K16 | delivered | `importErrors.overlap` z `{range}`; `importFlow.overlap` usunięty | S-13 |
+| K17 | delivered | `patterns.columns[3]` „Kwota”; F-04: etykiety nagłówków przez `tableHeaders` (kolejność ciała tabeli aplikacji) | F-04 etykiety; S-14 kolejność kitu |
+| K18 | delivered | `components.error` (odczyt listy), `fixedCosts.readError`; komentarze `DESIGN-GAP: K18` usunięte w F-04 | F-04 / S-15 |
+| K19 | partial | `imports.delete/deleteTitle/deleteBody/deleteClose`; eyebrow „Cofnij import” tylko w `app.js` | S-13 |
+| K20 | delivered | `imports.deleteSuccess` | S-13 |
+| K21 | partial | `patternDetail.*`, `threshold.*` dostarczone; brak „Ustaw próg”, liczby mnogiej wystąpień, eyebrow typu | S-14 |
+| K22 | delivered | `patternActions.eyebrow/title/lead/typeChanged/excludedToast/closeLabel` | S-14 |
+| K23 | partial | `fixedCosts.itemForms`; brak meta wiersza („poprzednio”, „pierwsze wystąpienie”) | S-15 |
+| K24 | delivered | `dashboard.descriptionNoName` | S-15 |
+| K25 | partial | szablony `dashboard.stats[].foot`; brak miesięcy w dopełniaczu, „podrożały” błędne dla n = 1 (K29) | S-15 |
+| K26 | delivered | `importFlow.supported`, `importErrors.unknownFormat`, `imports.bankName.*` | S-13 |
+| G20 | resolved-by-decision | C1 (link w stopce) | S-12 |
+| G23 | delivered | `settings.currentPassword/newPassword/repeatPassword`, `settings.html` | S-12 |
+| G24 | delivered | `settings.passwordSuccess/passwordInvalid/saveError/deleteError/deletedNotice`, `login-deleted.html` | S-12 |
+| G25 | delivered | `importFlow.importButton/waiting`, `imports-summary.html` | S-13 |
+| G26 | delivered | `importFlow.result`, `imports-result*.html` | S-13 |
+| G27 | delivered | `importErrors.tooLarge/tooMany/inconsistent/limits` (5 MB / 5000) | S-13 |
+| G28 | delivered | `--rytm-merchant-mark`, `patterns.showMore/merchantMark` | S-14 |
+| G29 | delivered | `styles.css` `:focus-within` z `--rytm-focus-ring` | S-14 |
+| G30 | delivered | `imports.deleteError/notFound/deleteWaiting`, `imports-deleted/delete-error/not-found.html` | S-13 |
+| G31 | partial | `patternDetail.notFound/noOccurrences/sequenceSummary`, `threshold.invalid/saveError`, `--rytm-sequence*`; etykieta „ponad progiem” poza miesiącem referencyjnym bez rozstrzygnięcia | S-14 |
+| G32 | resolved-by-decision | C3, `--rytm-field` | S-12 |
+| G33 | partial | selektor scalania, `mergeEmpty`, `renameLong`, `mergedVariants`, `undoMerge`; `patternActions.lead` odsyła do nieistniejących „ustawień wzorca” | S-14 |
+| G34 | delivered | `fixedCosts.noChanges/noNew/noComparison/readError/decreased`, `--rytm-badge-soft` | S-15 |
+| G35 | resolved-by-decision | C4; linia siatki nadal surowe `#d2d7d8` | S-15 |
+| G36 | resolved-by-decision (zamknięte) | C5 — trwałe pominięcie „Rozpoznane wydatki” i „Co wraca najczęściej”; F-04 zamyka wiersz, aplikacja ma 2 karty | F-04 |
+| G37 | delivered (luka aplikacji: odmowa demo na `/reset/new` bez copy kitu) | `app.demoNotice`, `settings.demo*`, `imports.demoDeleteBlocked`, `importFlow.demoImportBlocked` | S-12 + S-13 |
+
+Nowe wiersze rundy 3 (do autora, lista do rundy 4):
+
+| #   | W kicie | W aplikacji / kontrakcie | Status |
+| --- | --- | --- | --- |
+| K27 | Dostawa po raz drugi usunęła z `content.json` 4 klucze `authStates` (`loginError`, `resetTitle`, `resetBody`, `checkInbox`), choć prototyp `app.js` renderuje je dosłownie | F-04 przywrócił je w kicie (łatka przyjęcia); `login.astro`/`reset.astro` czytają `copy.authStates.*`, guard: `test/unit/kit-contract.test.ts` | partial — autor przywraca u źródła |
+| K28 | Copy porażki zapisu importu jest tylko w `prototype/app.js`, nie w `content.json` | `copyExtra.imports.saveError` (`imports/new.astro` → `ImportWizard` `genericError`) | placeholder (S-13 adoptuje, gdy kit doda klucz) |
+| K29 | `dashboard.stats[1].foot` „{n} {items} podrożały” błędne gramatycznie dla n = 1 | aplikacja zostaje przy `copyExtra.home.risen` | open · S-15 |
+| K30 | `patternDetail.monthNames` / „w {month}” daje „w wrześniu”, `app.js` pisze „we wrześniu” | F-04: helper `fillMonthLocative` pisze „we” przed „września”; odstępstwo od tekstu kitu | placeholder (do poprawy w kicie) |
+| K31 | `patternActions.renameMaxLength` = 60, `renameLong` „…maksymalnie {n} znaków” | aplikacja i DB: limit 100 (`parseDisplayName`, CHECK w `20260928120000_pattern_decisions.sql`); zmiana to zmiana schematu | open · S-14 wypełnia `{n}` = 100 |
+| K32 | Nowe zdublowane klucze: `patternDetail.thresholdError` vs `threshold.saveError`, `patternActions.error*` vs `mergeInvalid/renameLong/saveError`, `settings.*Password` vs `authStates.*Password`, `settings.confirmation` vs `deleteConfirm`, `imports.accountLabel` vs `importFlow.accountLabel` | slice czyta jeden z dwóch | open (jak K14) |
+
+Dostarczone bez wiersza K/G: `patterns.showMore` „Pokaż więcej” (S-14); C6 etykieta konta Santandera „Rachunek · •• 1094” (S-13); `confirmEmail.resendCountdown` (S-12); `trend.amountLabel/zeroMarker/gridLabel` (S-15); widoki wyniku importu: oczekiwanie / błąd / nie znaleziono (S-13).
+
+### Do rundy 4
+
+1. **K27** — przywrócić u źródła 4 klucze `authStates` (dwukrotnie usunięte).
+2. **K28** — klucz `content.json` dla porażki zapisu importu.
+3. **K29** — poprawne gramatycznie `dashboard.stats[1].foot` dla n = 1 (forma mnoga / szablon).
+4. **K30** — „we wrześniu” w tabeli lokatywnej miesięcy.
+5. **K31** — limit zmiany nazwy: 60 vs 100 w aplikacji i bazie.
+6. **K32** — usunąć zdublowane klucze (lista wyżej).
+7. Pozycje o statusie `partial` w „Runda 3 — status rejestru” (K11, K13, K15, K19, K21, K23, K25, G31, G33) i odmowa demo na `/reset/new` (G37).
 
 ## Jak kit wchodzi do aplikacji (dla `/10x-bootstrapper` i dalej)
 

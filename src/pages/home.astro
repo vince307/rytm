@@ -64,8 +64,8 @@ const barsFor = (trend: OverLimitTrend) => {
   }));
 };
 
-// K25 templates — kit `content.json` `dashboard.stats[].foot` prints these only as samples; `{delta}` / `{month}`
-// and `{n}` / `{items}` generalise them (K24 `leadFor` precedent).
+// K25 templates — the app's own `{delta}` / `{month}` and `{n}` / `{items}` feet (`copyExtra.home`), kept while the
+// kit's `dashboard.stats[].foot` is ungrammatical for n = 1 (K29); K24 `leadFor` precedent.
 const deltaFootFor = (previous: NonNullable<HomeStats["previous"]>) =>
   h.deltaFoot
     .replace("{delta}", formatSignedMoney(previous.deltaMinor))

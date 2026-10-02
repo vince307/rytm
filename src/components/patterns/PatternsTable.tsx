@@ -1,6 +1,6 @@
 // PatternsTable — prototype patterns() toolbar + table + foot (app.js), search/sort as in bindInteractions().
 // Renders only non-excluded patterns (`/patterns.astro` filters); the excluded ones go to `ExcludedPatterns`
-// (S-05 Phase 7). DESIGN-GAP: G28 — status badges (nowy / zmiana kwoty, S-06) and „Pokaż więcej” stay omitted.
+// (S-05 Phase 7). DESIGN-GAP: G28 — status badges (nowy / zmiana kwoty, S-06) stay omitted; „Pokaż więcej” (`patterns.showMore`, kit round 3) is S-14.
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/app/Badge";

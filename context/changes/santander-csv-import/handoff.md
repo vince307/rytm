@@ -97,3 +97,8 @@ build OK; pgTAP Files=5 Tests=102 PASS; smoke 140/0.
    - Rejected: leaving the two visual accounts.
    - Why: the accounts and imports were written outside a transaction (through the product); the reset keeps the next step's pgTAP and smoke clean.
    - What would change it: nothing; it is cheap and it is the contract rule.
+6. **Archive despite 4 open `[human]` rows (6.8–6.11).**
+   - Chosen: `/10x-archive` "Continue archiving" (the skill recommends it when only manual rows are pending).
+   - Rejected: "Resume implementation" / waiting for the owner.
+   - Why: no automated row is open, impl-review covers phases 1–6 with `MERGE: CLEAR`, the visual gate is `PASS`; the four rows are owner acceptances (real-export import, rule-7 deviation, K26 wording, S-11 re-keying) that cannot be done by an agent and are listed in the PR as „Do decyzji właściciela produktu”. Every Progress SHA is an ancestor of the branch and the merge is `--merge` (no squash), so no SHA repointing.
+   - What would change it: an open automated row, a CRITICAL finding, or a squash merge policy.

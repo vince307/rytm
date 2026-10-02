@@ -457,12 +457,12 @@ Recorded in place of the skill's questions (run contract rule 1).
 
 #### Automated
 
-- [x] 2.1 `npm test` + `santander-card` / `santander-patterns` files, 0 failed; ING pin and F-02 partition green
-- [x] 2.2 Deliberate break 1: no title gate → ING pin red; restored → green
-- [x] 2.3 Deliberate break 2: no city rule → Santander partition and cross-bank red; restored → green
-- [x] 2.4 Deliberate break 3: empty `CITY_PREFIX` → only 2-word-city unit cases red; restored → green
-- [x] 2.5 ING fixtures/scripts and `santander.ts` unchanged vs `main`
-- [x] 2.6 Full local gate vs baseline
+- [x] 2.1 `npm test` + `santander-card` / `santander-patterns` files, 0 failed; ING pin and F-02 partition green — 5205a19
+- [x] 2.2 Deliberate break 1: no title gate → ING pin red; restored → green — 5205a19
+- [x] 2.3 Deliberate break 2: no city rule → Santander partition and cross-bank red; restored → green — 5205a19
+- [x] 2.4 Deliberate break 3: empty `CITY_PREFIX` → only 2-word-city unit cases red; restored → green — 5205a19
+- [x] 2.5 ING fixtures/scripts and `santander.ts` unchanged vs `main` — 5205a19
+- [x] 2.6 Full local gate vs baseline — 5205a19
 
 #### Manual
 

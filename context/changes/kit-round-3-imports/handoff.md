@@ -1,62 +1,66 @@
 # Handoff — `kit-round-3-imports` (slice S-13)
 
-Written by the `/10x-implement … phase 6` step (last phase). Phase 6 is committed (`efc07cc`) and green; `change.md` is `implemented`. The one thing the next agent must not get wrong: eight Progress rows are not agent-tickable ([reviewer] 1.7, 2.7, 3.7, 4.6, 5.5, 6.7; [visual] 6.6; [human] 6.8) and the visual gate (6.6) was NOT run in this step.
+Written by the `/10x-impl-review kit-round-3-imports` step. Review is done: 0 critical, 2 warnings fixed in `e305f81`, 6 observations (3 deferred with `Trigger:`); `MERGE: CLEAR`; `change.md` is `impl_reviewed`. The one thing the next agent must not get wrong: the visual gate (6.6) has still NOT been run, and it must also decide follow-ups F7 and F8 (`follow-ups/review-fixes.md`).
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-imports`, cut from `main` at `2a8f89d` (F-04 merged) |
-| Commits | `6e369ff` … `63e0da2` (P1-P5, see git log), `7ec2161` handoff p5, `efc07cc` P6, + epilogue/handoff commit |
+| Commits | `6e369ff` … `3d1b147` (docs + P1–P6 + epilogue), `e305f81` fix (review), + this docs commit |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `implemented` |
-| `## Progress` rows remaining | 8 of 40 (all [reviewer]/[visual]/[human]) |
+| `change.md` status | `impl_reviewed` |
+| `## Progress` rows remaining | 2 of 40 (`grep -c '^- \[ \]' plan.md` = 2): [visual] 6.6, [human] 6.8 |
 | Working tree | clean after the commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/foundation/design-kit.md` | K32 row notes S-13 readers; new row K33 (kit author); K11 note lists kept `copyExtra.imports` keys; round-4 list item 9 (K33). K16/K20/K26/G25/G26/G27/G30/G37/G38 were already registered by P1-P5 |
-| `src/components/imports/ImportWizard.tsx` | header + `imports` prop comments describe round-3 behaviour |
-| `src/pages/imports/index.astro` | added a header comment (round-3 list, dialog, states) |
-| `context/changes/kit-round-3-imports/plan.md`, `change.md`, `handoff.md` | Progress 6.1-6.5 ticked with SHA; status implemented |
+| `context/changes/kit-round-3-imports/reviews/impl-review.md` | review report (findings F1–F8, suites, breaks, [reviewer] evidence, MERGE line) |
+| `context/changes/kit-round-3-imports/follow-ups/review-fixes.md` | deferred F3, F7, F8, each with `Trigger:` |
+| `test/unit/kit-contract.test.ts` | F1: new `it` pinning `importErrors.overlap {range}`, `imports.deleteTitle {range}`, `importFlow.importButton {n}{debits}`, `importFlow.debitForms` length 3 |
+| `src/components/imports/ImportWizard.tsx` | F2: `fill` alias removed, `fillTemplate` called directly |
+| `src/pages/imports/result.astro` | F2: `title` via `fillTemplate` instead of a `.replace` chain |
+| `context/changes/kit-round-3-imports/plan.md` | [reviewer] rows 1.7, 2.7, 3.7, 4.6, 5.5, 6.7 ticked |
+| `context/changes/kit-round-3-imports/change.md` | status `impl_reviewed` |
 
 ## 3. Verification
 
-| Command | Result (observed this step) |
+Baseline = contract line (`main` 2a8f89d). All observed in this step, after the fixes (`e305f81`):
+
+| Command | Result |
 | --- | --- |
 | `npm run lint` | 0 errors (baseline 0) |
-| `npx astro check` | 0 errors, 3 hints (baseline 0 errors) |
+| `npx astro check` | 0 errors, 155 files (baseline 0 / 152; +3 new files) |
 | `npm run fixture:check` | ing OK, santander OK |
-| `npm test` | 351 passed / 23 files (baseline 347 / 22, +4; delta vs P5 = 0) |
+| `npm test` | 352 passed / 23 files (baseline 347 / 22, +5: +7 presentation, +1 kit-contract P1, −4 accountLabel P4, +1 kit-contract review) |
 | `npm run build` | OK |
-| `npx supabase db reset && npx supabase test db` | Files=6, Tests=119, PASS (Δ0) |
-| `npm run smoke` (4398, fresh reset) | All smoke steps passed (P6 changes no behaviour; P5 count 166 on rerun, baseline 157, +9 expected) |
-| Seam greps (`overlapPrefix`, `deleteMissing`, `stand in`, `Santander wkrótce`, stale DESIGN-GAP ids) in `src`/`scripts` | empty; `accountLabel` hits are only the kit key `importFlow.accountLabel` (`flow.accountLabel`); `fill` is an alias of `fillTemplate` |
-| Unused-key check on `copyExtra.imports` (script in scratchpad, reader pattern `x.` / `copyExtra.imports.`) | 20 keys, 0 unused |
-| `git diff --stat main -- design/` | empty |
-| Break: re-added `copyExtra.imports.accountLabel` | first attempt (reader pattern `\.key`) stayed green because `flow.accountLabel` matched: the guard was wrong (meta-check). Pattern narrowed to `x.` / `copyExtra.imports.`; re-break reported `UNUSED accountLabel` (red), restored with `git checkout`, green again |
-| End state | dev server on 4398 killed; `db reset` + pgTAP PASS before smoke |
+| `npx supabase db reset && npx supabase test db` | Files=6, Tests=119, PASS (Δ0; no migration in the slice, `git diff main...HEAD -- supabase` empty) |
+| smoke, :4398, fresh reset | 166 PASS / 0 FAIL (baseline 157, +9 = plan) — run before and after fixes |
+| Leak check (live) | as test user, `/imports/result?id=<demo user's import>` vs random uuid: both 200, byte-identical bodies minus the id; anon → 302 `/login` |
+| Break 1 | `fileErrorMessage` `tooLarge` → `unknownFormat`: import-presentation red (1/7), restored green. Meta: proves the helper, wiring confirmed by reading |
+| Break 2 | `result.astro` redirect re-added for `notFound`: smoke red on the two not-found steps, restored. Meta: foreign-id branch proven by the leak check (RLS) |
+| End state | dev server on 4398 killed; DB reset + pgTAP PASS before the final smoke (smoke data left in local DB, as every smoke run) |
 
 ## 4. Next command
 
-`/10x-impl-review kit-round-3-imports`
+`visual gate (kit-round-3-imports), then /10x-archive kit-round-3-imports`
 
 ## 5. Open
 
-- **Manual-only rows (human checklist):** [reviewer] 1.7, 2.7, 3.7, 4.6, 5.5, 6.7; [visual] 6.6 (screenshots 1280 px and ~400 px of every state listed in `plan.md` Phase 6, incl. F8 dialog clipping at 400 px and the `ImportWizard` `submitting` bfcache risk); [human] 6.8 (accept kit-text deviations, send G38 + K33 to the kit author).
-- **DESIGN-GAP:** none added in P6; open register rows G38, K33 (round 4).
-- **Not exercised:** drag and drop block in a browser (5.5).
-- **Roadmap:** S-13 row in `context/foundation/roadmap.md` untouched (orchestrator-owned).
-- **Risks:** `plan.md` `## Known risks` — `ImportWizard` `submitting` has no bfcache reset; decided only by the visual gate.
-- **Follow-ups:** none; `follow-ups/review-fixes.md` not created.
+- **Manual-only rows:**
+  - [ ] [visual] 6.6 — screenshots 1280 px / ~400 px of every state listed in `plan.md` Phase 6 (incl. F8 dialog clipping at 400 px in `DeleteImportDialog`, `ImportWizard` `submitting` after Back, demo-locked error state showing `chooseOtherButton`).
+  - [ ] [human] 6.8 — accept S-13 kit-text deviations, send G38 + K33 to the kit author.
+- **Follow-ups** (`follow-ups/review-fixes.md`): F3 `result.astro` `imported` select error unlogged → not-found; F7 `ImportWizard` `chooseOtherButton` enabled when `demoLocked`; F8 `ImportWizard` `submitting` bfcache. F7/F8 triggers are the visual gate.
+- **DESIGN-GAP:** none added; open register rows G38, K33 (round 4).
+- **PR note:** `context/foundation/design-kit.md` diff is mostly Prettier table re-padding (19 lines with `-w`).
 
 ## 6. Autonomous decisions
 
-1. **Execution mode: implemented in this context.** Why: one fresh agent per step. Would change: a phase too large for the budget.
-2. **Skipped the manual-confirmation gate, commit-message prompt and next-phase prompt; used the plan's phase title.** Why: contract rule 1; manual rows left unticked. Would change: a maintainer present.
-3. **Visual gate (6.6) not run.** Why: row is tagged [visual], not the implementer's; the orchestrator owns the visual gate. Would change: orchestrator asking this step to capture.
-4. **Register: reused existing round-3 rows (K16..G30, G37, G38 were already written in P1-P5); only K32/K33/K11/round-4 added.** Rejected: rewriting statuses already correct. Would change: a review finding a status mismatch.
-5. **Epilogue run: `change.md` → `implemented` although [reviewer]/[visual]/[human] rows are open** (per the run instructions). Would change: the orchestrator wanting `implementing` until the visual gate.
-6. **Stale-comment sweep limited to hits of the plan's seam terms; two header comments updated, nothing else.** Would change: review finding another stale comment.
+1. **Read the code diff in the main context instead of the skill's two subagents.** Why: ≈600 lines of `src`/`test`, fully readable; one reader avoids inherited claims. Would change: a diff too large for the context budget.
+2. **Triage without AskUserQuestion:** WARNINGs F1/F2 fixed (cheap, no behaviour change); F3/F7/F8 deferred with `Trigger:`; F4/F5/F6 recorded. Why: contract rule 1 and the step's triage rule. Would change: a maintainer present.
+3. **F7 deferred, not fixed.** Why: UI behaviour change on a demo state the visual gate is about to capture; no server effect. Would change: the visual gate showing it, or the orchestrator wanting it in this PR.
+4. **No two-account migration test.** Why: the slice has no migration (empty `supabase/` diff); pgTAP Δ0 and the live foreign-id result check cover the one isolation question. Would change: any file under `supabase/` in the diff.
+5. **5.5 ticked on code evidence** (`onDrop` → `handleFile` early return), drag & drop not exercised in a browser. Would change: the visual gate finding the drop zone still accepts a file when locked.
+6. **MERGE: CLEAR with [visual]/[human] rows open.** Why: they are owned by the orchestrator's visual gate and the human checklist, not by this step's criteria. Would change: the orchestrator treating 6.6 as a merge criterion.

@@ -589,7 +589,7 @@ the kit-text departures are collected in the Phase 6 `[human]` row.
 
 #### Manual
 
-- [ ] 1.7 [reviewer] readStatement returns tooLarge before reading; step-1 copy from copy.*; removed keys have no reader
+- [x] 1.7 [reviewer] readStatement returns tooLarge before reading; step-1 copy from copy.*; removed keys have no reader — impl-review e305f81
 
 ### Phase 2: Wizard steps 2–3 on kit round 3
 
@@ -604,7 +604,7 @@ the kit-text departures are collected in the Phase 6 `[human]` row.
 
 #### Manual
 
-- [ ] 2.7 [reviewer] One summary grid for both branches; importButton plural; no-range overlap fallback is one sentence
+- [x] 2.7 [reviewer] One summary grid for both branches; importButton plural; no-range overlap fallback is one sentence — impl-review e305f81
 
 ### Phase 3: Import history and delete dialog
 
@@ -619,7 +619,7 @@ the kit-text departures are collected in the Phase 6 `[human]` row.
 
 #### Manual
 
-- [ ] 3.7 [reviewer] Dialog keeps usePageShowReset and onOpenAutoFocus; disabled only for demo; server guard untouched
+- [x] 3.7 [reviewer] Dialog keeps usePageShowReset and onOpenAutoFocus; disabled only for demo; server guard untouched — impl-review e305f81
 
 ### Phase 4: Import result in the round-3 layout
 
@@ -633,7 +633,7 @@ the kit-text departures are collected in the Phase 6 `[human]` row.
 
 #### Manual
 
-- [ ] 4.6 [reviewer] G38 row matches the comment; FR-003 count and range still on the result
+- [x] 4.6 [reviewer] G38 row matches the comment; FR-003 count and range still on the result — impl-review e305f81
 
 ### Phase 5: Demo notes in the wizard
 
@@ -646,7 +646,7 @@ the kit-text departures are collected in the Phase 6 `[human]` row.
 
 #### Manual
 
-- [ ] 5.5 [reviewer] Fresh demo account sees an enabled wizard; drag and drop blocked when locked
+- [x] 5.5 [reviewer] Fresh demo account sees an enabled wizard; drag and drop blocked when locked — impl-review e305f81
 
 ### Phase 6: Gap register, seam sweep and visual gate
 
@@ -661,5 +661,5 @@ the kit-text departures are collected in the Phase 6 `[human]` row.
 #### Manual
 
 - [ ] 6.6 [visual] Screenshots desktop + ~400 px of every listed state, compared with the kit views
-- [ ] 6.7 [reviewer] Seam sweep complete; register matches the plan; follow-ups carry Trigger lines
+- [x] 6.7 [reviewer] Seam sweep complete; register matches the plan; follow-ups carry Trigger lines — impl-review e305f81
 - [ ] 6.8 [human] Accept S-13 kit-text deviations and send G38 + K33 to the kit author

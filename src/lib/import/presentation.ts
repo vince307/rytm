@@ -6,14 +6,14 @@ import type { FileError } from "@/lib/import/detect";
 import { formatAccountTail } from "@/lib/format";
 
 /**
- * Fills `{placeholder}`s. A function replacement (as `accountLabel()` did, S-10 F4) so a value containing `$&` /
+ * Fills `{placeholder}`s. A function replacement (S-10 F4) so a value containing `$&` /
  * `$1` renders verbatim; an unknown placeholder stays literal.
  */
 export function fillTemplate(template: string, values: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (match, key: string) => (key in values ? String(values[key]) : match));
 }
 
-/** The bank's own name (kit `imports.bankName`); an unknown source falls back to `ing`, like the retired `accountLabel()`. */
+/** The bank's own name (kit `imports.bankName`); an unknown source falls back to `ing`, so a row never crashes. */
 export function bankDisplayName(names: Record<BankSource, string>, source: string): string {
   return names[isBankSource(source) ? source : "ing"];
 }

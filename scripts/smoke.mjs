@@ -401,9 +401,14 @@ const steps = [
     { status: 200, contains: "Wzorce pojawią się po pierwszym imporcie.", notContains: "Kawiarnia smoke" },
   ],
   [
-    "deleted import result goes back to the list",
+    "deleted import result shows not-found",
     () => request(importResultPath),
-    { status: 302, location: "/imports" },
+    { status: 200, contains: ">Nie znaleziono importu.<" },
+  ],
+  [
+    "import result of a malformed id shows not-found",
+    () => request("/imports/result?id=nope"),
+    { status: 200, contains: ">Nie znaleziono importu.<" },
   ],
   [
     "same range is imported again after delete",
@@ -954,7 +959,12 @@ const steps = [
   [
     "santander import result names the bank",
     () => request(santanderResultPath),
-    { status: 200, contains: "Santander · Rachunek" },
+    { status: 200, contains: ">Santander Bank Polska<" },
+  ],
+  [
+    "santander import result shows the account",
+    () => request(santanderResultPath),
+    { status: 200, contains: ">Rachunek · •• 0099<" },
   ],
   [
     "patterns lists the santander merchant",

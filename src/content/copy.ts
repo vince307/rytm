@@ -107,20 +107,18 @@ export const copyExtra = {
     saveError: "Nie udało się zapisać importu. Spróbuj ponownie.",
     // DESIGN-GAP: K11 — imports table headers the kit prototype draws but content.json lacks.
     table: { importedOn: "Data importu", debits: "Obciążenia" },
-    // DESIGN-GAP: K26 — the kit has only the single ING account label; the app adds a per-bank template
-    // (S-10 Phase 5), filled through `accountLabel()` so an unknown source never crashes the row.
-    accountLabel: { ing: "ING · {name}", santander: "Santander · {name}" },
     // Santander's export has no account name column (the owner's name, header col 3, is never stored, R2);
     // "Rachunek" is the kit's own word (`imports.santanderAccountName`), sent by the wizard as the stored name.
     santanderAccountName: "Rachunek",
-    // Result screen (prototype importResult(), app.js:63).
-    resultEyebrow: "Import gotowy",
+    // Result screen (prototype importResult()); the eyebrow is the kit's `importFlow.result`.
     toPatterns: "Zobacz wzorce",
     toOverview: "Przejdź do przeglądu",
     transactionForms: ["transakcja", "transakcje", "transakcji"],
-    // DESIGN-GAP: G26 — result screen before patterns exist (S-03): the kit h1 `importFlow.result`
-    // („Wzorce są już widoczne.”) and the pattern stats do not apply yet; placeholder h1 from the
-    // prototype lead („Dodaliśmy 64 obciążenia…”).
+    // DESIGN-GAP: K11 — the kit result panel's „Transakcje” label has no content.json key (`importFlow.transactions`
+    // is the genitive plural „transakcji”).
+    transactionsLabel: "Transakcje",
+    // DESIGN-GAP: K11 — the kit result h1 („Dodaliśmy 64 obciążenia.”) is built in the prototype script, not in
+    // content.json.
     resultTitle: "Dodaliśmy {n} {debits}.",
     debitForms: ["obciążenie", "obciążenia", "obciążeń"],
     next: "Dalej",

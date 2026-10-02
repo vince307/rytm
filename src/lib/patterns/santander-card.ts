@@ -1,6 +1,7 @@
-// Santander card step (import-formats.md Santander rules 1–5; S-11 Phase 2 + Phase 3). Pure, import-free module
-// that turns a Santander card/ATM/BLIK-withdrawal row's (counterparty, title) into the raw merchant consumed by
-// the patterns layer (src/lib/patterns/merchant.ts, which calls this before its own rule 7 / D3 operator check).
+// Santander card step (S-11 plan, Critical Implementation Details rules 1–5; import-formats.md § Normalizacja
+// sprzedawcy). Pure, import-free module that turns a Santander card/ATM/BLIK-withdrawal row's (counterparty,
+// title) into the raw merchant consumed by the patterns layer (src/lib/patterns/merchant.ts, which calls this
+// before its own rule 7 / D3 operator check).
 // An ING row's title never matches CARD_GATE or BLIK_GATE, so it always returns null for ING rows — they fall
 // straight through to rule 7.
 //
@@ -47,8 +48,9 @@ const CITY_PREFIX = new Set([
 ]);
 
 // Rule 4 (Phase 3): a store/till code token — e.g. `A12`, `K.3`, a bare `#` — is descriptor noise that splits one
-// merchant on real data (plan review F2); a glued `<WORD><digits>` token (e.g. a till number stuck to the word
-// before it, no space) is noise too, but only its digit tail is noise — the word stays.
+// merchant on real data (research R10; the first-token exemption is plan review F2); a glued `<WORD><digits>`
+// token (e.g. a till number stuck to the word before it, no space) is noise too, but only its digit tail is
+// noise — the word stays.
 const CODE_TOKEN = /^[A-Z]{0,2}\d[\dA-Z]*\.?$/i;
 const K_DOT_TOKEN = /^K\.\d+\.?$/i;
 // Guards a code-shaped token that follows an explicit "NR"/"NO" label (store/till number), e.g. `SKLEP NR 12` —

@@ -9,11 +9,6 @@ export const copy = content;
  */
 export const copyExtra = {
   auth: {
-    loginVisual: {
-      eyebrow: "Twój rytm",
-      title: "Wróć do swojego rytmu.",
-      lead: "Twoje wzorce wydatków czekają na kolejny miesiąc.",
-    },
     registerVisual: {
       eyebrow: "Twój rytm",
       title: "Zacznij widzieć więcej.",
@@ -24,20 +19,7 @@ export const copyExtra = {
       title: "Hasło można ustawić na nowo.",
       lead: "Wyślemy Ci prostą instrukcję na adres przypisany do konta.",
     },
-    optional: "opcjonalne",
-    namePlaceholder: "np. Ola",
-    emailPlaceholder: "ty@przyklad.pl",
     passwordPlaceholder: "••••••••",
-    forgotPassword: "Nie pamiętam hasła",
-    terms: "Zakładając konto akceptujesz regulamin.",
-    noAccount: "Nie masz jeszcze konta?",
-    createIt: "Utwórz je",
-    haveAccount: "Masz już konto?",
-    resetEyebrow: "Nie pamiętam hasła",
-    sendInstructions: "Wyślij instrukcję",
-    backToLogin: "Wróć do logowania",
-    checkInboxEyebrow: "Sprawdź skrzynkę",
-    checkInboxTitle: "Link jest w drodze.",
     // Round 2 prototype strings that content.json still lacks (design-kit.md K11, round 3):
     confirmedLogin: "E-mail potwierdzony — zaloguj się.",
     occupiedOr: "lub",
@@ -52,8 +34,6 @@ export const copyExtra = {
     saving: "Zapisywanie…",
     resent: "Wysłaliśmy link ponownie.",
     resendError: "Nie udało się wysłać ponownie. Spróbuj za chwilę.",
-    // DESIGN-GAP: G24 — `/login?deleted=1` note the kit does not define.
-    deletedLogin: "Konto zostało usunięte.",
   },
   home: {
     emptyEyebrow: "Przegląd miesiąca",

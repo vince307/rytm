@@ -52,7 +52,7 @@ export function FormField({
           }}
           placeholder={placeholder}
           className={cn(
-            "text-ink placeholder:text-muted/70 focus:border-ink focus:ring-ink/8 w-full rounded-lg border bg-white px-3.5 py-[13px] transition-colors outline-none focus:ring-[3px] disabled:cursor-not-allowed disabled:opacity-60",
+            "text-ink placeholder:text-muted/70 focus:border-ink focus:ring-ink/8 bg-paper w-full rounded-[8px] border px-3.5 py-[13px] transition-colors outline-none focus:ring-[3px] disabled:cursor-not-allowed disabled:opacity-60",
             error ? "border-excess-text" : "border-line",
             endContent && "pr-11",
           )}

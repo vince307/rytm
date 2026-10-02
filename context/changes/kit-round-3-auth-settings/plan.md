@@ -747,11 +747,11 @@ are collected in the Phase 8 `[human]` row.
 
 #### Automated
 
-- [ ] 6.1 npm test: Phase 5 count, 0 failed
-- [ ] 6.2 Smoke Phase 5 count + 1 PASS, 0 FAIL, auth steps unchanged and green
-- [ ] 6.3 No bg-white / rounded-lg left in FormField.tsx
-- [ ] 6.4 Deliberate break: deleted=1 back to deleteSuccess turns the new step red, old step green, restored, meta-check recorded
-- [ ] 6.5 Full local gate vs baseline, smoke + 15
+- [x] 6.1 npm test: Phase 5 count, 0 failed
+- [x] 6.2 Smoke Phase 5 count + 1 PASS, 0 FAIL, auth steps unchanged and green
+- [x] 6.3 No bg-white / rounded-lg left in FormField.tsx
+- [x] 6.4 Deliberate break: deleted=1 back to deleteSuccess turns the new step red, old step green, restored, meta-check recorded
+- [x] 6.5 Full local gate vs baseline, smoke + 15
 
 #### Manual
 

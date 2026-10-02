@@ -2,41 +2,41 @@
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import ResetForm from "@/components/auth/ResetForm";
 import { buttonVariants } from "@/components/ui/button";
-import { copy, copyExtra } from "@/content/copy";
+import { copy } from "@/content/copy";
 
 const sent = Astro.url.searchParams.has("sent");
 const s = copy.authStates;
-const x = copyExtra.auth;
+const a = copy.auth;
 ---
 
-<AuthLayout title={s.resetTitle} visual={x.resetVisual}>
+<AuthLayout title={s.resetTitle} visual={a.resetVisual}>
   {sent ? (
     <>
-      <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{x.checkInboxEyebrow}</div>
-      <h1 class="mt-4 mb-2 text-[34px] tracking-[-0.06em]">{x.checkInboxTitle}</h1>
+      <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{copy.confirmEmail.eyebrow}</div>
+      <h1 class="mt-4 mb-2 text-[34px] tracking-[-0.06em]">{copy.confirmEmail.title}</h1>
       <p class="mb-7 text-sm text-muted">{s.checkInbox}</p>
       <a href="/login" class:list={buttonVariants({ variant: "primary", size: "full" })}>
-        {x.backToLogin}
+        {a.backToLogin}
       </a>
     </>
   ) : (
     <>
-      <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{x.resetEyebrow}</div>
+      <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{a.resetEyebrow}</div>
       <h1 class="mt-4 mb-2 text-[34px] tracking-[-0.06em]">{s.resetTitle}</h1>
       <p class="mb-7 text-sm text-muted">{s.resetBody}</p>
       <ResetForm
         client:load
         labels={{
           email: copy.auth.fields.email,
-          emailPlaceholder: x.emailPlaceholder,
-          submit: x.sendInstructions,
+          emailPlaceholder: a.emailPlaceholder,
+          submit: a.sendInstructions,
           pending: s.sending,
           emailRequired: s.emailRequired,
         }}
       />
       <p class="mt-[22px] text-center text-[13px] text-muted">
         <a href="/login" class="font-bold text-excess-text">
-          {x.backToLogin}
+          {a.backToLogin}
         </a>
       </p>
     </>

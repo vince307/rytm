@@ -23,7 +23,7 @@ const x = copyExtra.auth;
         </a>{" "}
         {x.occupiedOr}{" "}
         <a href="/reset" class="font-bold underline">
-          {x.forgotPassword}
+          {a.forgotPassword}
         </a>
         .
       </InlineAlert>
@@ -37,15 +37,15 @@ const x = copyExtra.auth;
     serverError={error && !occupied ? s.registerError : null}
     labels={{
       name: a.fields.name,
-      optional: x.optional,
-      namePlaceholder: x.namePlaceholder,
+      optional: a.optional,
+      namePlaceholder: a.namePlaceholder,
       email: a.fields.email,
       password: a.fields.password,
-      emailPlaceholder: x.emailPlaceholder,
-      passwordPlaceholder: x.passwordPlaceholder,
+      emailPlaceholder: a.emailPlaceholder,
+      passwordPlaceholder: a.passwordPlaceholder,
       showPassword: s.showPassword,
       hidePassword: s.hidePassword,
-      terms: x.terms,
+      terms: a.terms,
       submit: a.register.title,
       pending: s.creating,
       emailRequired: s.emailRequired,
@@ -53,7 +53,7 @@ const x = copyExtra.auth;
     }}
   />
   <p class="mt-[22px] text-center text-[13px] text-muted">
-    {x.haveAccount}{" "}
+    {a.haveAccount}{" "}
     <a href="/login" class="font-bold text-excess-text">
       {copy.navigation.login}
     </a>

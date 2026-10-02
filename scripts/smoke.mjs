@@ -953,6 +953,11 @@ const steps = [
     () => request("/login?deleted=1"),
     { status: 200, contains: "Konto zostało usunięte." },
   ],
+  [
+    "login shows the full deleted notice",
+    () => request("/login?deleted=1"),
+    { status: 200, contains: ">Konto zostało usunięte. Możesz zalogować się ponownie lub utworzyć nowe konto.<" },
+  ],
   ["home redirects after deletion", () => request("/home"), { status: 302, location: "/login" }],
   [
     "signin after deletion is rejected",

@@ -595,12 +595,12 @@ the kit-text departures are collected in the Phase 6 `[human]` row.
 
 #### Automated
 
-- [ ] 2.1 npm test: Phase 1 count, 0 failed
-- [x] 2.2 Smoke Phase 1 count + 1 PASS, 0 FAIL
-- [x] 2.3 No accountLabel( / summary.skipped / overlapPrefix / G25 / K16 in src/components/imports
-- [ ] 2.4 Deliberate break: overlap range without the link turns the overlap smoke step red, restored
-- [ ] 2.5 Deliberate break: bank-prefixed accountDisplay turns import-presentation red, restored, meta-check recorded
-- [ ] 2.6 Full local gate vs baseline, smoke + 3
+- [x] 2.1 npm test: Phase 1 count, 0 failed — 2cc8922
+- [x] 2.2 Smoke Phase 1 count + 1 PASS, 0 FAIL — 2cc8922
+- [x] 2.3 No accountLabel( / summary.skipped / overlapPrefix / G25 / K16 in src/components/imports — 2cc8922
+- [x] 2.4 Deliberate break: overlap range without the link turns the overlap smoke step red, restored — 2cc8922
+- [x] 2.5 Deliberate break: bank-prefixed accountDisplay turns import-presentation red, restored, meta-check recorded — 2cc8922
+- [x] 2.6 Full local gate vs baseline, smoke + 3 — 2cc8922
 
 #### Manual
 

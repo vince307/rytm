@@ -154,10 +154,12 @@ Koniec zakresu **nie występuje** w nagłówku → D7: koniec = data eksportu (k
 DOP. VISA <6 cyfr>******<4 cyfry> PŁATNOŚĆ KARTĄ <kwota> <WALUTA> <sprzedawca i miasto>
 DOP. VISA …                        ZWROT PŁATNOŚCI KARTĄ <kwota> <WALUTA> <sprzedawca>     → kwota dodatnia, pomijany (D2)
 DOP. VISA …                        WYPŁATA Z BANKOMATU KARTĄ <kwota> <WALUTA> <adres>      → rawMerchant = tekst adresu (ten sam regex);
-                                                                                               wzorzec „bankomat” to dopiero wynik normalizacji (S-11), nie reguły 5
+                                                                                               wzorzec „bankomat” to wynik normalizacji (S-11), nie reguły 5
 Zakup BLIK <operator/sprzedawca>:<11 cyfr>                                                  → kontrahent w kol. 3; `:<11 cyfr>` jest stałą końcówką opisu
 Wypłata BLIK <tekst>:<11 cyfr>                                                              → wypłata gotówki przez BLIK, kontrahent w kol. 3, ta sama `:<11 cyfr>` końcówka;
-                                                                                               własny wzorzec, **nie** scalany z „bankomat”
+                                                                                               własny wzorzec, **nie** scalany z „bankomat”; prawdziwe eksporty kończą się
+                                                                                               ` ref:<11 cyfr>`, fixture bare `:<11 cyfr>` — kształt końcówki (`:<11 cyfr>`)
+                                                                                               jest ten sam, nigdy prawdziwa wartość
 Przelew środków / Przelew na telefon / dowolny tytuł (np. faktura/opłata z `/`-separowanymi    → sprzedawca = kol. 3 (kontrahent); tytuł z przecinkiem
   identyfikatorami, w cudzysłowie gdy zawiera przecinek)                                        wychodzi w kol. 2 w cudzysłowie
 Oplata za <coś> (ten sam kontrahent/rachunek/tytuł co miesiąc, stała kwota)                 → sprzedawca = kol. 3; wzorzec stały (fixed) po D5 —
@@ -172,9 +174,22 @@ Końcówka opisu kartowego (sprzedawca/adres) jest **ASCII, bez polskich znaków
 2. Waluta (kol. 4 nagłówka) ≠ `PLN` → odrzuć plik z komunikatem (fixture: plik konta USD).
 3. Kontrola: liczba wierszy danych == kol. 7 nagłówka.
 4. Pomiń kwoty ≥ 0 (D2).
-5. Sprzedawca surowy: regex powyżej dla `DOP. VISA …` (dla WYPŁATA Z BANKOMATU KARTĄ to tekst adresu — wzorzec „bankomat” pojawia się dopiero po normalizacji S-11, nie w tej regule); inaczej kol. 3, a gdy pusta — kol. 2.
+5. Sprzedawca surowy: regex powyżej dla `DOP. VISA …` (dla WYPŁATA Z BANKOMATU KARTĄ to tekst adresu — wzorzec „bankomat” pojawia się po normalizacji S-11, nie w tej regule); inaczej kol. 3, a gdy pusta — kol. 2.
 6. Zakres importu: start = kol. 1 nagłówka, koniec = kol. 0 nagłówka (D7).
 7. Brak ID: `Lp` **nie jest** przechowywane (S-10 decyzja 4 — restartuje się per eksport, a `bank_tx_id` jest `null` dla Santandra). FR-005 (odrzucenie nachodzących zakresów importu per rachunek) jest wystarczającą ochroną bez klucza per wiersz.
+
+### Normalizacja sprzedawcy (S-11)
+
+Reguły 1–5 powyżej dają surowy tekst; normalizacja sprzedawcy kartowego żyje w warstwie wzorców
+(`src/lib/patterns/santander-card.ts`), nie w czytniku, i działa tylko na wierszach, których `title` pasuje do
+bramki opisu kartowego `DOP. VISA …` (ta sama maska/akcja co w regexie powyżej). Wiersz bankomatowy (`WYPŁATA Z
+BANKOMATU KARTĄ`) zawsze daje jeden wzorzec `Bankomat`, niezależnie od adresu; `Wypłata BLIK` (własna bramka na
+końcówce `:<11 cyfr>`) zawsze daje jeden wzorzec `Wypłata BLIK`, niezależnie od kontrahenta. Dla płatności kartą
+kolejność reguł jest ustalona i ma znaczenie: cudzysłowy zamieniane na spacje, potem miasto (pozycyjnie, od końca
+końcówki, zawsze min. 1 token), potem kody sklepu/kasy (z wyjątkiem pierwszego tokenu i tokenu po `NR`/`NO`).
+Scalanie sprzedawcy między bankami (ING ↔ Santander) działa tylko dla nazw ASCII — końcówka kartowa Santandra jest
+ASCII (patrz wyżej), ING zachowuje polskie znaki diakrytyczne, więc wspólny klucz powstaje tylko wtedy, gdy nazwa
+sprzedawcy po obu stronach jest bez diakrytyków. Pełne reguły i regexy: `santander-card.ts` (nie powtarzane tu).
 
 ### Kształty do seeda (dodatkowe)
 

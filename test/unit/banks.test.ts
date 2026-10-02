@@ -31,4 +31,8 @@ describe("accountLabel", () => {
   it("falls back to the ing template for an unknown source", () => {
     expect(accountLabel(templates, "mbank", "Rachunek")).toBe("ING · Rachunek");
   });
+
+  it("inserts a name containing $& / $1 verbatim (S-10 F4)", () => {
+    expect(accountLabel(templates, "ing", "Konto $& $1 Testowe")).toBe("ING · Konto $& $1 Testowe");
+  });
 });

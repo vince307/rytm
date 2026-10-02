@@ -79,7 +79,9 @@ function parseLine(line: string): Field[] {
 
 const collapse = (s: string) => s.trim().replace(/\s+/g, " ");
 
-// Rule 5 (import-formats.md): card regex tail; else counterparty (col 3); else the description (col 2).
+// Rule 5 (import-formats.md): card regex tail; else counterparty (col 3); else the description (col 2). This
+// reader never normalises the card/ATM tail further — that happens read-time, in the patterns layer
+// (`src/lib/patterns/santander-card.ts`, S-11), not here.
 function rawMerchantOf(description: string, counterparty: string): string {
   const m = CARD.exec(description);
   if (m) return collapse(m[5]);

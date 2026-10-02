@@ -1,6 +1,10 @@
 // Merchant extraction (import-formats.md rule 7 / D3) and normalization (PRD FR-006).
 // Pure and deterministic: the same bank description always yields the same key and display name.
 // Rule order in `normalizeMerchant` is load-bearing — changing it re-keys merchants (S-04/S-05 store rows by key).
+// S-11: the Santander step (`santanderCardMerchant`) runs first in `rawMerchant` — a Santander card payment, ATM
+// or `Wypłata BLIK` row's raw merchant comes from there; everything else (including every ING row, which never
+// matches its gates) falls through to the rule 7 / D3 operator logic below, unchanged.
+import { santanderCardMerchant } from "@/lib/patterns/santander-card";
 
 /**
  * Payment operators (import-formats.md rule 7 / D3), matched case-insensitively against `Dane kontrahenta`.
@@ -13,9 +17,12 @@ const collapse = (s: string) => s.trim().replace(/\s+/g, " ");
 /**
  * Rule 7 / D3: a payment through an operator names the merchant by the last token of the `Tytuł` tail after
  * `Nr transakcji <digits>` (the merchant's domain); otherwise — or with an empty tail — the counterparty itself.
- * Same behaviour as `rawMerchant` in scripts/fixture-ing.mjs.
+ * Same behaviour as `rawMerchant` in scripts/fixture-ing.mjs. The Santander step (S-11) is checked first; it
+ * returns non-null only for a Santander card/ATM or `Wypłata BLIK` title, so an ING row is never affected.
  */
 export function rawMerchant(counterparty: string, title: string): string {
+  const card = santanderCardMerchant(counterparty, title);
+  if (card !== null) return card;
   const lower = counterparty.toLowerCase();
   const isOperator = OPERATORS.some((op) => lower.includes(op.toLowerCase()));
   if (isOperator) {

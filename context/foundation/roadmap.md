@@ -9,7 +9,7 @@ main_goal: quality
 top_blocker: none
 milestone_id: second-bank-santander
 milestone_seq: 2
-milestone_status: open
+milestone_status: done
 ---
 
 # Roadmap: Rytm
@@ -20,7 +20,7 @@ milestone_status: open
 
 ## Milestone
 
-**M-2: Drugi bank — Santander** — Status: open
+**M-2: Drugi bank — Santander** — Status: done
 
 - **Intent:** Użytkownik z kontem w Santander Bank Polska wgrywa jego eksport CSV na tych samych zasadach co ING, a jego transakcje — także kartowe — trafiają do tych samych, poprawnie zgrupowanych wzorców co transakcje z ING.
 - **Source materials:** `context/foundation/prd.md` (v1) — kolejna transza: jedyne wymaganie poza M-1, FR-018; kontrakt formatu w `context/foundation/import-formats.md` (sekcja Santander, D2, D4, D7, „Wykrywanie formatu”).
@@ -43,7 +43,7 @@ Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stał
 | ---- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------ | -------- |
 | F-03 | synthetic-santander-fixture | (foundation) w repozytorium jest syntetyczny eksport Santander PLN z pułapkami formatu i opisów oraz plik USD do odrzucenia | —             | FR-018, FR-014, NFR prywatność | done     |
 | S-10 | santander-csv-import        | wgrać plik CSV z Santandera i zobaczyć wynik importu na tych samych zasadach co ING                                         | F-03          | FR-018, FR-004, FR-005         | done |
-| S-11 | santander-card-merchants    | zobaczyć transakcje kartowe z Santandera we właściwych wzorcach sprzedawców, wspólnych z ING                                | S-10, F-03    | FR-018, FR-006, FR-007         | proposed |
+| S-11 | santander-card-merchants    | zobaczyć transakcje kartowe z Santandera we właściwych wzorcach sprzedawców, wspólnych z ING                                | S-10, F-03    | FR-018, FR-006, FR-007         | done |
 
 ## Baseline
 
@@ -100,7 +100,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Gwiazda przewodnia M-2 — normalizacja to rdzeń produktu (FR-006), a opisy kartowe Santandera mają inny kształt niż ING; ryzyko — zmiana normalizacji przesuwa istniejące wzorce ING, więc oczekiwany wynik fixture ING musi pozostać bez zmian.
-- **Status:** proposed
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -108,7 +108,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | ---------- | --------------------------- | -------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | F-03       | synthetic-santander-fixture | Syntetyczny eksport Santander PLN z pułapkami + plik USD | done                  | Zarchiwizowane → `context/archive/2026-10-01-synthetic-santander-fixture/`                                                                                                                                                                                                                  |
 | S-10       | santander-csv-import        | Import CSV z Santander Bank Polska                       | done                  | Zarchiwizowane → `context/archive/2026-10-02-santander-csv-import/`; migracja `20261002120000_import_statement_source.sql` (expand-only) stosowana przez job `deploy` |
-| S-11       | santander-card-merchants    | Transakcje kartowe Santandera we właściwych wzorcach     | yes                   | S-10 done. Santander zapisuje surowego sprzedawcę reguły 5 w `counterparty` (ogon opisu karty, `title` zachowuje maskę karty); normalizacja zmienia klucze wzorców Santandera — zapisane progi/decyzje po `merchant_key` (wiersz [human] 6.11 S-10). Trigger: S-11 — F4 S-10: `src/lib/import/banks.ts` `accountLabel` → `replace("{name}", () => name)` przy dotknięciu pliku |
+| S-11       | santander-card-merchants    | Transakcje kartowe Santandera we właściwych wzorcach     | done                  | Zarchiwizowane → `context/archive/2026-10-02-santander-card-merchants/`; bez migracji. Otwarte [human] 4.8–4.11 (wyrocznia F-03, przekluczowanie kart Santandera, import prawdziwego eksportu, min 1 token) — checklista właściciela w PR. Follow-upy FU1–FU5 w `follow-ups/review-fixes.md` z liniami `Trigger:` (m.in. Trigger: następna zmiana `scripts/fixture-santander.mjs`; Trigger: właściciel odrzuca [human] 4.9 / S-10 6.11) |
 
 ## Open Roadmap Questions
 
@@ -137,6 +137,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 (Append-only. Empty on the very first milestone.)
 
 - **M-1: Pierwszy miesiąc ponad progiem** (`first-over-limit-month`) — closed 2026-10-01. Cały przepływ MVP działa od końca do końca (logowanie → import CSV z ING → wzorce → progi → „ponad próg” i trend miesięcy → zmiany kosztów stałych, konto i usunięcie), lokalnie na prawdziwym wyciągu i publicznie na koncie demo z syntetycznym wyciągiem; 2 fundamenty + 9 wycinków.
+- **M-2: Drugi bank — Santander** (`second-bank-santander`) — closed 2026-10-02. Eksport CSV z Santander Bank Polska (PLN) importuje się na zasadach ING, a transakcje kartowe, wypłaty z bankomatu i ten sam sprzedawca z obu banków trafiają do wspólnych wzorców; 1 fundament + 2 wycinki.
 
 ## Done
 
@@ -155,3 +156,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **S-09: Użytkownik (recenzent) może wejść na publiczną instancję, zalogować się na konto demo i zobaczyć zaimportowany syntetyczny wyciąg z wzorcami; żaden prawdziwy wyciąg nie trafia do repozytorium ani na publiczny URL.** — Archived 2026-10-01 → `context/archive/2026-09-30-public-demo-seed/`. Lesson: —.
 - **F-03: (foundation) w repozytorium jest syntetyczny eksport Santander PLN z pułapkami formatu i opisów oraz plik USD do odrzucenia** — Archived 2026-10-02 → `context/archive/2026-10-01-synthetic-santander-fixture/`. Lesson: —.
 - **S-10: Użytkownik może wgrać plik CSV z Santander Bank Polska (PLN): aplikacja sama rozpoznaje format, pokazuje wynik importu (liczba obciążeń, zakres od daty z nagłówka do daty eksportu) i dodaje import do listy importów z nazwą banku; plik w innej walucie i zakres nakładający się na istniejący import tego rachunku są odrzucane z komunikatem, uznania i zwroty są pomijane, a transakcje trafiają do wzorców.** — Archived 2026-10-02 → `context/archive/2026-10-02-santander-csv-import/`. Lesson: —.
+- **S-11: Użytkownik może zobaczyć transakcje kartowe z Santandera we właściwych wzorcach: opis płatności kartą daje sprzedawcę bez numeru karty i numeru placówki, płatności obiema kartami jednego rachunku trafiają do tego samego wzorca, wypłaty z bankomatu tworzą jeden wzorzec, a ten sam sprzedawca z ING i z Santandera jest jednym wzorcem.** — Archived 2026-10-02 → `context/archive/2026-10-02-santander-card-merchants/`. Lesson: —.

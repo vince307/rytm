@@ -1,5 +1,7 @@
-// The banks this app can import a statement from (S-10). One source of truth for the payload schema,
-// the endpoint and (Phase 4+) format detection — never hard-code the two literals elsewhere.
+// The banks this app can import a statement from (S-10). One source of truth for the payload schema (and so
+// the endpoint's `p_source`) and the per-bank labels. Each reader still stamps its own literal (`source:
+// "ing"` / `"santander"` in its payload builder, `bank` in detect.ts's DetectResult) — a new bank touches those
+// too, and the database check `imports_source_check`.
 export const BANK_SOURCES = ["ing", "santander"] as const;
 
 export type BankSource = (typeof BANK_SOURCES)[number];

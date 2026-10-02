@@ -124,6 +124,18 @@ describe("parseSantanderStatement — main fixture", () => {
     expect(statement.rows).toHaveLength(1);
     expect(statement.rows[0].counterparty).toBe("TEST MERCHANT");
   });
+
+  // Real-only quoting signature `BBQ__QQB_` (Phase 1 shape comparison, impl-review F1): a card description is
+  // quoted when its merchant tail holds a comma, and col 3 is empty. The fixture has no such row, so this
+  // synthetic one (invented values) pins that the quoted description still yields the CARD tail, comma kept.
+  it("rule 5: a quoted card description whose tail holds a comma yields the tail, comma included", () => {
+    const header = '2026-01-31,01-01-2026,\'11 1090 0000 0000 0000 0000 0001,JAN TESTOWY,PLN,"1000,00","990,00",1,';
+    const row =
+      '30-01-2026,29-01-2026,"DOP. VISA 411111******1111 PŁATNOŚĆ KARTĄ 10.00 PLN SKLEP TESTOWY, MIASTO",,,"-10,00","990,00",1,';
+    const statement = parseOk(new TextEncoder().encode(`${header}\n${row}\n`));
+    expect(statement.rows).toHaveLength(1);
+    expect(statement.rows[0].counterparty).toBe("SKLEP TESTOWY, MIASTO");
+  });
 });
 
 describe("parseSantanderStatement — USD fixture and broken input", () => {

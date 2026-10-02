@@ -1,8 +1,8 @@
 // ING Bank Śląski statement reader (context/foundation/import-formats.md, ING rules 1–8, D1, D2, D7).
 // Pure module, no Node imports: runs in the browser (import wizard) and in Vitest. The dialect follows the
 // reference reader in scripts/fixture-ing-check.mjs (cp1250, lenient quotes for T19, searched header).
-// Deliberate independent copy of santander.ts's line reader (S-10 Phase 6): the two dialects differ (`;` vs
-// `,`, quote-escaping rules), so only the bank-agnostic pieces (common.ts) are shared.
+// Its line reader is deliberately separate from santander.ts's (S-10): the two dialects differ (`;` vs `,`,
+// quote-escaping rules), so only the bank-agnostic pieces (common.ts) are shared.
 import { isDate, toMinor, type ParseError, type StatementAccount } from "@/lib/import/common";
 import type { ImportPayload } from "@/lib/import/schema";
 

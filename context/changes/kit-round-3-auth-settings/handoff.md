@@ -1,49 +1,45 @@
 # Handoff — `kit-round-3-auth-settings` (slice S-12)
 
-Written by the `/10x-implement … phase 3` step of run `2026-10-02-kit-round-3`. Phases 1–3 are committed and green. The next agent must not miss that `copyExtra.settings` still holds `currentPassword`, `deleteError`, `deleting`, `close` and the dialog copy for `DeleteAccountDialog` (rebound in P5), and `demoLocked` for `reset/new.astro` (P7); no existing smoke assertion may be edited.
+Written by the `/10x-implement … phase 4` step of run `2026-10-02-kit-round-3`. Phases 1–4 are committed and green. The next agent must not miss that the password form is now collapsed in `SettingsPasswordRow`, and that `copyExtra.settings` still holds `currentPassword`, `deleteError`, `deleting`, `close` and the dialog copy for `DeleteAccountDialog` (rebound in P5), and `demoLocked` for `reset/new.astro` (P7); no existing smoke assertion may be edited.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-auth-settings`, cut from `main` at `60e92e1` (after S-13) |
-| Commits | 10 on the branch: identity, research, plan, plan review, p1 (464bfef), p1 handoff, p2 (b10c8d9), p2 handoff, p3 `feat(…): Settings copy, result alerts and the sign-out row (p3)` (42430cc), this handoff |
+| Commits | 12 on the branch: identity, research, plan, plan review, p1 (464bfef), p1 handoff, p2 (b10c8d9), p2 handoff, p3 (42430cc), p3 handoff, p4 `feat(…): Collapsed password form (p4)` (4688697), this handoff |
 | Pushed / PR / merged | no / none / no |
 | `change.md` status | `implementing` |
-| `## Progress` rows remaining | 37 (`grep -c '^- \[ \]' plan.md`) |
+| `## Progress` rows remaining | 33 (`grep -c '^- \[ \]' plan.md`) |
 | Working tree | clean after the handoff commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `src/pages/settings.astro` | reads `settings.*`, `auth.fields`, `authStates`; one `notice` per request via `InlineAlert` (success / error / info); new „Sesja” row with POST sign-out form; no DESIGN-GAP header |
-| `src/components/app/AppHeader.astro` | sign-out form removed (brand + month only) |
-| `src/components/app/Panel.astro` | danger variant `border-line` |
-| `src/components/app/SettingsRow.astro` | optional `class` prop |
-| `src/content/copy.ts` | `copyExtra.app` deleted; `copyExtra.settings` trimmed, `session` „Sesja” added |
-| `test/unit/kit-contract.test.ts` | +1 case: `settings.*` keys read on `/settings`, `deleteConfirm` contains `DELETE_CONFIRM_WORD` |
-| `scripts/smoke.mjs` | +4 steps: `settings offers sign-out`, `home header has no exit button`, `settings shows the save error`, `settings shows the demo password refusal` |
-| `plan.md`, `handoff.md` | Progress rows 3.1–3.6 ticked with SHA |
+| `src/components/settings/SettingsPasswordRow.tsx` | new island: masked „••••••••” + ghost „Zmień hasło” (`aria-expanded`/`aria-controls`), form below, closed by default |
+| `src/components/auth/NewPasswordForm.tsx` | optional `cancel` prop (ghost „Anuluj” next to submit); `/reset/new` unchanged |
+| `src/pages/settings.astro` | password row replaced by the island |
+| `src/content/copy.ts` | `copyExtra.settings.savePassword`, `cancel` |
+| `scripts/smoke.mjs` | +1 step `settings password form starts closed` |
+| `plan.md`, `handoff.md` | Progress rows 4.1–4.4 ticked with SHA |
 
 ## 3. Verification
 
 | Command | Result |
 | --- | --- |
 | `npm run lint` | 0 errors (baseline 0) |
-| `npx astro check` | 0 errors, 3 hints (156 files) |
+| `npx astro check` | 0 errors, 3 hints (157 files) |
 | `npm run fixture:check` | ing OK, santander OK |
-| `npm test` | 353 passed / 23 files (baseline 352, +1) |
+| `npm test` | 353 passed / 23 files (baseline 352, +1 from P3, P4 Δ0) |
 | `npm run build` | OK |
-| `npx supabase db reset` + `test db` | Files=6, Tests=119 PASS (baseline 119, Δ0) |
-| `npm run smoke` (port 4398) | 176 PASS / 0 FAIL (post-p2 172, +4; run baseline 166) |
-| grep `DESIGN-GAP` in settings.astro; grep `copyExtra.app` in src | both empty |
-| Deliberate break 1 | `error=password` mapped to `copyExtra.auth.resetNewError`: only `settings shows the save error` red; restored via `git checkout`, green |
-| Deliberate break 2 | „Sesja” row removed: only `settings offers sign-out` red; restored, green. Meta-check: proves the button renders, not that it signs out; the three `signout …` steps (302 `/`) prove the POST |
+| `npx supabase db reset` + `test db` | Files=6, Tests=119 PASS (Δ0) |
+| `npm run smoke` (port 4398) | 177 PASS / 0 FAIL (post-p3 176, +1; run baseline 166) |
+| Deliberate break | initial open state `true`: only `settings password form starts closed` red; restored via `git checkout`, green. Meta-check: proves the default state only; open/cancel/aria-expanded are client-side (visual row 8.6, reviewer 4.5) |
 
 ## 4. Next command
 
-`/10x-implement kit-round-3-auth-settings phase 4`
+`/10x-implement kit-round-3-auth-settings phase 5`
 
 ## 5. Open
 
@@ -51,6 +47,7 @@ Written by the `/10x-implement … phase 3` step of run `2026-10-02-kit-round-3`
   - [ ] [reviewer] rows 1.6, 2.6, 3.7, 4.5, 5.7, 6.6, 7.8, 8.7 (3.7: one alert per param; demo refusals `info`, errors `error`; logout is a plain POST — `src/pages/settings.astro` `notice`)
   - [ ] [visual] 8.6 (all states, desktop + ~400 px, incl. pattern-actions dialog `max-h`)
   - [ ] [human] 8.8: accept header sign-out removal, collapsed password form, dialog closing on error, short demo strip text, redirect `/` vs PRD, longer deleted notice; send K34 to the kit author
+- The island duplicates `SettingsRow.astro` grid classes (Astro component cannot render in React); keep them in sync if the row changes.
 - Until P5 the delete error shows twice (page alert + dialog `serverError`) — intermediate, as planned.
 - Danger-panel row: the „Sesja” row has `border-t border-line`; the preceding row's bottom border also draws (kit does the same with `!important` bottom 0 only on the logout row itself) — check in the visual gate.
 - Roadmap item S-12 not flipped to `in-progress` (orchestrator owns roadmap).
@@ -68,3 +65,6 @@ Written by the `/10x-implement … phase 3` step of run `2026-10-02-kit-round-3`
 6. **`SettingsRow` got an optional `class` prop for the logout row's top border instead of a new component.** Rejected: a global `.logout-row` rule. Why: Tailwind-only, one prop. Would change: the visual gate showing a doubled line.
 7. **Dialog `serverError` kept in P3, fed from `settings.passwordInvalid/deleteError/demoDeleteBlocked`.** Why: plan says the dialog keeps its error until P5. Would change: nothing.
 8. **Kit-contract test +1 `it` case (all keys in one loop), smoke +4 as in plan.** Would change: the orchestrator expecting a per-key count.
+9. **Island renders the whole password row (not just its value) because the form must span the row below it; classes mirrored from `SettingsRow`.** Rejected: island inside `SettingsRow` (form would sit in the grid cell). Would change: the visual gate showing misalignment.
+10. **Submit uses `size="default"` in cancel mode (kit `.form-actions` buttons are content-width), full width otherwise.** Would change: kit showing full-width.
+11. **Commit message approved as proposed; implemented in this context.** Would change: nothing.

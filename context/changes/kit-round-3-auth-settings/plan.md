@@ -719,10 +719,10 @@ are collected in the Phase 8 `[human]` row.
 
 #### Automated
 
-- [ ] 4.1 npm test: Phase 3 count, 0 failed
-- [ ] 4.2 Smoke Phase 3 count + 1 PASS, 0 FAIL
-- [ ] 4.3 Deliberate break: initial open state true turns the closed-form step red, restored, meta-check recorded
-- [ ] 4.4 Full local gate vs baseline, smoke + 11
+- [x] 4.1 npm test: Phase 3 count, 0 failed — 4688697
+- [x] 4.2 Smoke Phase 3 count + 1 PASS, 0 FAIL — 4688697
+- [x] 4.3 Deliberate break: initial open state true turns the closed-form step red, restored, meta-check recorded — 4688697
+- [x] 4.4 Full local gate vs baseline, smoke + 11 — 4688697
 
 #### Manual
 

@@ -7,9 +7,9 @@ updated: 2026-10-02
 prd_version: 1
 main_goal: quality
 top_blocker: none
-milestone_id: second-bank-santander
-milestone_seq: 2
-milestone_status: done
+milestone_id: kit-round-3
+milestone_seq: 3
+milestone_status: open
 ---
 
 # Roadmap: Rytm
@@ -20,95 +20,117 @@ milestone_status: done
 
 ## Milestone
 
-**M-2: Drugi bank — Santander** — Status: done
+**M-3: Runda 3 kitu — aplikacja bez placeholderów** — Status: open
 
-- **Intent:** Użytkownik z kontem w Santander Bank Polska wgrywa jego eksport CSV na tych samych zasadach co ING, a jego transakcje — także kartowe — trafiają do tych samych, poprawnie zgrupowanych wzorców co transakcje z ING.
-- **Source materials:** `context/foundation/prd.md` (v1) — kolejna transza: jedyne wymaganie poza M-1, FR-018; kontrakt formatu w `context/foundation/import-formats.md` (sekcja Santander, D2, D4, D7, „Wykrywanie formatu”).
+- **Intent:** Każdy ekran aplikacji wygląda i mówi tak, jak zaprojektował to autor kitu „Rytm — Oś” w rundzie 3: teksty pochodzą z `content.json`, stany pochodzą z prototypu, a placeholdery `DESIGN-GAP` zbudowane po stronie kodu znikają tam, gdzie kit dał już odpowiedź.
+- **Source materials:** dostawa rundy 3 (lokalnie, poza repozytorium: `context/runs/2026-10-02-kit-round-3/kit-delivery/` — `react-kit/` → `design/rytm-os/react-kit/` i `design/rytm-os/prototype/`, `rytm-os/` → `design/rytm-os/brand-pack/`; pliki w korzeniu dostawy i `rytm-os-views-html/` to duplikaty); brief rundy 3 `design/prompts/2026-10-02-gaps-round-3.md`; rejestr luk `context/foundation/design-kit.md` (pozycje K11–K26, G20, G23–G37). PRD bez zmian — gdy kit koliduje z PRD, wygrywa PRD.
 - **Done when:** every F-NN and S-NN below is `done`.
-- **Scope anchors:** FR-018 (nice-to-have), stosowane według reguł FR-003–FR-007 i FR-014 (prywatność: syntetyczny fixture zamiast prawdziwego wyciągu).
+- **Scope anchors:** FR-001, FR-003–FR-005, FR-007–FR-013, FR-018, FR-019 (zmienia się prezentacja, nie reguły); bez migracji.
 
 ## Vision recap
 
-Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stałe i częste i pozwala ustawić własny próg na wzorcu; to, co w miesiącu go przekracza, dostaje etykietę „ponad próg” i jest zsumowane. M-1 dowiózł cały przepływ dla ING Bank Śląski. M-2 dodaje drugie źródło danych — Santander Bank Polska — bez zmiany reguły: wzorzec to sprzedawca, niezależnie od banku, z którego przyszła transakcja.
+Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stałe i częste i pozwala ustawić własny próg na wzorcu; to, co w miesiącu go przekracza, dostaje etykietę „ponad próg” i jest zsumowane. M-1 dowiózł cały przepływ dla ING Bank Śląski. M-2 dodaje drugie źródło danych — Santander Bank Polska — bez zmiany reguły: wzorzec to sprzedawca, niezależnie od banku, z którego przyszła transakcja. M-3 nie zmienia reguły: przenosi aplikację na rundę 3 kitu — ostatnie placeholdery zbudowane po stronie kodu ustępują decyzjom autora identyfikacji.
 
 ## North star
 
-**S-11: Transakcje kartowe z Santandera trafiają do właściwych wzorców** — przy celu `quality` drugi bank ma wartość dopiero wtedy, gdy jego transakcje grupują się poprawnie; sam import bez tego daje listę wzorców z opisami kart zamiast sprzedawców.
+**S-13: Import i historia importów według rundy 3 kitu** — import to wejście do produktu i miejsce, gdzie kit jest dziś najbardziej nieaktualny (Santander „wkrótce”, trzy różne odrzucenia pod jednym „nieznany format”, wynik importu bez nagłówka z kitu); jego przejście na rundę 3 dowodzi, że kit i aplikacja znów mówią jednym głosem.
 
 > Gwiazda przewodnia to najmniejszy przepływ od końca do końca, którego dowiezienie udowadnia główną hipotezę kamienia milowego — umieszczona tak wcześnie, jak pozwalają jej wymagania wstępne, bo reszta ma znaczenie tylko wtedy, gdy ten przepływ działa.
 
 ## At a glance
 
-| ID   | Change ID                   | Outcome (user can …)                                                                                                        | Prerequisites | PRD refs                       | Status   |
-| ---- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------ | -------- |
-| F-03 | synthetic-santander-fixture | (foundation) w repozytorium jest syntetyczny eksport Santander PLN z pułapkami formatu i opisów oraz plik USD do odrzucenia | —             | FR-018, FR-014, NFR prywatność | done     |
-| S-10 | santander-csv-import        | wgrać plik CSV z Santandera i zobaczyć wynik importu na tych samych zasadach co ING                                         | F-03          | FR-018, FR-004, FR-005         | done |
-| S-11 | santander-card-merchants    | zobaczyć transakcje kartowe z Santandera we właściwych wzorcach sprzedawców, wspólnych z ING                                | S-10, F-03    | FR-018, FR-006, FR-007         | done |
+| ID   | Change ID                  | Outcome (user can …)                                                                                                                               | Prerequisites | PRD refs                                 | Status  |
+| ---- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------- | ------- |
+| F-04 | kit-round-3-intake         | (foundation) runda 3 kitu jest w `design/rytm-os/`, aplikacja na nowym `content.json` i tokenach działa bez regresji                               | —             | — (kit)                                  | pending |
+| S-12 | kit-round-3-auth-settings  | przejść logowanie, rejestrację, reset hasła i ustawienia konta (zmiana hasła, usunięcie, wylogowanie, konto demo) w wersji rundy 3 kitu            | F-04          | FR-001, FR-019                           | pending |
+| S-13 | kit-round-3-imports        | wgrać plik z ING lub Santandera, zobaczyć wynik, odrzucenia i historię importów (z cofnięciem) w wersji rundy 3 kitu                               | F-04          | FR-003, FR-004, FR-005, FR-018           | pending |
+| S-14 | kit-round-3-patterns       | przeglądać wzorce, szczegół z progiem i dialog akcji (scal, zmień nazwę, typ, wyklucz) we wszystkich stanach rundy 3 kitu                         | F-04          | FR-007, FR-008, FR-009, FR-010, FR-011   | pending |
+| S-15 | kit-round-3-home-fixed     | zobaczyć przegląd, trend „ponad progiem” i koszty stałe ze wszystkimi stanami (puste, brak porównania, błąd odczytu) w wersji rundy 3 kitu          | F-04          | FR-011, FR-012, FR-013                   | pending |
 
 ## Baseline
 
-What's already in place in the codebase as of `2026-10-01` (auto-researched + user-confirmed). M-1 (F-01, F-02, S-01–S-09) is done.
+What's already in place in the codebase as of `2026-10-02` (auto-researched). M-1 (F-01, F-02, S-01–S-09) and M-2 (F-03, S-10, S-11) are done.
 Foundations below assume these are present and do NOT re-scaffold them.
 
-- **Frontend:** present — strony Astro i wyspy React (`src/pages/*`, `src/components/imports/ImportWizard.tsx`); kreator importu woła wprost parser ING i zawsze pokazuje krok wyboru rachunku.
-- **Backend / API:** present — trasy API Astro (`src/pages/api/imports.ts`, `patterns/*`, `auth/*`); zapis importu wyłącznie przez RPC `import_ing_statement`.
-- **Data:** present — migracje z RLS per operację i pgTAP w CI. Pod Santandera: `bank_tx_id` jest już opcjonalne, a `imports_no_overlap` liczy nakładanie per rachunek, bez banku; `imports.source` dopuszcza tylko `'ing'`, brak numeru wiersza (`lp`) jako klucza dla banku bez ID transakcji.
-- **Auth:** present — Supabase auth, `src/middleware.ts`, strażnik konta demo (S-09).
-- **Deploy / infra:** present — CI `ci` → `smoke` → `deploy` z migracjami stosowanymi przez CI, Vercel `fra1`.
-- **Observability:** partial — tylko `console.*` po stronie serwera, bez trackera błędów (świadomie lekko, Parked z M-1).
-- **Import pipeline (dla M-2):** tylko ING — parser `src/lib/import/ing.ts` (cp1250, `;`, preambuła wielu rachunków) bez wykrywania formatu; schemat payloadu wymaga 18-cyfrowego ID transakcji ING i nazwy rachunku; `rawMerchant()` w `src/lib/patterns/merchant.ts` czyta kolumny ING, `normalizeMerchant()` jest neutralne względem banku; fixture i generator tylko dla ING; copy kitu mówi „Santander wkrótce”.
-- **Poza repozytorium:** prawdziwy eksport Santander PLN leży lokalnie u autora — służy wyłącznie do kształtowania syntetycznego fixture (kształty, nie dane), jak w F-02.
+- **Cały produkt działa** — logowanie, import ING i Santandera, wzorce, progi, „ponad próg”, trend, koszty stałe, ustawienia, konto demo; CI `ci` → `smoke` → `deploy`.
+- **Kit w repozytorium: runda 2** — `design/rytm-os/` (read-only), `scripts/sync-kit.sh` kopiuje assety do `public/rytm/` i `brand.css` do `src/styles/brand.css`; `src/content/copy.ts` importuje `content.json` wprost z `design/rytm-os/react-kit/docs/` (`copy`) i trzyma luki w `copyExtra` (216 tekstów, K11).
+- **Placeholdery** — `grep -rn "DESIGN-GAP" src/`; każdy ma wiersz w `context/foundation/design-kit.md` (`kit_round: 2`).
+- **Dostawa rundy 3 (poza repozytorium)** — `context/runs/2026-10-02-kit-round-3/kit-delivery/`; `content.json` 146 → 345 kluczy, `brand.css` + 8 tokenów semantycznych (bez nowych kolorów), prototyp 28 → 60 widoków, `copy-map.md`, CHANGELOG „Runda 3” z odpowiedziami C1–C6. Assety bez zmian. Znane pułapki przyjęcia: usunięte 4 klucze używane przez aplikację (`authStates.loginError`, `resetTitle`, `resetBody`, `checkInbox` — jak K12 w rundzie 2); `dashboard.stats` ma 2 karty (aplikacja czyta `stats[2]`); `patterns.columns` ma 7 kolumn (tabela renderuje 6); szablony `{month}`/`{n}` w kluczach dziś renderowanych dosłownie (`fixedCosts.new`, `trend.tooShort`, `authStates.passwordTooShort`, `resetNew.lead`); autor nie widział `copy.ts`, więc 55 tekstów `copyExtra` zmieniło nazwę klucza, a 90 brzmienie albo zniknęło.
 
 ## Foundations
 
-### F-03: Syntetyczny eksport Santandera
+### F-04: Przyjęcie rundy 3 kitu
 
-- **Outcome:** (foundation) w repozytorium jest syntetyczny plik CSV w formacie Santander Bank Polska (zgodny z `import-formats.md`) z pułapkami: dwie karty na jednym rachunku, ta sama sieć z różnymi numerami placówek, ten sam sprzedawca zapisany dwojako przez operatora kart, wypłata z bankomatu, BLIK, przelewy, zwrot płatności kartą do pominięcia, sprzedawca obecny też w fixture ING; obok plik konta USD do testu odrzucenia waluty, oczekiwany wynik i kontrola spójności jak dla ING.
-- **Change ID:** synthetic-santander-fixture
-- **PRD refs:** FR-018, FR-014, NFR „prywatność danych źródłowych”
-- **Unlocks:** S-10 (parser i import weryfikowane bez prawdziwego wyciągu w repo), S-11 (jakość grupowania kart mierzona na znanych pułapkach)
-- **Prerequisites:** prawdziwy eksport Santander PLN dostępny lokalnie u autora, poza repozytorium
-- **Parallel with:** —
-- **Blockers:** —
-- **Unknowns:**
-  - Czy płatności BLIK przez operatorów (PayU, PayPro…) w eksporcie Santandera niosą domenę sprzedawcy, jak w ING (D3)? — Owner: user. Block: no (sprawdzane na prawdziwym eksporcie przy kształtowaniu fixture).
-- **Risk:** Najpierw, bo cel `quality` wymaga mierzenia parsera i grupowania na znanych pułapkach, a prywatność wyklucza prawdziwy wyciąg w repo; ryzyko — fixture zbyt czysty względem prawdziwych opisów, łagodzone kształtowaniem z prawdziwego eksportu.
-- **Status:** done
-
-## Slices
-
-### S-10: Import CSV z Santandera
-
-- **Outcome:** Użytkownik może wgrać plik CSV z Santander Bank Polska (PLN): aplikacja sama rozpoznaje format, pokazuje wynik importu (liczba obciążeń, zakres od daty z nagłówka do daty eksportu) i dodaje import do listy importów z nazwą banku; plik w innej walucie i zakres nakładający się na istniejący import tego rachunku są odrzucane z komunikatem, uznania i zwroty są pomijane, a transakcje trafiają do wzorców.
-- **Change ID:** santander-csv-import
-- **PRD refs:** FR-018, FR-004, FR-005
-- **Prerequisites:** F-03
-- **Parallel with:** —
-- **Blockers:** —
-- **Unknowns:**
-  - Jak kreator i lista importów pokazują bank i pomijają wybór rachunku przy pliku z jednym rachunkiem, skoro kit zapowiada Santandera tylko jako „wkrótce”? — Owner: user. Block: no (luka kitu w `design-kit.md`, rozstrzygana w planie).
-- **Risk:** Przed gwiazdą przewodnią, bo bez zaimportowanych danych nie ma czego grupować; ryzyko — import ING musi działać bez zmian po uogólnieniu zapisu importu (migracja wstecznie zgodna, smoke ING bez zmian).
-- **Status:** done
-
-### S-11: Transakcje kartowe Santandera we właściwych wzorcach
-
-- **Outcome:** Użytkownik może zobaczyć transakcje kartowe z Santandera we właściwych wzorcach: opis płatności kartą daje sprzedawcę bez numeru karty i numeru placówki, płatności obiema kartami jednego rachunku trafiają do tego samego wzorca, wypłaty z bankomatu tworzą jeden wzorzec, a ten sam sprzedawca z ING i z Santandera jest jednym wzorcem.
-- **Change ID:** santander-card-merchants
-- **PRD refs:** FR-018, FR-006, FR-007
-- **Prerequisites:** S-10, F-03
+- **Outcome:** (foundation) dostawa rundy 3 jest przeniesiona do `design/rytm-os/` w strukturze kitu (react-kit, prototype, brand-pack, CHANGELOG), z łatką przyjęcia przywracającą klucze używane przez aplikację; `scripts/sync-kit.sh` zsynchronizował `brand.css` (nowe tokeny dostępne jako nazwy Tailwind, jeśli są potrzebne); aplikacja na nowym `content.json` działa bez regresji (żadnego `undefined`, surowego `{n}`/`{month}` ani rozjechanej tabeli); `design-kit.md` mówi `kit_round: 3`, każda pozycja K/G rundy 3 ma status (dostarczona / częściowo / pominięta) i slice M-3, który ją wdraża.
+- **Change ID:** kit-round-3-intake
+- **PRD refs:** — (kit; FR bez zmian)
+- **Unlocks:** S-12, S-13, S-14, S-15 (każdy wiąże swoje ekrany z prototypem i kluczami rundy 3)
+- **Prerequisites:** dostawa w `context/runs/2026-10-02-kit-round-3/kit-delivery/` (lokalnie u orkiestratora)
 - **Parallel with:** —
 - **Blockers:** —
 - **Unknowns:** —
-- **Risk:** Gwiazda przewodnia M-2 — normalizacja to rdzeń produktu (FR-006), a opisy kartowe Santandera mają inny kształt niż ING; ryzyko — zmiana normalizacji przesuwa istniejące wzorce ING, więc oczekiwany wynik fixture ING musi pozostać bez zmian.
-- **Status:** done
+- **Risk:** Najpierw, bo `copy.ts` importuje `content.json` wprost z kitu — podmiana plików i utrzymanie aplikacji na zielono muszą wejść jednym merge'em; ryzyko — cicha regresja copy na ekranach (klucz istnieje, ale zmienił znaczenie), łagodzone smoke + przeglądem ekranów, których dotykają zmienione klucze.
+- **Status:** pending
+
+## Slices
+
+### S-12: Auth i ustawienia według rundy 3 kitu
+
+- **Outcome:** Użytkownik przechodzi logowanie, rejestrację, potwierdzenie e-maila, reset i ustawienie nowego hasła z panelami wizualnymi rundy 3, a w ustawieniach zmienia hasło (obecne + nowe + powtórz) ze stanami sukcesu i błędu, wylogowuje się z ekranu ustawień, usuwa konto przez dialog z obecnym hasłem i wpisaniem `USUŃ`, po czym widzi notę na `/login`; na koncie demo widzi stałą notę o zablokowanych akcjach. Strony publiczne (landing, jak działa, dla kogo — także ze stopki na telefonie) używają copy z `content.json`.
+- **Change ID:** kit-round-3-auth-settings
+- **PRD refs:** FR-001, FR-019
+- **Prerequisites:** F-04
+- **Parallel with:** S-13, S-14, S-15 (różne ekrany; run i tak serializuje)
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Rusza formularze uwierzytelniania i destrukcyjny dialog — smoke auth musi zostać zielony, a blokada przycisku usunięcia nie może osłabić potwierdzenia po stronie serwera. Pozycje: K11 (auth, landing, howItWorks, forWho), K13, K14, K15, G20, G23, G24, G32, G37 (część ustawień).
+- **Status:** pending
+
+### S-13: Import i historia importów według rundy 3 kitu
+
+- **Outcome:** Użytkownik wgrywa plik z ING albo Santandera i widzi copy dla obu banków, krok podsumowania z bankiem, rachunkiem bez nazwiska („Rachunek · •• końcówka” dla Santandera), zakresem i przyciskiem „Importuj N obciążeń” ze stanem oczekiwania, wynik importu w układzie rundy 3, osobne odrzucenia (plik za duży, za dużo obciążeń, plik niespójny, waluta, pusty, nakładający się zakres z `{range}`), a w historii importów — bank, dialog usunięcia z `{range}` i komunikaty inline po usunięciu (sukces, błąd, nie znaleziono); na koncie demo widzi notę zamiast akcji.
+- **Change ID:** kit-round-3-imports
+- **PRD refs:** FR-003, FR-004, FR-005, FR-018
+- **Prerequisites:** F-04
+- **Parallel with:** S-12, S-14, S-15
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Gwiazda przewodnia M-3; kreator importu jest największą wyspą React — rozdzielenie trzech odrzuceń dziś zlanych w „nieznany format” wymaga, by serwer i klient zwracały rozróżnialne kody bez zmiany reguł walidacji. Pozycje: K11 (imports), K16, K18 (importy), K19, K20, K26, G25, G26, G27, G30, G37 (część importów).
+- **Status:** pending
+
+### S-14: Wzorce, szczegół i akcje według rundy 3 kitu
+
+- **Outcome:** Użytkownik przegląda listę wzorców z kolumną „Kwota” dla stałych, „Pokaż więcej” i widocznym fokusem wyszukiwania i sortowania; w szczególe widzi stany „nie znaleziono” i „miesiąc bez wystąpień”, sumę z odmianą miesiąca, opis sekwencji dla czytników ekranu, walidację i błąd zapisu progu; w dialogu akcji scala (z wyborem wzorca i stanem „brak wzorców”), zmienia nazwę (z walidacją), typ i wyklucza, widzi scalone warianty z cofnięciem.
+- **Change ID:** kit-round-3-patterns
+- **PRD refs:** FR-007, FR-008, FR-009, FR-010, FR-011
+- **Prerequisites:** F-04
+- **Parallel with:** S-12, S-13, S-15
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Paginacja „Pokaż więcej” to nowe zachowanie listy — nie może zmienić sortowania ani sum. Pozycje: K11 (patterns), K17, K21, K22, G28, G29, G31, G33.
+- **Status:** pending
+
+### S-15: Przegląd, trend i koszty stałe według rundy 3 kitu
+
+- **Outcome:** Użytkownik widzi przegląd w układzie rundy 3 (karta „Ponad progiem”, trend na pełną szerokość, zestawienie kosztów stałych; bez „Rozpoznanych wydatków” i „Co wraca najczęściej” — decyzja C5), leady i stopki kart z `{month}`/`{delta}`/`{n}` i odmianą, trend z sumami nad słupkami, znacznikiem zera i opisem „brak progu”, a w „Kosztach stałych” — licznik z prawdziwą formą mnogą, spokojny kolor obniżki, osobne komunikaty pustych sekcji, braku miesiąca porównawczego i błędu odczytu (inny niż pusty stan).
+- **Change ID:** kit-round-3-home-fixed
+- **PRD refs:** FR-011, FR-012, FR-013
+- **Prerequisites:** F-04
+- **Parallel with:** S-12, S-13, S-14
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Ostatni, bo zbiera resztki `copyExtra` (`home`, `fixed`, `app`) — jego ostatnia faza sprawdza, czy `copyExtra` zawiera już tylko to, czego kit naprawdę nie dał. Pozycje: K11 (home, fixed, app), K18 (przegląd, koszty stałe), K23, K24, K25, G34, G35, G36.
+- **Status:** pending
 
 ## Backlog Handoff
 
-| Roadmap ID | Change ID                   | Suggested issue title                                    | Ready for `/10x-plan` | Notes                                                                                                                                                                                                                                                                                       |
-| ---------- | --------------------------- | -------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| F-03       | synthetic-santander-fixture | Syntetyczny eksport Santander PLN z pułapkami + plik USD | done                  | Zarchiwizowane → `context/archive/2026-10-01-synthetic-santander-fixture/`                                                                                                                                                                                                                  |
-| S-10       | santander-csv-import        | Import CSV z Santander Bank Polska                       | done                  | Zarchiwizowane → `context/archive/2026-10-02-santander-csv-import/`; migracja `20261002120000_import_statement_source.sql` (expand-only) stosowana przez job `deploy` |
-| S-11       | santander-card-merchants    | Transakcje kartowe Santandera we właściwych wzorcach     | done                  | Zarchiwizowane → `context/archive/2026-10-02-santander-card-merchants/`; bez migracji. Otwarte [human] 4.8–4.11 (wyrocznia F-03, przekluczowanie kart Santandera, import prawdziwego eksportu, min 1 token) — checklista właściciela w PR. Follow-upy FU1–FU5 w `follow-ups/review-fixes.md` z liniami `Trigger:` (m.in. Trigger: następna zmiana `scripts/fixture-santander.mjs`; Trigger: właściciel odrzuca [human] 4.9 / S-10 6.11) |
+| Roadmap ID | Change ID                 | Suggested issue title                                   | Ready for `/10x-plan` | Notes |
+| ---------- | ------------------------- | ------------------------------------------------------- | --------------------- | ----- |
+| F-04       | kit-round-3-intake        | Przyjęcie rundy 3 kitu bez regresji aplikacji           | yes                   | Dostawa lokalnie w `context/runs/2026-10-02-kit-round-3/kit-delivery/` |
+| S-12       | kit-round-3-auth-settings | Auth i ustawienia według rundy 3 kitu                   | after F-04            | —     |
+| S-13       | kit-round-3-imports       | Import i historia importów według rundy 3 kitu          | after F-04            | —     |
+| S-14       | kit-round-3-patterns      | Wzorce, szczegół i akcje według rundy 3 kitu            | after F-04            | —     |
+| S-15       | kit-round-3-home-fixed    | Przegląd, trend i koszty stałe według rundy 3 kitu      | after F-04            | —     |
 
 ## Open Roadmap Questions
 

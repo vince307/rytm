@@ -1,10 +1,10 @@
 ---
 change_id: kit-round-3-imports
 title: Import wizard, result and import history bound to design kit round 3
-status: impl_reviewed
+status: archived
 created: 2026-10-02
 updated: 2026-10-02
-archived_at: null
+archived_at: 2026-10-02T22:13:20Z
 ---
 
 ## Notes

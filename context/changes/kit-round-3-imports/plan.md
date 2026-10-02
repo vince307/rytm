@@ -639,10 +639,10 @@ the kit-text departures are collected in the Phase 6 `[human]` row.
 
 #### Automated
 
-- [ ] 5.1 npm test: Phase 4 count, 0 failed
-- [ ] 5.2 Smoke Phase 4 count + 2 PASS, 0 FAIL, demo first import still green after db reset
-- [ ] 5.3 Deliberate break: demoLocked false / true turns the demo and test-user smoke steps red, restored, meta-check recorded
-- [ ] 5.4 Full local gate vs baseline, smoke + 9
+- [x] 5.1 npm test: Phase 4 count, 0 failed — 63e0da2
+- [x] 5.2 Smoke Phase 4 count + 2 PASS, 0 FAIL, demo first import still green after db reset — 63e0da2
+- [x] 5.3 Deliberate break: demoLocked false / true turns the demo and test-user smoke steps red, restored, meta-check recorded — 63e0da2
+- [x] 5.4 Full local gate vs baseline, smoke + 9 — 63e0da2
 
 #### Manual
 

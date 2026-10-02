@@ -1,8 +1,9 @@
 # Handoff — `santander-card-merchants` (slice S-11)
 
-Written by the visual-gate step of run `2026-10-01-m2-santander`. Progress row 4.6 is captured and ticked with
-`VISUAL: PASS` and no fixes. Every non-human row is now closed, and the slice is ready for `/10x-archive` and then
-ship. The next agent must not tick the four `[human]` rows (4.8–4.11). They go into the PR body as a checklist.
+Written by the visual-gate step of run `2026-10-01-m2-santander`, then finalised by the archive + ship step (final
+pre-merge state). Progress row 4.6 is captured and ticked with `VISUAL: PASS` and no fixes. Every non-human row is
+closed; the change is archived to `context/archive/2026-10-02-santander-card-merchants/` and shipped. The four
+`[human]` rows (4.8–4.11) stay open on purpose: they are the owner's post-run checklist in the PR body.
 
 ## 1. State
 
@@ -10,8 +11,8 @@ ship. The next agent must not tick the four `[human]` rows (4.8–4.11). They go
 | --- | --- |
 | Branch | `feat/santander-card-merchants`, cut from `main` at `9f63fd9` |
 | Commits | 19 on the branch (`main..HEAD`): the 18 before this step (… `6baf3fd` impl-review fixes, `1d3284f` `docs(santander-card-merchants): przegląd implementacji`), then this step's `docs(santander-card-merchants): bramka wizualna` |
-| Pushed / PR / merged | no / none / no |
-| `change.md` status | `impl_reviewed` (unchanged; `/10x-archive` stamps it) |
+| Pushed / PR / merged | PR/CI/merge/deploy recorded in `context/runs/2026-10-01-m2-santander/run-log.md` |
+| `change.md` status | `archived` (stamped by `/10x-archive` in the ship step) |
 | `## Progress` rows remaining | 4 (`grep -c '^- \[ \]' plan.md`): 4.8–4.11 `[human]` |
 | Working tree | clean after this step's commit; branch confirmed with `git branch --show-current` |
 
@@ -41,7 +42,7 @@ All observed in this step. Baseline = contract line (`main` 9f63fd9, after S-10)
 
 ## 4. Next command
 
-`/10x-archive santander-card-merchants`, then ship (no migration in this branch).
+none — shipped
 
 ## 5. Open
 
@@ -59,6 +60,18 @@ All observed in this step. Baseline = contract line (`main` 9f63fd9, after S-10)
 - DESIGN-GAP: none added. Migration: none. ARTIFACT GAP: none.
 
 ## 6. Autonomous decisions
+
+Ship step (archive + PR):
+
+- **Archived with 4 `[human]` rows open (4.8–4.11).** Chosen: archive. Rejected: wait for the owner. Why: they are
+  product calls and a real-data check, not agent-closable; they become the PR's „Do decyzji właściciela produktu”
+  checklist. Would change: an automated row still open.
+- **No SHA repointing.** The PR merges with `--merge`, so the phase SHAs stay in `main`'s history. Would change: a
+  squash merge.
+- **M-2 closed in the roadmap** (`milestone_status: done`, history entry), next milestone not opened. Why: every F/S of
+  M-2 is `done`, and the run brief asks for the closure. Would change: an owner adding scope to M-2.
+
+Visual-gate step:
 
 1. **Desktop width 1280, not 1440.** Plan row 4.6 names 1280 px, and the brief allowed 1280–1440. Rejected: 1440
    (S-10's choice). Would change: a gate rule fixing 1440.

@@ -21,7 +21,8 @@ ING (`merchantKey`). Trigger: a real ING + Santander import shows the same merch
 
 ## FU4 — min 2 fallback for the city rule
 
-`santander-card.ts` strips the city down to 1 token; a generic one-word name in two towns merges irreversibly.
+`santander-card.ts` strips the city down to 1 token; a generic one-word name in two towns merges irreversibly. The
+same fallback applies to the `CITY_PREFIX` pop (require ≥ 2 tokens left; +1 real split measured at plan review).
 Trigger: owner reports a wrong cross-town merge ([human] 4.11 rejected).
 
 ## FU5 — Re-key saved thresholds/decisions on old Santander keys

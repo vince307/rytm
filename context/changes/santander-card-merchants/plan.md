@@ -79,16 +79,24 @@ count, recorded in the handoff only as counts).
 `title` matches the card gate `^DOP\. VISA \d{6}\*{6}\d{4} (PŁATNOŚĆ KARTĄ|WYPŁATA Z BANKOMATU KARTĄ) `:
 1. ATM kind → return `"Bankomat"`.
 2. Replace every `"` with a space; split the collapsed tail on spaces.
-3. City (minimum 1 token left, never empty): pop the last token (`city`); then, while more than 1 token is left,
-   pop one more if the new last token is in `CITY_PREFIX` (upper-cased: `NOWY NOWA NOWE STARY STARA STARE BIALA BIALY
-   BIALE ZIELONA ZIELONY SUCHA DABROWA LOS SAN`); then, while more than 1 token is left, pop one more if the new last
-   token equals `city` case-insensitively (`<NAME> <CITY> <CITY>`).
+3. City (minimum 1 token left, never empty), **at most three pops, each a single `if`, never a loop** (as measured
+   by the research probe): if more than 1 token, pop the last token (`city`); then, if more than 1 token is left and
+   the new last token is in `CITY_PREFIX` (upper-cased: `NOWY NOWA NOWE STARY STARA STARE BIALA BIALY BIALE ZIELONA
+   ZIELONY SUCHA DABROWA LOS SAN`), pop one more; then, if more than 1 token is left and the new last token equals
+   `city` case-insensitively (`<NAME> <CITY> <CITY>`), pop one more.
 4. (Phase 3) Code tokens: drop a token matching `^[A-Z]{0,2}\d[\dA-Z]*\.?$`i, `^K\.\d+\.?$`i or equal to `#`, unless
-   the previous token matches `^(NR|NO)\.?$`i; strip trailing digits from a glued `^([A-Za-z]{3,})\d{3,}$` token; if
-   every token would be dropped, keep the tokens from step 3.
+   it is the **first** token (a brand such as `4F` / `5 SMAKOW` is a name, not a store code — plan review F2; measured
+   on the real export: no count change vs R10) or the previous token matches `^(NR|NO)\.?$`i; strip trailing digits
+   from a glued `^([A-Za-z]{3,})\d{3,}$` token; if every token would be dropped, keep the tokens from step 3. The `NR`
+   guard protects only numbers of 1–2 digits: a kept `NR 123` still loses `123` to `normalizeMerchant` `STORE_NUMBER`
+   (global, ING-shared, not changed) — see Known risks; unit cases for the guard use 1–2-digit numbers.
 5. Return the tokens joined by one space. `normalizeMerchant` / `merchantKey` then run unchanged (legal form, store
    number, doubled prefix, lower-case).
-A title starting `Wypłata BLIK ` (Phase 3) → return `"Wypłata BLIK"`. Any other title → the step returns `null` and
+A title matching `BLIK_GATE` = `^Wypłata BLIK .+:\d{11}$` (Phase 3; Santander's own end shape — the fixture's
+`:<11 cyfr>` and the real ` ref:<11 cyfr>` both end in `:` + 11 digits, measured 2/2 fixture and 3/3 real rows) →
+return `"Wypłata BLIK"`. A bare `startsWith("Wypłata BLIK")` is not enough: the phrase is not bank-specific, and an ING
+BLIK cash withdrawal (no ING example in the fixture, so the key-text pin cannot see it) would be re-keyed (plan
+review F1). Any other title → the step returns `null` and
 `rawMerchant` behaves exactly as on `main`.
 
 **Real-export measurement (local only).** The contract's symlink dir with the sandbox disabled; a harness in the
@@ -237,9 +245,9 @@ splits from R4 to R10.
 
 **Intent**: Remove descriptor noise that splits one merchant on real data, never merging two merchants.
 
-**Contract**: rule 4 exactly as in Critical Implementation Details (after the city rule); a title starting
-`Wypłata BLIK ` → `"Wypłata BLIK"` whatever the counterparty (gate also `null`-safe for the ` ref:` and `:` end
-shapes). The exported function keeps its name and signature (rename only if the seam sweep finds the name wrong; then
+**Contract**: rule 4 exactly as in Critical Implementation Details (after the city rule, first token never dropped);
+a title matching `BLIK_GATE` (`^Wypłata BLIK .+:\d{11}$`) → `"Wypłata BLIK"` whatever the counterparty (both the
+` ref:` and the `:` end shapes match it). The exported function keeps its name and signature (rename only if the seam sweep finds the name wrong; then
 update every caller).
 
 #### 2. Tests
@@ -250,7 +258,8 @@ update every caller).
 CITY>` → same key; `SKLEP NR 12 <CITY>` vs `SKLEP NR 7 <CITY>` → different keys; a 3-letter+digits token (`ABC12`)
 kept; glued `<WORD>12345 <CITY>` → `<WORD>`; `#` dropped; `12345 <CITY>` keeps `12345` (never empty); two
 `Wypłata BLIK` titles with different counterparties (one ending `:<11 digits>`, one ` ref:<11 digits>`) → same key
-`wypłata blik`; Santander partition test still 35/0/0, and the ST06 group is still its own pattern (not `Bankomat`).
+`wypłata blik`; an ING-shaped title `Wypłata BLIK <dd.mm.yyyy> Nr transakcji <digits>` (no `:<11 digits>` end) →
+`null`; a code-shaped first token (`4F SKLEP <CITY>`, `5 SMAKOW <CITY>`) is kept; Santander partition test still 35/0/0, and the ST06 group is still its own pattern (not `Bankomat`).
 
 ### Success Criteria:
 
@@ -339,7 +348,7 @@ are captured; seams left by Phases 1–3 are swept.
 - [human] F-03 3.9 carried: confirm the oracle's product calls (`Wypłata BLIK` own pattern, ST03 user-merge, `Oplata za …` fixed)
 - [human] S-10 6.11 carried: accept that S-11 re-keys Santander card patterns (real-export scale 239 → 193 keys); thresholds/decisions saved on old keys are orphaned
 - [human] Owner imports the real Santander PLN export locally (S-10 6.8) and checks the patterns: no wrong cross-town merge of a generic one-word name (min-1 rule), `Bankomat` and `Wypłata BLIK` each one pattern
-- [human] Accept min 1 token (decision 3): a one-word generic name (e.g. a car wash) in two towns merges irreversibly — the fallback is min 2 (+6 real keys)
+- [human] Accept min 1 token (decision 3): a one-word generic name (e.g. a car wash) in two towns merges irreversibly — the fallback is min 2 (+6 real keys); the same applies to the `CITY_PREFIX` pop leaving one word (Known risks)
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful before proceeding to the next phase.
 
@@ -394,6 +403,7 @@ Recorded in place of the skill's questions (run contract rule 1).
 | 12 | `import-formats.md` BLIK `ref:` shape | Doc note in Phase 4 | Follow-up | Shape-only fact found by research; prevents a stale contract | — |
 | 13 | Phase split | 4 phases (safety net / oracle rules / real-data rules / e2e + sweep) | One rules phase | Each phase independently green and measurable (R4 then R10) | — |
 | 14 | PRD / contract literal text | No deviation: FR-006/FR-018 silent on cities; `import-formats.md` ATM/BLIK lines and the F-03 partition hold. Oracle slug text (`sklep-rowerowy-sucha-beskidzka`, `kino-nova`, `wyplata-blik-gotowka`) is not matched literally — partition is the contract (`change.md`) | — | — | The owner reading slugs as key text |
+| 15 | Plan review (2026-10-02) | `BLIK_GATE` on Santander's `:<11 digits>` end shape; first token never a code token; single-`if` city pops; NR-guard limit and prefix-pop risk recorded | `startsWith("Wypłata BLIK")`; NR glue; prefix pop needing ≥ 2 left | Each fix measured on the real export: no count change for the applied ones, +1 split for the rejected ones | A real ING `Wypłata BLIK` title ending in `:<11 digits>`; an observed `NR <≥3 digits>` over-merge |
 
 ## Known risks
 
@@ -402,7 +412,17 @@ Recorded in place of the skill's questions (run contract rule 1).
   (no real ING export among the inputs) — follow-up.
 - 6 real merchants still split (descriptor styles); fixable with the existing merge.
 - Positional rule assumes the Visa descriptor keeps the city as the last token; an online merchant without a city
-  loses its last word (single-raw pattern, display only).
+  loses its last word. Usually display only, but an aggregator descriptor `<AGG> *<MERCHANT>` with no city slot
+  would reduce to `<AGG>` and merge different merchants (measured on the real export: 2 distinct `*` tails, neither
+  reduced to one token — plan review F5).
+- `CITY_PREFIX` pop may leave one generic word: a name ending in a prefix word (`<GENERIC> STARY <CITY>`) reduces to
+  `<GENERIC>` and can merge across towns. Requiring ≥ 2 tokens to remain for the prefix pop costs +1 real split
+  (194 keys / 7 split merchants, 0 over-merges either way), so R10 is kept; covered by [human] 4.11 and FU4 (plan
+  review F4).
+- The `NR`/`NO` guard is partial: a guarded number of ≥ 3 digits is still dropped by `normalizeMerchant`
+  `STORE_NUMBER` (`SKLEP NR 123` and `SKLEP NR 456` → `sklep nr`). Gluing the number to the guard (`NR123`) costs +1
+  real split against the private labelling (chains under several numbers labelled one merchant), so not applied; the
+  same merge already exists for ING (plan review F3).
 
 ## References
 

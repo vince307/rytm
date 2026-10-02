@@ -1,31 +1,30 @@
 # Handoff — `santander-card-merchants` (slice S-11)
 
-Written by the `/10x-plan` step of run `2026-10-01-m2-santander`. `plan.md` (4 code phases, 29 Progress rows) and
-`plan-brief.md` are written; `change.md` is `planned`; no product code changed. The next agent must not let any rule
-escape the Santander title gate — ING key text is pinned in Phase 1 precisely because the ING partition test cannot
-see a consistent re-key.
+Written by the `/10x-plan-review` step of run `2026-10-01-m2-santander`. Verdict PROCEED; `plan.md` amended in place
+(BLIK gate tightened, first token never a code token, single-`if` city pops, three risks recorded); `change.md` is
+`plan_reviewed`; no product code changed. The next agent must implement the rule order exactly as in plan.md
+§ Critical Implementation Details — including `BLIK_GATE` = `^Wypłata BLIK .+:\d{11}$`, not a bare `startsWith`.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/santander-card-merchants`, cut from `main` at `9f63fd9` |
-| Commits | 3 on the branch after this step's commit (`docs(santander-card-merchants): change identity (autonomous run)`, `… research`, `… plan`) |
+| Commits | 4 on the branch after this step's commit (`… change identity (autonomous run)`, `… research`, `… plan`, `docs(santander-card-merchants): plan review`) |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `planned` (via `.claude/skills/10x-plan/scripts/metadata-guard.mjs mark-planned`) |
-| `## Progress` rows remaining | 29 (`grep -c '^- \[ \]' plan.md`) |
-| Roadmap | S-11 `proposed → planning` (At a glance + body) |
+| `change.md` status | `plan_reviewed` |
+| `## Progress` rows remaining | 29 (`grep -c '^- \[ \]' plan.md`), unchanged — no phase split or merge |
+| Roadmap | S-11 `planning` (unchanged) |
 | Working tree | clean after the commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/santander-card-merchants/plan.md` | Plan: 4 phases, rule order in Critical Implementation Details, autonomous decisions table, Progress |
-| `context/changes/santander-card-merchants/plan-brief.md` | Two-page brief |
-| `context/changes/santander-card-merchants/follow-ups/review-fixes.md` | FU1–FU5 with `Trigger:` lines (BLIK operator, ST06 second address, diacritics, min 2, re-key saved rows) |
-| `context/changes/santander-card-merchants/change.md` | Frontmatter `status: planned` |
-| `context/foundation/roadmap.md` | S-11 status `planning` |
+| `context/changes/santander-card-merchants/reviews/plan-review.md` | Review report: 3 warnings, 2 observations, over-merge audit, `VERDICT: PROCEED` |
+| `context/changes/santander-card-merchants/plan.md` | Critical Implementation Details rules 3/4 + BLIK gate, Phase 3 contract/tests, Phase 4 [human] min-1 bullet, Known risks (+3 bullets), Autonomous decisions row 15 |
+| `context/changes/santander-card-merchants/follow-ups/review-fixes.md` | FU4 extended to the `CITY_PREFIX` pop |
+| `context/changes/santander-card-merchants/change.md` | `status: plan_reviewed` |
 | `context/changes/santander-card-merchants/handoff.md` | This file |
 
 ## 3. Verification
@@ -33,50 +32,46 @@ see a consistent re-key.
 | Command | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/santander-card-merchants` |
-| `grep -c '^- \[ \]' plan.md` | 29 = every Success Criteria bullet (P1 6, P2 7, P3 5, P4 11) |
-| `metadata-guard.mjs mark-planned` | `{"changed":true}` |
-| Read of research probe (`<scratchpad>/probe/rules.ts`) | Confirms the exact R10 rule order the plan specifies |
-| lint / astro check / vitest / build / pgTAP / smoke | **not run** — plan only, no code changed. Baseline inherited, unverified: contract line for `main` 9f63fd9 |
+| Research probe (`<scratchpad>/probe/measure.ts` logic, copy `m2.ts` + `rules2.ts`) on fixture + real PLN export, counts only | R10 reproduces: fixture 35 keys / 0 splits / 0 over; real 193 keys / 0 over-merged / 6 split merchants (10 extra) |
+| Same, first-token guard (applied) | unchanged 193 / 0 / 6 |
+| Same, prefix pop needing ≥ 2 left / `NR` glue (rejected) | 194 / 0 / 7 each (+1 split) |
+| Tightened `BLIK_GATE` | matches 3/3 real and 2/2 fixture `Wypłata BLIK` titles |
+| `merchantKey("SKLEP NR 123")` (probe copy of `merchant.ts`) | `sklep nr` — F3 confirmed |
+| Oracle checks (node over `expected.json`) | main file 184 imported / 1342109; 2-word-city groups single-raw; all 32 ING raws in the main file |
+| `grep -c '^- \[ \]' plan.md` | 29 |
+| lint / astro check / vitest / build / pgTAP / smoke | **not run** — review only, no code changed. Baseline inherited, unverified: contract line for `main` 9f63fd9 |
 
 ## 4. Next command
 
-`/10x-plan-review santander-card-merchants`
+`/10x-implement santander-card-merchants phase 1`
 
 ## 5. Open
 
-- Plan phases: (1) ING key-text pin + F3 + S-10 F4; (2) `src/lib/patterns/santander-card.ts` `santanderCardMerchant`
-  ATM/quotes/city + oracle/cross-bank tests; (3) code tokens + `NR` guard + `Wypłata BLIK`; (4) smoke join + `Bankomat`,
-  docs, seam sweep, visual gate.
-- Real-export measurement is local only, via the research probe harness in the session scratchpad (`probe/`, private
-  labelling `labels.json` there) — counts only, never in the repo. If the scratchpad is gone, report key counts only.
+- Known risks in plan.md: `NR` guard partial for ≥ 3 digits (`normalizeMerchant` `STORE_NUMBER`); `CITY_PREFIX` pop
+  can leave one generic word; cityless `<AGG> *<MERCHANT>` tails; min 1; ASCII-only cross-bank join.
+- Real-export measurement harness: `<scratchpad>/probe/` (`measure.ts`, `rules.ts`, `labels.json`, plus this step's
+  `m2.ts` / `rules2.ts` with the review variants). Counts only, never in the repo.
 - [human] rows (plan Phase 4):
   - [ ] 4.8 F-03 3.9 — confirm the oracle's product calls.
   - [ ] 4.9 S-10 6.11 — accept re-keying of Santander card patterns.
   - [ ] 4.10 Owner imports the real Santander PLN export locally and checks the patterns (S-10 6.8).
-  - [ ] 4.11 Accept min 1 token over min 2 (`santander-card.ts` city rule).
-- Follow-ups: `follow-ups/review-fixes.md` FU1–FU5.
+  - [ ] 4.11 Accept min 1 token (and the `CITY_PREFIX` pop to one word) over min 2.
+- Follow-ups: `follow-ups/review-fixes.md` FU1–FU5 (FU4 extended).
 - DESIGN-GAP: none. Migration: none.
 - ARTIFACT GAP: none.
 
 ## 6. Autonomous decisions
 
-1. **0 questions, MEDIUM.** Rejected: interview. Why: research measured every rule on both datasets. Would change: an
-   owner available.
-2. **Research's R10 rule set adopted verbatim, split into Phase 2 (R4) and Phase 3 (code tokens + BLIK).** Rejected:
-   one rules phase. Why: each phase independently green and measurable. Would change: R4 not reproducing on the real
-   export.
-3. **min 1, with a [human] row.** Rejected: min 2. Why: oracle slugs, 0 real over-merges. Would change: a wrong
-   cross-town merge observed → FU4.
-4. **`Wypłata BLIK` one pattern taken in.** Why: real-only split, oracle-neutral, `import-formats.md` "nie scalany z
-   bankomat" still holds. Would change: owner wanting per-ATM BLIK.
-5. **New module `santander-card.ts` with a local gate regex** (not an export of `santander.ts` `CARD`). Why: patterns
-   layer independent of the import layer, S-10 precedent of deliberate copies. Would change: the descriptor format
-   changing.
-6. **Display names `Bankomat` / `Wypłata BLIK`, no DESIGN-GAP.** Why: derived data in the name slot. Would change:
-   the label rendered as UI chrome.
-7. **Adjacent fixes taken: S-10 F4, merchant-patterns F3, `import-formats.md` BLIK `ref:` note.** Why: cheap,
-   assigned or found by research. Would change: a reviewer judging them scope creep.
-8. **No deviation from the PRD, `import-formats.md` or the F-03 partition**; oracle slug text is not matched
-   literally (partition is the contract, per `change.md`). Would change: the owner reading slugs as key text.
-9. **Roadmap and `change.md` edits committed with the plan** (the skill leaves them for implement; the run contract
-   requires a committed docs step). Would change: the orchestrator preferring an uncommitted roadmap edit.
+1. **Triage done in-plan, no questions.** Rejected: interactive triage. Why: run contract rule 1. Would change: a
+   human available.
+2. **F1 fixed: `BLIK_GATE` = `^Wypłata BLIK .+:\d{11}$`.** Rejected: `startsWith("Wypłata BLIK ")`. Why: the phrase
+   is not bank-specific and the ING pin cannot see an ING BLIK withdrawal (none in the fixture). Would change: a real
+   ING `Wypłata BLIK` title ending in `:` + 11 digits.
+3. **F2 fixed: first token never dropped as a code token.** Why: closes the brand-number class at zero measured cost.
+   Would change: a real chain whose descriptor starts with a store code.
+4. **F3 accepted, not fixed (no `NR123` glue).** Why: +1 real split against the private labelling and an uglier
+   name; same behaviour exists for ING. Would change: an observed `NR <≥3 digits>` over-merge.
+5. **F4: prefix pop kept at min 1 (R10), wording made single-`if`.** Why: tightening costs +1 split and no over-merge
+   was measured either way. Would change: owner rejecting [human] 4.11 → FU4.
+6. **No phase split/merge.** Why: each phase is independently green and one-agent sized (Phase 4 is the largest:
+   smoke + docs + sweep + visual). Would change: Phase 4 running past the context budget → split the visual gate out.

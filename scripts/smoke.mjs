@@ -222,6 +222,9 @@ async function request(path, { method = "GET", form } = {}) {
 
 const steps = [
   ["landing renders", () => request("/"), { status: 200, contains: "Zobacz swój rytm" }],
+  ["how-it-works renders", () => request("/how-it-works"), { status: 200, contains: ">Trzy spokojne kroki.<" }],
+  ["for-who renders", () => request("/for-who"), { status: 200, contains: ">Rytm pasuje do Twojego tempa.<" }],
+  ["landing footer links for-who", () => request("/"), { status: 200, contains: '>Dla kogo</a><a href="#"' }],
   ["login renders", () => request("/login"), { status: 200, contains: "Zaloguj się" }],
   ["login offers password reset", () => request("/login"), { status: 200, contains: "Nie pamiętam hasła" }],
   [

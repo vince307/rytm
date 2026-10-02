@@ -7,19 +7,31 @@ import { cn } from "@/lib/utils";
 const nav = copy.navigation;
 ---
 
-<header class="flex h-[78px] items-center justify-between border-b border-ink/10 max-[559px]:h-[68px]">
+<header class="flex h-[78px] items-center justify-between border-b border-ink/10 max-[559px]:h-16">
   <Brand />
-  <nav class="flex items-center gap-[27px] max-[899px]:gap-[13px]">
+  <nav class="flex items-center gap-[27px] max-[899px]:gap-[13px] max-[559px]:gap-[5px] max-[359px]:gap-[3px]">
     <a href="/how-it-works" class="text-sm font-semibold text-muted hover:text-ink max-[899px]:hidden">
       {nav.howItWorks}
     </a>
-    <a href="/for-who" class="text-sm font-semibold text-muted hover:text-ink max-[559px]:text-xs">
+    <a href="/for-who" class="text-sm font-semibold text-muted hover:text-ink max-[559px]:hidden">
       {nav.forWho}
     </a>
-    <a href="/login" class:list={cn(buttonVariants({ variant: "ghost" }), "max-[559px]:text-xs")}>
+    <a
+      href="/login"
+      class:list={cn(
+        buttonVariants({ variant: "ghost" }),
+        "max-[559px]:px-[9px] max-[559px]:py-2 max-[559px]:text-[11px] max-[359px]:px-1.5 max-[359px]:py-[7px] max-[359px]:text-[10px]",
+      )}
+    >
       {nav.login}
     </a>
-    <a href="/register" class:list={cn(buttonVariants({ variant: "primary" }), "max-[559px]:text-xs")}>
+    <a
+      href="/register"
+      class:list={cn(
+        buttonVariants({ variant: "primary" }),
+        "max-[559px]:px-[9px] max-[559px]:py-2 max-[559px]:text-[11px] max-[359px]:px-1.5 max-[359px]:py-[7px] max-[359px]:text-[10px]",
+      )}
+    >
       {nav.start}
     </a>
   </nav>

@@ -280,32 +280,6 @@ export const copyExtra = {
     overview: "Przegląd",
     navLabel: "Nawigacja aplikacji",
   },
-  landing: {
-    headlineEmphasis: "rytmie.",
-    stepsEyebrow: "Bez arkusza",
-    stepsTitle: "Trzy kroki do jasności.",
-    stepsNote: "Wystarczy jeden wieczór w miesiącu.",
-    heroCardTop: "Twój miesiąc",
-    heroCardSub: "wydatki rozpoznane",
-    ctaTitle: ["Zobacz, gdzie cicho", "ucieka pieniądz."],
-    ctaButton: "Utwórz konto",
-  },
-  howItWorks: {
-    sequenceCaption: "Jedna granica, wiele powrotów",
-    sequenceThreshold: "Twój próg",
-    sequenceOver: "Ponad próg",
-    stepsEyebrow: "Od pliku do obrazu",
-    stepsTitle: "Trzy spokojne kroki.",
-    stepsNote: "Bez ręcznego kategoryzowania.",
-  },
-  forWho: {
-    primaryCta: "Sprawdź swój rytm",
-    quoteLines: ["Nie chcę budżetu", "na każdy dzień."],
-    quoteStrong: "Chcę widzieć wzorce.",
-    cardsEyebrow: "Brzmi znajomo?",
-    cardsTitle: "Rytm pasuje do Twojego tempa.",
-    secondaryCta: "Zobacz jak działa",
-  },
   // DESIGN-GAP: K11 — the empty-view paragraph is in the prototype but not in content.json (round 3).
   emptyViews: { body: "Jeden plik CSV wystarczy, aby Rytm mógł rozpoznać Twój rytm wydatków." },
 } as const;

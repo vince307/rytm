@@ -1,10 +1,10 @@
 ---
 change_id: kit-round-3-intake
 title: Design kit round 3 taken into design/rytm-os/ with the app green on the new content.json
-status: impl_reviewed
+status: archived
 created: 2026-10-02
 updated: 2026-10-02
-archived_at: null
+archived_at: 2026-10-02T20:36:29Z
 ---
 
 ## Notes

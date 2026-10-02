@@ -41,7 +41,7 @@ Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stał
 
 | ID   | Change ID                  | Outcome (user can …)                                                                                                                               | Prerequisites | PRD refs                                 | Status  |
 | ---- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------- | ------- |
-| F-04 | kit-round-3-intake         | (foundation) runda 3 kitu jest w `design/rytm-os/`, aplikacja na nowym `content.json` i tokenach działa bez regresji                               | —             | — (kit)                                  | planning |
+| F-04 | kit-round-3-intake         | (foundation) runda 3 kitu jest w `design/rytm-os/`, aplikacja na nowym `content.json` i tokenach działa bez regresji                               | —             | — (kit)                                  | done |
 | S-12 | kit-round-3-auth-settings  | przejść logowanie, rejestrację, reset hasła i ustawienia konta (zmiana hasła, usunięcie, wylogowanie, konto demo) w wersji rundy 3 kitu            | F-04          | FR-001, FR-019                           | pending |
 | S-13 | kit-round-3-imports        | wgrać plik z ING lub Santandera, zobaczyć wynik, odrzucenia i historię importów (z cofnięciem) w wersji rundy 3 kitu                               | F-04          | FR-003, FR-004, FR-005, FR-018           | pending |
 | S-14 | kit-round-3-patterns       | przeglądać wzorce, szczegół z progiem i dialog akcji (scal, zmień nazwę, typ, wyklucz) we wszystkich stanach rundy 3 kitu                         | F-04          | FR-007, FR-008, FR-009, FR-010, FR-011   | pending |
@@ -70,7 +70,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Najpierw, bo `copy.ts` importuje `content.json` wprost z kitu — podmiana plików i utrzymanie aplikacji na zielono muszą wejść jednym merge'em; ryzyko — cicha regresja copy na ekranach (klucz istnieje, ale zmienił znaczenie), łagodzone smoke + przeglądem ekranów, których dotykają zmienione klucze.
-- **Status:** planning
+- **Status:** done
 
 ## Slices
 
@@ -126,11 +126,11 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 | Roadmap ID | Change ID                 | Suggested issue title                                   | Ready for `/10x-plan` | Notes |
 | ---------- | ------------------------- | ------------------------------------------------------- | --------------------- | ----- |
-| F-04       | kit-round-3-intake        | Przyjęcie rundy 3 kitu bez regresji aplikacji           | yes                   | Dostawa lokalnie w `context/runs/2026-10-02-kit-round-3/kit-delivery/` |
-| S-12       | kit-round-3-auth-settings | Auth i ustawienia według rundy 3 kitu                   | after F-04            | —     |
-| S-13       | kit-round-3-imports       | Import i historia importów według rundy 3 kitu          | after F-04            | —     |
-| S-14       | kit-round-3-patterns      | Wzorce, szczegół i akcje według rundy 3 kitu            | after F-04            | —     |
-| S-15       | kit-round-3-home-fixed    | Przegląd, trend i koszty stałe według rundy 3 kitu      | after F-04            | —     |
+| F-04       | kit-round-3-intake        | Przyjęcie rundy 3 kitu bez regresji aplikacji           | done                  | Zarchiwizowane 2026-10-02 → `context/archive/2026-10-02-kit-round-3-intake/`; follow-upy z `Trigger:` w `follow-ups/review-fixes.md` |
+| S-12       | kit-round-3-auth-settings | Auth i ustawienia według rundy 3 kitu                   | yes                   | F-04 zarchiwizowane; `grep -n 'Trigger: S-12' context/archive/2026-10-02-kit-round-3-intake/follow-ups/review-fixes.md` |
+| S-13       | kit-round-3-imports       | Import i historia importów według rundy 3 kitu          | yes                   | F-04 zarchiwizowane; `grep -n 'Trigger: S-13' context/archive/2026-10-02-kit-round-3-intake/follow-ups/review-fixes.md` |
+| S-14       | kit-round-3-patterns      | Wzorce, szczegół i akcje według rundy 3 kitu            | yes                   | F-04 zarchiwizowane; `grep -n 'Trigger: S-14' context/archive/2026-10-02-kit-round-3-intake/follow-ups/review-fixes.md` |
+| S-15       | kit-round-3-home-fixed    | Przegląd, trend i koszty stałe według rundy 3 kitu      | yes                   | F-04 zarchiwizowane; `grep -n 'Trigger: S-15' context/archive/2026-10-02-kit-round-3-intake/follow-ups/review-fixes.md` |
 
 ## Open Roadmap Questions
 
@@ -179,3 +179,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **F-03: (foundation) w repozytorium jest syntetyczny eksport Santander PLN z pułapkami formatu i opisów oraz plik USD do odrzucenia** — Archived 2026-10-02 → `context/archive/2026-10-01-synthetic-santander-fixture/`. Lesson: —.
 - **S-10: Użytkownik może wgrać plik CSV z Santander Bank Polska (PLN): aplikacja sama rozpoznaje format, pokazuje wynik importu (liczba obciążeń, zakres od daty z nagłówka do daty eksportu) i dodaje import do listy importów z nazwą banku; plik w innej walucie i zakres nakładający się na istniejący import tego rachunku są odrzucane z komunikatem, uznania i zwroty są pomijane, a transakcje trafiają do wzorców.** — Archived 2026-10-02 → `context/archive/2026-10-02-santander-csv-import/`. Lesson: —.
 - **S-11: Użytkownik może zobaczyć transakcje kartowe z Santandera we właściwych wzorcach: opis płatności kartą daje sprzedawcę bez numeru karty i numeru placówki, płatności obiema kartami jednego rachunku trafiają do tego samego wzorca, wypłaty z bankomatu tworzą jeden wzorzec, a ten sam sprzedawca z ING i z Santandera jest jednym wzorcem.** — Archived 2026-10-02 → `context/archive/2026-10-02-santander-card-merchants/`. Lesson: —.
+- **F-04: (foundation) dostawa rundy 3 jest przeniesiona do `design/rytm-os/` w strukturze kitu (react-kit, prototype, brand-pack, CHANGELOG), z łatką przyjęcia przywracającą klucze używane przez aplikację; `scripts/sync-kit.sh` zsynchronizował `brand.css` (nowe tokeny dostępne jako nazwy Tailwind, jeśli są potrzebne); aplikacja na nowym `content.json` działa bez regresji (żadnego `undefined`, surowego `{n}`/`{month}` ani rozjechanej tabeli); `design-kit.md` mówi `kit_round: 3`, każda pozycja K/G rundy 3 ma status (dostarczona / częściowo / pominięta) i slice M-3, który ją wdraża.** — Archived 2026-10-02 → `context/archive/2026-10-02-kit-round-3-intake/`. Lesson: —.

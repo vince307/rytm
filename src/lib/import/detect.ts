@@ -37,9 +37,9 @@ export function buildPayload(detected: Extract<DetectResult, { ok: true }>, acco
 }
 
 /** A file-level decision the wizard shows to the user — one step wider than `ParseError`: `empty` is not a
- * parse failure (the file is a well-formed statement with no debits, D2), and the oversized-file case never
- * reaches a reader at all (DESIGN-GAP: G27, the kit has no message for either). */
-export type FileError = "unknownFormat" | "wrongCurrency" | "empty";
+ * parse failure (the file is a well-formed statement with no debits, D2), and `tooLarge` never reaches a
+ * reader at all. */
+export type FileError = "unknownFormat" | "wrongCurrency" | "empty" | "tooLarge";
 
 /**
  * The wizard's file-level classification (S-10 Phase 6), moved out of `ImportWizard.tsx` so it is
@@ -52,8 +52,7 @@ export function readImportFile(
   bytes: Uint8Array,
   opts: { santanderAccountName: string },
 ): { detected: Extract<DetectResult, { ok: true }> } | { error: FileError } {
-  // DESIGN-GAP: G27 — the kit has no message for a file over the size limit; `unknownFormat` stands in.
-  if (bytes.length > MAX_FILE_BYTES) return { error: "unknownFormat" };
+  if (bytes.length > MAX_FILE_BYTES) return { error: "tooLarge" };
   const result = detectStatement(bytes, opts);
   if (!result.ok) return { error: result.error === "wrong-currency" ? "wrongCurrency" : "unknownFormat" };
   if (result.statement.accounts.every((a) => a.debits === 0)) return { error: "empty" };

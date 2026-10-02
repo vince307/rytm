@@ -41,12 +41,10 @@ const serverError: WizardServerError | undefined = kind.success
   <ImportWizard
     client:load
     labels={{
-      // DESIGN-GAP: K26 — the kit's `supported` and `unknownFormat` name only ING ("…Santander wkrótce.");
-      // the copyExtra versions name both banks and override them here, so every use site (including the
-      // G27 stand-ins) picks up the both-bank wording with no wizard edit.
-      flow: { title: f.title, steps: f.steps, supported: copyExtra.imports.supported, oneAccount: f.oneAccount },
+      flow: { title: f.title, steps: f.steps, supported: f.supported, oneAccount: f.oneAccount },
+      kit: copy.imports,
       imports: copyExtra.imports,
-      errors: { ...copy.importErrors, unknownFormat: copyExtra.imports.unknownFormat },
+      errors: copy.importErrors,
       genericError: copyExtra.imports.saveError,
     }}
     existing={existing}

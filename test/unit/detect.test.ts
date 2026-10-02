@@ -93,10 +93,10 @@ describe("readImportFile", () => {
     });
   });
 
-  it("rejects an oversized buffer as unknownFormat before any parsing", () => {
+  it("rejects an oversized buffer as tooLarge before any parsing", () => {
     const oversized = new Uint8Array(MAX_FILE_BYTES + 1);
     expect(readImportFile(oversized, { santanderAccountName: SANTANDER_ACCOUNT_NAME })).toEqual({
-      error: "unknownFormat",
+      error: "tooLarge",
     });
   });
 

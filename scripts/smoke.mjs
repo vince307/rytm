@@ -313,6 +313,21 @@ const steps = [
     () => request(importResultPath),
     { status: 200, contains: "Dodaliśmy 2 obciążenia." },
   ],
+  // S-13: the wizard island is server-rendered at step 1, so these match the rendered node (leading `>`), not
+  // the bare text that the island's serialized props also contain.
+  [
+    "import wizard step 1 names both banks",
+    () => request("/imports/new"),
+    {
+      status: 200,
+      contains: ">Obsługujemy pliki CSV z ING Bank Śląski i Santander Bank Polska w PLN.<",
+    },
+  ],
+  [
+    "import wizard shows the inconsistent-file message for a rejected payload",
+    () => request("/imports/new?error=invalid"),
+    { status: 200, contains: ">Plik jest niespójny:" },
+  ],
   ["patterns lists imported merchants", () => request("/patterns"), { status: 200, contains: "Kawiarnia smoke" }],
   // The rendered badge text node — a bare "stały" would also match the island's serialized copy props.
   ["patterns proposes a type", () => request("/patterns"), { status: 200, contains: ">stały<" }],

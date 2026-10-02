@@ -16,12 +16,16 @@ import { Glyph } from "@/components/Glyph";
 import type { copy, copyExtra } from "@/content/copy";
 import { accountLabel } from "@/lib/import/banks";
 import { buildPayload, readImportFile, type DetectResult, type FileError } from "@/lib/import/detect";
+import { fileErrorMessage, fillTemplate, tooManyMessage } from "@/lib/import/presentation";
 import { MAX_DEBITS, MAX_FILE_BYTES, importPayloadSchema } from "@/lib/import/schema";
 import { formatAccountTail, formatRangeLong, formatRangeShort, plural } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export interface ImportWizardLabels {
   flow: Pick<typeof copy.importFlow, "title" | "steps" | "supported" | "oneAccount">;
+  /** Kit `imports` — step-1 copy, bank names, the recognised-format chip. */
+  kit: typeof copy.imports;
+  /** `copyExtra.imports` — only the K11 / K28 placeholders (steps 2–3 until the later phases rebind them). */
   imports: typeof copyExtra.imports;
   errors: typeof copy.importErrors;
   /** `copyExtra.imports.saveError` (kit round 3 has the text only in `app.js`; K28 in design-kit.md) — a save that failed for a reason the user cannot act on. */
@@ -54,8 +58,7 @@ interface Loaded {
   detected: Extract<DetectResult, { ok: true }>;
 }
 
-const fill = (template: string, values: Record<string, string | number>) =>
-  template.replace(/\{(\w+)\}/g, (match, key: string) => (key in values ? String(values[key]) : match));
+const fill = fillTemplate;
 
 // Prototype .panel
 const panel = "border-line bg-paper rounded-xl border p-[22px] max-[559px]:p-[17px]";
@@ -68,10 +71,9 @@ async function readStatement(
   file: File,
   santanderAccountName: string,
 ): Promise<{ detected: Extract<DetectResult, { ok: true }> } | { error: FileError }> {
-  // DESIGN-GAP: G27 — the kit has no message for a file over the size limit; `unknownFormat` stands in.
   // Checked on the `File` object, before `file.arrayBuffer()`, so an oversized file is never read into
   // memory; `readImportFile` repeats the check on the decoded bytes so it can be unit-tested without a File.
-  if (file.size > MAX_FILE_BYTES) return { error: "unknownFormat" };
+  if (file.size > MAX_FILE_BYTES) return { error: "tooLarge" };
   try {
     return readImportFile(new Uint8Array(await file.arrayBuffer()), { santanderAccountName });
   } catch {
@@ -123,7 +125,7 @@ function StepTitle({
 }
 
 export default function ImportWizard({ labels, existing, serverError }: Props) {
-  const { flow, imports: x, errors } = labels;
+  const { flow, kit, imports: x, errors } = labels;
   const [step, setStep] = useState<Step>(1);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [fileError, setFileError] = useState<FileError | null>(null);
@@ -222,8 +224,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
       pageError?.kind === "overlap" ? (
         overlapMessage(pageError.from, pageError.to)
       ) : pageError?.kind === "invalid" ? (
-        // DESIGN-GAP: G27 — the kit has no message for a payload the server rejected; `unknownFormat` stands in.
-        <Headline text={errors.unknownFormat} />
+        <Headline text={errors.inconsistent} />
       ) : pageError?.kind === "failed" ? (
         labels.genericError
       ) : pageError?.kind === "demo" ? (
@@ -234,12 +235,12 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
     return (
       <>
         {fileInput}
-        <StepTitle eyebrow={x.newEyebrow} title={flow.title} lead={x.newLead} headingRef={headingRef}>
+        <StepTitle eyebrow={kit.newEyebrow} title={flow.title} lead={kit.newLead} headingRef={headingRef}>
           <a
             href="/imports"
             className="text-ink inline-flex items-center gap-1.5 text-[13px] font-extrabold no-underline"
           >
-            <Glyph name="arrow-left" size={15} /> {x.back}
+            <Glyph name="arrow-left" size={15} /> {kit.back}
           </a>
         </StepTitle>
         <Stepper steps={flow.steps} current={1} />
@@ -265,16 +266,16 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
           <div className="bg-ink text-paper grid size-[60px] place-items-center rounded-[13px]">
             <Glyph name="upload" size={28} />
           </div>
-          <h2 className="mt-[22px] mb-2 text-[23px] tracking-[-0.04em]">{x.dropTitle}</h2>
+          <h2 className="mt-[22px] mb-2 text-[23px] tracking-[-0.04em]">{kit.dropTitle}</h2>
           <p className="text-muted mb-[22px] text-[13px]">{flow.supported}</p>
           <Button type="button" variant="primary" onClick={openPicker}>
-            {x.choose}
+            {kit.choose}
           </Button>
           {loaded && (
             <div className="bg-paper-soft text-muted mt-[25px] flex items-center gap-[9px] rounded-lg px-3.5 py-[11px] text-xs">
               <Glyph name="success" className="text-green" />
               <span className="min-w-0 [overflow-wrap:anywhere]">
-                {loaded.fileName} · {x.formatRecognised[loaded.detected.bank]}
+                {loaded.fileName} · {fill(kit.formatRecognised, { bank: kit.bankName[loaded.detected.bank] })}
               </span>
               <button
                 type="button"
@@ -290,7 +291,7 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
         </section>
         {fileError && (
           <section className="mt-[15px] grid max-w-[760px] gap-2.5">
-            <ServerError className="mb-0" message={<Headline text={errors[fileError]} />}>
+            <ServerError className="mb-0" message={<Headline text={fileErrorMessage(errors, fileError)} />}>
               {chooseOtherButton}
             </ServerError>
           </section>
@@ -373,11 +374,9 @@ export default function ImportWizard({ labels, existing, serverError }: Props) {
   ) : chosen.debits === 0 ? (
     <Headline text={errors.empty} />
   ) : chosen.debits > MAX_DEBITS ? (
-    // DESIGN-GAP: G27 — the kit has no message for "too many debits in one import"; `unknownFormat` stands in.
-    <Headline text={errors.unknownFormat} />
+    <Headline text={tooManyMessage(errors)} />
   ) : !payloadValid ? (
-    // DESIGN-GAP: G27 — the kit has no message for "file inconsistent with the import contract"; `unknownFormat` stands in.
-    <Headline text={errors.unknownFormat} />
+    <Headline text={errors.inconsistent} />
   ) : null;
 
   return (

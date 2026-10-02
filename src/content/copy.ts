@@ -105,11 +105,6 @@ export const copyExtra = {
     eyebrow: "Importy CSV",
     title: "Twoje źródła danych.",
     lead: "Każdy import możesz cofnąć. Plik CSV nie jest przechowywany po imporcie.",
-    newEyebrow: "Nowy import",
-    newLead: "Wybierzesz jeden rachunek z pliku. Import obejmuje tylko obciążenia.",
-    back: "Wróć do importów",
-    dropTitle: "Upuść plik CSV tutaj",
-    choose: "Wybierz plik",
     // Wizard save failure (import result `status === 'error'` in round-3 `prototype/app.js`); not in `content.json`
     // (kit gap, round-4 K-row) — `components.error` is now the read-failure line.
     saveError: "Nie udało się zapisać importu. Spróbuj ponownie.",
@@ -119,13 +114,9 @@ export const copyExtra = {
     // DESIGN-GAP: K26 — the kit has only the single ING account label; the app adds a per-bank template
     // (S-10 Phase 5), filled through `accountLabel()` so an unknown source never crashes the row.
     accountLabel: { ing: "ING · {name}", santander: "Santander · {name}" },
-    // DESIGN-GAP: K26 — the Santander export has no account name column (the owner's name, header col 3, is
-    // never stored, R2); "Rachunek" is the kit's own word for the column, used as a neutral stand-in.
+    // Santander's export has no account name column (the owner's name, header col 3, is never stored, R2);
+    // "Rachunek" is the kit's own word (`imports.santanderAccountName`), sent by the wizard as the stored name.
     santanderAccountName: "Rachunek",
-    // DESIGN-GAP: K26 — the kit announces Santander as "wkrótce" (`importFlow.supported`). The app's wizard
-    // (new.astro) overrides the kit's `supported`/`unknownFormat` with these both-bank versions.
-    supported: "Obsługujemy wyciągi ING Bank Śląski i Santander Bank Polska w PLN.",
-    unknownFormat: "Nieznany format pliku. Obsługujemy: ING Bank Śląski i Santander Bank Polska.",
     // Result screen (prototype importResult(), app.js:63).
     resultEyebrow: "Import gotowy",
     toPatterns: "Zobacz wzorce",
@@ -136,10 +127,6 @@ export const copyExtra = {
     // prototype lead („Dodaliśmy 64 obciążenia…”).
     resultTitle: "Dodaliśmy {n} {debits}.",
     debitForms: ["obciążenie", "obciążenia", "obciążeń"],
-    // Import wizard (prototype importsNew/uploadReady/importAccount/importSummary, app.js:57–61).
-    // DESIGN-GAP: K26 — the kit's chip only ever says "rozpoznano format ING"; the app adds the Santander
-    // form, filled by the bank the detector found (S-10 Phase 6).
-    formatRecognised: { ing: "rozpoznano format ING", santander: "rozpoznano format Santander" },
     next: "Dalej",
     stepBack: "Wstecz",
     stepEyebrow: "Nowy import · krok {n} z 3",

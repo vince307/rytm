@@ -1,7 +1,7 @@
 ---
 change_id: santander-card-merchants
 title: Santander card transactions grouped into the right merchant patterns, shared with ING
-status: implementing
+status: implemented
 created: 2026-10-02
 updated: 2026-10-02
 archived_at: null

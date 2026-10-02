@@ -690,11 +690,11 @@ are collected in the Phase 8 `[human]` row.
 
 #### Automated
 
-- [x] 2.1 npm test: Phase 1 count, 0 failed
-- [x] 2.2 Smoke Phase 1 count + 3 PASS, 0 FAIL
-- [x] 2.3 No settingsLong / sidebarView / navLabel left in copy.ts
-- [x] 2.4 Deliberate break: demo false / true turns the demo-note and test-user steps red, restored, meta-check recorded
-- [x] 2.5 Full local gate vs baseline, smoke + 6
+- [x] 2.1 npm test: Phase 1 count, 0 failed — b10c8d9
+- [x] 2.2 Smoke Phase 1 count + 3 PASS, 0 FAIL — b10c8d9
+- [x] 2.3 No settingsLong / sidebarView / navLabel left in copy.ts — b10c8d9
+- [x] 2.4 Deliberate break: demo false / true turns the demo-note and test-user steps red, restored, meta-check recorded — b10c8d9
+- [x] 2.5 Full local gate vs baseline, smoke + 6 — b10c8d9
 
 #### Manual
 

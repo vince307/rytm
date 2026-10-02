@@ -43,7 +43,7 @@ Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stał
 | ---- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------ | -------- |
 | F-03 | synthetic-santander-fixture | (foundation) w repozytorium jest syntetyczny eksport Santander PLN z pułapkami formatu i opisów oraz plik USD do odrzucenia | —             | FR-018, FR-014, NFR prywatność | done     |
 | S-10 | santander-csv-import        | wgrać plik CSV z Santandera i zobaczyć wynik importu na tych samych zasadach co ING                                         | F-03          | FR-018, FR-004, FR-005         | done |
-| S-11 | santander-card-merchants    | zobaczyć transakcje kartowe z Santandera we właściwych wzorcach sprzedawców, wspólnych z ING                                | S-10, F-03    | FR-018, FR-006, FR-007         | proposed |
+| S-11 | santander-card-merchants    | zobaczyć transakcje kartowe z Santandera we właściwych wzorcach sprzedawców, wspólnych z ING                                | S-10, F-03    | FR-018, FR-006, FR-007         | planning |
 
 ## Baseline
 
@@ -100,7 +100,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Gwiazda przewodnia M-2 — normalizacja to rdzeń produktu (FR-006), a opisy kartowe Santandera mają inny kształt niż ING; ryzyko — zmiana normalizacji przesuwa istniejące wzorce ING, więc oczekiwany wynik fixture ING musi pozostać bez zmian.
-- **Status:** proposed
+- **Status:** planning
 
 ## Backlog Handoff
 

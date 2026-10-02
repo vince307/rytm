@@ -6,6 +6,7 @@ import InlineAlert from "@/components/app/InlineAlert.astro";
 import NewPasswordForm from "@/components/auth/NewPasswordForm";
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
+import { MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 
 const r = copy.resetNew;
 const s = copy.authStates;
@@ -39,7 +40,7 @@ const hasError = params.has("error");
     <>
       <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{r.eyebrow}</div>
       <h1 class="mt-4 mb-2 text-[34px] tracking-[-0.06em]">{r.title}</h1>
-      <p class="mb-7 text-sm text-muted">{r.lead}</p>
+      <p class="mb-7 text-sm text-muted">{r.lead.replace("{n}", String(MIN_PASSWORD_LENGTH))}</p>
       <NewPasswordForm
         client:load
         serverError={params.get("error") === "demo" ? copyExtra.settings.demoLocked : hasError ? x.resetNewError : null}
@@ -51,7 +52,7 @@ const hasError = params.has("error");
           hidePassword: s.hidePassword,
           submit: x.saveNewPassword,
           pending: x.saving,
-          passwordTooShort: s.passwordTooShort,
+          passwordTooShort: s.passwordTooShort.replace("{n}", String(MIN_PASSWORD_LENGTH)),
           passwordsDiffer: x.passwordsDiffer,
         }}
       />

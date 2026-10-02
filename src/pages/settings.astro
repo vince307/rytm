@@ -8,7 +8,7 @@ import InlineAlert from "@/components/app/InlineAlert.astro";
 import NewPasswordForm from "@/components/auth/NewPasswordForm";
 import DeleteAccountDialog from "@/components/settings/DeleteAccountDialog";
 import { copy, copyExtra } from "@/content/copy";
-import { DELETE_CONFIRM_WORD } from "@/lib/auth-rules";
+import { DELETE_CONFIRM_WORD, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 
 const s = copy.settings;
 const a = copy.authStates;
@@ -67,7 +67,7 @@ const deleteError =
             hidePassword: a.hidePassword,
             submit: x.changePassword,
             pending: xa.saving,
-            passwordTooShort: a.passwordTooShort,
+            passwordTooShort: a.passwordTooShort.replace("{n}", String(MIN_PASSWORD_LENGTH)),
             passwordsDiffer: xa.passwordsDiffer,
             currentRequired: a.passwordRequired,
           }}

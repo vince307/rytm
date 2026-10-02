@@ -81,8 +81,8 @@ export const copyExtra = {
     // DESIGN-GAP: G35 — the kit's trend panel has no state for "no pattern has an applicable threshold at all";
     // placeholder, the author supplies the final copy.
     noThreshold: "Ustaw próg na wzorcu, a tu pojawi się suma ponad progiem.",
-    // DESIGN-GAP: K25 — the kit prints these only as `content.json` `dashboard.stats[].foot` *samples*
-    // ("+42,20 zł względem kwietnia", "2 pozycje podrożały"); the templates below reproduce them byte for byte.
+    // DESIGN-GAP: K25 / K29 — round 3 ships `dashboard.stats[].foot` templates, but no genitive months and „{n} {items}
+    // podrożały” is wrong for n = 1 (K29 in design-kit.md); the app keeps these templates until the kit foot is grammatical.
     deltaFoot: "{delta} względem {month}",
     monthsGenitive: [
       "stycznia",
@@ -110,6 +110,9 @@ export const copyExtra = {
     back: "Wróć do importów",
     dropTitle: "Upuść plik CSV tutaj",
     choose: "Wybierz plik",
+    // Wizard save failure (import result `status === 'error'` in round-3 `prototype/app.js`); not in `content.json`
+    // (kit gap, round-4 K-row) — `components.error` is now the read-failure line.
+    saveError: "Nie udało się zapisać importu. Spróbuj ponownie.",
     newImport: "+ Nowy import",
     // Imports table (prototype imports(), app.js:56) — column headers and the account cell.
     table: { importedOn: "Data importu", account: "Rachunek", range: "Zakres dat", debits: "Obciążenia" },
@@ -192,8 +195,6 @@ export const copyExtra = {
     sortPrefix: "Sortuj: ",
     footer: "{n} {patterns} · wszystkie miesiące",
     patternForms: ["wzorzec", "wzorce", "wzorców"],
-    // DESIGN-GAP: K17 — the kit table has no "kwota dla stałych" column (FR-007); placeholder header.
-    amountColumn: "Kwota",
     // DESIGN-GAP: K21 — detail / threshold-editor / list strings the prototype renders that content.json still
     // lacks (round 3); taken verbatim from app.js patternDetail() / thresholdEditor() / patternRows() / showToast().
     detailEyebrow: " wzorzec",

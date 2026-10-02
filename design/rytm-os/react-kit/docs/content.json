@@ -35,7 +35,18 @@
         "title": "Zobacz ponad progiem",
         "body": "Nadwyżka trafia do widoku „ponad progiem w tym miesiącu”. Bez wstydu, z konkretem."
       }
-    ]
+    ],
+    "headlineEmphasis": "rytmie.",
+    "stepsEyebrow": "Bez arkusza",
+    "stepsTitle": "Trzy kroki do jasności.",
+    "stepsNote": "Wystarczy jeden wieczór w miesiącu.",
+    "heroCardTop": "Twój miesiąc",
+    "heroCardSub": "wydatki rozpoznane",
+    "ctaTitle": [
+      "Zobacz, gdzie cicho",
+      "ucieka pieniądz."
+    ],
+    "ctaButton": "Utwórz konto"
   },
   "howItWorks": {
     "eyebrow": "Jak działa Rytm",
@@ -78,7 +89,13 @@
         "title": "Ponad próg",
         "body": "Rytm nie mówi, co masz robić. Pokazuje miejsce, w którym możesz zdecydować."
       }
-    ]
+    ],
+    "sequenceCaption": "Jedna granica, wiele powrotów",
+    "sequenceThreshold": "Twój próg",
+    "sequenceOver": "Ponad próg",
+    "stepsEyebrow": "Od pliku do obrazu",
+    "stepsTitle": "Trzy spokojne kroki.",
+    "stepsNote": "Bez ręcznego kategoryzowania."
   },
   "forWho": {
     "eyebrow": "Dla kogo jest Rytm",
@@ -108,7 +125,16 @@
         "link": "Ustaw swój próg"
       }
     ],
-    "closing": "Rytm zostawia miejsce na normalne życie. Pomaga tylko zauważyć, kiedy małe decyzje zaczynają się powtarzać."
+    "closing": "Rytm zostawia miejsce na normalne życie. Pomaga tylko zauważyć, kiedy małe decyzje zaczynają się powtarzać.",
+    "primaryCta": "Sprawdź swój rytm",
+    "quoteLines": [
+      "Nie chcę budżetu",
+      "na każdy dzień."
+    ],
+    "quoteStrong": "Chcę widzieć wzorce.",
+    "cardsEyebrow": "Brzmi znajomo?",
+    "cardsTitle": "Rytm pasuje do Twojego tempa.",
+    "secondaryCta": "Zobacz jak działa"
   },
   "auth": {
     "login": {
@@ -126,52 +152,54 @@
       "email": "E-mail",
       "password": "Hasło"
     },
-    "confirmEmailTitle": "Potwierdź swój e-mail.",
-    "confirmEmailBody": "Wysłaliśmy link aktywacyjny na podany adres e-mail. Kliknij go, aby dokończyć rejestrację.",
-    "resetNewTitle": "Ustaw nowe hasło.",
-    "resetExpired": "Link wygasł. Wyślij nowy link, aby kontynuować."
+    "loginVisual": {
+      "eyebrow": "Twój rytm",
+      "title": "Wróć do swojego rytmu.",
+      "lead": "Twoje wzorce wydatków czekają na kolejny miesiąc."
+    },
+    "registerVisual": {
+      "eyebrow": "Twój rytm",
+      "title": "Zacznij widzieć więcej.",
+      "lead": "Jedno konto, jeden spokojny widok Twoich wydatków."
+    },
+    "resetVisual": {
+      "eyebrow": "Spokojnie",
+      "title": "Hasło można ustawić na nowo.",
+      "lead": "Wyślemy Ci prostą instrukcję na adres przypisany do konta."
+    },
+    "optional": "opcjonalne",
+    "namePlaceholder": "np. Ola",
+    "emailPlaceholder": "ty@przyklad.pl",
+    "passwordPlaceholder": "••••••••",
+    "forgotPassword": "Nie pamiętam hasła",
+    "terms": "Zakładając konto akceptujesz regulamin.",
+    "noAccount": "Nie masz jeszcze konta?",
+    "createIt": "Utwórz je",
+    "haveAccount": "Masz już konto?",
+    "resetEyebrow": "Nie pamiętam hasła",
+    "sendInstructions": "Wyślij instrukcję",
+    "backToLogin": "Wróć do logowania"
   },
   "dashboard": {
     "eyebrow": "Przegląd miesiąca",
     "greeting": "Dzień dobry, Olu.",
-    "description": "Oto rytm Twoich wydatków w maju.",
+    "description": "Oto rytm Twoich wydatków w {month}.",
     "stats": [
       {
         "label": "Ponad progiem w tym miesiącu",
         "value": "284,40 zł",
-        "foot": "+42,20 zł względem kwietnia"
-      },
-      {
-        "label": "Rozpoznane wydatki",
-        "value": "3 842,60 zł",
-        "foot": "64 transakcje · 12 wzorców"
+        "foot": "{delta} względem {month}"
       },
       {
         "label": "Koszty stałe",
         "value": "1 920 zł",
-        "foot": "2 pozycje podrożały"
-      }
-    ],
-    "patterns": [
-      {
-        "merchant": "Wolt",
-        "meta": "8 razy · próg 4",
-        "amount": "+84 zł"
-      },
-      {
-        "merchant": "Spotify",
-        "meta": "co miesiąc",
-        "amount": "24,99 zł"
-      },
-      {
-        "merchant": "Kawa i spółka",
-        "meta": "11 razy · próg 8",
-        "amount": "+61 zł"
+        "foot": "{n} {items} podrożały"
       }
     ],
     "importTitle": "Dodaj najnowszy wyciąg",
     "importBody": "CSV z Twojego banku · plik nie jest przechowywany po imporcie",
-    "greetingNoName": "Dzień dobry."
+    "greetingNoName": "Dzień dobry.",
+    "descriptionNoName": "Twój {month} w jednym spokojnym widoku."
   },
   "patterns": {
     "title": "To, co wraca.",
@@ -180,6 +208,7 @@
       "Sprzedawca",
       "Typ",
       "Wystąpienia",
+      "Kwota",
       "Suma",
       "Próg",
       "Ponad progiem"
@@ -189,13 +218,45 @@
       "suma",
       "liczba",
       "nazwa"
-    ]
+    ],
+    "countForms": [
+      "wzorzec",
+      "wzorce",
+      "wzorców"
+    ],
+    "showMore": "Pokaż więcej",
+    "excluded": "Wykluczone",
+    "merchantMark": "Znak sprzedawcy"
   },
   "patternDetail": {
     "back": "Wróć do wzorców",
-    "sumLabel": "Suma w maju",
+    "sumLabel": "Suma w {month}",
     "transactions": "Transakcje z wyciągu",
-    "rawDescription": "opis surowy · kwota"
+    "rawDescription": "opis surowy · kwota",
+    "monthNames": {
+      "styczeń": "styczniu",
+      "luty": "lutym",
+      "marzec": "marcu",
+      "kwiecień": "kwietniu",
+      "maj": "maju",
+      "czerwiec": "czerwcu",
+      "lipiec": "lipcu",
+      "sierpień": "sierpniu",
+      "wrzesień": "wrześniu",
+      "październik": "październiku",
+      "listopad": "listopadzie",
+      "grudzień": "grudniu"
+    },
+    "notFound": "Nie znaleziono wzorca. Mógł zniknąć po cofnięciu importu.",
+    "noOccurrences": "Brak wystąpień w tym miesiącu.",
+    "sequenceSummary": "{within} wystąpień w ramach progu, {over} ponad próg.",
+    "thresholdError": "Nie udało się zapisać progu. Spróbuj ponownie.",
+    "thresholdInvalid": "Wpisz próg większy od zera.",
+    "typeFixed": "Sprzedawca o stałej, powtarzalnej kwocie.",
+    "typeFrequent": "Sprzedawca, który wraca niezależnie od kwoty.",
+    "monthSelect": "Wystąpienia w miesiącu",
+    "sequenceWithin": "W ramach progu",
+    "sequenceOver": "Ponad próg"
   },
   "threshold": {
     "acceptedAmount": "Akceptowana kwota",
@@ -204,29 +265,95 @@
     "empty": "Ustaw próg, aby Rytm mógł oznaczać kolejne wystąpienia jako ponad próg.",
     "active": "Po przekroczeniu granicy kolejne wystąpienia zostaną oznaczone etykietą „ponad próg”.",
     "save": "Zapisz próg",
-    "remove": "Usuń próg"
+    "remove": "Usuń próg",
+    "title": "Próg wzorca",
+    "noThreshold": "brak ustawionego progu",
+    "activeLabel": "aktywny",
+    "amount": "Kwota",
+    "count": "Liczba wystąpień",
+    "unitCurrency": "zł",
+    "unitCount": "×",
+    "saving": "Zapisywanie…",
+    "invalid": "Wpisz próg większy od zera.",
+    "saveError": "Nie udało się zapisać progu. Spróbuj ponownie."
   },
   "patternActions": {
+    "restore": "Przywróć",
+    "excluded": "Wykluczony z analizy",
+    "restored": "Wzorzec przywrócony do analizy.",
+    "eyebrow": "Akcje na wzorcu",
+    "title": "Zarządzaj wzorcem.",
+    "lead": "Decyzje dotyczą wszystkich kolejnych miesięcy. Możesz je później odwrócić w ustawieniach wzorca.",
     "merge": "Scal z…",
     "changeType": "Zmień typ",
     "rename": "Zmień nazwę",
+    "close": "Zamknij",
+    "mergeTitle": "Scal wzorce",
+    "mergeLead": "Wybierz wzorzec, z którym połączyć tego sprzedawcę.",
+    "mergeEmpty": "Nie ma innych wzorców do scalenia.",
+    "mergeInvalid": "Nie można scalić tych wzorców.",
+    "renameTitle": "Zmień nazwę wzorca",
+    "renamePlaceholder": "Nowa nazwa",
+    "renameLong": "Nazwa może mieć maksymalnie {n} znaków.",
+    "save": "Zapisz",
+    "saving": "Zapisywanie…",
+    "saveError": "Nie udało się zapisać zmian. Spróbuj ponownie.",
+    "typeChanged": "Typ wzorca zmieniony.",
+    "excludedToast": "Wzorzec wykluczony z analizy.",
+    "mergedVariants": "Połączone nazwy",
+    "undoMerge": "Cofnij scalenie",
+    "merged": "Wzorce scalone.",
+    "renamed": "Nazwa wzorca zmieniona.",
     "exclude": "Wyklucz z analizy",
-    "restore": "Przywróć",
-    "excluded": "Wykluczony z analizy",
-    "restored": "Wzorzec przywrócony do analizy."
+    "closeLabel": "Zamknij",
+    "mergeForms": [
+      "wzorzec",
+      "wzorce",
+      "wzorców"
+    ],
+    "errorMerge": "Nie można scalić tych wzorców.",
+    "errorRename": "Nazwa może mieć maksymalnie {n} znaków.",
+    "errorSave": "Nie udało się zapisać zmian. Spróbuj ponownie.",
+    "renameMaxLength": 60
   },
   "fixedCosts": {
     "title": "Co zmieniło się samo?",
     "changed": "Zmieniły kwotę",
-    "new": "Nowe w tym miesiącu",
-    "unchanged": "Bez zmian"
+    "new": "Nowe w {month}",
+    "unchanged": "Bez zmian",
+    "decreased": "Obniżona kwota",
+    "noChanges": "W tym miesiącu nie zmieniły się żadne koszty stałe.",
+    "noNew": "Nie pojawiły się nowe koszty stałe.",
+    "noComparison": "Brak poprzedniego miesiąca do porównania.",
+    "readError": "Nie udało się wczytać kosztów stałych. Odśwież widok.",
+    "itemForms": [
+      "pozycja",
+      "pozycje",
+      "pozycji"
+    ],
+    "counts": {
+      "changed": 2,
+      "new": 1,
+      "unchanged": 2
+    },
+    "unchangedForms": [
+      "pozycja",
+      "pozycje",
+      "pozycji"
+    ]
   },
   "trend": {
     "title": "Ponad progiem",
     "range": "miesięcznie · wszystkie dane",
     "legend": "suma ponad progiem",
-    "current": "bieżący, niepełny miesiąc",
-    "tooShort": "Trend pojawi się po 3 miesiącach danych."
+    "current": "Bieżący miesiąc",
+    "tooShort": "Trend pojawi się po {n} miesiącach danych.",
+    "noThreshold": "Brak ustawionego progu",
+    "zero": "Brak kwoty ponad próg",
+    "amountLabel": "{amount} ponad próg",
+    "zeroMarker": "Brak kwoty ponad próg",
+    "gridLabel": "Suma ponad progiem",
+    "minimumMonths": 3
   },
   "importFlow": {
     "title": "Dodaj wyciąg.",
@@ -235,10 +362,24 @@
       "Rachunek",
       "Podsumowanie"
     ],
-    "supported": "Obsługujemy wyciągi ING Bank Śląski w PLN. Później dołączymy Santander.",
+    "supported": "Obsługujemy pliki CSV z ING Bank Śląski i Santander Bank Polska w PLN.",
     "oneAccount": "Import obejmuje jeden rachunek i tylko obciążenia.",
-    "overlap": "Zakres nachodzi na istniejący import. Po potwierdzeniu dane nie będą automatycznie deduplikowane.",
-    "result": "Wzorce są już widoczne."
+    "result": "Import gotowy.",
+    "accountLabel": "Rachunek",
+    "importButton": "Importuj {n} {debits}",
+    "debitForms": [
+      "obciążenie",
+      "obciążenia",
+      "obciążeń"
+    ],
+    "waiting": "Importowanie…",
+    "back": "Wstecz",
+    "rangeLabel": "Zakres dat",
+    "bank": "Bank",
+    "transactions": "transakcji",
+    "accountDefaultING": "Konto główne",
+    "accountSantander": "Rachunek",
+    "demoImportBlocked": "Na wspólnym koncie demo dodawanie i cofanie importów jest wyłączone."
   },
   "emptyState": {
     "title": "Nie masz jeszcze żadnego importu.",
@@ -250,7 +391,30 @@
     "data": "Plik CSV nie jest przechowywany po imporcie. Konto przechowuje wynik analizy i Twoje decyzje.",
     "deleteTitle": "Usuń konto",
     "deleteBody": "Usunięcie konta kasuje importy, wzorce, progi i wszystkie decyzje bez śladu.",
-    "confirmation": "Wpisz USUŃ, aby potwierdzić."
+    "confirmation": "Wpisz USUŃ, aby potwierdzić.",
+    "eyebrow": "Ustawienia / konto",
+    "lead": "Sprawdź dane i ustawienia prywatności.",
+    "logout": "Wyloguj się",
+    "changePassword": "Zmień hasło",
+    "currentPassword": "Obecne hasło",
+    "newPassword": "Nowe hasło",
+    "repeatPassword": "Powtórz hasło",
+    "passwordSuccess": "Hasło zostało zmienione.",
+    "passwordInvalid": "Obecne hasło jest nieprawidłowe.",
+    "saveError": "Nie udało się zapisać zmian. Spróbuj ponownie.",
+    "deleteConfirm": "Wpisz USUŃ, aby potwierdzić.",
+    "deleteCurrentPassword": "Podaj obecne hasło.",
+    "deleteButton": "Usuń konto",
+    "deleteError": "Nie udało się usunąć konta. Spróbuj ponownie.",
+    "deletedNotice": "Konto zostało usunięte. Możesz zalogować się ponownie lub utworzyć nowe konto.",
+    "demoPasswordBlocked": "Na wspólnym koncie demo zmiana hasła jest wyłączona.",
+    "demoDeleteBlocked": "Na wspólnym koncie demo usunięcie konta jest wyłączone.",
+    "dangerBorder": "var(--rytm-line)",
+    "deletePassword": "Obecne hasło",
+    "deleteDisabledHelp": "Przycisk uaktywni się po wpisaniu USUŃ.",
+    "deleteSuccess": "Konto zostało usunięte.",
+    "demoNotice": "To jest wspólne konto demo. Zmiana hasła i usunięcie konta są wyłączone.",
+    "logoutDecision": "Wylogowanie jest dostępne na ekranie Ustawienia."
   },
   "mobileNav": {
     "overview": "Przegląd",
@@ -264,37 +428,47 @@
     "new": "nowy",
     "changed": "zmiana kwoty",
     "success": "Sukces — próg zapisany.",
-    "error": "Błąd — sprawdź plik CSV.",
-    "info": "Informacja — trend pojawi się po 3 miesiącach."
+    "error": "Nie udało się wczytać danych. Odśwież widok lub spróbuj ponownie.",
+    "info": "Informacja — trend pojawi się po {n} miesiącach."
   },
   "authStates": {
-    "loginError": "Nie rozpoznaliśmy tego e-maila i hasła. Spróbuj ponownie.",
-    "resetTitle": "Odzyskaj dostęp.",
-    "resetBody": "Podaj e-mail, którego używasz w Rytmie.",
-    "checkInbox": "Jeśli konto istnieje, wysłaliśmy instrukcję zmiany hasła.",
     "registerOccupied": "Ten e-mail jest już zajęty.",
     "registerError": "Nie udało się utworzyć konta. Sprawdź adres e-mail i spróbuj ponownie.",
     "emailRequired": "Podaj poprawny adres e-mail.",
     "passwordRequired": "Podaj hasło.",
-    "passwordTooShort": "Hasło musi mieć co najmniej 6 znaków.",
+    "passwordTooShort": "Hasło musi mieć co najmniej {n} znaków.",
     "showPassword": "Pokaż",
     "hidePassword": "Ukryj",
     "signingIn": "Logowanie…",
     "creating": "Tworzenie konta…",
-    "sending": "Wysyłanie…"
+    "sending": "Wysyłanie…",
+    "passwordMismatch": "Hasła muszą być takie same.",
+    "currentPassword": "Obecne hasło",
+    "newPassword": "Nowe hasło",
+    "repeatPassword": "Powtórz hasło",
+    "currentPasswordInvalid": "Obecne hasło jest nieprawidłowe.",
+    "genericError": "Coś poszło nie tak. Spróbuj ponownie.",
+    "passwordChanged": "Hasło zostało zmienione.",
+    "passwordMinLength": 6,
+    "loginError": "Nie rozpoznaliśmy tego e-maila i hasła. Spróbuj ponownie.",
+    "resetTitle": "Odzyskaj dostęp.",
+    "resetBody": "Podaj e-mail, którego używasz w Rytmie.",
+    "checkInbox": "Jeśli konto istnieje, wysłaliśmy instrukcję zmiany hasła."
   },
   "footer": {
     "copyright": "© {year} Rytm. Spokojnie o pieniądzach.",
     "privacy": "Prywatność",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "forWho": "Dla kogo"
   },
   "resetNew": {
     "eyebrow": "Nowe hasło",
     "title": "Ustaw nowe hasło.",
-    "lead": "Hasło musi mieć co najmniej 6 znaków.",
+    "lead": "Hasło musi mieć co najmniej {n} znaków.",
     "success": "Hasło zostało zmienione.",
     "expired": "Ten link już wygasł.",
-    "sendNew": "Wyślij nowy link"
+    "sendNew": "Wyślij nowy link",
+    "passwordMinLength": 6
   },
   "confirmEmail": {
     "eyebrow": "Sprawdź skrzynkę",
@@ -302,7 +476,8 @@
     "body": "Wysłaliśmy link aktywacyjny na podany adres e-mail. Kliknij go, aby dokończyć rejestrację.",
     "spam": "Nie widzisz wiadomości? Sprawdź folder spam.",
     "resend": "Wyślij ponownie",
-    "back": "Wróć do logowania"
+    "back": "Wróć do logowania",
+    "resendCountdown": "Wyślij ponownie za {seconds} s"
   },
   "emptyViews": {
     "patterns": {
@@ -321,11 +496,67 @@
     "button": "Wgraj CSV"
   },
   "importErrors": {
-    "overlap": "Ten zakres nachodzi na istniejący import: 1 marca – 31 maja 2026.",
-    "unknownFormat": "Nieznany format pliku. Obsługujemy: ING Bank Śląski. Santander wkrótce.",
+    "overlap": "Ten zakres nachodzi na istniejący import: {range}.",
+    "unknownFormat": "Nieznany format pliku. Obsługujemy ING Bank Śląski i Santander Bank Polska.",
     "wrongCurrency": "Waluta inna niż PLN. Wybierz plik rachunku prowadzonego w PLN.",
     "empty": "Brak obciążeń. Ten plik zawiera tylko wpływy lub jest pusty.",
     "chooseOther": "Wybierz inny plik",
-    "back": "Wróć do importów"
+    "back": "Wróć do importów",
+    "tooLarge": "Plik przekracza limit {maxMb} MB. Wybierz mniejszy plik.",
+    "tooMany": "Plik zawiera ponad {maxTransactions} obciążeń. Podziel wyciąg na mniejsze zakresy.",
+    "inconsistent": "Plik jest niespójny: liczba wierszy lub daty nie zgadzają się z deklarowanym zakresem. Pobierz wyciąg ponownie.",
+    "limits": {
+      "maxMb": 5,
+      "maxTransactions": 5000
+    }
+  },
+  "imports": {
+    "eyebrow": "Importy CSV",
+    "title": "Twoje źródła danych.",
+    "lead": "Każdy import możesz cofnąć. Plik CSV nie jest przechowywany po imporcie.",
+    "newEyebrow": "Nowy import",
+    "newLead": "Wybierzesz jeden rachunek z pliku. Import obejmuje tylko obciążenia.",
+    "back": "Wróć do importów",
+    "dropTitle": "Upuść plik CSV tutaj",
+    "choose": "Wybierz plik",
+    "newImport": "+ Nowy import",
+    "formatRecognised": "Rozpoznano format {bank}.",
+    "bankName": {
+      "ing": "ING Bank Śląski",
+      "santander": "Santander Bank Polska"
+    },
+    "accountLabel": "Rachunek",
+    "santanderAccountName": "Rachunek",
+    "delete": "Usuń import",
+    "deleteTitle": "Usunąć import z zakresu {range}?",
+    "deleteBody": "Wzorce wykryte w tym imporcie zostaną przeliczone.",
+    "deleteSuccess": "Import usunięty.",
+    "deleteError": "Nie udało się usunąć importu. Spróbuj ponownie.",
+    "notFound": "Nie znaleziono importu.",
+    "deleteWaiting": "Usuwanie…",
+    "demoDeleteBlocked": "Na wspólnym koncie demo cofanie importów jest wyłączone.",
+    "deleteClose": "Zamknij",
+    "accountSantander": "Rachunek"
+  },
+  "app": {
+    "exit": "Wyjdź",
+    "sidebarView": "Widok",
+    "sidebarData": "Dane",
+    "patternsLong": "Wzorce wydatków",
+    "fixedLong": "Koszty stałe",
+    "importsLong": "Importy CSV",
+    "settings": "Ustawienia",
+    "overview": "Przegląd",
+    "navLabel": "Nawigacja aplikacji",
+    "demoNotice": "Wspólne konto demo — niektóre działania są wyłączone."
+  },
+  "home": {
+    "emptyEyebrow": "Przegląd miesiąca",
+    "emptyTitle": "Zacznij od pierwszego importu.",
+    "emptyLead": "Rytm pokaże Ci wzorce, kiedy dostanie pierwszy wyciąg.",
+    "emptyIllustrationAlt": "Dokument czekający na import"
+  },
+  "stub": {
+    "info": "Ten widok pojawi się po pierwszym imporcie wyciągu."
   }
 }

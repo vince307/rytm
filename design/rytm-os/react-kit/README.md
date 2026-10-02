@@ -15,6 +15,7 @@ Ten katalog zawiera minimalny zestaw do odtworzenia strony Rytm w React, Next.js
 - `docs/content.json` — wszystkie teksty widoków jako dane do komponentów.
 - `docs/routes.md` — mapa wszystkich tras, w tym dashboardu, wzorców, kosztów stałych, importu i ustawień.
 - `docs/asset-map.json` — referencje do plików dla bundlera.
+- `prototype/` — klikalny prototyp HTML, style, skrypty i osobne strony podglądowe dla wszystkich stanów.
 
 ## Szybkie użycie
 
@@ -36,3 +37,8 @@ Teksty, które pojawiają się na stronie, są zebrane w `docs/content.json`, wi
 ## Runda 2
 
 Dodano stany auth (`#/reset/new`, `#/confirm-email`), puste widoki przed pierwszym importem, błędy importu, sekcję wykluczonych wzorców i reguły mobile 320–560 px. Prototypowe pliki HTML znajdują się w głównym eksporcie `rytm-os-views-html.zip`.
+
+
+## Runda 3
+
+Dodano stany auth i ustawień, obsługę koncepcyjną dwóch banków, warianty błędów importu, przypadki brzegowe wzorców, koszty stałe, wykres i demo. Szczegóły decyzji i tras są w `docs/routes.md` oraz repozytoryjnym `CHANGELOG.md`. Prototyp uruchom przez lokalny serwer HTTP; instrukcja jest w `prototype/README.md`.

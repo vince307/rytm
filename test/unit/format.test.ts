@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  fillMonthLocative,
   formatAccountTail,
   formatIsoDate,
   formatMonthAxis,
@@ -98,5 +99,32 @@ describe("formatMonthAxis", () => {
     ["2026-01", "sty 26"],
   ])("%s → %s", (yearMonth, text) => {
     expect(formatMonthAxis(yearMonth)).toBe(text);
+  });
+});
+
+describe("fillMonthLocative", () => {
+  const locatives = [
+    "styczniu",
+    "lutym",
+    "marcu",
+    "kwietniu",
+    "maju",
+    "czerwcu",
+    "lipcu",
+    "sierpniu",
+    "wrześniu",
+    "październiku",
+    "listopadzie",
+    "grudniu",
+  ];
+
+  it.each([
+    ["Nowe w {month}", "2026-05", "Nowe w maju"],
+    ["Nowe w {month}", "2026-09", "Nowe we wrześniu"],
+    ["Suma w {month}", "2026-01", "Suma w styczniu"],
+    ["Suma w {month}", "2026-09", "Suma we wrześniu"],
+    ["Ponad progiem {month}", "2026-09", "Ponad progiem wrześniu"],
+  ])("%s / %s → %s", (template, yearMonth, expected) => {
+    expect(fillMonthLocative(template, yearMonth, locatives)).toBe(expected);
   });
 });

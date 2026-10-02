@@ -50,7 +50,6 @@ const tableCopy: PatternsTableCopy = {
   sortOptions: copy.patterns.sortOptions,
   sortPrefix: x.sortPrefix,
   columns: copy.patterns.columns,
-  amountColumn: x.amountColumn,
   typeLabels: x.typeLabels,
   footer: x.footer,
   patternForms: x.patternForms,
@@ -64,7 +63,6 @@ const tableCopy: PatternsTableCopy = {
   {"error" in result ? (
     <>
       <PageTitle eyebrow={x.eyebrow} title={copy.patterns.title} lead={copy.patterns.description} />
-      {/* DESIGN-GAP: K18 — the kit has no copy for a failed read of a list; `components.error` stands in. */}
       <InlineAlert kind="error">{copy.components.error}</InlineAlert>
     </>
   ) : items.length === 0 ? (

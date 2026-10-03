@@ -1,24 +1,26 @@
 # Handoff — `i18n-en` (slice S-16)
 
-Written by the `/10x-research i18n-en` step of run `2026-10-03-i18n-en`. Research is complete (`research.md`, status `complete`); `change.md` is `preparing`. The one thing not to get wrong: `copyExtra` is `as const`, so the design's `CopyExtra = typeof copyExtraPl` makes every EN string a type error — the plan needs a recursive `Widen<T>` type (verified in a scratch `tsc` run: accepts EN strings, keeps `[one, few, many]` tuples, rejects a 2-tuple).
+Written by the `/10x-plan i18n-en` step of run `2026-10-03-i18n-en`. `plan.md` (7 code phases, 56 Progress rows) and `plan-brief.md` are written; `change.md` is `planned`, roadmap S-16 `planning`. The one thing not to get wrong: the middleware keeps `locals.locale` pinned to `pl` and `getCopy("en")` returns PL until Phase 5 — PL must stay byte-identical at every phase boundary (smoke baseline steps unchanged).
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/i18n-en`, cut from `main` at `b973428` |
-| Commits | 4 on the branch: `d2b8d49`, `7c5bf13` (owner), `d0800ce` (new step) + this step's `docs(i18n-en): research` |
+| Commits | 5 on the branch: `d2b8d49`, `7c5bf13`, `d0800ce`, `5859e7b` + this step's `docs(i18n-en): plan` |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `preparing` (set by `metadata-guard.mjs mark-researched`) |
-| `## Progress` rows remaining | n/a — no `plan.md` yet |
+| `change.md` status | `planned` (via `metadata-guard.mjs mark-planned`) |
+| `## Progress` rows remaining | 56 (`grep -c '^- \[ \]' plan.md`) |
 | Working tree | clean per `tree-clean.sh` after the commit (allow-listed `?? design/prompts/2026-10-03-gaps-round-4.md` untouched) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/i18n-en/research.md` | Source-backed answers to unknowns (a)–(g), typing experiment, hard-coded-Polish sweep, EN dictionary shape, 6 open plan decisions |
-| `context/changes/i18n-en/change.md` | Frontmatter only: `status: new → preparing`, `updated` (via `metadata-guard.mjs`) |
+| `context/changes/i18n-en/plan.md` | Full plan: 7 phases, success criteria as baseline + delta, deliberate breaks, `## Autonomous decisions` (17), `## Progress` |
+| `context/changes/i18n-en/plan-brief.md` | Two-page brief |
+| `context/changes/i18n-en/change.md` | Frontmatter `status: planned` |
+| `context/foundation/roadmap.md` | S-16 At a glance row and `### S-16` Status → `planning` |
 | `context/changes/i18n-en/handoff.md` | This file |
 
 ## 3. Verification
@@ -26,31 +28,31 @@ Written by the `/10x-research i18n-en` step of run `2026-10-03-i18n-en`. Researc
 | Command | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/i18n-en` |
-| scratch `tsc --strict --ignoreConfig` (`as const` vs `Widen<T>`) | naive `satisfies typeof pl` → 5 errors; `Widen` → OK; `Widen` with 2-tuple → error (expected) |
-| Node 22.14 `Intl` en-GB probe | `May 2026`, `01/05/2026`, `Sept 26`, `1 May`, `3,842.60`; PluralRules en-GB `one`/`other`; pl-PL `3842,60` (no 4-digit grouping) |
-| Node `fetch` default headers | `accept-language: *`, no `Referer` |
-| node walk of `content.json` | 405 strings, 18 arrays, 9 numeric leaves, 6 `{month}`/`{year}` templates |
-| `grep` `supabase/migrations` for `USUŃ\|DELETE_CONFIRM\|confirm` | no hit → word not in DB |
-| lint / astro check / vitest / build / pgTAP / smoke | **not run** — research-only step, no product code changed. Baseline inherited, unverified here: lint 0; astro check 0 (166 files); vitest 387 (27 files); pgTAP 119; smoke 195 PASS |
+| `metadata-guard.mjs mark-planned` | `{"changed":true}`; `status: planned` |
+| Progress ↔ Success Criteria mapping | 1:1 per phase (P1 7, P2 7, P3 8, P4 8, P5 8, P6 8, P7 10 = 56) |
+| lint / astro check / vitest / build / pgTAP / smoke | **not run** — docs-only step, no product code changed. Baseline inherited, unverified here: lint 0; astro check 0 (166 files); vitest 387 (27 files); pgTAP 119; smoke 195 PASS — Phase 1 measures it on the branch |
 
 ## 4. Next command
 
-`/10x-plan i18n-en`
+`/10x-plan-review i18n-en`
 
 ## 5. Open
 
-- Plan decisions (research.md "Open Questions"): drop vs keep `copy`/`copyExtra` value exports in `src/content/copy.ts` (recommend drop; tests `kit-contract.test.ts`, `patterns-table.test.ts`, `sequence-label.test.ts` → `getCopy("pl")`); `KitCopy` mutable vs `DeepReadonly`; month helper in `src/lib/format.ts` (replace `home.astro` `nominatives = Object.keys(...)`; EN `patternDetail.monthNames` = PL keys → English names); `fillMonthLocative` gets `locale`; homes for hero literal (`index.astro`, keep PL string `3 842,60 zł` — `formatMoney` would change it), `Layout.astro` banner `Uwaga:`/`"Dokumentacja"`, `config-status.ts` strings, switch labels (new `copyExtra` keys); `formatThresholdInput` EN decimal point; smoke `request()` `headers` option + EN steps last, reset to `pl`.
-- Correction to change.md: `src/lib/import/presentation.ts` needs only the type import change (uses locale-free `formatAccountTail`); locale threads through `sequence-label.ts` `sequenceLabel` and `fixed-view.ts` `deltaText`.
-- Islands needing a `locale` prop: `PatternsTable.tsx`, `ImportWizard.tsx`; `ThresholdEditor.tsx` if EN pre-fill is in scope; `DeleteAccountDialog.tsx` gets a `confirmWord` prop (A4).
-- Visual gates: a browser with `Accept-Language: en-*` gets EN on first visit — PL shots need `rytm-locale=pl`.
-- DESIGN-GAPs to add during implementation: K42 (no EN copy in kit), K43 (no language switcher) in `context/foundation/design-kit.md`.
-- Triggered follow-ups (unchanged from change.md): `AuthLayout.astro` visual title weight; `index.astro` steps head < 560 px; deferred `PanelTitle` sweep and S-14 F7 `fieldBox`.
-- No migration expected.
+- Phases: P1 locale plumbing (`src/lib/i18n.ts` `resolveLocale`); P2 `format.ts` required `locale`; P3 `getCopy` / `getMonths` in `src/content/copy.ts`, exports dropped; P4 `src/content/en/kit.ts` + `test/unit/i18n-parity.test.ts`; P5 `src/content/en/extra.ts`, middleware `resolveLocale`, `auth-rules.ts` `DELETE_CONFIRM_WORDS` / `isDeleteConfirmWord`; P6 `src/components/LocaleSwitch.astro`, `src/pages/api/locale.ts`, `i18n.ts` `localeRedirectTarget`, K42/K43 rows; P7 seam sweep + visual gate.
+- Smoke: net + 10 (P1 + 1, P5 + 2, P6 + 7); EN steps last, last step switches back to `pl` (shared cookie jar in `scripts/smoke.mjs` `request`).
+- Visual gates: PL shots need `rytm-locale=pl` from P5 on (a browser with `Accept-Language: en-*` gets EN).
+- Manual-only rows (human checklist): `[reviewer]` 1.7, 2.7, 3.8, 4.8, 5.8, 6.7, 7.7; `[visual]` 6.8, 7.8 (EN matrix), 7.9 (PL); `[human]` 7.10 — accept own EN translation (K42), switch design K43 with bilingual „Język / Language” title, `USUŃ` or `DELETE`, `Accept-Language` first visit, parity test instead of compile error for array lengths/placeholders (departs from `design.md` success criterion), default Supabase e-mails; send K42–K43 to the kit author.
+- DESIGN-GAPs to add: K42 (P4/P5), K43 (P6) in `context/foundation/design-kit.md`.
+- Follow-ups: P6 closes `AuthLayout.astro` `visual.title` weight and `index.astro` steps head < 560 px; P7 writes `follow-ups/review-fixes.md` re-arming `PanelTitle` sweep, S-14 F7, E2E setup trigger, K42 replacement.
+- Roadmap Backlog Handoff row for S-16 still names `/10x-research` as next step (status column is not there) — archive step updates the row.
+- No migration.
 
 ## 6. Autonomous decisions
 
-1. **Scope derived from change.md (a)–(g), no question asked.** Rejected: re-scoping. Why: the contract forbids AskUserQuestion and change.md lists the unknowns. Would change: the owner adding a locale or URL prefix.
-2. **Researched locally, no sub-agents.** Rejected: 2–4 parallel workers. Why: targeted questions over ~15 known files; sequential greps answered each faster than delegation. Would change: a scope needing a sweep of unknown areas.
-3. **Recommend EN `monthNames` with PL keys + English values and a month helper.** Rejected: relaxing `KitCopy` for one key; a separate `copyExtra.monthsNominative` in both locales (PL copy would duplicate kit keys). Why: keeps `satisfies KitCopy` strict and the kit untouched. Would change: the kit shipping EN month data.
-4. **Recommend keeping the hero amount a dictionary string.** Rejected: `formatMoney(locale)`. Why: pl-PL output `3842,60 zł` differs from today's `3 842,60 zł` → PL regression. Would change: owner accepting the PL change.
-5. **A4 and A5 confirmed, not reopened.** Why: no DB check of `USUŃ`; no browser-only risk found (`ImportWizard` range formatting is post-interaction; `PatternsTable` money formatting is already SSR+client today). Would change: a hydration mismatch observed in the EN visual gate → follow-up for `/10x-e2e-setup`.
+1. **Complexity HIGH, 0 questions asked.** Rejected: interview. Why: contract forbids AskUserQuestion; design + research decided everything with recommendations. Would change: an owner available.
+2. **Seven phases, ≤ 1 new UI component each** (design had 5). Rejected: design's 5. Why: fresh agent per phase; P4 (~405 strings) is a phase on its own; formatting and copy channel split so each is independently green. Would change: phase cost much lower than expected.
+3. **Locale pinned `pl` until P5.** Rejected: resolve from P1. Why: no mixed PL copy + EN numbers between phases. Would change: phases shipping separately.
+4. **Drop `copy`/`copyExtra` value exports; `KitCopy = typeof content`; `CopyExtra = Widen<…>`; month helper `getMonths(locale)`.** Rejected: PL aliases, `DeepReadonly`, relaxing `KitCopy`. Why: compile gate for missed consumers; kit untouched. Would change: kit shipping EN data.
+5. **Hero amount and banner strings into the dictionary; threshold input EN decimal in scope; delete word per locale with server accepting either (A4).** Why: success criterion „no Polish UI strings”, PL bytes unchanged. Would change: owner wanting one delete word or the PL hero via `formatMoney`.
+6. **Bilingual „Język / Language” `/settings` title, visible `PL`/`EN`.** Rejected: translated title. Why: findable in any language, design's literal. Would change: visual gate showing it crowded at 400 px.
+7. **One departure from `design.md`** (lengths/placeholders by test, not compiler) → `[human]` 7.10. **No departure from the PRD** (silent on languages).

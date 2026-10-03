@@ -46,7 +46,7 @@ Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stał
 | S-13 | kit-round-3-imports       | wgrać plik z ING lub Santandera, zobaczyć wynik, odrzucenia i historię importów (z cofnięciem) w wersji rundy 3 kitu                       | F-04          | FR-003, FR-004, FR-005, FR-018         | done    |
 | S-14 | kit-round-3-patterns      | przeglądać wzorce, szczegół z progiem i dialog akcji (scal, zmień nazwę, typ, wyklucz) we wszystkich stanach rundy 3 kitu                  | F-04          | FR-007, FR-008, FR-009, FR-010, FR-011 | done |
 | S-15 | kit-round-3-home-fixed    | zobaczyć przegląd, trend „ponad progiem” i koszty stałe ze wszystkimi stanami (puste, brak porównania, błąd odczytu) w wersji rundy 3 kitu | F-04          | FR-011, FR-012, FR-013                 | done |
-| S-16 | i18n-en                   | przełączyć interfejs na angielski (i z powrotem) przełącznikiem w stopce, panelu auth i `/settings`; wybór przetrwa przeładowanie, pierwsza wizyta respektuje `Accept-Language`, PL bez zmian | S-12…S-15     | — (PRD milczy o językach)              | ready |
+| S-16 | i18n-en                   | przełączyć interfejs na angielski (i z powrotem) przełącznikiem w stopce, panelu auth i `/settings`; wybór przetrwa przeładowanie, pierwsza wizyta respektuje `Accept-Language`, PL bez zmian | S-12…S-15     | — (PRD milczy o językach)              | planning |
 
 ## Baseline
 
@@ -133,7 +133,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** — (kit nie ma copy EN ani przełącznika → luki `DESIGN-GAP` K42/K43, własne tłumaczenie do podmiany)
 - **Risk:** Dotyka każdego widoku: przepięcie 30 konsumentów `@/content/copy` i wszystkich formaterów `format.ts` na `locale` musi zostać refactorem bez zmiany PL (smoke, kit-contract test). Polska gramatyka zaszyta poza słownikiem (`fillMonthLocative` „we wrześniu”, klucze `patternDetail.monthNames` jako mianowniki, krotki `[one, few, many]`, słowo `USUŃ`) wymaga decyzji per locale. Bez migracji.
-- **Status:** ready
+- **Status:** planning
 
 ## Backlog Handoff
 

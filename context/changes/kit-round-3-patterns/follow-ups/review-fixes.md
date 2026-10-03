@@ -18,3 +18,19 @@ Each item carries a `Trigger:` line; later slices grep for it.
 - [ ] **K35–K37 to the kit author** — plural forms in `patternDetail.sequenceSummary`, `threshold.invalid` omits the
   range/decimals rule, no key for the transactions-panel literal (register rows K35–K37).
   Trigger: kit round 4
+
+## From `/10x-impl-review` (2026-10-03, `reviews/impl-review.md`)
+
+- [ ] **F5 — dialog title can run under the close glyph on a phone** (`src/components/ui/dialog.tsx` `dialogContentClass`
+  18 px side padding vs the close button at `right-[19px]`, 17 px wide; `DialogTitle` has no right padding). Affects the
+  delete-import and delete-account dialogs too. Check in visual row 8.7; if a title overlaps, add right padding to
+  `DialogTitle`.
+  Trigger: visual gate of kit-round-3-patterns (row 8.7)
+- [ ] **F7 — `FormField.tsx` / `DeleteAccountDialog.tsx` keep their own 8 px box** (`focus:ring-ink/8` on the input) instead
+  of `fieldBox` (`focus-within:` on a wrapper); `fieldBox`'s comment says „the one 8 px form box”.
+  Trigger: next slice touching auth or settings forms
+- [ ] **F8 — `/patterns/<key>` has no assembly `try`** (`patternDetail`, `sequenceLabel` run unguarded, unlike
+  `patterns.astro` since P1); not a regression.
+  Trigger: S-15 (alongside the `fixed.astro` `try`)
+- [ ] **F9 — `home.astro` comment cites a „`patterns.astro` `sumLabel` precedent” that never existed** (stale since S-06).
+  Trigger: S-15 (touches `home.astro`)

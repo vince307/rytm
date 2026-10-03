@@ -736,7 +736,7 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Manual
 
-- [ ] 1.7 [reviewer] Body and header order match kit patternRows(); try wraps assembly only
+- [x] 1.7 [reviewer] Body and header order match kit patternRows(); try wraps assembly only — 5e85b9a (impl review: thead maps copy.columns, body Kwota before Suma; try wraps listOverview + fixedOverview only, loadPatternData outside)
 
 ### Phase 2: Status badges and the Badge tones
 
@@ -750,7 +750,7 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Manual
 
-- [ ] 2.6 [reviewer] One fixedOverview call on the same loadPatternData result; Tailwind color names only
+- [x] 2.6 [reviewer] One fixedOverview call on the same loadPatternData result; Tailwind color names only — 5e85b9a (impl review: one fixedOverview(dataResult.patterns, dataResult.rows) in the same try; bg-excess/18 text-excess-text)
 
 ### Phase 3: Pokaż więcej
 
@@ -765,7 +765,7 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Manual
 
-- [ ] 3.7 [reviewer] Count line counts the filtered list; reveal keeps the sort; search keeps expanded
+- [x] 3.7 [reviewer] Count line counts the filtered list; reveal keeps the sort; search keeps expanded — 5e85b9a (impl review: footer reads total; listView filter → sort → slice; expanded never reset; re-broken: slice before filter → 5 tests red, restored)
 
 ### Phase 4: Toolbar field, one focus ring, one field box, dialog geometry
 
@@ -780,7 +780,7 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Manual
 
-- [ ] 4.7 [reviewer] buttonVariants / BackLink / dialog close keep the same focus classes; ui importing app/field-styles accepted; no dialog importer passes a className fighting the new padding
+- [x] 4.7 [reviewer] buttonVariants / BackLink / dialog close keep the same focus classes; ui importing app/field-styles accepted; no dialog importer passes a className fighting the new padding — 5e85b9a (impl review: focusRing byte-identical to main; no DialogContent importer passes className; ui → app import accepted)
 
 ### Phase 5: Detail copy rebind and the sequence label
 
@@ -795,7 +795,7 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Manual
 
-- [ ] 5.7 [reviewer] K35/K36 rows match the DESIGN-GAP comments; threshold-form unchanged
+- [x] 5.7 [reviewer] K35/K36 rows match the DESIGN-GAP comments; threshold-form unchanged — 5e85b9a (impl review: K35/K36 rows match copy.ts / [...key].astro comments; threshold-form.ts not in the diff)
 
 ### Phase 6: Detail states and merged variants
 
@@ -809,7 +809,7 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Manual
 
-- [ ] 6.6 [reviewer] Other ViewEmpty callers render identical markup; K37 row matches its comment
+- [x] 6.6 [reviewer] Other ViewEmpty callers render identical markup; K37 row matches its comment — 5e85b9a (impl review: same elements and classes; only inter-element whitespace inside the inline-flex CTA differs, no visual effect — OBSERVATION F6; K37 matches)
 
 ### Phase 7: Actions dialog copy, rename field and decision results
 
@@ -824,7 +824,7 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Manual
 
-- [ ] 7.7 [reviewer] Untouched rename save writes nothing new; validateMerge and endpoints untouched
+- [x] 7.7 [reviewer] Untouched rename save writes nothing new; validateMerge and endpoints untouched — 5e85b9a (impl review: defaultValue = stored displayName or "", parseDisplayName("") = null; api/ and validateMerge not in the diff)
 
 ### Phase 8: Gap register, seam sweep and visual gate
 
@@ -840,5 +840,5 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 - [ ] 8.6 [visual] Screenshots desktop + ~400 px of every listed pattern state, compared with the kit views
 - [ ] 8.7 [visual] Screenshots desktop + ~400 px of the other views touched by shared changes (imports and settings dialogs, /fixed badge, focus ring)
-- [ ] 8.8 [reviewer] Seam sweep complete; register matches the plan; follow-ups carry Trigger lines
+- [x] 8.8 [reviewer] Seam sweep complete; register matches the plan; follow-ups carry Trigger lines — 5e85b9a (impl review: sweep missed dead copyExtra.patterns.sumLabel, a stale dialogFieldBox comment and G32 wording — fixed in 5e85b9a; follow-ups carry Trigger lines)
 - [ ] 8.9 [human] Accept S-14 product-visible choices (page size 10 kept expanded on search, field radius 14 → 8 px, dialog padding across 3 dialogs, /fixed badge tint, badges mean latest month, K35 plurals, K36 shorter invalid message, page-level dialog errors, lead „ustawienia wzorca” = detail page) and send K35–K37 to the kit author

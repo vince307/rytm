@@ -216,7 +216,8 @@ async function request(path, { method = "GET", form } = {}) {
     body: form ? new URLSearchParams(form).toString() : undefined,
   });
   storeCookies(response);
-  const body = response.status === 200 ? await response.text() : "";
+  // 404 bodies are read too: the kit not-found panel is asserted on its rendered text (S-14 phase 6).
+  const body = response.status === 200 || response.status === 404 ? await response.text() : "";
   return { status: response.status, location: response.headers.get("location") ?? "", body };
 }
 
@@ -663,6 +664,11 @@ const steps = [
     { status: 200, contains: "Wzorce scalone." },
   ],
   [
+    "unknown pattern shows the kit not-found panel",
+    () => request(`/patterns/smoke-missing-${Date.now()}`),
+    { status: 404, contains: ">Nie znaleziono wzorca.<", notContains: ">Akcje<" },
+  ],
+  [
     "detail offers the actions",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: ">Akcje<", notContains: "Wzorce scalone." },
@@ -676,6 +682,11 @@ const steps = [
     "merged pattern lists its variant",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: ">Cofnij scalenie<" },
+  ],
+  [
+    "merged pattern titles its variants",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">Połączone nazwy<" },
   ],
   [
     "merged pattern is re-typed by D5",

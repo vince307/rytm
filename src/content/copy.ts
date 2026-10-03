@@ -156,9 +156,9 @@ export const copyExtra = {
       "listopadzie",
       "grudniu",
     ],
-    // DESIGN-GAP: G31 — states/pieces of the pattern detail and threshold editor the kit does not define.
-    detailMissing: "Nie znaleziono tego wzorca — mógł zniknąć po usunięciu importu.",
-    monthEmpty: "Brak wystąpień w tym miesiącu.",
+    // DESIGN-GAP: K37 — `app.js` patternDetail() has this transactions-panel line as a literal, no content.json key.
+    noTransactions: "Brak transakcji do pokazania w wybranym miesiącu.",
+    // DESIGN-GAP: G31 — the kit has no label for the over-limit sum of a month other than the reference one.
     overInMonth: "Ponad progiem w {month}",
     // DESIGN-GAP: K35 — kit `patternDetail.sequenceSummary` has no plural forms ("{within} wystąpień …"); the app
     // keeps this template and fills the forms from `occurrenceForms` (kit app.js aria-label shape).
@@ -188,8 +188,6 @@ export const copyExtra = {
     merged: "Wzorce scalone.",
     unmerged: "Scalenie cofnięte.",
     renamed: "Nazwa zmieniona.",
-    mergedLabel: "Scalone warianty",
-    unmerge: "Cofnij scalenie",
     mergeInvalid: "Nie można scalić z tym wzorcem.",
     nameInvalid: "Nazwa może mieć najwyżej 100 znaków.",
     decisionError: "Nie udało się zapisać decyzji. Spróbuj ponownie.",

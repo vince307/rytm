@@ -1,5 +1,6 @@
 ---
-// ViewEmpty.astro — prototype .view-empty + .empty-mark (round 2, G18)
+// ViewEmpty.astro — prototype .view-empty + .empty-mark (round 2, G18); round 3 centres the panel
+// (`.view-empty{margin-left:auto;margin-right:auto}`, adopted at the S-14 visual gate).
 import Icon from "@/components/Icon.astro";
 import Panel from "@/components/app/Panel.astro";
 import { buttonVariants } from "@/components/ui/button";
@@ -16,7 +17,7 @@ interface Props {
 const { icon, headingLevel: Heading = "h2", arrow = true, title, body, cta, href } = Astro.props;
 ---
 
-<Panel class="mt-6 max-w-[720px] px-7 py-14 text-center">
+<Panel class="mx-auto mt-6 max-w-[720px] px-7 py-14 text-center">
   {icon && (
     <div class="mx-auto mb-[18px] grid size-16 place-items-center rounded-[14px] bg-ink text-paper">
       <Icon name={icon} size={28} />

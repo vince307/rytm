@@ -1,10 +1,10 @@
 ---
 change_id: kit-round-3-auth-settings
 title: Auth, account settings and public pages bound to design kit round 3
-status: impl_reviewed
+status: archived
 created: 2026-10-03
 updated: 2026-10-03
-archived_at: null
+archived_at: 2026-10-03T11:14:47Z
 ---
 
 ## Notes

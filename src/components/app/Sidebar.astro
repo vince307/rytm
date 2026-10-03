@@ -2,7 +2,7 @@
 import Icon from "@/components/Icon.astro";
 import type { NavKey } from "@/components/app/nav";
 import type { IconName } from "@/content/copy";
-import { copyExtra } from "@/content/copy";
+import { copy } from "@/content/copy";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 }
 
 const { active } = Astro.props;
-const a = copyExtra.app;
+const a = copy.app;
 const link =
   "flex items-center gap-[11px] rounded-lg px-3 py-[11px] text-[13px] font-bold text-muted no-underline hover:bg-paper-soft hover:text-ink";
 const activeLink = "bg-paper-soft text-ink";
@@ -50,7 +50,7 @@ const items: { key: NavKey; href: string; text: string; icon: IconName }[] = [
       aria-current={active === "settings" ? "page" : undefined}
     >
       <Icon name="settings" size={17} />
-      <span>{a.settingsLong}</span>
+      <span>{a.settings}</span>
     </a>
   </div>
 </aside>

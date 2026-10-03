@@ -2,7 +2,7 @@
 import Icon from "@/components/Icon.astro";
 import type { NavKey } from "@/components/app/nav";
 import type { IconName } from "@/content/copy";
-import { copy, copyExtra } from "@/content/copy";
+import { copy } from "@/content/copy";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -22,7 +22,7 @@ const items: { key: NavKey; href: string; text: string; icon: IconName }[] = [
 
 <nav
   class="fixed inset-x-0 bottom-0 z-20 hidden justify-around border-t border-line bg-paper px-1 pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] shadow-[0_-8px_25px_rgba(32,47,64,0.07)] max-[899px]:flex"
-  aria-label={copyExtra.app.navLabel}
+  aria-label={copy.app.navLabel}
 >
   {items.map((i) => (
     <a

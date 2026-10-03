@@ -7,14 +7,15 @@ import { copy, copyExtra } from "@/content/copy";
 const hasError = Astro.url.searchParams.has("error");
 // Kit round 2: #/login?confirmed=1 — the confirmation link was verified but /auth/callback could not open a session here.
 const confirmed = Astro.url.searchParams.has("confirmed");
-// G24: the account was deleted; /api/auth/delete lands here with the session already cleared.
+// Kit round 3 `login-deleted.html`: the account was deleted; /api/auth/delete lands here with the session already
+// cleared. Notice text `settings.deletedNotice`.
 const deleted = Astro.url.searchParams.has("deleted");
 const a = copy.auth;
 const s = copy.authStates;
 const x = copyExtra.auth;
 ---
 
-<AuthLayout title={a.login.title} visual={x.loginVisual}>
+<AuthLayout title={a.login.title} visual={a.loginVisual}>
   {confirmed && (
     <div class="mb-[22px]">
       <InlineAlert kind="success">{x.confirmedLogin}</InlineAlert>
@@ -22,7 +23,7 @@ const x = copyExtra.auth;
   )}
   {deleted && (
     <div class="mb-[22px]">
-      <InlineAlert kind="success">{x.deletedLogin}</InlineAlert>
+      <InlineAlert kind="success">{copy.settings.deletedNotice}</InlineAlert>
     </div>
   )}
   <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{a.login.eyebrow}</div>
@@ -31,12 +32,12 @@ const x = copyExtra.auth;
   <SignInForm
     client:load
     serverError={hasError ? s.loginError : null}
-    forgotPassword={{ href: "/reset", label: x.forgotPassword }}
+    forgotPassword={{ href: "/reset", label: a.forgotPassword }}
     labels={{
       email: a.fields.email,
       password: a.fields.password,
-      emailPlaceholder: x.emailPlaceholder,
-      passwordPlaceholder: x.passwordPlaceholder,
+      emailPlaceholder: a.emailPlaceholder,
+      passwordPlaceholder: a.passwordPlaceholder,
       showPassword: s.showPassword,
       hidePassword: s.hidePassword,
       submit: copy.navigation.login,
@@ -46,9 +47,9 @@ const x = copyExtra.auth;
     }}
   />
   <p class="text-center text-[13px] text-muted">
-    {x.noAccount}{" "}
+    {a.noAccount}{" "}
     <a href="/register" class="font-bold text-excess-text">
-      {x.createIt}
+      {a.createIt}
     </a>
   </p>
 </AuthLayout>

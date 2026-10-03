@@ -3,7 +3,11 @@ import Layout from "@/layouts/Layout.astro";
 import AppHeader from "@/components/app/AppHeader.astro";
 import Sidebar from "@/components/app/Sidebar.astro";
 import MobileNav from "@/components/app/MobileNav.astro";
+import DemoNotice from "@/components/app/DemoNotice.astro";
 import type { NavKey } from "@/components/app/nav";
+import { copy } from "@/content/copy";
+import { isDemoEmail } from "@/lib/demo";
+import { DEMO_EMAIL } from "astro:env/server";
 
 interface Props {
   title: string;
@@ -11,14 +15,21 @@ interface Props {
 }
 
 const { title, active } = Astro.props;
+const demo = isDemoEmail(Astro.locals.user?.email, DEMO_EMAIL);
 ---
 
 <Layout title={title}>
   <div class="min-h-screen bg-paper-soft">
     <AppHeader />
+    {demo && <DemoNotice text={copy.app.demoNotice} />}
     <div class="mx-auto grid max-w-[1440px] grid-cols-[230px_1fr] max-[899px]:grid-cols-1">
       <Sidebar active={active} />
-      <main class="w-full max-w-[1100px] px-[42px] pt-[35px] pb-[60px] max-[899px]:px-[18px] max-[899px]:pt-[26px] max-[899px]:pb-[88px]">
+      <main
+        class:list={[
+          "w-full max-w-[1100px] px-[42px] pb-[60px] max-[899px]:px-[18px] max-[899px]:pt-[26px] max-[899px]:pb-[88px]",
+          demo ? "pt-[26px]" : "pt-[35px]",
+        ]}
+      >
         <slot />
       </main>
     </div>

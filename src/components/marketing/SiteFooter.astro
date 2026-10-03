@@ -5,15 +5,18 @@ const f = copy.footer;
 const year = new Date().getFullYear();
 ---
 
-<footer class="flex justify-between border-t border-line py-7 text-xs text-muted max-[559px]:block max-[559px]:leading-loose">
+<footer class="flex justify-between border-t border-line py-7 text-xs text-muted max-[559px]:flex max-[559px]:flex-col max-[559px]:gap-[7px] max-[559px]:pb-[22px] max-[559px]:leading-[1.45]">
   <span>{f.copyright.replace("{year}", String(year))}</span>
-  <span>
+  <span class="max-[559px]:flex max-[559px]:gap-[13px]">
+    <a href="/for-who" class="hidden text-muted no-underline max-[559px]:inline max-[559px]:ml-0">
+      {f.forWho}
+    </a>
     {/* eslint-disable-next-line astro/jsx-a11y/anchor-is-valid -- kit specifies placeholder "#" links */}
-    <a href="#" class="ml-[18px] text-muted no-underline max-[559px]:mr-[15px] max-[559px]:ml-0">
+    <a href="#" class="ml-[18px] text-muted no-underline max-[559px]:ml-0">
       {f.privacy}
     </a>
     {/* eslint-disable-next-line astro/jsx-a11y/anchor-is-valid -- kit specifies placeholder "#" links */}
-    <a href="#" class="ml-[18px] text-muted no-underline max-[559px]:mr-[15px] max-[559px]:ml-0">
+    <a href="#" class="ml-[18px] text-muted no-underline max-[559px]:ml-0">
       {f.contact}
     </a>
   </span>

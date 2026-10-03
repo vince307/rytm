@@ -222,6 +222,9 @@ async function request(path, { method = "GET", form } = {}) {
 
 const steps = [
   ["landing renders", () => request("/"), { status: 200, contains: "Zobacz swój rytm" }],
+  ["how-it-works renders", () => request("/how-it-works"), { status: 200, contains: ">Trzy spokojne kroki.<" }],
+  ["for-who renders", () => request("/for-who"), { status: 200, contains: ">Rytm pasuje do Twojego tempa.<" }],
+  ["landing footer links for-who", () => request("/"), { status: 200, contains: '>Dla kogo</a><a href="#"' }],
   ["login renders", () => request("/login"), { status: 200, contains: "Zaloguj się" }],
   ["login offers password reset", () => request("/login"), { status: 200, contains: "Nie pamiętam hasła" }],
   [
@@ -261,12 +264,30 @@ const steps = [
     () => request("/reset/new"),
     { status: 200, contains: "Ten link już wygasł." },
   ],
+  [
+    "reset/new expired shows the kit layout",
+    () => request("/reset/new"),
+    {
+      status: 200,
+      contains: [">Link wygasł<", ">Dla bezpieczeństwa link do zmiany hasła działa przez ograniczony czas.<"],
+    },
+  ],
   ["home redirects anonymous user", () => request("/home"), { status: 302, location: "/login" }],
   ["settings redirects anonymous user", () => request("/settings"), { status: 302, location: "/login" }],
   [
     "signup creates account",
     () => request("/api/auth/signup", { method: "POST", form: { email, password } }),
     { status: 302, location: "/confirm-email" },
+  ],
+  [
+    "confirm-email shows its own panel",
+    () => request("/confirm-email"),
+    { status: 200, contains: ">Jeszcze jeden krok<" },
+  ],
+  [
+    "confirm-email resent shows the kit countdown",
+    () => request("/confirm-email?resent=1"),
+    { status: 200, contains: ">Wyślij ponownie za 60 s<" },
   ],
   [
     "signin rejects wrong password",
@@ -293,7 +314,45 @@ const steps = [
     () => request("/fixed"),
     { status: 200, contains: ">Koszty stałe pojawią się po pierwszym imporcie.<", notContains: ">Zmieniły kwotę<" },
   ],
+  [
+    "home has no demo note for the test user",
+    () => request("/home"),
+    { status: 200, notContains: ">Wspólne konto demo — niektóre działania są wyłączone.<" },
+  ],
+  ["settings offers sign-out", () => request("/settings"), { status: 200, contains: ">Wyloguj się<" }],
+  ["home header has no exit button", () => request("/home"), { status: 200, notContains: ">Wyjdź<" }],
+  [
+    "settings shows the save error",
+    () => request("/settings?error=password"),
+    { status: 200, contains: ">Nie udało się zapisać zmian. Spróbuj ponownie.<" },
+  ],
+  [
+    "settings shows the demo password refusal",
+    () => request("/settings?error=demo-password"),
+    { status: 200, contains: ">Na wspólnym koncie demo zmiana hasła jest wyłączona.<" },
+  ],
+  [
+    "settings shows the delete error",
+    () => request("/settings?error=delete"),
+    { status: 200, contains: ">Nie udało się usunąć konta. Spróbuj ponownie.<" },
+  ],
+  [
+    "settings shows the wrong-password delete error",
+    () => request("/settings?error=delete-password"),
+    { status: 200, contains: ">Obecne hasło jest nieprawidłowe.<" },
+  ],
+  [
+    "settings shows the demo delete refusal",
+    () => request("/settings?error=demo-delete"),
+    { status: 200, contains: ">Na wspólnym koncie demo usunięcie konta jest wyłączone.<" },
+  ],
   ["settings renders account e-mail", () => request("/settings"), { status: 200, contains: email }],
+  [
+    "settings password form starts closed",
+    () => request("/settings"),
+    { status: 200, contains: ">Zmień hasło<", notContains: 'id="current"' },
+  ],
+  // Since the form is collapsed, the next step matches the island's serialized props only (S-12 P4).
   [
     "settings fills the password minimum",
     () => request("/settings"),
@@ -912,6 +971,11 @@ const steps = [
     () => request("/login?deleted=1"),
     { status: 200, contains: "Konto zostało usunięte." },
   ],
+  [
+    "login shows the full deleted notice",
+    () => request("/login?deleted=1"),
+    { status: 200, contains: ">Konto zostało usunięte. Możesz zalogować się ponownie lub utworzyć nowe konto.<" },
+  ],
   ["home redirects after deletion", () => request("/home"), { status: 302, location: "/login" }],
   [
     "signin after deletion is rejected",
@@ -1022,6 +1086,17 @@ const steps = [
     "demo user signs in",
     () => request("/api/auth/signin", { method: "POST", form: demo }),
     { status: 302, location: "/home" },
+  ],
+  // S-12 P2: the app shell shows the permanent demo note for the demo account only.
+  [
+    "demo home shows the demo note",
+    () => request("/home"),
+    { status: 200, contains: ">Wspólne konto demo — niektóre działania są wyłączone.<" },
+  ],
+  [
+    "demo settings shows the demo note",
+    () => request("/settings"),
+    { status: 200, contains: ">Wspólne konto demo — niektóre działania są wyłączone.<" },
   ],
   // Only guarantees the account has an import: the first run creates it, later local runs are refused.
   [

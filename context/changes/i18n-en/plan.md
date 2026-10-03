@@ -681,13 +681,13 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Automated
 
-- [x] 3.1 npm test: Phase 2 count PASS, Δ0, 0 failed
-- [x] 3.2 Smoke Phase 2 count PASS, 0 FAIL, Δ0
-- [x] 3.3 No copy/copyExtra value export or import, no page-local monthNames read
-- [x] 3.4 No banner, config or hero literal left outside src/content
-- [x] 3.5 Deliberate break: PL nominatives from values turns the home lead smoke step red, restored, meta-check recorded
-- [x] 3.6 Deliberate break: re-added copy import turns astro check red, restored
-- [x] 3.7 Full local gate vs baseline, smoke + 1 cumulative
+- [x] 3.1 npm test: Phase 2 count PASS, Δ0, 0 failed — 3461cbc
+- [x] 3.2 Smoke Phase 2 count PASS, 0 FAIL, Δ0 — 3461cbc
+- [x] 3.3 No copy/copyExtra value export or import, no page-local monthNames read — 3461cbc
+- [x] 3.4 No banner, config or hero literal left outside src/content — 3461cbc
+- [x] 3.5 Deliberate break: PL nominatives from values turns the home lead smoke step red, restored, meta-check recorded — 3461cbc
+- [x] 3.6 Deliberate break: re-added copy import turns astro check red, restored — 3461cbc
+- [x] 3.7 Full local gate vs baseline, smoke + 1 cumulative — 3461cbc
 
 #### Manual
 

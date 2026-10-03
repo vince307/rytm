@@ -112,7 +112,7 @@ export default function NewPasswordForm({
       />
       {cancel ? (
         <div className="mt-3 flex flex-wrap gap-[10px]">
-          <SubmitButton pendingText={labels.pending} size="default">
+          <SubmitButton pendingText={labels.pending} size="default" showArrow={false}>
             {labels.submit}
           </SubmitButton>
           <Button type="button" variant="ghost" onClick={cancel.onCancel}>

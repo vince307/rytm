@@ -12,6 +12,7 @@ interface Props {
 }
 
 // Kit `settings()` + `togglePasswordForm()`: masked value and a ghost toggle; the form opens below the row.
+// Kit `.settings-password-form`: top border, no bottom border; „Zapisz hasło” has no ↗ (kit `settings()`).
 // Row classes mirror `SettingsRow.astro` (an Astro component cannot be used inside an island).
 export default function SettingsPasswordRow({ label, masked, toggleLabel, cancelLabel, current, formLabels }: Props) {
   const [open, setOpen] = useState(false);
@@ -33,7 +34,7 @@ export default function SettingsPasswordRow({ label, masked, toggleLabel, cancel
         </Button>
       </div>
       {open && (
-        <div id="settings-password-form" className="border-line border-b py-[18px]">
+        <div id="settings-password-form" className="border-line border-t py-[18px]">
           <div className="max-w-[460px]">
             <NewPasswordForm
               action="/api/auth/password"

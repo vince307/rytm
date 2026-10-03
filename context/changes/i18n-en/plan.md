@@ -697,13 +697,13 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Automated
 
-- [ ] 4.1 npm test: Phase 3 count + parity cases, 0 failed
-- [ ] 4.2 Smoke Phase 3 count PASS, 0 FAIL, Δ0
-- [ ] 4.3 astro check accepts kitEn satisfies KitCopy
-- [ ] 4.4 Deliberate break: dropped placeholder turns the placeholder case red, restored
-- [ ] 4.5 Deliberate break: shortened EN array turns the length case red while astro check stays green, restored, meta-check recorded
-- [ ] 4.6 Deliberate break: Polish diacritic in EN turns the diacritics case red, restored
-- [ ] 4.7 Full local gate vs baseline, smoke + 1 cumulative
+- [x] 4.1 npm test: Phase 3 count + parity cases, 0 failed
+- [x] 4.2 Smoke Phase 3 count PASS, 0 FAIL, Δ0
+- [x] 4.3 astro check accepts kitEn satisfies KitCopy
+- [x] 4.4 Deliberate break: dropped placeholder turns the placeholder case red, restored
+- [x] 4.5 Deliberate break: shortened EN array turns the length case red while astro check stays green, restored, meta-check recorded
+- [x] 4.6 Deliberate break: Polish diacritic in EN turns the diacritics case red, restored
+- [x] 4.7 Full local gate vs baseline, smoke + 1 cumulative
 
 #### Manual
 

@@ -1,6 +1,6 @@
 # Handoff — `kit-round-3-home-fixed` (slice S-15)
 
-Written by the visual-gate step of autonomous run `2026-10-02-kit-round-3`. `VISUAL: PASS`; [visual] rows 2.8, 5.9, 5.10 ticked; one fix (`c9574d7`, trend value 5 px bottom margin — F5 decided). The next agent must not get wrong: only the `[human]` row 5.11 stays open — it is a maintainer checklist, not a blocker for archive/ship; no migrations.
+Written by the archive + ship step of autonomous run `2026-10-02-kit-round-3` (final pre-merge state). Slice archived, roadmap S-15 `done`, milestone M-3 recorded as done (last slice). The next agent must not get wrong: nothing remains for an agent — the `[human]` row 5.11 is the maintainer's post-run checklist (listed in the PR body); no migrations.
 
 ## 1. State
 
@@ -8,10 +8,10 @@ Written by the visual-gate step of autonomous run `2026-10-02-kit-round-3`. `VIS
 | --- | --- |
 | Branch | `feat/kit-round-3-home-fixed`, cut from `main` at `1bf6a5c` (after S-14) |
 | Commits | P1 `6108b70` … P5 `ab93627`, review fix `fcc4554`, review docs `1657af6`; this step: fix `c9574d7`, screenshots `0e89f25` + `f30be8f`, + docs commit `docs(kit-round-3-home-fixed): bramka wizualna` |
-| Pushed / PR / merged | no / no / no |
-| `change.md` status | `impl_reviewed` (unchanged) |
+| Pushed / PR / merged | PR/CI/merge/deploy recorded in `context/runs/2026-10-02-kit-round-3/run-log.md` |
+| `change.md` status | `archived` (folder → `context/archive/2026-10-03-kit-round-3-home-fixed/`) |
 | `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`): 5.11 `[human]` |
-| Working tree | clean after the docs commit |
+| Working tree | clean after the archive commit |
 
 ## 2. Artifacts
 
@@ -43,7 +43,7 @@ Observed in this step after `c9574d7`; baseline `main` 1bf6a5c (after S-14).
 
 ## 4. Next command
 
-`/10x-archive kit-round-3-home-fixed then ship (no migrations)`
+`none — shipped`
 
 ## 5. Open
 
@@ -61,3 +61,6 @@ Observed in this step after `c9574d7`; baseline `main` 1bf6a5c (after S-14).
 4. **Small two-month accounts via `POST /api/imports` (smoke payload format, `Origin` header) instead of the wizard.** Why: the ING fixture cannot produce one-month / no-changes / no-new states; the endpoint is the wizard's own submit target. Would change: fixtures for those states.
 5. **Auth visual heading weight filed, not fixed.** Why: pre-existing on `main`, shared by every auth page; S-15 only changed the prop source. Would change: the maintainer wanting it in this slice.
 6. **Ticked 2.8, 5.9, 5.10.** Each listed state captured at both widths and compared. Would change: a state found missing from the plan list.
+7. **Archived with [human] 5.11 open and 3 [visual] rows without SHA suffix.** 5.11 is a product-owner acceptance — a post-run checklist in the PR body, not an agent task; 2.8/5.9/5.10 are screenshot-only rows (visual-gate commits `0e89f25`, `f30be8f`). No SHA repoint (merge commit, not squash — branch SHAs stay in `main` history). Would change: the owner rejecting a 5.11 choice — then a new change, not a reopen.
+8. **M-3 marked done in the roadmap** (`milestone_status: done`, Milestone History entry) following the M-2 precedent (`ac348c4`); no new milestone opened. Would change: the maintainer wanting `/10x-roadmap` to close it formally.
+

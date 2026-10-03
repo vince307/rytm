@@ -6,26 +6,29 @@
 // cannot know a month is incomplete, the reference month is only the latest month present in the data; G35 is
 // resolved by kit decision C4, the legend text stays `legend` from the page. Every bar carries a visible sum (the kit's bars
 // carry only height) so a historical month's figure never needs a hover/tooltip the kit does not define.
-// Colour mapping (G35, no dedicated tokens): bar / legend dot `bg-muted/55` (kit `#9aaab3`), dashed gridline
-// `border-line` (kit `#d2d7d8`), info panel `bg-paper-soft`/`border-ink` (kit `.info-panel`, exact `paper-soft`).
+// Colour mapping (G35, no dedicated tokens): bar / legend dot `bg-muted` (kit `--rytm-sequence` = muted, exact; the G35 bar-grey part is closed), dashed gridline
+// `border-line` (kit `#d2d7d8`), note via `InfoPanel` (kit `.info-panel`).
+import InfoPanel from "@/components/app/InfoPanel.astro";
 import { cn } from "@/lib/utils";
 
+// Every string arrives from the page (kit `copy.trend.*`), this component imports no copy.
 interface Props {
-  bars: { label: string; amount: string; height: number }[];
+  bars: { label: string; amount: string; height: number; name: string }[];
   legend: string;
   ariaLabel: string;
   note?: string;
-  hint?: string;
+  zeroNote?: string;
+  noThreshold?: string;
 }
-const { bars, legend, ariaLabel, note, hint } = Astro.props;
+const { bars, legend, ariaLabel, note, zeroNote, noThreshold } = Astro.props;
 // Geometry = kit `.monthly-trend` (visual gate, impl review F6): the 200 px `<ol>` is the bar area, its `border-b`
 // is the baseline the bars stand on, the dashed gridline sits at its 50 % (`top-[100px]`, kit `.trend:before`), and
 // the month labels hang 22 px below the baseline (kit `.tbar:after` `bottom:-22px`) inside the wrapper's `pb-[22px]`,
 // so the legend keeps the kit's 31 px from the baseline (9 px + 22 px). `flex-row-reverse` on the scroll box makes a
 // long axis that overflows (≈ 400 px viewport, 12 months) open scrolled to its END — the reference month the stat
-// card above reports — instead of the oldest one (DOM and reading order unchanged; G35).
-// Kit `.info-panel` — one class string for both the "za krótki trend" note and the "brak progu" hint (impl review).
-const infoPanel = "mt-[14px] border-l-[3px] border-ink bg-paper-soft p-[13px] text-xs text-muted";
+// card above reports — instead of the oldest one (DOM and reading order unchanged; G35). The value keeps kit
+// `.trend-value` `margin-bottom:5px` but not its ≤ 560 px `white-space:normal`: the long axis scrolls instead, so a
+// value never wraps onto two lines (visual gate S-15, impl review F5).
 ---
 
 <div class="flex flex-row-reverse overflow-x-auto">
@@ -37,12 +40,16 @@ const infoPanel = "mt-[14px] border-l-[3px] border-ink bg-paper-soft p-[13px] te
     <ol aria-label={ariaLabel} class="flex h-[200px] gap-[13px] border-b border-line px-2.5 max-[559px]:gap-[7px]">
       {bars.map((bar) => (
         <li class="relative flex min-w-[44px] flex-1 flex-col items-center">
-          <span class="shrink-0 text-[10px] whitespace-nowrap text-muted">{bar.amount}</span>
+          <span class="mb-[5px] shrink-0 text-[11px] font-bold whitespace-nowrap text-ink max-[559px]:text-[9px] max-[359px]:text-[8px]">
+            {bar.amount}
+          </span>
           <div class="relative w-full flex-1">
             <i
+              role="img"
+              aria-label={bar.name}
               class:list={cn(
-                "absolute inset-x-0 bottom-0 w-full rounded-t-[3px] bg-muted/55",
-                bar.height === 0 && "h-[2px]",
+                "absolute inset-x-0 bottom-0 w-full rounded-t-[3px]",
+                bar.height === 0 ? "h-[2px] bg-line" : "bg-muted",
               )}
               style={bar.height > 0 ? `height:${bar.height}%` : undefined}
             ></i>
@@ -57,9 +64,10 @@ const infoPanel = "mt-[14px] border-l-[3px] border-ink bg-paper-soft p-[13px] te
 </div>
 <div class="mt-[9px] flex items-center gap-[17px] text-[11px] text-muted">
   <span>
-    <i class="mr-[5px] inline-block h-2 w-2 rounded-full bg-muted/55" aria-hidden="true"></i>
+    <i class="mr-[5px] inline-block h-2 w-2 rounded-full bg-muted" aria-hidden="true"></i>
     {legend}
   </span>
+  {zeroNote && <span class="ml-auto max-[559px]:text-[10px]">{zeroNote}</span>}
+  {noThreshold && <span>{noThreshold}</span>}
 </div>
-{note && <div class:list={infoPanel}>{note}</div>}
-{hint && <div class:list={infoPanel}>{hint}</div>}
+{note && <InfoPanel>{note}</InfoPanel>}

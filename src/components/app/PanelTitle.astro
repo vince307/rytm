@@ -1,0 +1,19 @@
+---
+// PanelTitle.astro — kit `.panel-title` and `.section-label` (prototype/styles.css): the same `h2` plus a right-hand
+// slot, differing only in `align-items` and `margin-bottom`. No copy of its own; the title comes from the caller.
+import { cn } from "@/lib/utils";
+
+interface Props {
+  title: string;
+  variant?: "panel" | "section";
+  class?: string;
+}
+const { title, variant = "panel", class: className } = Astro.props;
+---
+
+<div
+  class:list={cn("flex justify-between", variant === "panel" ? "mb-5 items-start" : "mb-[9px] items-center", className)}
+>
+  <h2 class="text-[17px] tracking-[-0.03em]">{title}</h2>
+  <slot />
+</div>

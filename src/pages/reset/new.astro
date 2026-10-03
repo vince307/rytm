@@ -17,7 +17,7 @@ const expired = params.get("state") === "expired" || (!success && !Astro.locals.
 const hasError = params.has("error");
 ---
 
-<AuthLayout title={r.title} visual={x.resetNewVisual}>
+<AuthLayout title={r.title} visual={{ ...copy.auth.resetVisual, lead: x.resetNewVisual.lead }}>
   {success ? (
     <>
       <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{x.doneEyebrow}</div>

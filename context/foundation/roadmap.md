@@ -9,7 +9,7 @@ main_goal: quality
 top_blocker: none
 milestone_id: kit-round-3
 milestone_seq: 3
-milestone_status: open
+milestone_status: done
 ---
 
 # Roadmap: Rytm
@@ -20,7 +20,7 @@ milestone_status: open
 
 ## Milestone
 
-**M-3: Runda 3 kitu — aplikacja bez placeholderów** — Status: open
+**M-3: Runda 3 kitu — aplikacja bez placeholderów** — Status: done
 
 - **Intent:** Każdy ekran aplikacji wygląda i mówi tak, jak zaprojektował to autor kitu „Rytm — Oś” w rundzie 3: teksty pochodzą z `content.json`, stany pochodzą z prototypu, a placeholdery `DESIGN-GAP` zbudowane po stronie kodu znikają tam, gdzie kit dał już odpowiedź.
 - **Source materials:** dostawa rundy 3 (lokalnie, poza repozytorium: `context/runs/2026-10-02-kit-round-3/kit-delivery/` — `react-kit/` → `design/rytm-os/react-kit/` i `design/rytm-os/prototype/`, `rytm-os/` → `design/rytm-os/brand-pack/`; pliki w korzeniu dostawy i `rytm-os-views-html/` to duplikaty); brief rundy 3 `design/prompts/2026-10-02-gaps-round-3.md`; rejestr luk `context/foundation/design-kit.md` (pozycje K11–K26, G20, G23–G37). PRD bez zmian — gdy kit koliduje z PRD, wygrywa PRD.
@@ -45,7 +45,7 @@ Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stał
 | S-12 | kit-round-3-auth-settings | przejść logowanie, rejestrację, reset hasła i ustawienia konta (zmiana hasła, usunięcie, wylogowanie, konto demo) w wersji rundy 3 kitu    | F-04          | FR-001, FR-019                         | done     |
 | S-13 | kit-round-3-imports       | wgrać plik z ING lub Santandera, zobaczyć wynik, odrzucenia i historię importów (z cofnięciem) w wersji rundy 3 kitu                       | F-04          | FR-003, FR-004, FR-005, FR-018         | done    |
 | S-14 | kit-round-3-patterns      | przeglądać wzorce, szczegół z progiem i dialog akcji (scal, zmień nazwę, typ, wyklucz) we wszystkich stanach rundy 3 kitu                  | F-04          | FR-007, FR-008, FR-009, FR-010, FR-011 | done |
-| S-15 | kit-round-3-home-fixed    | zobaczyć przegląd, trend „ponad progiem” i koszty stałe ze wszystkimi stanami (puste, brak porównania, błąd odczytu) w wersji rundy 3 kitu | F-04          | FR-011, FR-012, FR-013                 | pending |
+| S-15 | kit-round-3-home-fixed    | zobaczyć przegląd, trend „ponad progiem” i koszty stałe ze wszystkimi stanami (puste, brak porównania, błąd odczytu) w wersji rundy 3 kitu | F-04          | FR-011, FR-012, FR-013                 | done |
 
 ## Baseline
 
@@ -120,7 +120,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Ostatni, bo zbiera resztki `copyExtra` (`home`, `fixed`, `app`) — jego ostatnia faza sprawdza, czy `copyExtra` zawiera już tylko to, czego kit naprawdę nie dał. Pozycje: K11 (home, fixed, app), K18 (przegląd, koszty stałe), K23, K24, K25, G34, G35, G36.
-- **Status:** pending
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -130,7 +130,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | S-12       | kit-round-3-auth-settings | Auth i ustawienia według rundy 3 kitu              | done                  | Zarchiwizowane 2026-10-03 → `context/archive/2026-10-03-kit-round-3-auth-settings/`; follow-upy F1, F2 (`Trigger: S-14`), F3 (`Trigger: next slice that touches the public pages`); [human] 8.8 otwarte (lista w PR; m.in. usunięte „Wyjdź” z nagłówka — wylogowanie tylko w `/settings`) |
 | S-13       | kit-round-3-imports       | Import i historia importów według rundy 3 kitu     | done                  | Zarchiwizowane 2026-10-02 → `context/archive/2026-10-02-kit-round-3-imports/`; follow-up F3 (`Trigger: next change touching src/pages/imports/result.astro, or an observability audit`); [human] 6.8 otwarte (lista w PR)                                                                                                                |
 | S-14       | kit-round-3-patterns      | Wzorce, szczegół i akcje według rundy 3 kitu       | done                  | Zarchiwizowane 2026-10-03 → `context/archive/2026-10-03-kit-round-3-patterns/`; follow-upy z `Trigger:` (S-15: `fixed.astro` `try`, F8, F9; kit round 4: K35–K37, Panel radius, błędy w dialogu; S-05 F6/F7); [human] 8.9 otwarte (lista w PR; m.in. promień pól 14 → 8 px, padding `DialogContent`, wyśrodkowany `ViewEmpty` także na `/fixed` i `/imports`) |
-| S-15       | kit-round-3-home-fixed    | Przegląd, trend i koszty stałe według rundy 3 kitu | yes                   | F-04 zarchiwizowane; `grep -n 'Trigger: S-15' context/archive/2026-10-02-kit-round-3-intake/follow-ups/review-fixes.md`; S-13 zarchiwizowane: `grep -n 'Trigger:' context/archive/2026-10-02-kit-round-3-imports/follow-ups/review-fixes.md`; wspólny `PageTitle.astro` układa tytuł i akcję w kolumnie poniżej 560 px (jak kit rundy 3); S-12 zarchiwizowane: `grep -n 'Trigger:' context/archive/2026-10-03-kit-round-3-auth-settings/follow-ups/review-fixes.md` (F1, F2 dla S-14); nagłówek aplikacji bez „Wyjdź” (wylogowanie w `/settings`, wiersz „Sesja”); S-14 zarchiwizowane: `grep -n 'Trigger: S-15' context/archive/2026-10-03-kit-round-3-patterns/follow-ups/review-fixes.md` (`fixed.astro` `try`, F8 `[...key].astro`, F9 `home.astro`); wspólne: pola z promieniem 8 px i jednym pierścieniem fokusu (`field-styles.ts`), padding `DialogContent`, wyśrodkowany `ViewEmpty` |
+| S-15       | kit-round-3-home-fixed    | Przegląd, trend i koszty stałe według rundy 3 kitu | done                  | Zarchiwizowane 2026-10-03 → `context/archive/2026-10-03-kit-round-3-home-fixed/`; bez migracji. `/home`: jedna karta „Ponad progiem” + trend + zestawienie „Koszty stałe” (bez panelu importu i sumy kosztów stałych), minimalny słupek trendu 12 → 8 %; nowy test jednostkowy pilnuje, by `copyExtra` nie dublował tekstu kitu. [human] 5.11 otwarte (lista w PR; K38–K41, G39 → autor kitu). Follow-up: `AuthLayout.astro` waga tytułu jak kit `.auth-copy h1` — `Trigger: next slice touching AuthLayout.astro` (`grep -n 'Trigger:' context/archive/2026-10-03-kit-round-3-home-fixed/follow-ups/review-fixes.md`) |
 
 ## Open Roadmap Questions
 
@@ -160,6 +160,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 - **M-1: Pierwszy miesiąc ponad progiem** (`first-over-limit-month`) — closed 2026-10-01. Cały przepływ MVP działa od końca do końca (logowanie → import CSV z ING → wzorce → progi → „ponad próg” i trend miesięcy → zmiany kosztów stałych, konto i usunięcie), lokalnie na prawdziwym wyciągu i publicznie na koncie demo z syntetycznym wyciągiem; 2 fundamenty + 9 wycinków.
 - **M-2: Drugi bank — Santander** (`second-bank-santander`) — closed 2026-10-02. Eksport CSV z Santander Bank Polska (PLN) importuje się na zasadach ING, a transakcje kartowe, wypłaty z bankomatu i ten sam sprzedawca z obu banków trafiają do wspólnych wzorców; 1 fundament + 2 wycinki.
+- **M-3: Runda 3 kitu — aplikacja bez placeholderów** (`kit-round-3`) — closed 2026-10-03. Każdy ekran aplikacji (auth i ustawienia, import i historia, wzorce i akcje, przegląd, trend i koszty stałe) jest związany z rundą 3 kitu „Rytm — Oś”: teksty z `content.json`, stany z prototypu, `copyExtra` ograniczony do luk kitu; bez migracji; 1 fundament + 4 wycinki.
 
 ## Done
 
@@ -183,3 +184,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **S-13: Użytkownik wgrywa plik z ING albo Santandera i widzi copy dla obu banków, krok podsumowania z bankiem, rachunkiem bez nazwiska („Rachunek · •• końcówka” dla Santandera), zakresem i przyciskiem „Importuj N obciążeń” ze stanem oczekiwania, wynik importu w układzie rundy 3, osobne odrzucenia (plik za duży, za dużo obciążeń, plik niespójny, waluta, pusty, nakładający się zakres z `{range}`), a w historii importów — bank, dialog usunięcia z `{range}` i komunikaty inline po usunięciu (sukces, błąd, nie znaleziono); na koncie demo widzi notę zamiast akcji.** — Archived 2026-10-02 → `context/archive/2026-10-02-kit-round-3-imports/`. Lesson: —.
 - **S-12: Użytkownik przechodzi logowanie, rejestrację, potwierdzenie e-maila, reset i ustawienie nowego hasła z panelami wizualnymi rundy 3, a w ustawieniach zmienia hasło (obecne + nowe + powtórz) ze stanami sukcesu i błędu, wylogowuje się z ekranu ustawień, usuwa konto przez dialog z obecnym hasłem i wpisaniem `USUŃ`, po czym widzi notę na `/login`; na koncie demo widzi stałą notę o zablokowanych akcjach. Strony publiczne (landing, jak działa, dla kogo — także ze stopki na telefonie) używają copy z `content.json`.** — Archived 2026-10-03 → `context/archive/2026-10-03-kit-round-3-auth-settings/`. Lesson: —.
 - **S-14: Użytkownik przegląda listę wzorców z kolumną „Kwota” dla stałych, „Pokaż więcej” i widocznym fokusem wyszukiwania i sortowania; w szczególe widzi stany „nie znaleziono” i „miesiąc bez wystąpień”, sumę z odmianą miesiąca, opis sekwencji dla czytników ekranu, walidację i błąd zapisu progu; w dialogu akcji scala (z wyborem wzorca i stanem „brak wzorców”), zmienia nazwę (z walidacją), typ i wyklucza, widzi scalone warianty z cofnięciem.** — Archived 2026-10-03 → `context/archive/2026-10-03-kit-round-3-patterns/`. Lesson: —.
+- **S-15: Użytkownik widzi przegląd w układzie rundy 3 (karta „Ponad progiem”, trend na pełną szerokość, zestawienie kosztów stałych; bez „Rozpoznanych wydatków” i „Co wraca najczęściej” — decyzja C5), leady i stopki kart z `{month}`/`{delta}`/`{n}` i odmianą, trend z sumami nad słupkami, znacznikiem zera i opisem „brak progu”, a w „Kosztach stałych” — licznik z prawdziwą formą mnogą, spokojny kolor obniżki, osobne komunikaty pustych sekcji, braku miesiąca porównawczego i błędu odczytu (inny niż pusty stan).** — Archived 2026-10-03 → `context/archive/2026-10-03-kit-round-3-home-fixed/`. Lesson: —.

@@ -94,12 +94,17 @@ export function formatSignedMoney(minor: number): string {
   return `${minor > 0 ? "+" : "−"}${formatMoney(Math.abs(minor))}`;
 }
 
+/** `YYYY-MM` → zero-based month index (`"2026-05"` → 4); one parse for every month table lookup. */
+export function monthIndex(yearMonth: string): number {
+  return Number(yearMonth.slice(5, 7)) - 1;
+}
+
 /**
  * Fills a kit month template (`"Nowe w {month}"`, `"Suma w {month}"`) with the month's locative. Polish writes „we"
  * before „wrześniu" (kit templates say „w {month}" — F-04 intake, round-4 K-row); `yearMonth` is `YYYY-MM`.
  */
 export function fillMonthLocative(template: string, yearMonth: string, locatives: readonly string[]): string {
-  const locative = locatives[Number(yearMonth.slice(5, 7)) - 1];
+  const locative = locatives[monthIndex(yearMonth)];
   const preposition = locative === "wrześniu" ? "we" : "w";
   return template.includes("w {month}")
     ? template.replace("w {month}", `${preposition} ${locative}`)

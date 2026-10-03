@@ -1,0 +1,29 @@
+---
+// FixedSummary.astro — kit `.panel.dashboard-fixed` / `.fixed-summary-row` (prototype/styles.css): the `/home`
+// „Koszty stałe” summary (two rows and a link to `/fixed`). Props are finished texts; no copy of its own.
+import Panel from "@/components/app/Panel.astro";
+import PanelTitle from "@/components/app/PanelTitle.astro";
+import { focusRing } from "@/components/app/field-styles";
+
+interface Props {
+  title: string;
+  link: string;
+  href: string;
+  rows: { label: string; value: string }[];
+}
+const { title, link, href, rows } = Astro.props;
+---
+
+<Panel class="mt-[15px] grid w-full grid-cols-2 gap-3 max-[559px]:grid-cols-1">
+  <PanelTitle title={title} class="col-span-full mb-[2px] max-[559px]:col-auto">
+    <a href={href} class:list={["text-ink rounded-sm text-[13px] font-extrabold no-underline", focusRing]}>
+      {link}
+    </a>
+  </PanelTitle>
+  {rows.map((row) => (
+    <div class="flex items-center justify-between border-t border-line py-[13px] text-[13px] text-muted">
+      <span>{row.label}</span>
+      <strong class="text-ink">{row.value}</strong>
+    </div>
+  ))}
+</Panel>

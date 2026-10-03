@@ -49,7 +49,17 @@ describe("kit contract (content.json as the app reads it)", () => {
   });
 
   it("has a locative for each of the 12 months", () => {
-    expect(copyExtra.patterns.monthsLocative).toHaveLength(12);
+    const locatives = Object.values(copy.patternDetail.monthNames);
+    expect(locatives).toHaveLength(12);
+    expect(locatives[8]).toBe("wrześniu");
+  });
+
+  it("has a nominative for each of the 12 months (keys of patternDetail.monthNames)", () => {
+    const nominatives = Object.keys(copy.patternDetail.monthNames);
+    expect(nominatives).toHaveLength(12);
+    expect(nominatives[0]).toBe("styczeń");
+    expect(nominatives[4]).toBe("maj");
+    expect(nominatives[8]).toBe("wrzesień");
   });
 
   it("keeps the import rejection messages, placeholders and limits the wizard fills (S-13)", () => {
@@ -73,6 +83,8 @@ describe("kit contract (content.json as the app reads it)", () => {
     expect(copy.importFlow.debitForms).toHaveLength(3);
     // patterns.astro / ExcludedPatterns cast `patterns.countForms` to a 3-tuple for `plural()` (S-14 impl review).
     expect(copy.patterns.countForms).toHaveLength(3);
+    // fixed.astro casts `fixedCosts.itemForms` to a 3-tuple for `plural()` (S-15 impl review).
+    expect(copy.fixedCosts.itemForms).toHaveLength(3);
   });
 
   it("keeps the auth keys confirm-email and reset/new read (S-12 P7)", () => {
@@ -116,5 +128,27 @@ describe("kit contract (content.json as the app reads it)", () => {
     for (const cls of ["p-[26px]", "max-[559px]:px-[18px]", "max-[559px]:py-[22px]", "w-[calc(100%-32px)]"]) {
       expect(dialogContentClass).toContain(cls);
     }
+  });
+
+  it("keeps copyExtra free of strings the kit already ships (S-15 milestone audit)", () => {
+    // A leaf equal to a kit string is a duplicate, not a gap — rebind it to `copy`. Each exception is a different
+    // role for the same bytes (the kit key belongs to another component / heading), so it must carry a reason.
+    const ROLE_EXCEPTIONS: Record<string, string> = {
+      "auth.saving": "`threshold.saving` / `patternActions.saving` belong to other components' namespaces",
+      "settings.close": "`patternActions.close*` / `imports.deleteClose` are other dialogs' buttons",
+      "settings.deleting": "`imports.deleteWaiting` is the import dialog's pending label",
+      "patterns.mergeSubmit": "`patternActions.mergeTitle` is the dialog's h2, not the submit button",
+      "imports.transactionForms.2": "one form of a 3-form array; `importFlow.transactions` is a label",
+    };
+    const leaves = (node: unknown, path: string, out: [string, string][]): [string, string][] => {
+      if (typeof node === "string") out.push([path, node]);
+      else if (node && typeof node === "object") {
+        for (const [k, v] of Object.entries(node)) leaves(v, path ? `${path}.${k}` : k, out);
+      }
+      return out;
+    };
+    const kitStrings = new Set(leaves(copy, "", []).map(([, v]) => v));
+    const dupes = leaves(copyExtra, "", []).filter(([path, v]) => kitStrings.has(v) && !(path in ROLE_EXCEPTIONS));
+    expect(dupes).toEqual([]);
   });
 });

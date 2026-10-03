@@ -119,13 +119,11 @@ export const copyExtra = {
     deleteDialogEyebrow: "Cofnij import",
   },
   patterns: {
-    eyebrow: "Wzorce wydatków",
     // DESIGN-GAP: K11 — strings of prototype patterns() / patternRows() / badge() absent from content.json.
     upload: "+ Wgraj CSV",
     typeLabels: { fixed: "stały", frequent: "częsty" },
     sortPrefix: "Sortuj: ",
     footer: "{n} {patterns} · wszystkie miesiące",
-    patternForms: ["wzorzec", "wzorce", "wzorców"],
     // DESIGN-GAP: K21 — detail / threshold-editor / list strings the prototype renders that content.json still
     // lacks (round 3); taken verbatim from app.js patternDetail() / thresholdEditor() / patternRows() / showToast().
     detailEyebrow: " wzorzec",
@@ -190,8 +188,6 @@ export const copyExtra = {
     excludedToast: "Wzorzec wykluczony z analizy.",
     // modal()'s close button aria-label is shared across every modal type, including patternActions.
     close: "Zamknij",
-    // `/patterns`'s "Wykluczone" toggle (prototype patterns(), excluded-toggle button text) — verbatim, S-05 faza 7.
-    excludedToggle: "Wykluczone",
     // DESIGN-GAP: G33 — the kit names no merge picker, rename field, direct-submit type/exclude, merged-variants
     // list, merge undo or result-line copy for FR-009 (the prototype only fires toasts on closeModal()); every
     // string below is a placeholder built from tokens and kit-adjacent phrasing, not a design decision.

@@ -18,7 +18,7 @@ export function formatDate(timestamp: string): string {
 const pluralRules = new Intl.PluralRules("pl-PL");
 
 /** Polish noun form for `n`: `[one, few, many]`, e.g. `["transakcja", "transakcje", "transakcji"]`. */
-export function plural(n: number, [one, few, many]: readonly [string, string, string]): string {
+export function plural(n: number, [one, few, many]: readonly [string, string, string] | readonly string[]): string {
   const category = pluralRules.select(n);
   if (category === "one") return one;
   if (category === "few") return few;

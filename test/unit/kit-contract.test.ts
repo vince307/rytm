@@ -9,7 +9,6 @@ import { describe, expect, it } from "vitest";
 import { copy, copyExtra } from "@/content/copy";
 import { DELETE_CONFIRM_WORD, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 import { MAX_DEBITS, MAX_FILE_BYTES } from "@/lib/import/schema";
-import { tableHeaders } from "@/lib/patterns/table-columns";
 
 describe("kit contract (content.json as the app reads it)", () => {
   it("keeps the 4 authStates keys the login and reset pages read", () => {
@@ -25,11 +24,11 @@ describe("kit contract (content.json as the app reads it)", () => {
     expect(copy.dashboard.stats[1].label).toBe("Koszty stałe");
   });
 
-  it("keeps 7 pattern table columns, all mapped by tableHeaders", () => {
+  it("keeps 7 pattern table columns in kit order (Kwota before Suma), read straight from copy.patterns.columns", () => {
     expect(copy.patterns.columns).toHaveLength(7);
-    const headers = tableHeaders(copy.patterns.columns);
-    expect(headers).toHaveLength(7);
-    for (const h of headers) expect(h.length).toBeGreaterThan(0);
+    for (const h of copy.patterns.columns) expect(h.length).toBeGreaterThan(0);
+    expect(copy.patterns.columns[3]).toBe("Kwota");
+    expect(copy.patterns.columns[4]).toBe("Suma");
   });
 
   it("keeps the placeholders the app fills", () => {

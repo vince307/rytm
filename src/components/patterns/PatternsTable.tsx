@@ -9,7 +9,6 @@ import { Glyph } from "@/components/Glyph";
 import { formatMoney, plural } from "@/lib/format";
 import { merchantMark } from "@/components/patterns/merchant-mark";
 import { patternHref } from "@/lib/patterns/path";
-import { tableHeaders } from "@/lib/patterns/table-columns";
 import { cn } from "@/lib/utils";
 import type { PatternListItem, Threshold } from "@/types";
 
@@ -25,7 +24,8 @@ export interface PatternsTableCopy {
   columns: readonly string[];
   typeLabels: { fixed: string; frequent: string };
   footer: string;
-  patternForms: readonly [string, string, string];
+  /** `copy.patterns.countForms` (kit round 3). */
+  patternForms: readonly string[];
   /** Próg cell, `count` kind — `"{n} × / miesiąc"` (K21 verbatim format). */
   thresholdCount: string;
   /** Próg cell, `sum` kind — `"{amount} / miesiąc"` (G31 placeholder). */
@@ -110,7 +110,7 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
           <table className="w-full border-collapse text-[13px]">
             <thead>
               <tr>
-                {tableHeaders(copy.columns).map((label) => (
+                {copy.columns.map((label) => (
                   <th key={label} className={head}>
                     {label}
                   </th>
@@ -140,10 +140,10 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
                     <Badge tone={p.type}>{copy.typeLabels[p.type]}</Badge>
                   </td>
                   <td className={cell}>{p.occurrences}</td>
-                  <td className={cn(cell, "whitespace-nowrap")}>{formatMoney(p.sumMinor)}</td>
                   <td className={cn(cell, "whitespace-nowrap")}>
                     {p.fixedAmountMinor === null ? "—" : formatMoney(p.fixedAmountMinor)}
                   </td>
+                  <td className={cn(cell, "whitespace-nowrap")}>{formatMoney(p.sumMinor)}</td>
                   <td className={cn(cell, "whitespace-nowrap")}>{thresholdLabel(p.threshold, copy)}</td>
                   <td className={cn(cell, "whitespace-nowrap")}>
                     {p.overMinor > 0 ? (

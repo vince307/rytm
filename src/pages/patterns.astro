@@ -23,8 +23,12 @@ const supabase = createClient(Astro.request.headers, Astro.cookies);
 const dataResult = supabase ? await loadPatternData(supabase) : { error: new Error("Supabase is not configured") };
 const result: { error: unknown } | { patterns: PatternListItem[] } = (() => {
   if ("error" in dataResult) return { error: dataResult.error };
-  const { items } = listOverview(dataResult.patterns, dataResult.rows, dataResult.thresholds);
-  return { patterns: items };
+  try {
+    const { items } = listOverview(dataResult.patterns, dataResult.rows, dataResult.thresholds);
+    return { patterns: items };
+  } catch (error) {
+    return { error };
+  }
 })();
 if ("error" in result) {
   // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
@@ -52,7 +56,7 @@ const tableCopy: PatternsTableCopy = {
   columns: copy.patterns.columns,
   typeLabels: x.typeLabels,
   footer: x.footer,
-  patternForms: x.patternForms,
+  patternForms: copy.patterns.countForms,
   thresholdCount: x.thresholdCount,
   thresholdSum: x.thresholdSum,
   openPattern: x.openPattern,
@@ -62,17 +66,17 @@ const tableCopy: PatternsTableCopy = {
 <AppLayout title={copy.patterns.title} active="patterns">
   {"error" in result ? (
     <>
-      <PageTitle eyebrow={x.eyebrow} title={copy.patterns.title} lead={copy.patterns.description} />
+      <PageTitle eyebrow={copy.app.patternsLong} title={copy.patterns.title} lead={copy.patterns.description} />
       <InlineAlert kind="error">{copy.components.error}</InlineAlert>
     </>
   ) : items.length === 0 ? (
     <>
-      <PageTitle eyebrow={x.eyebrow} title={e.patterns.title} lead={e.patterns.lead} />
+      <PageTitle eyebrow={copy.app.patternsLong} title={e.patterns.title} lead={e.patterns.lead} />
       <ViewEmpty icon="patterns" title={e.cta} body={copyExtra.emptyViews.body} cta={e.button} href="/imports/new" />
     </>
   ) : (
     <>
-      <PageTitle eyebrow={x.eyebrow} title={copy.patterns.title} lead={copy.patterns.description}>
+      <PageTitle eyebrow={copy.app.patternsLong} title={copy.patterns.title} lead={copy.patterns.description}>
         <a href="/imports/new" class:list={buttonVariants({ variant: "primary" })}>
           {x.upload}
         </a>

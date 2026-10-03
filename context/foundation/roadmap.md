@@ -44,7 +44,7 @@ Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stał
 | F-04 | kit-round-3-intake        | (foundation) runda 3 kitu jest w `design/rytm-os/`, aplikacja na nowym `content.json` i tokenach działa bez regresji                       | —             | — (kit)                                | done    |
 | S-12 | kit-round-3-auth-settings | przejść logowanie, rejestrację, reset hasła i ustawienia konta (zmiana hasła, usunięcie, wylogowanie, konto demo) w wersji rundy 3 kitu    | F-04          | FR-001, FR-019                         | done     |
 | S-13 | kit-round-3-imports       | wgrać plik z ING lub Santandera, zobaczyć wynik, odrzucenia i historię importów (z cofnięciem) w wersji rundy 3 kitu                       | F-04          | FR-003, FR-004, FR-005, FR-018         | done    |
-| S-14 | kit-round-3-patterns      | przeglądać wzorce, szczegół z progiem i dialog akcji (scal, zmień nazwę, typ, wyklucz) we wszystkich stanach rundy 3 kitu                  | F-04          | FR-007, FR-008, FR-009, FR-010, FR-011 | pending |
+| S-14 | kit-round-3-patterns      | przeglądać wzorce, szczegół z progiem i dialog akcji (scal, zmień nazwę, typ, wyklucz) we wszystkich stanach rundy 3 kitu                  | F-04          | FR-007, FR-008, FR-009, FR-010, FR-011 | planning |
 | S-15 | kit-round-3-home-fixed    | zobaczyć przegląd, trend „ponad progiem” i koszty stałe ze wszystkimi stanami (puste, brak porównania, błąd odczytu) w wersji rundy 3 kitu | F-04          | FR-011, FR-012, FR-013                 | pending |
 
 ## Baseline
@@ -108,7 +108,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Paginacja „Pokaż więcej” to nowe zachowanie listy — nie może zmienić sortowania ani sum. Pozycje: K11 (patterns), K17, K21, K22, G28, G29, G31, G33.
-- **Status:** pending
+- **Status:** planning
 
 ### S-15: Przegląd, trend i koszty stałe według rundy 3 kitu
 

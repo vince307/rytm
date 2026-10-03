@@ -1,28 +1,29 @@
 # Handoff — `kit-round-3-patterns` (slice S-14)
 
-Written by the `/10x-research` step of autonomous run `2026-10-02-kit-round-3`. `research.md` answers every open
-question from `change.md`. The slice is a copy rebind (56 `copyExtra.patterns` leaves: 25 identical, 18 stay, 13
-need a decision) plus kit column order, „Pokaż więcej”, status badges, and a `try` on `/patterns`. There is no
-migration. The one thing not to get wrong: apply „Pokaż więcej” **after** the client-side filter and sort, and keep
-the count line on the whole filtered list. Never copy the kit's `showMorePatterns()`, which ignores search and sort.
+Written by the `/10x-plan` step of autonomous run `2026-10-02-kit-round-3`. `plan.md` has 9 small code phases
+(no migration, no new UI component) with 60 Progress rows; next is the plan review. The one thing not to get
+wrong: „Pokaż więcej” slices **after** filter and sort (`listView` in `src/lib/patterns/list-view.ts`), and the
+count line counts the whole filtered list. Never copy the kit's `showMorePatterns()`.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-patterns`, cut from `main` at `5ed97f4` |
-| Commits | 2 on the branch after this step (`… change identity`, `docs(kit-round-3-patterns): research`) |
+| Commits | 3 on the branch after this step (`… change identity`, `… research`, `docs(kit-round-3-patterns): plan`) |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `preparing` (set by `metadata-guard.mjs mark-researched`) |
-| `## Progress` rows remaining | n/a: no `plan.md` yet |
+| `change.md` status | `planned` (`metadata-guard.mjs mark-planned`) |
+| `## Progress` rows remaining | 60 of 60 (`grep -c '^- \[ \]' plan.md`) |
 | Working tree | clean after the commit (`tree-clean.sh`) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/kit-round-3-patterns/research.md` | Research covering: §1 copy map (identical / stays / decide); §2 smoke + unit pins; §3 kit layout and behaviour (list, „Pokaż więcej”, badges, detail states, actions dialog); §4 copy decisions; §5 shared-component blast radius; §6 status badges + `/patterns` 500; Open Questions = plan choices |
-| `context/changes/kit-round-3-patterns/change.md` | frontmatter only: `status: preparing`, `updated: 2026-10-03` |
+| `context/changes/kit-round-3-patterns/plan.md` | Full plan: 9 phases, Critical Implementation Details, Testing Strategy, Known risks, `## Autonomous decisions` (16 rows), `## Progress` |
+| `context/changes/kit-round-3-patterns/plan-brief.md` | Two-page brief: decisions, phases at a glance, risks |
+| `context/changes/kit-round-3-patterns/change.md` | frontmatter `status: planned`, `updated: 2026-10-03` |
+| `context/foundation/roadmap.md` | S-14 status `pending` → `planning` (At a glance row + `### S-14` block) |
 | `context/changes/kit-round-3-patterns/handoff.md` | This file |
 
 ## 3. Verification
@@ -30,51 +31,47 @@ the count line on the whole filtered list. Never copy the kit's `showMorePattern
 | Command | Result |
 | --- | --- |
 | `git branch --show-current` | `feat/kit-round-3-patterns` |
-| `metadata-guard.mjs inspect` / `mark-researched` | `changed: true` |
-| grep of `content.json` for the 11 „stays” literals (§1.2) | only „Scal wzorce” (`mergeTitle`) found |
-| `src/styles/brand.css` `:root` | `--rytm-focus-ring` = ink/12, `--rytm-badge-soft` = excess/18 (exact) |
-| `src/styles/global.css` | `--radius-lg` = 14px, so `field` `rounded-lg` ≠ 8px |
-| Code suites (lint, astro check, vitest, build, pgTAP, smoke) | not run: research only, no code changed. Baseline inherited, unverified: `main` at `5ed97f4`, vitest 354, pgTAP 119, smoke 184 PASS |
+| Success Criteria ↔ Progress (script over `plan.md`) | 1:1 for all 9 phases (automated 6/5/6/5/6/5/6/4/5, manual 1×8 + 4) |
+| `metadata-guard.mjs inspect` / `mark-planned` | `changed: true` |
+| Code checks during planning | `vitest.config.ts` includes only `*.test.ts` (render tests use `createElement`); `decision-form.ts` has no exported limit (P7 adds `DISPLAY_NAME_MAX`); kit `app.js` places merged variants in the transactions panel and pluralises both sequence counts; last register ids K34 / G38 |
+| Code suites (lint, astro check, vitest, build, pgTAP, smoke) | not run: plan only, no code changed. Baseline inherited, unverified: `main` at `5ed97f4`, vitest 354, pgTAP 119, smoke 184 PASS. Each implement phase measures it on the branch |
 
 ## 4. Next command
 
-`/10x-plan kit-round-3-patterns`
+`/10x-plan-review kit-round-3-patterns`
 
 ## 5. Open
 
-- Plan choices (research.md § Open Questions):
-  - the „Pokaż więcej” page size (≥ 4 so every smoke merchant renders) and collapse-on-search;
-  - the actions dialog: in-place sections vs kit separate views (`PatternActionsDialog.tsx`);
-  - the rename field (`defaultValue={name}` → kit placeholder / stored `displayName` only, follow-up F5);
-  - the not-found layout (`ViewEmpty.astro` vs `Panel`);
-  - the sequence a11y (`role="img"` aria-label vs the `sr-only` span in `[...key].astro`).
-- New `design-kit.md` rows for the plan to add: K35 (`patternDetail.sequenceSummary` lacks plural forms; the app
-  keeps a `copyExtra` template, §4.1), K36 (`threshold.invalid` omits the range/decimals rule of
-  `parseThresholdValue`, §4.2). Narrow the G33 note: `patternActions.lead` read as the detail page (§4.3).
-- Tests to update with the change: `test/unit/table-columns.test.ts` (dropped with `tableHeaders`) and
-  `test/unit/kit-contract.test.ts` (the 7-columns test, and the `sumLabel` placeholder → `copy.patternDetail.sumLabel`).
-- Shared blast radius:
-  - `DialogContent` (3 dialogs, visual gate on all three);
-  - `Badge` `new` tint (also `/fixed`);
-  - `focusRing` export: keep ink/15 to stay at zero visual change site-wide (`buttonVariants`).
-- Out of scope, carried: S-05 F6 (`validateMerge` excluded source), F7 (`unmerge` scoping); `fixed.astro` `try`
-  (S-15).
-- No `DESIGN-GAP` added in this step (research only).
+- Phases: P1 columns + list copy + `try` · P2 status badges · P3 „Pokaż więcej” · P4 toolbar field + `focusRing` /
+  `fieldBox` · P5 detail copy + sequence label · P6 detail states + merged variants · P7 dialog + rename (F5) +
+  result lines · P8 `DialogContent` geometry · P9 register + seam sweep + visual gate.
+- Manual-only Progress rows: `[reviewer]` 1.7, 2.6, 3.7, 4.6, 5.7, 6.6, 7.7, 8.5, 9.8; `[visual]` 9.6 (every pattern
+  state), 9.7 (imports / settings dialogs, `/fixed` badge, focus ring); `[human]` 9.9 (product-visible choices + send
+  K35–K37 to the kit author).
+- Register rows to add during implement: K35 (P5), K36 (P5), K37 (P6); G33 narrowed (P7); closures in P9.
+- Smoke delta is + 8, or + 9 if P6 finds a smoke merchant with no occurrence in the reference month (data-dependent).
+- Carried, out of scope: S-05 F6 (`validateMerge` excluded source), F7 (`unmerge` scoping), `fixed.astro` `try`
+  (S-15), Panel radius 20 vs 12. P9 files them in `follow-ups/review-fixes.md` with `Trigger:` lines.
+- No `DESIGN-GAP` added in this step.
 
 ## 6. Autonomous decisions
 
-1. **`sequenceSummary`: keep plurals in `copyExtra`.** Rejected: the kit string („1 wystąpień”). Why: the JSON key is
-   ungrammatical and the kit's own `app.js` pluralises; this follows the K29 precedent. What would change it: the
-   maintainer accepting the kit string for screen-reader-only text, or round 4 adding forms.
-2. **`threshold.invalid`: adopt the kit string; the validator is unchanged.** Rejected: keep the more precise
-   `copyExtra` text. Why: the kit is the copy source, and PRD FR-010 is silent on the message. What would change
-   it: user feedback that the message misleads on out-of-range input; then use the K36 answer.
-3. **`patternActions.lead`: adopt it, with no `[human]` row.** Why: it is byte-identical to the current text, and
-   the detail page hosting the dialog is the reversal surface. What would change it: a separate pattern-settings
-   screen entering scope.
-4. **Focus-ring consolidation keeps ink/15.** Rejected: unify on `--rytm-focus-ring` (.12). Why: the kit has no
-   button or link focus rule, and a site-wide change is outside one-view scope. What would change it: the kit
-   adding a `:focus-visible` rule.
-5. **Status badges: one extra `fixedOverview` call on the same `loadPatternData` result.** No second read, so
-   `change.md` decision 2 holds. What would change it: `fixedOverview` cost on large data showing in the build or
-   smoke timing.
+Full table: `plan.md` § Autonomous decisions. None departs from the PRD's literal text. The key ones:
+
+1. **Page size 10, applied after filter + sort, kept expanded on a new search.** Rejected: kit 3, collapse on
+   search. Why: ≥ 4 keeps every smoke row; collapsing hides matches the user revealed. What would change it: the
+   maintainer's `[human]` 9.9 answer (one constant).
+2. **In-place dialog sections with kit headings and states; errors stay page alerts.** Rejected: kit separate modal
+   views, in-dialog errors after a redirect. Why: smaller change; the PRG flow and smoke stay as they are; S-12
+   precedent. What would change it: the reviewer requiring in-dialog retry, or kit round 4.
+3. **Rename value = stored `displayName` or empty, placeholder = shown name (F5).** Why: an untouched save never
+   freezes the derived name and never clears a stored one. What would change it: nothing expected.
+4. **`sequenceSummary` keeps plurals (K35); `threshold.invalid` adopted (K36); `patternActions.lead` adopted.**
+   These follow research decisions 1–3. What would change them: the maintainer accepting the kit string (K35), or
+   feedback that the shorter message misleads (K36).
+5. **Shared changes ship with screenshots of the other views.** Field radius 14 → 8 px (pattern views only), dialog
+   padding 31 → 26 px (all three dialogs), `/fixed` badge tint 25 → 18 %, all on `[human]` 9.9. `focusRing` keeps
+   ink/15, so there is no visual change site-wide. What would change it: a visual-gate regression in a non-pattern
+   dialog.
+6. **No step asked the user.** Complexity was MEDIUM with 0 questions, because research answered every open question
+   with a recommendation. What would change it: a product owner being available.

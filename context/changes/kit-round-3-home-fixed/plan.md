@@ -702,12 +702,12 @@ departures and product-visible choices the maintainer may reverse are collected 
 
 #### Automated
 
-- [ ] 4.1 npm test: Phase 3 count plus fixed-view cases, 0 failed
-- [ ] 4.2 Smoke Phase 3 count PASS, 0 FAIL, four fixed steps re-pinned
-- [ ] 4.3 No compact, changedEmpty, newEmpty, noComparison, eyebrow, itemForms or G34 left in fixed.astro / FixedSection
-- [ ] 4.4 Deliberate break: noChanges ignoring hasComparison turns fixed-view and the one-month step red, restored, meta-check recorded
-- [ ] 4.5 Deliberate break: deltaText without suffix turns fixed-view and the changed-amount step red, restored
-- [ ] 4.6 Full local gate vs baseline, smoke + 3 cumulative
+- [x] 4.1 npm test: Phase 3 count plus fixed-view cases, 0 failed — e875337
+- [x] 4.2 Smoke Phase 3 count PASS, 0 FAIL, four fixed steps re-pinned — e875337
+- [x] 4.3 No compact, changedEmpty, newEmpty, noComparison, eyebrow, itemForms or G34 left in fixed.astro / FixedSection — e875337
+- [x] 4.4 Deliberate break: noChanges ignoring hasComparison turns fixed-view and the one-month step red, restored, meta-check recorded — e875337
+- [x] 4.5 Deliberate break: deltaText without suffix turns fixed-view and the changed-amount step red, restored — e875337
+- [x] 4.6 Full local gate vs baseline, smoke + 3 cumulative — e875337
 
 #### Manual
 

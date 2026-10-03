@@ -1,19 +1,20 @@
 // PatternsTable — prototype patterns() toolbar + table + foot (app.js), search/sort as in bindInteractions().
 // Renders only non-excluded patterns (`/patterns.astro` filters); the excluded ones go to `ExcludedPatterns`
-// (S-05 Phase 7). DESIGN-GAP: G28 — status badges (nowy / zmiana kwoty, S-06) stay omitted; „Pokaż więcej” (`patterns.showMore`, kit round 3) is S-14.
+// (S-05 Phase 7).
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/app/Badge";
-import { field, control } from "@/components/app/field-styles";
+import { field, control, focusRing } from "@/components/app/field-styles";
 import { Glyph } from "@/components/Glyph";
+import { Button } from "@/components/ui/button";
+import { listView, type PatternSort } from "@/lib/patterns/list-view";
 import { formatMoney, plural } from "@/lib/format";
 import { merchantMark } from "@/components/patterns/merchant-mark";
 import { patternHref } from "@/lib/patterns/path";
-import { tableHeaders } from "@/lib/patterns/table-columns";
 import { cn } from "@/lib/utils";
 import type { PatternListItem, Threshold } from "@/types";
 
-type SortKey = "sum" | "count" | "name";
+type SortKey = PatternSort;
 const SORT_KEYS: readonly SortKey[] = ["sum", "count", "name"];
 
 export interface PatternsTableCopy {
@@ -25,6 +26,7 @@ export interface PatternsTableCopy {
   columns: readonly string[];
   typeLabels: { fixed: string; frequent: string };
   footer: string;
+  /** `copy.patterns.countForms` (kit round 3) — content.json types it `string[]`; the page hands over the three forms. */
   patternForms: readonly [string, string, string];
   /** Próg cell, `count` kind — `"{n} × / miesiąc"` (K21 verbatim format). */
   thresholdCount: string;
@@ -32,17 +34,23 @@ export interface PatternsTableCopy {
   thresholdSum: string;
   /** Arrow cell `aria-label` — „Otwórz wzorzec” (K21). */
   openPattern: string;
+  /** `copy.patterns.showMore` — the table-foot button. */
+  showMore: string;
+  /** `copy.components.new` / `.changed`. */
+  statusLabels: { new: string; changed: string };
 }
+
+/** A list row plus its status in the reference month (`patternStatuses`); the island never computes it. */
+export type PatternRow = PatternListItem & { status: "new" | "changed" | null };
 
 interface PatternsTableProps {
   /** Already in the default order (sum desc, then name, then key). */
-  patterns: PatternListItem[];
+  patterns: PatternRow[];
   copy: PatternsTableCopy;
 }
 
 const cell = "border-b border-line px-[17px] py-4 align-middle";
 const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] whitespace-nowrap text-muted uppercase");
-const focusRing = "outline-none focus-visible:ring-[3px] focus-visible:ring-ink/15";
 
 /** Próg cell (kit `patternRows()`): `count` → „{n} × / miesiąc” (K21 verbatim), `amount` → the money itself,
  * `sum` → „{amount} / miesiąc” (G31 placeholder — the kit never renders a sum-kind threshold), none → „—”. */
@@ -57,18 +65,14 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
   const [term, setTerm] = useState("");
   const [sort, setSort] = useState<SortKey>("sum");
 
-  const visible = useMemo(() => {
-    const needle = term.toLowerCase();
-    // The input order is the tie-breaker (stable sort), so equal sums/counts keep the server's order.
-    const list = patterns.filter((p) => p.name.toLowerCase().includes(needle));
-    if (sort === "name") return list.sort((a, b) => a.name.localeCompare(b.name, "pl"));
-    if (sort === "count") return list.sort((a, b) => b.occurrences - a.occurrences);
-    return list.sort((a, b) => b.sumMinor - a.sumMinor);
-  }, [patterns, term, sort]);
+  const [expanded, setExpanded] = useState(false);
 
-  const footer = copy.footer
-    .replace("{n}", String(visible.length))
-    .replace("{patterns}", plural(visible.length, copy.patternForms));
+  const { shown, total, hasMore } = useMemo(
+    () => listView(patterns, term, sort, expanded),
+    [patterns, term, sort, expanded],
+  );
+
+  const footer = copy.footer.replace("{n}", String(total)).replace("{patterns}", plural(total, copy.patternForms));
 
   return (
     <>
@@ -110,7 +114,7 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
           <table className="w-full border-collapse text-[13px]">
             <thead>
               <tr>
-                {tableHeaders(copy.columns).map((label) => (
+                {copy.columns.map((label) => (
                   <th key={label} className={head}>
                     {label}
                   </th>
@@ -119,7 +123,7 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
               </tr>
             </thead>
             <tbody className="[&>tr:last-child>td]:border-b-0">
-              {visible.map((p) => (
+              {shown.map((p) => (
                 <tr key={p.key}>
                   <td className={cell}>
                     <a
@@ -140,10 +144,10 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
                     <Badge tone={p.type}>{copy.typeLabels[p.type]}</Badge>
                   </td>
                   <td className={cell}>{p.occurrences}</td>
-                  <td className={cn(cell, "whitespace-nowrap")}>{formatMoney(p.sumMinor)}</td>
                   <td className={cn(cell, "whitespace-nowrap")}>
                     {p.fixedAmountMinor === null ? "—" : formatMoney(p.fixedAmountMinor)}
                   </td>
+                  <td className={cn(cell, "whitespace-nowrap")}>{formatMoney(p.sumMinor)}</td>
                   <td className={cn(cell, "whitespace-nowrap")}>{thresholdLabel(p.threshold, copy)}</td>
                   <td className={cn(cell, "whitespace-nowrap")}>
                     {p.overMinor > 0 ? (
@@ -151,6 +155,11 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
                     ) : (
                       "—"
                     )}
+                    {p.status ? (
+                      <span className="ml-2 inline-block">
+                        <Badge tone={p.status}>{copy.statusLabels[p.status]}</Badge>
+                      </span>
+                    ) : null}
                   </td>
                   <td className={cn(cell, "text-right")}>
                     <a
@@ -169,8 +178,18 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
             </tbody>
           </table>
         </div>
-        <div className="border-line text-muted flex items-center justify-between border-t px-[17px] py-[13px] text-xs max-[559px]:flex-col max-[559px]:items-start">
+        <div className="border-line text-muted flex items-center justify-between border-t px-[17px] py-[13px] text-xs max-[559px]:flex-col max-[559px]:items-start max-[559px]:gap-[13px]">
           <span>{footer}</span>
+          {hasMore ? (
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setExpanded(true);
+              }}
+            >
+              {copy.showMore}
+            </Button>
+          ) : null}
         </div>
       </section>
     </>

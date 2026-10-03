@@ -6,7 +6,7 @@
 import Icon from "@/components/Icon.astro";
 import RestoreForm from "@/components/patterns/RestoreForm.astro";
 import { merchantMark } from "@/components/patterns/merchant-mark";
-import { copy, copyExtra } from "@/content/copy";
+import { copy } from "@/content/copy";
 import { plural } from "@/lib/format";
 
 interface Props {
@@ -14,16 +14,15 @@ interface Props {
 }
 
 const { patterns } = Astro.props;
-const x = copyExtra.patterns;
 ---
 
 {patterns.length > 0 && (
   <details class="group mt-4">
     <summary class="flex cursor-pointer list-none items-center gap-2 py-[10px] text-xs font-extrabold text-muted [&::-webkit-details-marker]:hidden">
       <Icon name="arrow" size={14} class="-rotate-90 transition-transform group-open:rotate-0" />
-      {x.excludedToggle}
+      {copy.patterns.excluded}
       <span class="font-normal">
-        {patterns.length} {plural(patterns.length, x.patternForms)}
+        {patterns.length} {plural(patterns.length, copy.patterns.countForms as [string, string, string])}
       </span>
     </summary>
     {/* Panel-styled (border/radius/bg as Panel.astro), but padding 0 20 (plan contract) — each row supplies its

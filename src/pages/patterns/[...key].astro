@@ -8,6 +8,8 @@
 import AppLayout from "@/layouts/AppLayout.astro";
 import BackLink from "@/components/app/BackLink.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
+import ViewEmpty from "@/components/app/ViewEmpty.astro";
+import Icon from "@/components/Icon.astro";
 import Panel from "@/components/app/Panel.astro";
 import SequenceMark from "@/components/app/SequenceMark.astro";
 import { Badge } from "@/components/app/Badge";
@@ -18,7 +20,9 @@ import RestoreForm from "@/components/patterns/RestoreForm.astro";
 import { ThresholdEditor, type ThresholdEditorCopy } from "@/components/patterns/ThresholdEditor";
 import { copy, copyExtra } from "@/content/copy";
 import { fillMonthLocative, formatIsoDate, formatMoney, formatMonthShort, plural } from "@/lib/format";
+import { DISPLAY_NAME_MAX } from "@/lib/patterns/decision-form";
 import { loadPatternData } from "@/lib/patterns/load";
+import { sequenceLabel } from "@/lib/patterns/sequence-label";
 import { referenceMonth } from "@/lib/patterns/over-limit";
 import { keyFromPath, patternHref } from "@/lib/patterns/path";
 import { detailTarget, patternDetail, type DetailTarget, type PatternDetailView } from "@/lib/patterns/view";
@@ -52,8 +56,6 @@ if (redirectHref !== null) {
 }
 const pattern: MerchantPattern | undefined = target?.kind === "found" ? target.pattern : undefined;
 
-// DESIGN-GAP: G31 — the kit has no "pattern not found" state (e.g. the owning import was deleted, S-04 decision
-// 8's idempotent delete leaves no trace for the pattern itself either).
 if (!readError && !pattern) {
   Astro.response.status = 404;
 }
@@ -75,7 +77,13 @@ if (pattern && "rows" in dataResult) {
   monthOptions = detail.months.map((m) => ({ value: m, label: formatMonthShort(m) }));
 }
 
-const sumLabel = detail ? fillMonthLocative(x.sumLabel, month, x.monthsLocative) : "";
+// Kit `patternDetail.notFound` = title + body in one string; the title keeps its full stop.
+const notFoundSplit = copy.patternDetail.notFound.indexOf(". ") + 1;
+const notFoundTitle = copy.patternDetail.notFound.slice(0, notFoundSplit);
+const notFoundBody = copy.patternDetail.notFound.slice(notFoundSplit).trim();
+
+const sumLabel = detail ? fillMonthLocative(copy.patternDetail.sumLabel, month, x.monthsLocative) : "";
+// DESIGN-GAP: G31 — `overInMonth` is the one detail string the kit does not define.
 const overLabel = detail
   ? month === refMonth
     ? copy.dashboard.stats[0].label
@@ -84,45 +92,48 @@ const overLabel = detail
 const rawDescription = (t: { counterparty: string; title: string }) =>
   t.title ? `${t.counterparty} · ${t.title}` : t.counterparty;
 const overCount = detail ? detail.sequence.filter(Boolean).length : 0;
-const sequenceSummary = detail
-  ? x.sequenceSummary
-      .replace("{n}", String(detail.count))
-      .replace("{occurrences}", plural(detail.count, x.occurrenceForms))
-      .replace("{over}", String(overCount))
-  : "";
+const sequenceSummary = detail ? sequenceLabel(detail.count, overCount, x.sequenceSummary, x.occurrenceForms) : "";
 
 const editorCopy: ThresholdEditorCopy = {
   acceptedAmount: copy.threshold.acceptedAmount,
   countPerMonth: copy.threshold.countPerMonth,
   sumPerMonth: copy.threshold.sumPerMonth,
-  valueLabel: x.valueLabel,
-  suffix: x.suffix,
+  valueLabel: { amount: copy.threshold.amount, count: copy.threshold.count },
+  suffix: { money: copy.threshold.unitCurrency, count: copy.threshold.unitCount },
   empty: copy.threshold.empty,
   active: copy.threshold.active,
   setThreshold: x.setThreshold,
   save: copy.threshold.save,
   remove: copy.threshold.remove,
-  saving: copyExtra.auth.saving,
+  saving: copy.threshold.saving,
 };
 
 const actionsCopy: PatternActionsCopy = {
   actions: x.actions,
-  actionsEyebrow: x.actionsEyebrow,
-  actionsTitle: x.actionsTitle,
-  actionsLead: x.actionsLead,
+  eyebrow: copy.patternActions.eyebrow,
+  title: copy.patternActions.title,
+  lead: copy.patternActions.lead,
+  close: copy.patternActions.closeLabel,
+  saving: copy.patternActions.saving,
   merge: copy.patternActions.merge,
   changeType: copy.patternActions.changeType,
   rename: copy.patternActions.rename,
   exclude: copy.patternActions.exclude,
-  mergeLabel: x.mergeLabel,
+  mergeTitle: copy.patternActions.mergeTitle,
+  mergeLead: copy.patternActions.mergeLead,
+  mergeEmpty: copy.patternActions.mergeEmpty,
+  mergeField: x.mergeField,
   mergeSubmit: x.mergeSubmit,
-  mergeNone: x.mergeNone,
-  renameLabel: x.renameLabel,
+  renameTitle: copy.patternActions.renameTitle,
+  renameLabel: copy.patternActions.renamePlaceholder,
   renameHint: x.renameHint,
-  renameSubmit: x.renameSubmit,
-  saving: copyExtra.auth.saving,
-  close: x.close,
+  renameSubmit: copy.patternActions.save,
 };
+
+// The stored rename override of this pattern ("" = none): the rename field's value, so an untouched save posts what
+// is already stored (an empty value writes no override) instead of freezing the statement name as one (F5).
+const storedName =
+  pattern && "patterns" in dataResult ? (dataResult.decisions.get(pattern.key)?.displayName ?? "") : "";
 
 // Other analysed (non-excluded — S-05 decision 7: a merge target must not itself be excluded), non-self patterns,
 // sorted by name (`pl`) — mirrors validateMerge's own root/excluded checks so the picker never offers a target the
@@ -139,14 +150,15 @@ const mergeTargets =
 // only; decision results (S-05) get their own alert under `.detail-top` (`decisionAlert` below) since a decision
 // redirect never carries `saved`/`removed`/`error=value|save` and vice versa (mutually exclusive query params).
 const params = Astro.url.searchParams;
+// DESIGN-GAP: K36 — kit `threshold.invalid` omits the range / two-decimals rule `parseThresholdValue` enforces.
 const resultAlert = params.get("saved")
   ? { kind: "success" as const, message: copy.components.success }
   : params.get("removed")
     ? { kind: "success" as const, message: x.thresholdRemoved }
     : params.get("error") === "value"
-      ? { kind: "error" as const, message: x.thresholdInvalid }
+      ? { kind: "error" as const, message: copy.threshold.invalid }
       : params.get("error") === "save"
-        ? { kind: "error" as const, message: x.thresholdSaveError }
+        ? { kind: "error" as const, message: copy.threshold.saveError }
         : null;
 
 // Kit `.text-button` (K21 style precedent) — kept short so the unmerge button's rendered text stays inline
@@ -155,45 +167,58 @@ const unmergeClass = buttonVariants({ variant: "text", size: "inline" });
 
 // Decision result line (S-05 Phase 6), rendered under `.detail-top`, above the heading.
 const decisionAlert = params.get("merged")
-  ? { kind: "success" as const, message: x.merged }
+  ? { kind: "success" as const, message: copy.patternActions.merged }
   : params.get("unmerged")
     ? { kind: "success" as const, message: x.unmerged }
     : params.get("typed")
-      ? { kind: "success" as const, message: x.typeChanged }
+      ? { kind: "success" as const, message: copy.patternActions.typeChanged }
       : params.get("renamed")
-        ? { kind: "success" as const, message: x.renamed }
+        ? { kind: "success" as const, message: copy.patternActions.renamed }
         : params.get("excluded")
-          ? { kind: "success" as const, message: x.excludedToast }
+          ? { kind: "success" as const, message: copy.patternActions.excludedToast }
           : params.get("restored")
             ? { kind: "success" as const, message: copy.patternActions.restored }
             : params.get("error") === "merge"
-              ? { kind: "error" as const, message: x.mergeInvalid }
+              ? { kind: "error" as const, message: copy.patternActions.mergeInvalid }
               : params.get("error") === "name"
-                ? { kind: "error" as const, message: x.nameInvalid }
+                ? {
+                    kind: "error" as const,
+                    message: copy.patternActions.renameLong.replace("{n}", String(DISPLAY_NAME_MAX)),
+                  }
                 : params.get("error") === "decision"
-                  ? { kind: "error" as const, message: x.decisionError }
+                  ? { kind: "error" as const, message: copy.patternActions.saveError }
                   : null;
 ---
 
 <AppLayout title={pattern ? pattern.name : copy.patterns.title} active="patterns">
-  <div class="detail-top mb-[22px] flex items-center justify-between gap-3 max-[560px]:flex-col max-[560px]:items-stretch">
-    <BackLink href="/patterns" label={copy.patternDetail.back} />
-    {pattern && (
-      <PatternActionsDialog
-        client:load
-        patternKey={pattern.key}
-        type={pattern.type}
-        name={pattern.name}
-        excluded={pattern.excluded}
-        mergeTargets={mergeTargets}
-        copy={actionsCopy}
-      />
-    )}
-  </div>
+  {(readError !== null || pattern !== undefined) && (
+    <div class="detail-top mb-[22px] flex items-center justify-between gap-3 max-[560px]:flex-col max-[560px]:items-stretch">
+      <BackLink href="/patterns" label={copy.patternDetail.back} />
+      {pattern && (
+        <PatternActionsDialog
+          client:load
+          patternKey={pattern.key}
+          type={pattern.type}
+          name={pattern.name}
+          storedName={storedName}
+          excluded={pattern.excluded}
+          mergeTargets={mergeTargets}
+          copy={actionsCopy}
+        />
+      )}
+    </div>
+  )}
   {readError ? (
     <InlineAlert kind="error">{copy.components.error}</InlineAlert>
   ) : !pattern ? (
-    <InlineAlert kind="info">{x.detailMissing}</InlineAlert>
+    <ViewEmpty
+      headingLevel="h1"
+      arrow={false}
+      title={notFoundTitle}
+      body={notFoundBody}
+      cta={copy.patternDetail.back}
+      href="/patterns"
+    />
   ) : detail ? (
     <>
       {decisionAlert && (
@@ -218,27 +243,9 @@ const decisionAlert = params.get("merged")
             {x.detailEyebrow}
           </div>
           <h1 class="mt-3 mb-[7px] text-[44px] tracking-[-0.07em] max-[899px]:text-[38px]">{pattern.name}</h1>
-          <p class="m-0 text-muted">{x.typeLeads[pattern.type]}</p>
-          {pattern.merged.length > 0 && (
-            <div class="mt-4">
-              <span class="text-xs font-bold text-muted">{x.mergedLabel}</span>
-              <div class="mt-2 grid gap-2">
-                {pattern.merged.map((variant) => (
-                  <div class="flex items-center justify-between gap-3">
-                    <span class="text-[13px]">{variant.name}</span>
-                    <form method="POST" action="/api/patterns/decision">
-                      <input type="hidden" name="key" value={pattern.key} />
-                      <input type="hidden" name="action" value="unmerge" />
-                      <input type="hidden" name="source" value={variant.key} />
-                      {/* No type="submit" — see RestoreForm.astro's comment (prettier-plugin-astro breaks a
-                          multi-attribute button, which would defeat the smoke `>text<` anchor below). */}
-                      <button class:list={[unmergeClass]}>{x.unmerge}</button>
-                    </form>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <p class="m-0 text-muted">
+            {pattern.type === "fixed" ? copy.patternDetail.typeFixed : copy.patternDetail.typeFrequent}
+          </p>
         </div>
         <div class="text-right max-[899px]:text-left">
           <span class="block text-xs text-muted">{sumLabel}</span>
@@ -256,8 +263,10 @@ const decisionAlert = params.get("merged")
       <section class="grid grid-cols-[1fr_1.15fr] gap-[15px] max-[899px]:grid-cols-1">
         <Panel>
           <div class="mb-5 flex items-start justify-between gap-3">
-            <h2 class="m-0 text-[17px] tracking-[-0.03em]">{x.thresholdPanel}</h2>
-            <span class="text-xs text-muted">{detail.threshold ? x.thresholdActive : x.thresholdNone}</span>
+            <h2 class="m-0 text-[17px] tracking-[-0.03em]">{copy.threshold.title}</h2>
+            <span class="text-xs text-muted">
+              {detail.threshold ? copy.threshold.activeLabel : copy.threshold.noThreshold}
+            </span>
           </div>
           {resultAlert && (
             <div class="mb-4">
@@ -275,25 +284,30 @@ const decisionAlert = params.get("merged")
         </Panel>
         <Panel>
           <div class="mb-5 flex items-start justify-between gap-3">
-            <h2 class="m-0 text-[17px] tracking-[-0.03em]">{x.occurrencesPanel}</h2>
-            <MonthSelect client:load months={monthOptions} value={month} label={x.occurrencesPanel} />
+            <h2 class="m-0 text-[17px] tracking-[-0.03em]">{copy.patternDetail.monthSelect}</h2>
+            <MonthSelect client:load months={monthOptions} value={month} label={copy.patternDetail.monthSelect} />
           </div>
           {detail.count > 0 ? (
             <>
-              <div class="flex min-h-[120px] flex-wrap items-center gap-[9px] py-[15px]">
-                <span class="sr-only">{sequenceSummary}</span>
+              <div
+                class="flex min-h-[120px] flex-wrap items-center gap-[9px] py-[15px]"
+                role="img"
+                aria-label={sequenceSummary}
+              >
                 {detail.sequence.map((over) => (
                   <SequenceMark over={over} />
                 ))}
               </div>
               <div class="flex justify-between text-xs text-muted">
-                <span>{x.sequenceWithin}</span>
+                <span>{copy.patternDetail.sequenceWithin}</span>
                 <b class="text-excess-text font-bold">{copy.patternDetail.sequenceOver}</b>
               </div>
             </>
           ) : (
-            // DESIGN-GAP: G31 — the kit assumes a pattern always has occurrences in the shown month.
-            <p class="text-[13px] text-muted">{x.monthEmpty}</p>
+            <div class="flex min-h-[120px] items-center justify-center gap-2.5 text-sm text-muted">
+              <Icon name="info" size={18} />
+              <span>{copy.patternDetail.noOccurrences}</span>
+            </div>
           )}
         </Panel>
       </section>
@@ -303,21 +317,46 @@ const decisionAlert = params.get("merged")
           <h2 class="m-0 text-[17px] tracking-[-0.03em]">{copy.patternDetail.transactions}</h2>
           <span class="text-xs text-muted">{copy.patternDetail.rawDescription}</span>
         </div>
-        <div>
-          {detail.transactions.map((t) => (
-            <div class="flex items-center justify-between gap-3 border-b border-line py-[14px] last:border-b-0">
-              <div class="min-w-0">
-                <div class="text-[13px] font-bold">{formatIsoDate(t.occurredOn)}</div>
-                <div class="mt-[3px] text-[11px] text-muted">{rawDescription(t)}</div>
+        {detail.count === 0 ? (
+          // DESIGN-GAP: K37 — kit `app.js` literal, no content.json key.
+          <p class="text-muted">{x.noTransactions}</p>
+        ) : (
+          <div>
+            {detail.transactions.map((t) => (
+              <div class="flex items-center justify-between gap-3 border-b border-line py-[14px] last:border-b-0">
+                <div class="min-w-0">
+                  <div class="text-[13px] font-bold">{formatIsoDate(t.occurredOn)}</div>
+                  <div class="mt-[3px] text-[11px] text-muted">{rawDescription(t)}</div>
+                </div>
+                {/* a real raw description is far longer than the kit's "WOLT*WARSAW": the amount never wraps */}
+                <div class="flex shrink-0 items-center gap-3">
+                  <strong class="text-[14px] whitespace-nowrap">{formatMoney(t.amountMinor)}</strong>
+                  {t.overMinor > 0 && <Badge tone="excess">{x.overBadge}</Badge>}
+                </div>
               </div>
-              {/* a real raw description is far longer than the kit's "WOLT*WARSAW": the amount never wraps */}
-              <div class="flex shrink-0 items-center gap-3">
-                <strong class="text-[14px] whitespace-nowrap">{formatMoney(t.amountMinor)}</strong>
-                {t.overMinor > 0 && <Badge tone="excess">{x.overBadge}</Badge>}
-              </div>
+            ))}
+          </div>
+        )}
+        {pattern.merged.length > 0 && (
+          <div class="mt-5 border-t border-line pt-[15px]">
+            <h3 class="mb-2 text-[13px]">{copy.patternActions.mergedVariants}</h3>
+            <div class="grid gap-2">
+              {pattern.merged.map((variant) => (
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-[13px] text-muted">{variant.name}</span>
+                  <form method="POST" action="/api/patterns/decision">
+                    <input type="hidden" name="key" value={pattern.key} />
+                    <input type="hidden" name="action" value="unmerge" />
+                    <input type="hidden" name="source" value={variant.key} />
+                    {/* No type="submit" — see RestoreForm.astro's comment (prettier-plugin-astro breaks a
+                        multi-attribute button, which would defeat the smoke `>text<` anchor below). */}
+                    <button class:list={[unmergeClass]}>{copy.patternActions.undoMerge}</button>
+                  </form>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        )}
       </Panel>
     </>
   ) : null}

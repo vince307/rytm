@@ -1,16 +1,14 @@
 // Badge — prototype .badge (styles.css). The kit's raw `.badge.fixed` / `.badge.frequent` backgrounds map onto
 // Tailwind names exactly as InlineAlert maps the same values: green/15 and ink/8. `excess` is the kit's
 // `.badge.excess` (background var(--amber), i.e. `excess`, text ink) — S-04's "ponad próg" mark.
-// DESIGN-GAP: G34 — `new` (S-06, `/fixed` "Nowe w tym miesiącu") has no token of its own: the prototype's later,
-// winning CSS rule renders `.badge.new` / `.badge.changed` in amber (not the earlier grey-blue it overrides — K9),
-// so this tone reuses the same tint `InlineAlert` uses for its error state — `bg-excess/25 text-excess-text`.
-// `changed` stays unimplemented until the `/patterns` status badges (G28).
+// `new` / `changed` (`/fixed`, `/patterns` status) share the kit round-3 `--rytm-badge-soft` tint with
+// `--rytm-excess-text` text: `bg-excess/18 text-excess-text` (G34 delivered).
 import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
 interface BadgeProps {
-  tone: "fixed" | "frequent" | "excess" | "new";
+  tone: "fixed" | "frequent" | "excess" | "new" | "changed";
   children: ReactNode;
 }
 
@@ -18,7 +16,8 @@ const tones = {
   fixed: "bg-green/15 text-green",
   frequent: "bg-ink/8 text-ink",
   excess: "bg-excess text-ink",
-  new: "bg-excess/25 text-excess-text",
+  new: "bg-excess/18 text-excess-text",
+  changed: "bg-excess/18 text-excess-text",
 } as const;
 
 export function Badge({ tone, children }: BadgeProps) {

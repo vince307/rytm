@@ -216,7 +216,8 @@ async function request(path, { method = "GET", form } = {}) {
     body: form ? new URLSearchParams(form).toString() : undefined,
   });
   storeCookies(response);
-  const body = response.status === 200 ? await response.text() : "";
+  // 404 bodies are read too: the kit not-found panel is asserted on its rendered text (S-14 phase 6).
+  const body = response.status === 200 || response.status === 404 ? await response.text() : "";
   return { status: response.status, location: response.headers.get("location") ?? "", body };
 }
 
@@ -485,6 +486,11 @@ const steps = [
     { status: 200, contains: ">Ponad progiem<" },
   ],
   [
+    "patterns list shows no Pokaż więcej for a short list",
+    () => request("/patterns"),
+    { status: 200, notContains: ">Pokaż więcej<" },
+  ],
+  [
     "home shows the trend without a threshold",
     () => request("/home"),
     {
@@ -526,6 +532,11 @@ const steps = [
     "pattern detail renders the month total",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: "Suma w maju" },
+  ],
+  [
+    "pattern detail shows the kit invalid-threshold line",
+    () => request("/patterns/kawiarnia%20smoke?error=value"),
+    { status: 200, contains: "Wpisz próg większy od zera." },
   ],
   [
     "pattern detail has no threshold yet",
@@ -590,6 +601,14 @@ const steps = [
     { status: 200, contains: ">ponad próg<" },
   ],
   [
+    "pattern detail labels the sequence",
+    () => request("/patterns/kawiarnia%20smoke"),
+    {
+      status: 200,
+      contains: 'role="img" aria-label="0 wystąpień w ramach progu, 1 wystąpienie ponad próg"',
+    },
+  ],
+  [
     "pattern detail shows the over-limit sum",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: ">5,50 zł<" },
@@ -645,6 +664,11 @@ const steps = [
     { status: 200, contains: "Wzorce scalone." },
   ],
   [
+    "unknown pattern shows the kit not-found panel",
+    () => request(`/patterns/smoke-missing-${Date.now()}`),
+    { status: 404, contains: ">Nie znaleziono wzorca.<", notContains: ">Akcje<" },
+  ],
+  [
     "detail offers the actions",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: ">Akcje<", notContains: "Wzorce scalone." },
@@ -658,6 +682,11 @@ const steps = [
     "merged pattern lists its variant",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: ">Cofnij scalenie<" },
+  ],
+  [
+    "merged pattern titles its variants",
+    () => request("/patterns/kawiarnia%20smoke"),
+    { status: 200, contains: ">Połączone nazwy<" },
   ],
   [
     "merged pattern is re-typed by D5",
@@ -718,6 +747,16 @@ const steps = [
     { status: 302, location: "/patterns/kawiarnia%20smoke?error=name" },
   ],
   [
+    "rename error line fills the limit",
+    () => request("/patterns/kawiarnia%20smoke?error=name"),
+    { status: 200, contains: "Nazwa może mieć maksymalnie 100 znaków." },
+  ],
+  [
+    "merge error line uses the kit text",
+    () => request("/patterns/kawiarnia%20smoke?error=merge"),
+    { status: 200, contains: "Nie można scalić tych wzorców." },
+  ],
+  [
     "pattern is renamed",
     () =>
       request("/api/patterns/decision", {
@@ -725,6 +764,11 @@ const steps = [
         form: { key: "kawiarnia smoke", action: "rename", name: "Kawiarnia Rytm" },
       }),
     { status: 302, location: "/patterns/kawiarnia%20smoke?renamed=1" },
+  ],
+  [
+    "rename confirms the result",
+    () => request("/patterns/kawiarnia%20smoke?renamed=1"),
+    { status: 200, contains: "Nazwa wzorca zmieniona." },
   ],
   [
     "rename keeps the exclusion",

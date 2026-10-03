@@ -24,13 +24,16 @@ export const decisionSchema = z.discriminatedUnion("action", [
 
 export type DecisionInput = z.infer<typeof decisionSchema>;
 
+/** Rename length limit; matches the `display_name` CHECK in the pattern_decisions migration. */
+export const DISPLAY_NAME_MAX = 100;
+
 /** Trims the raw rename field; an empty result clears the override (`null`), over 100 characters is rejected
  * without touching the database. "invalid" is a distinct sentinel literal callers narrow on with `=== "invalid"`. */
 // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents -- the rule sees "invalid" as subsumed by the broader `string` case, but callers narrow on the exact literal
 export function parseDisplayName(raw: string): string | null | "invalid" {
   const trimmed = raw.trim();
   if (trimmed === "") return null;
-  if (trimmed.length > 100) return "invalid";
+  if (trimmed.length > DISPLAY_NAME_MAX) return "invalid";
   return trimmed;
 }
 

@@ -119,23 +119,14 @@ export const copyExtra = {
     deleteDialogEyebrow: "Cofnij import",
   },
   patterns: {
-    eyebrow: "Wzorce wydatków",
     // DESIGN-GAP: K11 — strings of prototype patterns() / patternRows() / badge() absent from content.json.
     upload: "+ Wgraj CSV",
     typeLabels: { fixed: "stały", frequent: "częsty" },
     sortPrefix: "Sortuj: ",
     footer: "{n} {patterns} · wszystkie miesiące",
-    patternForms: ["wzorzec", "wzorce", "wzorców"],
     // DESIGN-GAP: K21 — detail / threshold-editor / list strings the prototype renders that content.json still
     // lacks (round 3); taken verbatim from app.js patternDetail() / thresholdEditor() / patternRows() / showToast().
     detailEyebrow: " wzorzec",
-    typeLeads: {
-      fixed: "Sprzedawca o stałej, powtarzalnej kwocie.",
-      frequent: "Sprzedawca, który wraca niezależnie od kwoty.",
-    },
-    thresholdPanel: "Próg wzorca",
-    thresholdActive: "aktywny",
-    thresholdNone: "brak ustawionego progu",
     // thresholdEditor()'s save button when no threshold is set yet; content.json's threshold.save ("Zapisz
     // próg") covers only the change path.
     setThreshold: "Ustaw próg",
@@ -143,18 +134,11 @@ export const copyExtra = {
     thresholdRemoved: "Próg usunięty.",
     // thresholdEditor()'s field label and input-suffix text; content.json's threshold object holds only the
     // button/note copy, not these.
-    valueLabel: { amount: "Kwota", count: "Liczba wystąpień" },
-    suffix: { money: "zł", count: "×" },
-    occurrencesPanel: "Wystąpienia w miesiącu",
-    sequenceWithin: "W ramach progu",
     overBadge: "ponad próg",
     // patternRows()'s Próg-cell format for a `count` threshold and the arrow cell's aria-label; verbatim.
     thresholdCount: "{n} × / miesiąc",
     openPattern: "Otwórz wzorzec",
     occurrenceForms: ["wystąpienie", "wystąpienia", "wystąpień"],
-    // `patternDetail.sumLabel` bakes the month in ("Suma w maju"); `{month}` + `monthsLocative` generalise it —
-    // May reproduces the kit string byte for byte.
-    sumLabel: "Suma w {month}",
     monthsLocative: [
       "styczniu",
       "lutym",
@@ -169,46 +153,26 @@ export const copyExtra = {
       "listopadzie",
       "grudniu",
     ],
-    // DESIGN-GAP: G31 — states/pieces of the pattern detail and threshold editor the kit does not define.
-    detailMissing: "Nie znaleziono tego wzorca — mógł zniknąć po usunięciu importu.",
-    monthEmpty: "Brak wystąpień w tym miesiącu.",
+    // DESIGN-GAP: K37 — `app.js` patternDetail() has this transactions-panel line as a literal, no content.json key.
+    noTransactions: "Brak transakcji do pokazania w wybranym miesiącu.",
+    // DESIGN-GAP: G31 — the kit has no label for the over-limit sum of a month other than the reference one.
     overInMonth: "Ponad progiem w {month}",
-    sequenceSummary: "{n} {occurrences}, {over} ponad próg",
-    thresholdInvalid:
-      "Podaj wartość większą od zera — liczbę całkowitą lub kwotę z najwyżej dwoma miejscami po przecinku.",
-    thresholdSaveError: "Nie udało się zapisać progu. Spróbuj ponownie.",
+    // DESIGN-GAP: K35 — kit `patternDetail.sequenceSummary` has no plural forms ("{within} wystąpień …"); the app
+    // keeps this template and fills the forms from `occurrenceForms` (kit app.js aria-label shape).
+    sequenceSummary: "{within} {withinForms} w ramach progu, {over} {overForms} ponad próg",
     // Próg-cell format for a `sum` threshold — the kit's patternRows() never renders one (its five sample
     // patterns hold only count/amount thresholds), so this is a placeholder generalising the `count` format.
     thresholdSum: "{amount} / miesiąc",
-    // DESIGN-GAP: K22 — the "Akcje" dialog and its result toasts exist only in prototype/app.js
-    // (modal('patternActions'), showToast() calls in modal()), not in content.json; taken verbatim.
+    // K22: "Akcje" is the trigger label of modal('patternActions'); the kit's content.json has no key for it.
     actions: "Akcje",
-    actionsEyebrow: "Akcje na wzorcu",
-    actionsTitle: "Zarządzaj wzorcem.",
-    actionsLead: "Decyzje dotyczą wszystkich kolejnych miesięcy. Możesz je później odwrócić w ustawieniach wzorca.",
-    typeChanged: "Typ wzorca zmieniony.",
-    excludedToast: "Wzorzec wykluczony z analizy.",
-    // modal()'s close button aria-label is shared across every modal type, including patternActions.
-    close: "Zamknij",
-    // `/patterns`'s "Wykluczone" toggle (prototype patterns(), excluded-toggle button text) — verbatim, S-05 faza 7.
-    excludedToggle: "Wykluczone",
-    // DESIGN-GAP: G33 — the kit names no merge picker, rename field, direct-submit type/exclude, merged-variants
-    // list, merge undo or result-line copy for FR-009 (the prototype only fires toasts on closeModal()); every
-    // string below is a placeholder built from tokens and kit-adjacent phrasing, not a design decision.
-    mergeLabel: "Scal z wzorcem",
-    mergeSubmit: "Scal",
-    mergeNone: "Brak innych wzorców do scalenia.",
-    renameLabel: "Nazwa sprzedawcy",
+    // DESIGN-GAP: G33 — the kit now draws merge, merge-empty and rename (content.json `patternActions.*`), but
+    // names no screen for the lead ("Decyzje dotyczą…": read here as the detail page), no separate modal views
+    // (the app reveals the forms in place) and no in-dialog errors (results are page lines); the merge field label
+    // and submit are app.js literals, the rename hint has no kit text.
+    mergeField: "Wzorzec",
+    mergeSubmit: "Scal wzorce",
     renameHint: "Pusta nazwa przywraca nazwę z wyciągu.",
-    renameSubmit: "Zapisz nazwę",
-    merged: "Wzorce scalone.",
     unmerged: "Scalenie cofnięte.",
-    renamed: "Nazwa zmieniona.",
-    mergedLabel: "Scalone warianty",
-    unmerge: "Cofnij scalenie",
-    mergeInvalid: "Nie można scalić z tym wzorcem.",
-    nameInvalid: "Nazwa może mieć najwyżej 100 znaków.",
-    decisionError: "Nie udało się zapisać decyzji. Spróbuj ponownie.",
   },
   fixed: {
     eyebrow: "Koszty stałe",

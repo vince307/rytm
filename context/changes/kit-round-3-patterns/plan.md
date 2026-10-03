@@ -761,7 +761,7 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 - [x] 3.3 No G28 left in PatternsTable.tsx — 4eb395d
 - [x] 3.4 Deliberate break: page size 1 turns the new smoke step and list-view tests red, restored, meta-check recorded — 4eb395d
 - [x] 3.5 Deliberate break: slice before filter in listView turns the last-by-sum search case red, restored — 4eb395d
-- [ ] 3.6 Full local gate vs baseline, smoke + 1
+- [x] 3.6 Full local gate vs baseline, smoke + 1 — 4eb395d (pgTAP 119 PASS after db reset measured by the orchestrator; agent's sandbox blocked Docker)
 
 #### Manual
 

@@ -57,7 +57,7 @@ const demo = isDemoEmail(Astro.locals.user?.email, DEMO_EMAIL);
     <SettingsPasswordRow
       client:load
       label={f.password}
-      masked="••••••••"
+      masked={copy.auth.passwordPlaceholder}
       toggleLabel={s.changePassword}
       cancelLabel={x.cancel}
       current={{ label: s.currentPassword }}

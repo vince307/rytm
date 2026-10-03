@@ -2,9 +2,8 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { PatternsTable, type PatternsTableCopy } from "@/components/patterns/PatternsTable";
+import { PatternsTable, type PatternRow, type PatternsTableCopy } from "@/components/patterns/PatternsTable";
 import { copy, copyExtra } from "@/content/copy";
-import type { PatternListItem } from "@/types";
 
 const x = copyExtra.patterns;
 const tableCopy: PatternsTableCopy = {
@@ -18,9 +17,10 @@ const tableCopy: PatternsTableCopy = {
   thresholdCount: x.thresholdCount,
   thresholdSum: x.thresholdSum,
   openPattern: x.openPattern,
+  statusLabels: { new: copy.components.new, changed: copy.components.changed },
 };
 
-const item = (over: Partial<PatternListItem>): PatternListItem => ({
+const item = (over: Partial<PatternRow>): PatternRow => ({
   key: "sklep",
   name: "Sklep",
   type: "fixed",
@@ -30,10 +30,11 @@ const item = (over: Partial<PatternListItem>): PatternListItem => ({
   threshold: null,
   overMinor: 0,
   excluded: false,
+  status: null,
   ...over,
 });
 
-function render(patterns: PatternListItem[]): string {
+function render(patterns: PatternRow[]): string {
   return renderToStaticMarkup(createElement(PatternsTable, { patterns, copy: tableCopy }));
 }
 
@@ -53,5 +54,16 @@ describe("PatternsTable render", () => {
     expect(cells[3]).not.toBe(cells[4]);
     expect(cells[3]).toMatch(/42,00/);
     expect(cells[4]).toMatch(/^1234,56/);
+  });
+
+  it("renders a status badge after the Ponad progiem value, none when status is null", () => {
+    const html = render([
+      item({ status: "new" }),
+      item({ key: "b", name: "B", status: "changed" }),
+      item({ key: "c", name: "C" }),
+    ]);
+    expect(html).toContain(`>${copy.components.new}<`);
+    expect(html).toContain(`>${copy.components.changed}<`);
+    expect(html.match(new RegExp(`>${copy.components.new}<`, "g"))).toHaveLength(1);
   });
 });

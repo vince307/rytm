@@ -4,13 +4,14 @@ import InlineAlert from "@/components/app/InlineAlert.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
 import ViewEmpty from "@/components/app/ViewEmpty.astro";
 import ExcludedPatterns from "@/components/patterns/ExcludedPatterns.astro";
-import { PatternsTable, type PatternsTableCopy } from "@/components/patterns/PatternsTable";
+import { PatternsTable, type PatternRow, type PatternsTableCopy } from "@/components/patterns/PatternsTable";
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
+import { patternStatuses } from "@/lib/patterns/status";
+import { fixedOverview } from "@/lib/patterns/fixed";
 import { loadPatternData } from "@/lib/patterns/load";
 import { createClient } from "@/lib/supabase";
 import { listOverview } from "@/lib/patterns/view";
-import type { PatternListItem } from "@/types";
 
 const e = copy.emptyViews;
 const x = copyExtra.patterns;
@@ -21,11 +22,12 @@ const x = copyExtra.patterns;
 // island-ready items directly — no second `Map` re-merge here.
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 const dataResult = supabase ? await loadPatternData(supabase) : { error: new Error("Supabase is not configured") };
-const result: { error: unknown } | { patterns: PatternListItem[] } = (() => {
+const result: { error: unknown } | { patterns: PatternRow[] } = (() => {
   if ("error" in dataResult) return { error: dataResult.error };
   try {
     const { items } = listOverview(dataResult.patterns, dataResult.rows, dataResult.thresholds);
-    return { patterns: items };
+    const statuses = patternStatuses(fixedOverview(dataResult.patterns, dataResult.rows));
+    return { patterns: items.map((item) => ({ ...item, status: statuses.get(item.key) ?? null })) };
   } catch (error) {
     return { error };
   }
@@ -34,7 +36,7 @@ if ("error" in result) {
   // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
   console.error("patterns list failed", result.error);
 }
-const items: PatternListItem[] = "patterns" in result ? result.patterns : [];
+const items: PatternRow[] = "patterns" in result ? result.patterns : [];
 // Excluded patterns leave the table for the "Wykluczone" section below it (S-05 Phase 7, G28); the empty state
 // (below) still keys off `items.length` — a list of only-excluded patterns is not "no patterns at all".
 const visibleItems = items.filter((p) => !p.excluded);
@@ -60,6 +62,7 @@ const tableCopy: PatternsTableCopy = {
   thresholdCount: x.thresholdCount,
   thresholdSum: x.thresholdSum,
   openPattern: x.openPattern,
+  statusLabels: { new: copy.components.new, changed: copy.components.changed },
 };
 ---
 

@@ -1,6 +1,6 @@
 // PatternsTable — prototype patterns() toolbar + table + foot (app.js), search/sort as in bindInteractions().
 // Renders only non-excluded patterns (`/patterns.astro` filters); the excluded ones go to `ExcludedPatterns`
-// (S-05 Phase 7). DESIGN-GAP: G28 — status badges (nowy / zmiana kwoty, S-06) stay omitted; „Pokaż więcej” (`patterns.showMore`, kit round 3) is S-14.
+// (S-05 Phase 7). DESIGN-GAP: G28 — „Pokaż więcej” (`patterns.showMore`, kit round 3) is S-14.
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/app/Badge";
@@ -32,11 +32,16 @@ export interface PatternsTableCopy {
   thresholdSum: string;
   /** Arrow cell `aria-label` — „Otwórz wzorzec” (K21). */
   openPattern: string;
+  /** `copy.components.new` / `.changed`. */
+  statusLabels: { new: string; changed: string };
 }
+
+/** A list row plus its status in the reference month (`patternStatuses`); the island never computes it. */
+export type PatternRow = PatternListItem & { status: "new" | "changed" | null };
 
 interface PatternsTableProps {
   /** Already in the default order (sum desc, then name, then key). */
-  patterns: PatternListItem[];
+  patterns: PatternRow[];
   copy: PatternsTableCopy;
 }
 
@@ -151,6 +156,11 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
                     ) : (
                       "—"
                     )}
+                    {p.status ? (
+                      <span className="ml-2 inline-block">
+                        <Badge tone={p.status}>{copy.statusLabels[p.status]}</Badge>
+                      </span>
+                    ) : null}
                   </td>
                   <td className={cn(cell, "text-right")}>
                     <a

@@ -26,7 +26,7 @@ freezing the derived name. All three dialogs get the kit round-3 padding.
 
 | Decision | Choice | Why (1 sentence) | Source |
 | --- | --- | --- | --- |
-| „Pokaż więcej” | 10 rows after filter + sort; count on the filtered list; stays expanded on search | Keeps the roadmap Risk (no change to sorting or sums) and every smoke row | Research / Plan |
+| „Pokaż więcej” | 10 rows after filter + sort; count on the filtered list; stays expanded on search | Keeps the roadmap Risk (no change to sorting or sums) and every smoke row (at most 2 rows in smoke) | Research / Plan |
 | Dialog structure | In-place sections with kit headings and states | Smaller than kit modal navigation; PRG and smoke unchanged | Plan |
 | Merge/rename errors | Page alert after redirect (unchanged) | S-12 precedent: one alert slot | Plan |
 | Rename field (F5) | Value = stored name or empty; placeholder = shown name | Untouched save never freezes or clears a name | Research / Plan |
@@ -35,7 +35,7 @@ freezing the derived name. All three dialogs get the kit round-3 padding.
 | Status badges | One `fixedOverview` on the same read | Kit draws them; no rule change, no second read | Research |
 | Focus ring | One export, ink/15 unchanged | Kit has no focus rule; zero visual change site-wide | Research |
 | Rename limit | 100, no migration | Schema CHECK 1–100; M-3 has no migrations (K31) | Change / Research |
-| Phases | 9 small phases, no new UI component | Each phase runs as a fresh agent and must be green on its own | Plan |
+| Phases | 8 small phases (plan review merged dialog geometry into 4), no new UI component | Each phase runs as a fresh agent and must be green on its own | Plan |
 
 ## Scope
 
@@ -59,15 +59,14 @@ is proven by `renderToStaticMarkup` tests; page-rendered strings by smoke (`>tex
 | 1. Columns + list copy + `try` | Kit order, `tableHeaders` gone, no 500 | Smoke cannot see order (props) → render test |
 | 2. Status badges | „nowy” / „zmiana kwoty”, `Badge` `changed` | `/fixed` tint changes too (intended) |
 | 3. „Pokaż więcej” | 10-row page after filter + sort | Slicing before filtering |
-| 4. Field + focus + fieldBox | 8 px toolbar, one focus source | Site-wide button classes must stay identical |
+| 4. Field + focus + fieldBox + dialog geometry | 8 px toolbar, one focus source, kit padding in 3 dialogs, close glyph on `Glyph` | Site-wide button classes must stay identical; visual change on `/imports`, `/settings` |
 | 5. Detail copy + sequence | Kit keys, plural `role="img"` label | Changed meaning (`within`, not all occurrences) |
 | 6. Detail states | Not-found, no-occurrences, merged variants | `ViewEmpty` callers must stay identical |
 | 7. Dialog | Kit sections, F5 fix, result lines | Result strings leaking into island props |
-| 8. Dialog geometry | Kit round-3 padding in 3 dialogs | Visual change on `/imports`, `/settings` |
-| 9. Register + sweep + visual | Rows closed, follow-ups, screenshots | Missing data for the badge state |
+| 8. Register + sweep + visual | Rows closed, follow-ups, screenshots | Missing data for the badge state |
 
 **Prerequisites:** local Supabase, synthetic ING fixture import (more than 10 merchants) for the visual gate.
-**Estimated effort:** 9 implement sessions, each with the full local gate.
+**Estimated effort:** 8 implement sessions, each with the full local gate.
 
 ## Open Risks & Assumptions
 
@@ -79,4 +78,4 @@ is proven by `renderToStaticMarkup` tests; page-rendered strings by smoke (`>tex
 
 - Every pattern state matches its kit view at 1280 and ~400 px, and the other dialogs show no regression.
 - Smoke baseline + 8 (or + 9), vitest green, pgTAP unchanged, no `copyExtra.patterns` leaf without a reader.
-- The maintainer accepts or reverses the product-visible choices in `[human]` row 9.9.
+- The maintainer accepts or reverses the product-visible choices in `[human]` row 8.9.

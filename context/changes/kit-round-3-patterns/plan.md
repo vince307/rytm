@@ -50,7 +50,8 @@ against `src/` and `design/rytm-os/`. Anchors are symbols.
   `react-dom/server` `renderToStaticMarkup` with `createElement` works in the node environment.
 - Register `context/foundation/design-kit.md`: last K id `K34`, last G id `G38`.
 - Smoke (`scripts/smoke.mjs`): raw-HTML `contains`/`notContains`, `location` prefix; island props serialize the same
-  strings, so island content is matched as `>text<`. The smoke user has 4 merchants; the demo account has no
+  strings, so island content is matched as `>text<`. The smoke user's `/patterns` shows at most 2 table rows at any step (May import:
+  Sklep + Kawiarnia; the June import that adds Piekarnia lands only after the merge — plan review F1); the demo account has no
   transactions in `supabase/seed.sql`.
 
 ## Desired End State
@@ -99,11 +100,11 @@ against `src/` and `design/rytm-os/`. Anchors are symbols.
 
 ## Implementation Approach
 
-Nine small phases, each green on its own, each deleting the `copyExtra.patterns` leaves whose last reader it
+Eight small phases, each green on its own, each deleting the `copyExtra.patterns` leaves whose last reader it
 rebinds (a `grep` proves no reader is left). List first (P1 columns + list copy + `try`, P2 badges, P3 „Pokaż
 więcej”), then the shared field/focus consolidation (P4), the detail page (P5 copy + sequence, P6 states + merged
-variants), the dialog (P7), the shared `DialogContent` geometry (P8, isolated so its screenshots cover the two
-non-pattern dialogs), and the register + seam sweep + visual gate (P9). No phase adds more than one new UI component
+variants), the dialog (P7), and the register + seam sweep + visual gate (P8). The shared `DialogContent` geometry rides
+with the other shared class changes in P4 (plan review F2); its screenshots are P8 row 8.7. No phase adds more than one new UI component
 (none needs one: `ViewEmpty` is extended, not duplicated). Every phase measures the baseline on the branch before
 editing and reports `baseline + delta`.
 
@@ -280,7 +281,8 @@ the `PatternsTable.tsx` header. Render test: 12 rows → 10 `<tr>` in `<tbody>`,
 **File**: `scripts/smoke.mjs`
 
 **Contract**: +1 `patterns list shows no Pokaż więcej for a short list` — `notContains: ">Pokaż więcej<"` on
-`/patterns` as the test user (4 merchants).
+`/patterns` as the test user, placed right after `patterns table keeps the Ponad progiem header` (2 rows there:
+Sklep smoke + Kawiarnia smoke, before the merge).
 
 ### Success Criteria:
 
@@ -289,7 +291,7 @@ the `PatternsTable.tsx` header. Render test: 12 rows → 10 `<tr>` in `<tbody>`,
 - `npm test`: Phase 2 count + list-view and render cases, 0 failed
 - Smoke Phase 2 count + 1 PASS, 0 FAIL
 - `grep -n "G28" src/components/patterns/PatternsTable.tsx` empty
-- Deliberate break: `PATTERNS_PAGE_SIZE = 3` → the new smoke step red (button rendered for 4 rows) and list-view tests red; restored; meta-check recorded (needle is the rendered node, not the serialized `showMore` prop)
+- Deliberate break: `PATTERNS_PAGE_SIZE = 1` → the new smoke step red (button rendered for the 2 rows) and list-view tests red; restored; meta-check recorded (needle is the rendered node, not the serialized `showMore` prop; a size ≥ 2 would leave the step green — plan review F1)
 - Deliberate break: slice before filtering in `listView` → the last-by-sum search case red; restored
 - Full local gate vs baseline, smoke + 1
 
@@ -299,13 +301,16 @@ the `PatternsTable.tsx` header. Render test: 12 rows → 10 `<tr>` in `<tbody>`,
 
 ---
 
-## Phase 4: Toolbar field, one focus ring, one field box
+## Phase 4: Toolbar field, one focus ring, one field box, dialog geometry
 
 ### Overview
 
 Kit `.search-field` / `.select-field` round 3 (8 px, `--rytm-focus-ring`), plus the two consolidations the
-follow-ups ask for: one `focusRing` export (value unchanged) and one `fieldBox` export (S-12 F1, S-04 F11, S-05 F4).
-No new UI component.
+follow-ups ask for: one `focusRing` export (value unchanged) and one `fieldBox` export (S-12 F1, S-04 F11, S-05 F4),
+and the shared `DialogContent` on the kit round-3 `.modal` (S-12 F2) with the close glyph on `Glyph` (S-01 F9, whose
+trigger is "the dialog-geometry change"). Merged here by the plan review: every item is a shared class-string change
+with smoke Δ0, `dialog.tsx` is already open for the close-button `focusRing`, and the screenshots of the two
+non-pattern dialogs are taken in the final phase anyway. No new UI component.
 
 ### Changes Required:
 
@@ -343,6 +348,20 @@ box and the dialog's local `fieldBox` compose it; both G32 comments go. `merchan
 `focus-visible:ring-ink/15`; `buttonVariants()` contains every `focusRing` class; `fieldBox` contains `rounded-[8px]`
 and `bg-paper`.
 
+#### 4. Dialog geometry and close glyph
+
+**File**: `src/components/ui/dialog.tsx`, `test/unit/kit-contract.test.ts`
+
+**Intent**: S-12 F2 — kit `.modal{padding:26px}`, `≤560px{padding:22px 18px;width:100%;border-radius:12px}`,
+`.modal-backdrop{padding:16px}`; S-01 F9 — one icon component.
+
+**Contract**: export `dialogContentClass` (the class string `DialogContent` composes): `p-[26px]`,
+`w-[calc(100%-32px)] max-w-[480px]`, `rounded-[13px]`, `max-[559px]:px-[18px] max-[559px]:py-[22px]
+max-[559px]:rounded-[12px]`; `max-h-[calc(100vh-32px)] overflow-auto` kept. The close button's inline `<svg><use
+…#close>` becomes `<Glyph name="close" size={17} className="block" />` (same markup, `Glyph` already renders
+`rytm-icon` + `aria-hidden`). kit-contract pins `p-[26px]`, `max-[559px]:px-[18px]`, `max-[559px]:py-[22px]`,
+`w-[calc(100%-32px)]`. Close button position unchanged.
+
 ### Success Criteria:
 
 #### Automated Verification:
@@ -350,12 +369,13 @@ and `bg-paper`.
 - `npm test`: Phase 3 count + the new kit-contract cases, 0 failed
 - Smoke Phase 3 count PASS, 0 FAIL (Δ0)
 - `grep -rn "G29\|G32" src` empty; `grep -rn "focus-visible:ring-ink/15" src` matches only `field-styles.ts`
-- Deliberate break: `field` back to `rounded-lg` → kit-contract red; restored; meta-check recorded (pins the token, not the pixels — visual row 9.x covers pixels)
+- Deliberate break: `field` back to `rounded-lg` → kit-contract red; restored; meta-check recorded (pins the token, not the pixels — visual row 8.6 / 8.7 covers pixels)
+- Deliberate break: dialog padding back to `p-[31px]` → the dialog pin red; restored; meta-check recorded (pins classes; visual row 8.7 proves the three dialogs)
 - Full local gate vs baseline, smoke Δ0
 
 #### Manual Verification:
 
-- [reviewer] `buttonVariants` / `BackLink` / dialog close render the same class set as before (focus ring unchanged site-wide); `ui/` importing from `app/field-styles` noted as accepted
+- [reviewer] `buttonVariants` / `BackLink` / dialog close render the same class set as before (focus ring unchanged site-wide); `ui/` importing from `app/field-styles` noted as accepted; no dialog importer passes a `className` that fights the new padding
 
 ---
 
@@ -565,43 +585,7 @@ wzorców.`. Existing `Wzorce scalone.`, `>Akcje<`, 101-char `?error=name` redire
 
 ---
 
-## Phase 8: Kit round-3 dialog geometry
-
-### Overview
-
-Shared `DialogContent` to the kit `.modal` round 3 (S-12 F2). Isolated so its screenshots cover the two
-non-pattern dialogs. No new UI component.
-
-### Changes Required:
-
-#### 1. DialogContent
-
-**File**: `src/components/ui/dialog.tsx`, `test/unit/kit-contract.test.ts`
-
-**Intent**: Kit `.modal{padding:26px}`, `≤560px{padding:22px 18px;width:100%;border-radius:12px}`,
-`.modal-backdrop{padding:16px}`.
-
-**Contract**: export `dialogContentClass` (the class string `DialogContent` composes): `p-[26px]`,
-`w-[calc(100%-32px)] max-w-[480px]`, `rounded-[13px]`, `max-[559px]:px-[18px] max-[559px]:py-[22px]
-max-[559px]:rounded-[12px]`; `max-h-[calc(100vh-32px)] overflow-auto` kept. kit-contract pins `p-[26px]`,
-`max-[559px]:px-[18px]`, `max-[559px]:py-[22px]`, `w-[calc(100%-32px)]`. Close button position unchanged.
-
-### Success Criteria:
-
-#### Automated Verification:
-
-- `npm test`: Phase 7 count + the dialog pin, 0 failed
-- Smoke Phase 7 count PASS, 0 FAIL (Δ0)
-- Deliberate break: padding back to `p-[31px]` → the pin red; restored; meta-check recorded (pins classes; the visual row proves the three dialogs)
-- Full local gate vs baseline, smoke + 8 (or + 9)
-
-#### Manual Verification:
-
-- [reviewer] No dialog importer passes a `className` that fights the new padding (`DeleteImportDialog`, `DeleteAccountDialog`, `PatternActionsDialog`)
-
----
-
-## Phase 9: Gap register, seam sweep and visual gate
+## Phase 8: Gap register, seam sweep and visual gate
 
 ### Overview
 
@@ -620,7 +604,7 @@ K30 / K31 / K32 notes say which keys stay unread; K35–K37 present with their a
 
 #### 2. Seam sweep
 
-**File**: any file touched in P1–P8, `src/content/copy.ts`
+**File**: any file touched in P1–P7, `src/content/copy.ts`
 
 **Contract**: every remaining `copyExtra.patterns` leaf has a reader in `src/` (scripted grep loop over the leaf
 names); no local `focusRing` / `fieldBox` / `rounded-lg` duplicate in `src/components/patterns/`; no comment still
@@ -651,7 +635,7 @@ maintainer preference); K35–K37 (kit round 4).
 - [visual] Screenshots desktop 1280 + ~400 px, compared with the kit views: `/patterns` default, > 10 rows collapsed and expanded (synthetic ING fixture import), search narrowing below the page size, search field focused, sort select focused, a „nowy” and a „zmiana kwoty” badge (if the data yields one, else stated), empty state, „Wykluczone” open; `/patterns/<key>` with threshold and over-limit marks, without threshold, `?error=value`, a month without occurrences, not-found, merged variants, excluded banner, month select focused, threshold field focused; actions dialog default, merge revealed, merge empty, rename revealed (placeholder shows the name, value empty)
 - [visual] Other views touched by shared changes, desktop + ~400 px: `/imports` delete-import dialog, `/settings` delete-account dialog (with its fields), `/fixed` „nowy” badge, a primary button and the back link with keyboard focus (ring unchanged)
 - [reviewer] Seam sweep complete; register matches the plan; follow-ups carry Trigger lines
-- [human] Accept S-14 product-visible choices: „Pokaż więcej” page size 10 that stays expanded on a new search; field radius 14 → 8 px on the patterns toolbar and month select; dialog padding 31 → 26 px (22/18 px on a phone) across all three dialogs; `/fixed` „nowy” tint 25 → 18 %; status badges mean „in the latest month”; sequence label keeps plurals instead of the kit string (K35); `threshold.invalid` drops the range/decimals hint (K36); merge/rename errors stay page alerts; send K35–K37 to the kit author
+- [human] Accept S-14 product-visible choices: „Pokaż więcej” page size 10 that stays expanded on a new search; field radius 14 → 8 px on the patterns toolbar and month select; dialog padding 31 → 26 px (22/18 px on a phone) across all three dialogs; `/fixed` „nowy” tint 25 → 18 %; status badges mean „in the latest month”; sequence label keeps plurals instead of the kit string (K35); `threshold.invalid` drops the range/decimals hint (K36); merge/rename errors stay page alerts; `patternActions.lead` „…w ustawieniach wzorca” read as the detail page (plan review F4); send K35–K37 to the kit author
 
 ## Testing Strategy
 
@@ -672,7 +656,7 @@ maintainer preference); K35–K37 (kit round 4).
 
 1. `npx supabase start`, import the synthetic ING fixture for the test user (more than 10 merchants),
    `ASTRO_DEV_BACKGROUND=1 npx astro dev --port 4399 --ignore-lock`.
-2. Walk the P9 visual list at 1280 and ~400 px; trigger result lines by URL params; open (do not submit) the
+2. Walk the P8 visual list at 1280 and ~400 px; trigger result lines by URL params; open (do not submit) the
    delete-import and delete-account dialogs.
 3. Kill the dev server (`lsof -ti :4399 | xargs kill`).
 
@@ -681,10 +665,11 @@ maintainer preference); K35–K37 (kit round 4).
 - The badge, paging and column proofs are render tests of the island, not of the hydrated page; hydration uses the
   same component, and the visual gate checks the result.
 - `ui/button.tsx` and `ui/dialog.tsx` importing `focusRing` from `app/field-styles.ts` inverts the usual ui → app
-  direction; accepted to close S-04 F3 with one source (reviewer row 4.6).
+  direction; accepted to close S-04 F3 with one source (reviewer row 4.7).
 - Status badges compare the latest month with the previous one while the list covers all months; the reading
   „in the latest month” is part of the `[human]` row.
 - The no-occurrences state may lack a smoke step (data-dependent); the visual row covers it.
+- `/patterns` smoke shows at most 2 table rows, so smoke proves only „no button on a short list”; paging itself (10 rows, button, reveal in sort order) is proven by the `listView` unit tests and the render test, and the visual row 8.6 with the synthetic ING fixture (plan review F1).
 
 ## Performance Considerations
 
@@ -698,17 +683,17 @@ None. Rollback = revert the merge.
 
 Recorded in place of the skill's questions (run contract rule 1). No decision departs from the PRD's literal text:
 FR-007 lists the columns the table keeps (the full list is one click away), FR-009 / FR-010 / FR-011 rules are
-unchanged. Kit departures and product-visible choices are collected in the `[human]` row 9.9.
+unchanged. Kit departures and product-visible choices are collected in the `[human]` row 8.9.
 
 | # | Decision | Chosen | Rejected | Why | What would change it |
 | --- | --- | --- | --- | --- | --- |
 | 1 | Complexity / questions | MEDIUM, 0 questions | Interview | Research answered every open question with a recommendation; the rest is reversible presentation | A product owner available |
-| 2 | „Pokaż więcej” | 10 rows, after filter + sort, count on the filtered list, stays expanded on search | Kit 3 (demo data); collapse on search | ≥ 4 keeps every smoke row; 10 is a screenful at 1280 px; collapsing on search hides matches the user just revealed | Maintainer prefers another size (one constant) |
+| 2 | „Pokaż więcej” | 10 rows, after filter + sort, count on the filtered list, stays expanded on search | Kit 3 (demo data); collapse on search | ≥ 2 keeps every smoke row; 10 is a screenful at 1280 px; collapsing on search hides matches the user just revealed | Maintainer prefers another size (one constant) |
 | 3 | Dialog structure | In-place sections with kit headings and states | Kit separate modal views | Smaller change; PRG flow and smoke unchanged; every kit state still drawn | Kit round 4 or maintainer asking for kit navigation |
 | 4 | Merge / rename errors | Page alert after the redirect (unchanged) | Reopen the dialog with the inline error | S-12 precedent (one alert slot); no client state across a redirect | Reviewer requires in-dialog retry |
 | 5 | `sequenceSummary` | `copyExtra` template, plurals for both counts (K35) | Kit „{within} wystąpień …” | Kit JSON is ungrammatical; its own `app.js` pluralises; K29 precedent | Maintainer accepts the kit string for screen-reader text |
 | 6 | `threshold.invalid` | Kit string, validator unchanged (K36) | Keep the precise `copyExtra` text | Kit is the copy source; PRD FR-010 silent on the message | Feedback that out-of-range input is confusing |
-| 7 | `patternActions.lead` | Kit key, no `[human]` row | Rewording | Byte-identical to today; the detail page is where every decision is reversed | A separate pattern-settings screen in scope |
+| 7 | `patternActions.lead` | Kit key; listed in `[human]` row 8.9 (plan review F4) | Rewording | Byte-identical to today; the detail page is where every decision is reversed | A separate pattern-settings screen in scope |
 | 8 | Sequence a11y | `role="img"` + `aria-label` (kit) | `sr-only` span | Kit fidelity; both announce; removes a duplicate node | Screen-reader test showing a regression |
 | 9 | Merged variants | Bottom of the transactions panel (kit), per-variant undo kept | Kit single undo button | Unmerge is per source (`unmerge` action takes `source`) | `unmerge` gaining a whole-chain mode |
 | 10 | Rename field (F5) | Value = stored `displayName` or empty; placeholder = shown name | Kit empty value always; today's derived prefill | Untouched save never freezes the derived name and never clears a stored one | — |
@@ -717,7 +702,7 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 | 13 | Focus ring | One `focusRing` export, ink/15 unchanged | Unify on `--rytm-focus-ring` (.12) | Kit has no `:focus-visible` rule; zero visual change site-wide | Kit adds a focus rule |
 | 14 | Status badges | In scope, one `fixedOverview` on the same read | Follow-up to S-15 | Kit draws them; no rule change; no second read | `fixedOverview` cost visible in smoke timing |
 | 15 | Rename limit | 100 (`DISPLAY_NAME_MAX`) | Kit 60 | Schema CHECK 1–100; M-3 has no migrations (K31) | Kit round 4 insisting on 60 → expand/contract change |
-| 16 | Phase size | 9 phases, no new UI component, shared dialog geometry isolated | Fewer, larger phases | Contract: fresh agent per phase, small and green | — |
+| 16 | Phase size | 8 phases (plan review merged the dialog geometry into P4), no new UI component | 9 phases with the geometry isolated; fewer, larger phases | Contract: fresh agent per phase, small and green | — |
 
 ## References
 
@@ -774,7 +759,7 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 - [ ] 3.1 npm test: Phase 2 count plus list-view and render cases, 0 failed
 - [ ] 3.2 Smoke Phase 2 count + 1 PASS, 0 FAIL
 - [ ] 3.3 No G28 left in PatternsTable.tsx
-- [ ] 3.4 Deliberate break: page size 3 turns the new smoke step and list-view tests red, restored, meta-check recorded
+- [ ] 3.4 Deliberate break: page size 1 turns the new smoke step and list-view tests red, restored, meta-check recorded
 - [ ] 3.5 Deliberate break: slice before filter in listView turns the last-by-sum search case red, restored
 - [ ] 3.6 Full local gate vs baseline, smoke + 1
 
@@ -782,7 +767,7 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 - [ ] 3.7 [reviewer] Count line counts the filtered list; reveal keeps the sort; search keeps expanded
 
-### Phase 4: Toolbar field, one focus ring, one field box
+### Phase 4: Toolbar field, one focus ring, one field box, dialog geometry
 
 #### Automated
 
@@ -790,11 +775,12 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 - [ ] 4.2 Smoke Phase 3 count PASS, 0 FAIL, Δ0
 - [ ] 4.3 No G29 / G32 in src; focus-visible:ring-ink/15 only in field-styles.ts
 - [ ] 4.4 Deliberate break: field back to rounded-lg turns kit-contract red, restored, meta-check recorded
-- [ ] 4.5 Full local gate vs baseline, smoke Δ0
+- [ ] 4.5 Deliberate break: dialog padding back to 31 px turns the dialog pin red, restored, meta-check recorded
+- [ ] 4.6 Full local gate vs baseline, smoke Δ0
 
 #### Manual
 
-- [ ] 4.6 [reviewer] buttonVariants / BackLink / dialog close keep the same focus classes; ui importing app/field-styles accepted
+- [ ] 4.7 [reviewer] buttonVariants / BackLink / dialog close keep the same focus classes; ui importing app/field-styles accepted; no dialog importer passes a className fighting the new padding
 
 ### Phase 5: Detail copy rebind and the sequence label
 
@@ -840,32 +826,19 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 - [ ] 7.7 [reviewer] Untouched rename save writes nothing new; validateMerge and endpoints untouched
 
-### Phase 8: Kit round-3 dialog geometry
+### Phase 8: Gap register, seam sweep and visual gate
 
 #### Automated
 
-- [ ] 8.1 npm test: Phase 7 count plus the dialog pin, 0 failed
-- [ ] 8.2 Smoke Phase 7 count PASS, 0 FAIL, Δ0
-- [ ] 8.3 Deliberate break: padding back to 31 px turns the pin red, restored, meta-check recorded
-- [ ] 8.4 Full local gate vs baseline, smoke + 8 (or + 9)
+- [ ] 8.1 Every copyExtra.patterns leaf has a reader
+- [ ] 8.2 Seam greps empty (tableHeaders, BODY_ORDER, detailMissing, monthEmpty, G28, G29, G32)
+- [ ] 8.3 Phase leaves design/ and brand.css untouched
+- [ ] 8.4 Deliberate break: re-added unused copyExtra.patterns.mergeNone caught by the leaf-reader grep, restored
+- [ ] 8.5 Full local gate vs baseline, smoke + 8 (or + 9)
 
 #### Manual
 
-- [ ] 8.5 [reviewer] No dialog importer passes a className fighting the new padding
-
-### Phase 9: Gap register, seam sweep and visual gate
-
-#### Automated
-
-- [ ] 9.1 Every copyExtra.patterns leaf has a reader
-- [ ] 9.2 Seam greps empty (tableHeaders, BODY_ORDER, detailMissing, monthEmpty, G28, G29, G32)
-- [ ] 9.3 Phase leaves design/ and brand.css untouched
-- [ ] 9.4 Deliberate break: re-added unused copyExtra.patterns.mergeNone caught by the leaf-reader grep, restored
-- [ ] 9.5 Full local gate vs baseline, smoke + 8 (or + 9)
-
-#### Manual
-
-- [ ] 9.6 [visual] Screenshots desktop + ~400 px of every listed pattern state, compared with the kit views
-- [ ] 9.7 [visual] Screenshots desktop + ~400 px of the other views touched by shared changes (imports and settings dialogs, /fixed badge, focus ring)
-- [ ] 9.8 [reviewer] Seam sweep complete; register matches the plan; follow-ups carry Trigger lines
-- [ ] 9.9 [human] Accept S-14 product-visible choices (page size 10 kept expanded on search, field radius 14 → 8 px, dialog padding across 3 dialogs, /fixed badge tint, badges mean latest month, K35 plurals, K36 shorter invalid message, page-level dialog errors) and send K35–K37 to the kit author
+- [ ] 8.6 [visual] Screenshots desktop + ~400 px of every listed pattern state, compared with the kit views
+- [ ] 8.7 [visual] Screenshots desktop + ~400 px of the other views touched by shared changes (imports and settings dialogs, /fixed badge, focus ring)
+- [ ] 8.8 [reviewer] Seam sweep complete; register matches the plan; follow-ups carry Trigger lines
+- [ ] 8.9 [human] Accept S-14 product-visible choices (page size 10 kept expanded on search, field radius 14 → 8 px, dialog padding across 3 dialogs, /fixed badge tint, badges mean latest month, K35 plurals, K36 shorter invalid message, page-level dialog errors, lead „ustawienia wzorca” = detail page) and send K35–K37 to the kit author

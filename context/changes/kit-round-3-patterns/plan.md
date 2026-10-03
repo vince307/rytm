@@ -801,11 +801,11 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Automated
 
-- [ ] 6.1 npm test: Phase 5 count, 0 failed
-- [ ] 6.2 Smoke Phase 5 count + 2 (or + 3) PASS, 0 FAIL, Cofnij scalenie still green
-- [ ] 6.3 G31 in the detail page names only overInMonth; no reader for detailMissing / monthEmpty / mergedLabel / unmerge
-- [ ] 6.4 Deliberate break: unsplit notFound title turns the not-found step red, restored, meta-check recorded
-- [ ] 6.5 Full local gate vs baseline, smoke + 5 (or + 6)
+- [x] 6.1 npm test: Phase 5 count, 0 failed — cd8a99f
+- [x] 6.2 Smoke Phase 5 count + 2 (or + 3) PASS, 0 FAIL, Cofnij scalenie still green — cd8a99f
+- [x] 6.3 G31 in the detail page names only overInMonth; no reader for detailMissing / monthEmpty / mergedLabel / unmerge — cd8a99f
+- [x] 6.4 Deliberate break: unsplit notFound title turns the not-found step red, restored, meta-check recorded — cd8a99f
+- [x] 6.5 Full local gate vs baseline, smoke + 5 (or + 6) — cd8a99f
 
 #### Manual
 

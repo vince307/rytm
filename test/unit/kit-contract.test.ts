@@ -54,6 +54,14 @@ describe("kit contract (content.json as the app reads it)", () => {
     expect(locatives[8]).toBe("wrześniu");
   });
 
+  it("has a nominative for each of the 12 months (keys of patternDetail.monthNames)", () => {
+    const nominatives = Object.keys(copy.patternDetail.monthNames);
+    expect(nominatives).toHaveLength(12);
+    expect(nominatives[0]).toBe("styczeń");
+    expect(nominatives[4]).toBe("maj");
+    expect(nominatives[8]).toBe("wrzesień");
+  });
+
   it("keeps the import rejection messages, placeholders and limits the wizard fills (S-13)", () => {
     expect(copy.importErrors.tooLarge).toContain("{maxMb}");
     expect(copy.importErrors.tooMany).toContain("{maxTransactions}");

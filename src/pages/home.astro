@@ -1,6 +1,6 @@
 ---
-// /home — kit `dashboard()` no-name variant (`#/home-no-name`, K5) + `trendChart()` `.monthly-trend` + the
-// `.import-panel` (FR-013, US-05, FR-012, US-04, S-07). `loadPatternData` → `overLimitTrend(patterns, rows,
+// /home — kit `dashboard()` no-name variant (round 3): one `.stats-single` accent card, the `trendChart()`
+// `.monthly-trend` panel and the `.dashboard-fixed` „Koszty stałe” summary (FR-013, US-05, FR-012, US-04, S-07, S-15). `loadPatternData` → `overLimitTrend(patterns, rows,
 // thresholds)` → `fixedOverview(patterns, rows)` → `homeStats(trend, fixed)`, all inside one `try` (S-06
 // follow-up: a `patternTxs` id-drift throw must not become a 500 here; `/patterns` and `/fixed` are not
 // retrofitted — one view, tracked as a follow-up). The pre-import state (`referenceMonth === null`) is
@@ -10,7 +10,8 @@ import EmptyState from "@/components/app/EmptyState.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
 import Panel from "@/components/app/Panel.astro";
-import ImportPanel from "@/components/home/ImportPanel.astro";
+import FixedSummary from "@/components/home/FixedSummary.astro";
+import PanelTitle from "@/components/app/PanelTitle.astro";
 import StatCard from "@/components/home/StatCard.astro";
 import TrendChart from "@/components/home/TrendChart.astro";
 import { buttonVariants } from "@/components/ui/button";
@@ -48,11 +49,10 @@ if ("error" in result) {
   console.error("home failed", result.error);
 }
 
-// K24 template — verbatim lead from `applyDashboardState` (`#/home-no-name`); `{month}` + `monthsNominative`
-// generalise the kit's baked-in "maj" (`fillMonthLocative` month templates in `src/lib/format.ts` is the precedent).
-// `monthIndex` (shared, `src/lib/format.ts`) indexes the `months*` declension tables (one parse for K24 and K25).
-
-const leadFor = (month: string) => h.lead.replace("{month}", h.monthsNominative[monthIndex(month)]);
+// Lead: kit `dashboard.descriptionNoName` (K24 delivered); the nominative is the kit's own `monthNames` key order
+// (pinned by `kit-contract.test.ts`), indexed by the shared `monthIndex` (`src/lib/format.ts`, also used for K25).
+const nominatives = Object.keys(copy.patternDetail.monthNames);
+const leadFor = (month: string) => copy.dashboard.descriptionNoName.replace("{month}", nominatives[monthIndex(month)]);
 
 const barsFor = (trend: OverLimitTrend) => {
   const max = Math.max(0, ...trend.months.map((m) => m.overMinor));
@@ -63,14 +63,14 @@ const barsFor = (trend: OverLimitTrend) => {
   }));
 };
 
-// K25 templates — the app's own `{delta}` / `{month}` and `{n}` / `{items}` feet (`copyExtra.home`), kept while the
-// kit's `dashboard.stats[].foot` is ungrammatical for n = 1 (K29); K24 `leadFor` precedent.
+// K25 — kit foot template `dashboard.stats[0].foot` with the app's genitive months (`copyExtra.home`).
 const deltaFootFor = (previous: NonNullable<HomeStats["previous"]>) =>
-  h.deltaFoot
+  copy.dashboard.stats[0].foot
     .replace("{delta}", formatSignedMoney(previous.deltaMinor))
     .replace("{month}", h.monthsGenitive[monthIndex(previous.month)]);
 
-const risenFootFor = (n: number) => h.risen.replace("{n}", String(n)).replace("{items}", plural(n, h.risenForms));
+// One text node per smoke-pinned count (`>1 koszt<`): built here so prettier never wraps it in the template.
+const costsText = (n: number) => `${n} ${plural(n, h.fixedSummary.costForms)}`;
 ---
 
 <AppLayout title={copy.dashboard.eyebrow} active="home">
@@ -81,19 +81,18 @@ const risenFootFor = (n: number) => h.risen.replace("{n}", String(n)).replace("{
     </>
   ) : result.referenceMonth === null ? (
     <>
-      <PageTitle eyebrow={h.emptyEyebrow} title={h.emptyTitle} lead={h.emptyLead} />
+      <PageTitle eyebrow={copy.home.emptyEyebrow} title={copy.home.emptyTitle} lead={copy.home.emptyLead} />
       <EmptyState
         title={e.title}
         body={e.body}
         cta={e.cta}
         href="/imports/new"
         illustration="/rytm/illustrations/rytm-pusty-stan-jasny.svg"
-        illustrationAlt={h.emptyIllustrationAlt}
+        illustrationAlt={copy.home.emptyIllustrationAlt}
       />
     </>
   ) : (
     <>
-      {/* DESIGN-GAP: K24 — no-name lead, month generalised (see leadFor above). */}
       <PageTitle
         eyebrow={copy.dashboard.eyebrow}
         title={copy.dashboard.greetingNoName}
@@ -103,24 +102,18 @@ const risenFootFor = (n: number) => h.risen.replace("{n}", String(n)).replace("{
           {copyExtra.patterns.upload}
         </a>
       </PageTitle>
-      <div class="mb-[15px] grid grid-cols-[1.2fr_1fr] gap-[15px] max-[899px]:grid-cols-1">
+      <div class="mb-4 grid grid-cols-[minmax(260px,380px)] max-[360px]:grid-cols-[minmax(0,1fr)]">
         <StatCard
           accent
           label={copy.dashboard.stats[0].label}
           value={formatMoney(result.stats.overMinor)}
           foot={result.stats.previous ? deltaFootFor(result.stats.previous) : undefined}
         />
-        <StatCard
-          label={copy.dashboard.stats[1].label}
-          value={formatMoney(result.stats.fixedTotalMinor)}
-          foot={risenFootFor(result.stats.fixedRisen)}
-        />
       </div>
       <Panel>
-        <div class="mb-5 flex items-start justify-between">
-          <h2 class="text-[17px] tracking-[-0.03em]">{copy.trend.title}</h2>
+        <PanelTitle title={copy.trend.title}>
           <span class="text-xs text-muted">{copy.trend.range}</span>
-        </div>
+        </PanelTitle>
         <TrendChart
           ariaLabel={copy.trend.title}
           bars={barsFor(result.trend)}
@@ -133,11 +126,14 @@ const risenFootFor = (n: number) => h.risen.replace("{n}", String(n)).replace("{
           hint={!result.trend.hasThreshold ? h.noThreshold : undefined}
         />
       </Panel>
-      <ImportPanel
-        title={copy.dashboard.importTitle}
-        body={copy.dashboard.importBody}
-        cta={copy.imports.choose}
-        href="/imports/new"
+      <FixedSummary
+        title={copy.dashboard.stats[1].label}
+        link={h.fixedSummary.link}
+        href="/fixed"
+        rows={[
+          { label: h.fixedSummary.risen, value: costsText(result.stats.fixedRisen) },
+          { label: h.fixedSummary.added, value: costsText(result.stats.fixedNew) },
+        ]}
       />
     </>
   )}

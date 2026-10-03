@@ -8,12 +8,12 @@
 // amount with its previous value, an excluded pattern staying off the list, a new pattern with its "pierwsze
 // wystąpienie" meta and "nowy" badge, and the comparison-present negative control — reusing the smoke user's
 // existing May/June imports and decisions rather than a dedicated payload (S-06 plan Key Discoveries), and
-// /home (FR-013/US-05, FR-012/US-04, S-07 Phases 2-4): pre-import (no trend, no import panel), a one-month
-// no-threshold state (hint + tooShort panel), the over-limit sum after a threshold is saved, the import panel
-// offering the next upload once data exists, the sum dropping to 0 after removal, an excluded pattern's threshold
+// /home (FR-013/US-05, FR-012/US-04, S-07, S-15): pre-import (no trend, no summary), a one-month
+// no-threshold state (hint + tooShort panel), the over-limit sum after a threshold is saved, the „Koszty stałe”
+// summary with one month and the lead naming the reference month, the sum dropping to 0 after removal, an excluded pattern's threshold
 // contributing nothing while the newer month still appears on the axis, every month recomputing once the pattern
 // is restored, the accent stat card's delta foot hidden with one month of data and shown once a previous month
-// exists, and the "Koszty stałe" card's total and "podrożała" count — pure GETs inserted between existing steps,
+// exists, and the summary's „Podrożały” / „Nowe” counts — pure GETs inserted between existing steps,
 // no new payload — and the S-09 demo guard (the seeded demo account refused a second import, an undo, a password
 // change and a deletion).
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
@@ -308,7 +308,7 @@ const steps = [
   [
     "home before import has no trend",
     () => request("/home"),
-    { status: 200, notContains: [">Ponad progiem<", ">Dodaj najnowszy wyciąg<"] },
+    { status: 200, notContains: [">Ponad progiem<", ">Zobacz zmiany<"] },
   ],
   [
     "fixed shows the pre-import view",
@@ -582,7 +582,21 @@ const steps = [
       notContains: "Ustaw próg na wzorcu, a tu pojawi się suma ponad progiem.",
     },
   ],
-  ["home offers the next import", () => request("/home"), { status: 200, contains: ">Dodaj najnowszy wyciąg<" }],
+  [
+    // One month: no comparison month, so „Nowe” reads 0 (never "everything is new", US-04 AC).
+    "home summarises fixed costs with one month",
+    () => request("/home"),
+    {
+      status: 200,
+      contains: [">Zobacz zmiany<", ">Podrożały<", ">0 kosztów<"],
+      notContains: ">Dodaj najnowszy wyciąg<",
+    },
+  ],
+  [
+    "home lead names the reference month",
+    () => request("/home"),
+    { status: 200, contains: ">Twój maj w jednym spokojnym widoku.<" },
+  ],
   [
     // One month of data (May only) — `homeStats.previous` is `null` (`previousMonth` April has no rows), so the
     // accent stat card renders no delta foot at all (S-07 Phase 3, plan review F1 gap rule).
@@ -872,11 +886,11 @@ const steps = [
     { status: 200, contains: ">+1,50 zł<", notContains: ">Żaden koszt stały nie zmienił kwoty w tym miesiącu.<" },
   ],
   [
-    // "Koszty stałe" card: Kawiarnia Rytm 47,00 + Sklep smoke 12,99 + Piekarnia smoke 8,00 = 67,99 zł; only
-    // Kawiarnia Rytm rose (S-07 Phase 3, `homeStats.fixedRisen` counts `deltaMinor > 0` only).
+    // "Koszty stałe" summary: Kawiarnia Rytm rose (`homeStats.fixedRisen` counts `deltaMinor > 0` only), Piekarnia
+    // smoke is new (`fixedNew`).
     "home counts fixed costs that rose",
     () => request("/home"),
-    { status: 200, contains: [">1 pozycja podrożała<", ">67,99 zł<"] },
+    { status: 200, contains: [">Podrożały<", ">Nowe<", ">1 koszt<"], notContains: [">67,99 zł<", ">0 kosztów<"] },
   ],
   [
     "fixed shows the previous amount",

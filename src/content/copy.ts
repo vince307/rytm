@@ -42,30 +42,10 @@ export const copyExtra = {
     emptyTitle: "Zacznij od pierwszego importu.",
     emptyLead: "Rytm pokaże Ci wzorce, kiedy dostanie pierwszy wyciąg.",
     emptyIllustrationAlt: "Dokument czekający na import",
-    // DESIGN-GAP: K24 — verbatim from `prototype/app.js` `applyDashboardState` (`#/home-no-name`); the kit bakes
-    // the month into the sentence ("Twój maj w jednym spokojnym widoku."), `{month}` + `monthsNominative`
-    // generalise it (May reproduces the kit string byte for byte).
-    lead: "Twój {month} w jednym spokojnym widoku.",
-    monthsNominative: [
-      "styczeń",
-      "luty",
-      "marzec",
-      "kwiecień",
-      "maj",
-      "czerwiec",
-      "lipiec",
-      "sierpień",
-      "wrzesień",
-      "październik",
-      "listopad",
-      "grudzień",
-    ],
     // DESIGN-GAP: G35 — the kit's trend panel has no state for "no pattern has an applicable threshold at all";
     // placeholder, the author supplies the final copy.
     noThreshold: "Ustaw próg na wzorcu, a tu pojawi się suma ponad progiem.",
-    // DESIGN-GAP: K25 / K29 — round 3 ships `dashboard.stats[].foot` templates, but no genitive months and „{n} {items}
-    // podrożały” is wrong for n = 1 (K29 in design-kit.md); the app keeps these templates until the kit foot is grammatical.
-    deltaFoot: "{delta} względem {month}",
+    // DESIGN-GAP: K25 — `dashboard.stats[0].foot` is the template, the kit ships no genitive month names.
     monthsGenitive: [
       "stycznia",
       "lutego",
@@ -80,8 +60,14 @@ export const copyExtra = {
       "listopada",
       "grudnia",
     ],
-    risen: "{n} {items}",
-    risenForms: ["pozycja podrożała", "pozycje podrożały", "pozycji podrożało"],
+    // DESIGN-GAP: K38 — the „Koszty stałe” summary panel's literals live in kit `app.js`, with no `content.json`
+    // key; „kosztów” is the regular genitive plural the kit never shows.
+    fixedSummary: {
+      link: "Zobacz zmiany",
+      risen: "Podrożały",
+      added: "Nowe",
+      costForms: ["koszt", "koszty", "kosztów"],
+    },
   },
   imports: {
     // Wizard save failure (import result `status === 'error'` in round-3 `prototype/app.js`); not in `content.json`

@@ -31,7 +31,7 @@ const emptyFixed: FixedOverview = {
 describe("homeStats — crafted inputs", () => {
   it("case 1: empty trend + empty overview", () => {
     const result = homeStats(trendOf([], false), emptyFixed);
-    expect(result).toEqual({ overMinor: 0, previous: null, fixedTotalMinor: 0, fixedRisen: 0 });
+    expect(result).toEqual({ overMinor: 0, previous: null, fixedRisen: 0, fixedNew: 0 });
   });
 
   it("case 2: one month of data — no previous", () => {
@@ -65,7 +65,7 @@ describe("homeStats — crafted inputs", () => {
     expect(result.previous).toBeNull();
   });
 
-  it("case 4: fixed total sums every row, only rises count toward fixedRisen", () => {
+  it("case 4: only rises count toward fixedRisen, new rows toward fixedNew", () => {
     const fixed: FixedOverview = {
       referenceMonth: "2026-06",
       comparisonMonth: "2026-05",
@@ -79,7 +79,19 @@ describe("homeStats — crafted inputs", () => {
     };
     const result = homeStats(trendOf([]), fixed);
     expect(result.fixedRisen).toBe(1);
-    expect(result.fixedTotalMinor).toBe(5150 + 2000 + 900 + 1200);
+    expect(result.fixedNew).toBe(1);
+  });
+
+  it("case 4b: no comparison month — fixedNew is 0 whatever the rows", () => {
+    const fixed: FixedOverview = {
+      referenceMonth: "2026-05",
+      comparisonMonth: null,
+      hasComparison: false,
+      changed: [],
+      new: [],
+      unchanged: [{ key: "d", name: "d", amountMinor: 1200 }],
+    };
+    expect(homeStats(trendOf([]), fixed).fixedNew).toBe(0);
   });
 });
 
@@ -101,7 +113,7 @@ describe("homeStats — F-02 fixture (case 5)", () => {
     }));
   }
 
-  it("kino światło count 1 — reference-month over-limit, previous-month delta, fixed total and rises", () => {
+  it("kino światło count 1 — reference-month over-limit, previous-month delta, fixed rises and new count", () => {
     const rows = fixtureSources();
     const patterns = derivePatterns(rows);
     const thresholds = new Map<string, Threshold>([["kino światło", { kind: "count", value: 1 }]]);
@@ -110,7 +122,7 @@ describe("homeStats — F-02 fixture (case 5)", () => {
     const result = homeStats(trend, fixed);
     expect(result.overMinor).toBe(0);
     expect(result.previous).toEqual({ month: "2026-07", deltaMinor: -8759 });
-    expect(result.fixedTotalMinor).toBe(175298);
     expect(result.fixedRisen).toBe(1);
+    expect(result.fixedNew).toBe(fixed.new.length);
   });
 });

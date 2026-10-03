@@ -2,7 +2,9 @@
 import "../styles/global.css";
 import Banner from "@/components/Banner.astro";
 import { missingConfigs } from "@/lib/config-status";
-import { copy } from "@/content/copy";
+import { getCopy } from "@/content/copy";
+
+const { copy, copyExtra } = getCopy(Astro.locals.locale);
 
 interface Props {
   title: string;
@@ -15,7 +17,7 @@ const ogImage = new URL("/rytm/social/rytm-og-1200x630.png", Astro.url.origin).t
 ---
 
 <!doctype html>
-<html lang="pl">
+<html lang={Astro.locals.locale}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -32,12 +34,12 @@ const ogImage = new URL("/rytm/social/rytm-og-1200x630.png", Astro.url.origin).t
   <body>
     {missingConfigs.map((cfg) => (
       <Banner variant="error">
-        <strong>Uwaga:</strong> {cfg.message}
+        <strong>{copyExtra.config.warning}</strong> {copyExtra.config[cfg.messageKey]}
         {cfg.docsUrl && (
           <>
             {" "}
             <a href={cfg.docsUrl} target="_blank" rel="noopener noreferrer">
-              {cfg.docsLabel ?? "Dokumentacja"}
+              {copyExtra.config[cfg.docsLabelKey]}
             </a>
             .
           </>

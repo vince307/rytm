@@ -6,8 +6,10 @@
 import Icon from "@/components/Icon.astro";
 import RestoreForm from "@/components/patterns/RestoreForm.astro";
 import { merchantMark } from "@/components/patterns/merchant-mark";
-import { copy } from "@/content/copy";
+import { getCopy } from "@/content/copy";
 import { plural } from "@/lib/format";
+
+const { copy } = getCopy(Astro.locals.locale);
 
 interface Props {
   patterns: { key: string; name: string }[];
@@ -22,7 +24,8 @@ const { patterns } = Astro.props;
       <Icon name="arrow" size={14} class="-rotate-90 transition-transform group-open:rotate-0" />
       {copy.patterns.excluded}
       <span class="font-normal">
-        {patterns.length} {plural(patterns.length, copy.patterns.countForms as [string, string, string])}
+        {patterns.length}{" "}
+        {plural(patterns.length, copy.patterns.countForms as [string, string, string], Astro.locals.locale)}
       </span>
     </summary>
     {/* Panel-styled (border/radius/bg as Panel.astro), but padding 0 20 (plan contract) — each row supplies its

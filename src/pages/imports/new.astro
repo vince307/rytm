@@ -6,9 +6,11 @@ import { DEMO_EMAIL } from "astro:env/server";
 import AppLayout from "@/layouts/AppLayout.astro";
 import ImportWizard from "@/components/imports/ImportWizard";
 import type { ExistingImport, WizardServerError } from "@/components/imports/ImportWizard";
-import { copy, copyExtra } from "@/content/copy";
+import { getCopy } from "@/content/copy";
 import { createClient } from "@/lib/supabase";
 import { demoImportAllowed, isDemoEmail } from "@/lib/demo";
+
+const { copy, copyExtra } = getCopy(Astro.locals.locale);
 
 const f = copy.importFlow;
 
@@ -46,6 +48,7 @@ const serverError: WizardServerError | undefined = kind.success
 <AppLayout title={f.title} active="imports">
   <ImportWizard
     client:load
+    locale={Astro.locals.locale}
     labels={{
       flow: {
         title: f.title,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { copy } from "@/content/copy";
+import { getCopy } from "@/content/copy";
 import {
   accountDisplay,
   bankDisplayName,
@@ -7,6 +7,8 @@ import {
   fillTemplate,
   tooManyMessage,
 } from "@/lib/import/presentation";
+
+const { copy } = getCopy("pl");
 
 describe("fillTemplate", () => {
   it("renders a value containing $& verbatim", () => {

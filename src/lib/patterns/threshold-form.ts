@@ -2,6 +2,7 @@
 // without a server; the save / delete endpoints (Phase 5) parse with these before touching the database.
 import { z } from "zod";
 
+import type { Locale } from "@/lib/i18n";
 import { patternHref } from "@/lib/patterns/path";
 import type { ThresholdKind, Threshold } from "@/types";
 
@@ -43,11 +44,12 @@ export function parseThresholdValue(kind: ThresholdKind, raw: string): number | 
 
 /** Inverse of `parseThresholdValue` for pre-filling the editor: `"4"` for a count, `"55"` / `"55,50"` for money
  * (whole zloty drop the decimal part; the kit shows no trailing `,00`). */
-export function formatThresholdInput(threshold: Threshold): string {
+export function formatThresholdInput(threshold: Threshold, locale: Locale): string {
   if (threshold.kind === "count") return String(threshold.value);
   const whole = Math.floor(threshold.value / 100);
   const frac = threshold.value % 100;
-  return frac === 0 ? String(whole) : `${whole},${String(frac).padStart(2, "0")}`;
+  const decimal = locale === "en" ? "." : ",";
+  return frac === 0 ? String(whole) : `${whole}${decimal}${String(frac).padStart(2, "0")}`;
 }
 
 export type ThresholdSaveStatus = "saved" | "removed" | "error-value" | "error-save";

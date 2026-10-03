@@ -1,7 +1,14 @@
 export const MIN_PASSWORD_LENGTH = 6;
 
-/** Word the user must type to delete their account; the client gates the button, the server validates it. */
-export const DELETE_CONFIRM_WORD = "USUŃ";
+import type { Locale } from "@/lib/i18n";
+
+/** Word the user must type to delete their account, per locale; the client gates the button, the server validates it. */
+export const DELETE_CONFIRM_WORDS: Record<Locale, string> = { pl: "USUŃ", en: "DELETE" };
+
+/** Either locale's word proves intent (`Ń` is untypeable on most non-Polish keyboards); exact, case-sensitive match. */
+export function isDeleteConfirmWord(value: string): boolean {
+  return Object.values(DELETE_CONFIRM_WORDS).includes(value);
+}
 
 /** Supabase re-sends a confirmation e-mail at most once per this many seconds. */
 export const RESEND_COOLDOWN_SECONDS = 60;

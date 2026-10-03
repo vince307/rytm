@@ -3,7 +3,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { PatternsTable, type PatternRow, type PatternsTableCopy } from "@/components/patterns/PatternsTable";
-import { copy, copyExtra } from "@/content/copy";
+import { getCopy } from "@/content/copy";
+
+const { copy, copyExtra } = getCopy("pl");
 
 const x = copyExtra.patterns;
 const tableCopy: PatternsTableCopy = {
@@ -36,7 +38,7 @@ const item = (over: Partial<PatternRow>): PatternRow => ({
 });
 
 function render(patterns: PatternRow[]): string {
-  return renderToStaticMarkup(createElement(PatternsTable, { patterns, copy: tableCopy }));
+  return renderToStaticMarkup(createElement(PatternsTable, { patterns, copy: tableCopy, locale: "pl" }));
 }
 
 describe("PatternsTable render", () => {

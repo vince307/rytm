@@ -3,6 +3,7 @@
 import AppLayout from "@/layouts/AppLayout.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
 import Panel from "@/components/app/Panel.astro";
+import LocaleSwitch from "@/components/LocaleSwitch.astro";
 import SettingsRow from "@/components/app/SettingsRow.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
 import SettingsPasswordRow from "@/components/settings/SettingsPasswordRow";
@@ -10,8 +11,11 @@ import DeleteAccountDialog from "@/components/settings/DeleteAccountDialog";
 import { buttonVariants } from "@/components/ui/button";
 import { DEMO_EMAIL } from "astro:env/server";
 import { isDemoEmail } from "@/lib/demo";
-import { copy, copyExtra } from "@/content/copy";
-import { DELETE_CONFIRM_WORD, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
+import { getCopy } from "@/content/copy";
+import { DELETE_CONFIRM_WORDS, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
+
+const { locale } = Astro.locals;
+const { copy, copyExtra } = getCopy(locale);
 
 const s = copy.settings;
 const a = copy.authStates;
@@ -85,6 +89,12 @@ const demo = isDemoEmail(Astro.locals.user?.email, DEMO_EMAIL);
       </form>
     </SettingsRow>
   </Panel>
+  <Panel class="mt-[15px] max-w-[800px]">
+    <div class="mb-5 flex items-center justify-between">
+      <h2 class="m-0 text-[17px] tracking-[-0.03em]">{copyExtra.locale.sectionTitle}</h2>
+      <LocaleSwitch locale={locale} labels={copyExtra.locale} />
+    </div>
+  </Panel>
   <Panel variant="danger" class="mt-[15px] max-w-[800px]">
     <div>
       <div class="text-xs font-extrabold tracking-[0.14em] text-excess-text uppercase">{x.dangerEyebrow}</div>
@@ -94,13 +104,14 @@ const demo = isDemoEmail(Astro.locals.user?.email, DEMO_EMAIL);
     <DeleteAccountDialog
       client:load
       demo={demo}
+      confirmWord={DELETE_CONFIRM_WORDS[locale]}
       labels={{
         trigger: s.deleteButton,
         eyebrow: x.deleteDialogEyebrow,
         title: x.deleteDialogTitle,
         body: x.deleteDialogBody,
         confirmationHint: s.deleteConfirm,
-        placeholder: DELETE_CONFIRM_WORD,
+        placeholder: DELETE_CONFIRM_WORDS[locale],
         currentPassword: s.deletePassword,
         passwordPlaceholder: copy.auth.passwordPlaceholder,
         confirm: s.deleteButton,

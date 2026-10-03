@@ -3,7 +3,9 @@
 // detail page's excluded banner (S-05 Phase 6) and the /patterns "Wykluczone" section (S-05 Phase 7). Plain
 // <form> POST, no client JS: the endpoint's own redirect carries the result line (S-04 decision 15 precedent).
 import { buttonVariants } from "@/components/ui/button";
-import { copy } from "@/content/copy";
+import { getCopy } from "@/content/copy";
+
+const { copy } = getCopy(Astro.locals.locale);
 
 interface Props {
   patternKey: string;

@@ -64,7 +64,15 @@ describe("formatThresholdInput", () => {
     [{ kind: "amount", value: 5550 }, "55,50"],
     [{ kind: "amount", value: 5501 }, "55,01"],
   ])("formats %o → %s", (threshold, expected) => {
-    expect(formatThresholdInput(threshold)).toBe(expected);
+    expect(formatThresholdInput(threshold, "pl")).toBe(expected);
+  });
+
+  it.each<[Threshold, string]>([
+    [{ kind: "count", value: 4 }, "4"],
+    [{ kind: "amount", value: 5550 }, "55.50"],
+    [{ kind: "amount", value: 5500 }, "55"],
+  ])("formats %o → %s in English", (threshold, expected) => {
+    expect(formatThresholdInput(threshold, "en")).toBe(expected);
   });
 
   it("round-trips through parseThresholdValue", () => {
@@ -74,7 +82,7 @@ describe("formatThresholdInput", () => {
       { kind: "amount", value: 5550 } as const,
       { kind: "amount", value: 5501 } as const,
     ]) {
-      expect(parseThresholdValue(threshold.kind, formatThresholdInput(threshold))).toBe(threshold.value);
+      expect(parseThresholdValue(threshold.kind, formatThresholdInput(threshold, "pl"))).toBe(threshold.value);
     }
   });
 });

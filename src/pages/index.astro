@@ -1,9 +1,11 @@
 ---
 import MarketingLayout from "@/layouts/MarketingLayout.astro";
 import { buttonVariants } from "@/components/ui/button";
-import { copy } from "@/content/copy";
+import { getCopy } from "@/content/copy";
 import { cn } from "@/lib/utils";
 import { formatMonthYear } from "@/lib/format";
+
+const { copy, copyExtra } = getCopy(Astro.locals.locale);
 
 const l = copy.landing;
 const x = copy.landing;
@@ -45,9 +47,9 @@ const barHeights = ["32%", "49%", "41%", "65%", "54%", "72%", "88%", "62%"];
       <span class="absolute -right-10 -bottom-[120px] size-[290px] rounded-full border border-paper/15"></span>
       <div class="flex items-center justify-between text-xs text-paper/80">
         <span>{x.heroCardTop}</span>
-        <span>{formatMonthYear()}</span>
+        <span>{formatMonthYear(new Date(), Astro.locals.locale)}</span>
       </div>
-      <div class="mt-[35px] mb-2 text-[42px] font-bold tracking-[-0.06em]">3 842,60 zł</div>
+      <div class="mt-[35px] mb-2 text-[42px] font-bold tracking-[-0.06em]">{copyExtra.landing.heroAmount}</div>
       <div class="text-xs text-paper/60">{x.heroCardSub}</div>
       <div class="mt-[30px] flex h-[145px] items-end gap-[11px] border-b border-paper/15 px-3.5">
         {barHeights.map((h, i) => (
@@ -66,7 +68,7 @@ const barHeights = ["32%", "49%", "41%", "65%", "54%", "72%", "88%", "62%"];
   </section>
 
   <section class="pt-[30px] pb-[100px]">
-    <div class="mb-7 flex items-end justify-between">
+    <div class="mb-7 flex items-end justify-between max-[559px]:flex-col max-[559px]:items-start max-[559px]:gap-2">
       <div>
         <div class:list={eyebrow}>{x.stepsEyebrow}</div>
         <h2 class="mt-2.5 text-[38px] tracking-[-0.06em] max-[559px]:text-[31px]">{x.stepsTitle}</h2>

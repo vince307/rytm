@@ -1,17 +1,19 @@
 // Accessible label of the large occurrence sequence (kit `patternDetail` aria-label shape, decision 5): both counts
 // take the Polish plural forms, no trailing full stop. `within = count − over`.
 import { plural } from "@/lib/format";
+import type { Locale } from "@/lib/i18n";
 
 export function sequenceLabel(
   count: number,
   over: number,
   template: string,
   forms: readonly [string, string, string],
+  locale: Locale,
 ): string {
   const within = count - over;
   return template
     .replace("{within}", String(within))
-    .replace("{withinForms}", plural(within, forms))
+    .replace("{withinForms}", plural(within, forms, locale))
     .replace("{over}", String(over))
-    .replace("{overForms}", plural(over, forms));
+    .replace("{overForms}", plural(over, forms, locale));
 }

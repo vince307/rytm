@@ -2,6 +2,7 @@
 // month with no change"). One message per state: without a comparison month `changed` and `new` are necessarily empty
 // (S-06 D6), so `noChanges` / `noNew` would be a second, misleading message next to `noComparison`.
 import { formatSignedMoney } from "@/lib/format";
+import type { Locale } from "@/lib/i18n";
 import type { FixedOverview } from "@/lib/patterns/fixed";
 
 export interface FixedNotices {
@@ -22,6 +23,6 @@ export function fixedNotices(overview: FixedOverview): FixedNotices {
 }
 
 /** `+1,50 zł · wzrost` / `−5,00 zł · spadek` — the signed delta plus its word, so direction is not colour alone. */
-export function deltaText(deltaMinor: number, words: { increase: string; decrease: string }): string {
-  return `${formatSignedMoney(deltaMinor)} · ${deltaMinor > 0 ? words.increase : words.decrease}`;
+export function deltaText(deltaMinor: number, words: { increase: string; decrease: string }, locale: Locale): string {
+  return `${formatSignedMoney(deltaMinor, locale)} · ${deltaMinor > 0 ? words.increase : words.decrease}`;
 }

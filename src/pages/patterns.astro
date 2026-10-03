@@ -6,12 +6,14 @@ import ViewEmpty from "@/components/app/ViewEmpty.astro";
 import ExcludedPatterns from "@/components/patterns/ExcludedPatterns.astro";
 import { PatternsTable, type PatternRow, type PatternsTableCopy } from "@/components/patterns/PatternsTable";
 import { buttonVariants } from "@/components/ui/button";
-import { copy, copyExtra } from "@/content/copy";
+import { getCopy } from "@/content/copy";
 import { patternStatuses } from "@/lib/patterns/status";
 import { fixedOverview } from "@/lib/patterns/fixed";
 import { loadPatternData } from "@/lib/patterns/load";
 import { createClient } from "@/lib/supabase";
 import { listOverview } from "@/lib/patterns/view";
+
+const { copy, copyExtra } = getCopy(Astro.locals.locale);
 
 const e = copy.emptyViews;
 const x = copyExtra.patterns;
@@ -90,7 +92,7 @@ const tableCopy: PatternsTableCopy = {
           <InlineAlert kind={resultAlert.kind}>{resultAlert.message}</InlineAlert>
         </div>
       )}
-      <PatternsTable client:load patterns={visibleItems} copy={tableCopy} />
+      <PatternsTable client:load patterns={visibleItems} copy={tableCopy} locale={Astro.locals.locale} />
       <ExcludedPatterns patterns={excludedItems} />
     </>
   )}

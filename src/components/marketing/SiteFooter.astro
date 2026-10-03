@@ -1,5 +1,8 @@
 ---
-import { copy } from "@/content/copy";
+import { getCopy } from "@/content/copy";
+import LocaleSwitch from "@/components/LocaleSwitch.astro";
+
+const { copy, copyExtra } = getCopy(Astro.locals.locale);
 
 const f = copy.footer;
 const year = new Date().getFullYear();
@@ -19,5 +22,6 @@ const year = new Date().getFullYear();
     <a href="#" class="ml-[18px] text-muted no-underline max-[559px]:ml-0">
       {f.contact}
     </a>
+    <LocaleSwitch locale={Astro.locals.locale} labels={copyExtra.locale} class="ml-[18px] max-[559px]:ml-0" />
   </span>
 </footer>

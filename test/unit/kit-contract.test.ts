@@ -9,9 +9,11 @@ import { describe, expect, it } from "vitest";
 import { field, fieldBox, focusRing } from "@/components/app/field-styles";
 import { buttonVariants } from "@/components/ui/button";
 import { dialogContentClass } from "@/components/ui/dialog";
-import { copy, copyExtra } from "@/content/copy";
-import { DELETE_CONFIRM_WORD, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
+import { getCopy } from "@/content/copy";
+import { DELETE_CONFIRM_WORDS, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 import { MAX_DEBITS, MAX_FILE_BYTES } from "@/lib/import/schema";
+
+const { copy, copyExtra } = getCopy("pl");
 
 describe("kit contract (content.json as the app reads it)", () => {
   it("keeps the 4 authStates keys the login and reset pages read", () => {
@@ -113,8 +115,14 @@ describe("kit contract (content.json as the app reads it)", () => {
     ] as const) {
       expect(s[key].length, key).toBeGreaterThan(0);
     }
-    // The dialog's confirmation hint must name the word the server compares against.
-    expect(s.deleteConfirm).toContain(DELETE_CONFIRM_WORD);
+    // The dialog's confirmation hint must name the word the dialog compares against, in every locale.
+    for (const locale of ["pl", "en"] as const) {
+      const ls = getCopy(locale).copy.settings;
+      const word = DELETE_CONFIRM_WORDS[locale];
+      expect(ls.confirmation, locale).toContain(word);
+      expect(ls.deleteConfirm, locale).toContain(word);
+      expect(ls.deleteDisabledHelp, locale).toContain(word);
+    }
   });
 
   it("pins the shared field / focus / box classes and the round-3 dialog geometry (S-14 p4)", () => {

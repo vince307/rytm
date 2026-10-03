@@ -204,7 +204,7 @@ function storeCookies(response) {
   }
 }
 
-async function request(path, { method = "GET", form } = {}) {
+async function request(path, { method = "GET", form, headers } = {}) {
   const response = await fetch(BASE_URL + path, {
     method,
     redirect: "manual",
@@ -212,6 +212,7 @@ async function request(path, { method = "GET", form } = {}) {
       Cookie: cookieHeader(),
       Origin: BASE_URL,
       ...(form ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
+      ...headers,
     },
     body: form ? new URLSearchParams(form).toString() : undefined,
   });
@@ -223,6 +224,7 @@ async function request(path, { method = "GET", form } = {}) {
 
 const steps = [
   ["landing renders", () => request("/"), { status: 200, contains: "Zobacz swój rytm" }],
+  ["landing declares the page language", () => request("/"), { status: 200, contains: '<html lang="pl"' }],
   ["how-it-works renders", () => request("/how-it-works"), { status: 200, contains: ">Trzy spokojne kroki.<" }],
   ["for-who renders", () => request("/for-who"), { status: 200, contains: ">Rytm pasuje do Twojego tempa.<" }],
   ["landing footer links for-who", () => request("/"), { status: 200, contains: '>Dla kogo</a><a href="#"' }],
@@ -1239,6 +1241,69 @@ const steps = [
   ],
   ["patterns renders empty view", () => request("/patterns"), { status: 200, contains: "Wgraj pierwszy wyciąg" }],
   ["signout seeded user", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
+  // S-16 P5: the locale resolves from Accept-Language when no cookie is set (EN steps last; P6 appends the switch).
+  [
+    "first visit honours Accept-Language",
+    () => request("/", { headers: { "Accept-Language": "en-GB,en;q=0.9" } }),
+    { status: 200, contains: ['<html lang="en"', ">Rytm shows you that rhythm.<"] },
+  ],
+  // Composite: if red, rerun the three requests by hand before touching code (the step hides which one failed).
+  [
+    "signed-in view follows Accept-Language",
+    async () => {
+      const signin = await request("/api/auth/signin", { method: "POST", form: seeded });
+      if (signin.status !== 302) return signin;
+      const settings = await request("/settings", { headers: { "Accept-Language": "en-GB,en;q=0.9" } });
+      await request("/api/auth/signout", { method: "POST" });
+      return settings;
+    },
+    { status: 200, contains: ">Your account.<" },
+  ],
+  // S-16 P6: the language switch. Order matters (cookie jar); the last step returns the jar to Polish.
+  [
+    "locale switch rejects an unknown value",
+    () => request("/api/locale", { method: "POST", form: { locale: "xx" } }),
+    { status: 400 },
+  ],
+  [
+    "locale switch sets English",
+    () => request("/api/locale", { method: "POST", form: { locale: "en" } }),
+    { status: 303, location: "/" },
+  ],
+  [
+    "landing renders in English after the switch",
+    () => request("/"),
+    {
+      status: 200,
+      contains: ['<html lang="en"', ">Rytm shows you that rhythm.<", 'aria-pressed="true"', ">EN<"],
+    },
+  ],
+  ["English persists on the next page", () => request("/login"), { status: 200, contains: ">Log in<" }],
+  [
+    "locale switch returns to a same-origin page",
+    () =>
+      request("/api/locale", {
+        method: "POST",
+        form: { locale: "en" },
+        headers: { Referer: `${BASE_URL}/how-it-works` },
+      }),
+    { status: 303, location: "/how-it-works" },
+  ],
+  [
+    "locale switch ignores a foreign referer",
+    () =>
+      request("/api/locale", { method: "POST", form: { locale: "en" }, headers: { Referer: "https://example.com/x" } }),
+    { status: 303, location: "/" },
+  ],
+  [
+    "locale switch returns to Polish",
+    async () => {
+      const post = await request("/api/locale", { method: "POST", form: { locale: "pl" } });
+      if (post.status !== 303) return post;
+      return request("/");
+    },
+    { status: 200, contains: ['<html lang="pl"', "Zobacz swój rytm"] },
+  ],
 ];
 
 let failed = 0;

@@ -45,9 +45,9 @@ describe("fixedNotices", () => {
 describe("deltaText", () => {
   const words = { increase: "wzrost", decrease: "spadek" };
   it("suffixes a rise", () => {
-    expect(deltaText(150, words)).toBe("+1,50 zł · wzrost");
+    expect(deltaText(150, words, "pl")).toBe("+1,50 zł · wzrost");
   });
   it("suffixes a drop with U+2212", () => {
-    expect(deltaText(-500, words)).toBe("−5,00 zł · spadek");
+    expect(deltaText(-500, words, "pl")).toBe("−5,00 zł · spadek");
   });
 });

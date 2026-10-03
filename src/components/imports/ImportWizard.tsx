@@ -16,7 +16,7 @@ import { SubmitButton } from "@/components/auth/SubmitButton";
 import { Stepper } from "@/components/app/Stepper";
 import { Glyph } from "@/components/Glyph";
 import { usePageShowReset } from "@/components/hooks/usePageShowReset";
-import type { copy, copyExtra } from "@/content/copy";
+import type { CopyExtra, KitCopy } from "@/content/copy";
 import { buildPayload, readImportFile, type DetectResult, type FileError } from "@/lib/import/detect";
 import {
   accountDisplay,
@@ -27,11 +27,12 @@ import {
 } from "@/lib/import/presentation";
 import { MAX_DEBITS, MAX_FILE_BYTES, importPayloadSchema } from "@/lib/import/schema";
 import { formatRangeLong, formatRangeShort, plural } from "@/lib/format";
+import type { Locale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export interface ImportWizardLabels {
   flow: Pick<
-    typeof copy.importFlow,
+    KitCopy["importFlow"],
     | "title"
     | "steps"
     | "supported"
@@ -48,10 +49,10 @@ export interface ImportWizardLabels {
     debitForms: readonly [string, string, string];
   };
   /** Kit `imports` — step-1 copy, bank names, the recognised-format chip. */
-  kit: typeof copy.imports;
+  kit: KitCopy["imports"];
   /** `copyExtra.imports` — the K11 / K28 placeholders for wizard steps 2–3 (kit round 3 has no content.json keys for them). */
-  imports: typeof copyExtra.imports;
-  errors: typeof copy.importErrors;
+  imports: CopyExtra["imports"];
+  errors: KitCopy["importErrors"];
   /** `copyExtra.imports.saveError` (kit round 3 has the text only in `app.js`; K28 in design-kit.md) — a save that failed for a reason the user cannot act on. */
   genericError: string;
 }
@@ -71,6 +72,7 @@ export interface WizardServerError {
 
 interface Props {
   labels: ImportWizardLabels;
+  locale: Locale;
   /** The caller's own imports (RLS) — step 3 checks the chosen account's range against them. */
   existing: ExistingImport[];
   serverError?: WizardServerError;
@@ -148,7 +150,7 @@ function StepTitle({
   );
 }
 
-export default function ImportWizard({ labels, existing, serverError, demoLocked = false }: Props) {
+export default function ImportWizard({ labels, locale, existing, serverError, demoLocked = false }: Props) {
   const { flow, kit, imports: x, errors } = labels;
   const [step, setStep] = useState<Step>(1);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
@@ -227,7 +229,7 @@ export default function ImportWizard({ labels, existing, serverError, demoLocked
       <>
         {overlapBefore}
         <a href="/imports" className="underline">
-          {formatRangeLong(from, to)}
+          {formatRangeLong(from, to, locale)}
         </a>
         {overlapAfter} {x.overlapTail}
       </>
@@ -348,7 +350,7 @@ export default function ImportWizard({ labels, existing, serverError, demoLocked
         <StepTitle
           eyebrow={fillTemplate(x.stepEyebrow, { n: 2 })}
           title={x.accountTitle}
-          lead={fillTemplate(x.accountLead, { n, accounts: plural(n, x.accountForms) })}
+          lead={fillTemplate(x.accountLead, { n, accounts: plural(n, x.accountForms, locale) })}
           headingRef={headingRef}
         />
         <section className={cn(panel, "max-w-[700px]")}>
@@ -368,7 +370,7 @@ export default function ImportWizard({ labels, existing, serverError, demoLocked
                 <span className="min-w-0 flex-1">
                   <strong className="block text-sm">{accountDisplay(a.name, a.number)}</strong>
                   <small className="text-muted mt-1 block text-xs">
-                    {bankDisplayName(kit.bankName, bank)} · {a.rows} {plural(a.rows, x.transactionForms)}
+                    {bankDisplayName(kit.bankName, bank)} · {a.rows} {plural(a.rows, x.transactionForms, locale)}
                   </small>
                 </span>
                 {a.number === account && <b className="text-green text-[11px]">{x.selected}</b>}
@@ -429,8 +431,8 @@ export default function ImportWizard({ labels, existing, serverError, demoLocked
           {[
             [flow.bank, bankDisplayName(kit.bankName, bank)],
             [flow.accountLabel, accountDisplay(chosen.name, chosen.number)],
-            [flow.rangeLabel, formatRangeShort(period.start, period.end)],
-            [x.summary.debits, `${chosen.debits} ${plural(chosen.debits, x.transactionForms)}`],
+            [flow.rangeLabel, formatRangeShort(period.start, period.end, locale)],
+            [x.summary.debits, `${chosen.debits} ${plural(chosen.debits, x.transactionForms, locale)}`],
           ].map(([term, value]) => (
             <div key={term}>
               <dt className="text-muted mb-1.5 block text-xs">{term}</dt>
@@ -477,7 +479,10 @@ export default function ImportWizard({ labels, existing, serverError, demoLocked
                 {flow.back}
               </Button>
               <SubmitButton size="default" pendingText={flow.waiting} pending={submitting}>
-                {fillTemplate(flow.importButton, { n: chosen.debits, debits: plural(chosen.debits, flow.debitForms) })}
+                {fillTemplate(flow.importButton, {
+                  n: chosen.debits,
+                  debits: plural(chosen.debits, flow.debitForms, locale),
+                })}
               </SubmitButton>
             </div>
           </form>

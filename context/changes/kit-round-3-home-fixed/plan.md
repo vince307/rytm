@@ -686,13 +686,13 @@ departures and product-visible choices the maintainer may reverse are collected 
 
 #### Automated
 
-- [ ] 3.1 npm test: Phase 2 count + 1, 0 failed
-- [ ] 3.2 Smoke Phase 2 count + 2 PASS, 0 FAIL
-- [ ] 3.3 No copyExtra.home.noThreshold, hint prop or local infoPanel left
-- [ ] 3.4 Deliberate break: unconditional zeroNote turns the bar-names step red, restored, meta-check recorded
-- [ ] 3.5 Deliberate break: minimum back to 12 turns the trendBarHeight cases red, restored
-- [ ] 3.6 Deliberate break: chip shown with a threshold turns the over-limit-sum step red, restored
-- [ ] 3.7 Full local gate vs baseline, smoke + 3 cumulative
+- [x] 3.1 npm test: Phase 2 count + 1, 0 failed — bcf364a
+- [x] 3.2 Smoke Phase 2 count + 2 PASS, 0 FAIL — bcf364a
+- [x] 3.3 No copyExtra.home.noThreshold, hint prop or local infoPanel left — bcf364a
+- [x] 3.4 Deliberate break: unconditional zeroNote turns the bar-names step red, restored, meta-check recorded — bcf364a
+- [x] 3.5 Deliberate break: minimum back to 12 turns the trendBarHeight cases red, restored — bcf364a
+- [x] 3.6 Deliberate break: chip shown with a threshold turns the over-limit-sum step red, restored — bcf364a
+- [x] 3.7 Full local gate vs baseline, smoke + 3 cumulative — bcf364a
 
 #### Manual
 

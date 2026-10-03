@@ -1,7 +1,7 @@
 ---
 change_id: kit-round-3-home-fixed
 title: Przegląd, trend i koszty stałe według rundy 3 kitu
-status: planned
+status: plan_reviewed
 created: 2026-10-03
 updated: 2026-10-03
 archived_at: null

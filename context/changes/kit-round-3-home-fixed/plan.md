@@ -114,7 +114,7 @@ least one deliberate break with a meta-check, and runs the full local gate (`npm
 ## Critical Implementation Details
 
 **One text node per smoke-pinned string.** Every new string smoke asserts (`>Brak ustawionego progu<`, `>Cienka
-kreska oznacza 0,00 zł<`, `>Zobacz zmiany<`, `>1 koszt<`, `>+1,50 zł · wzrost<`, `>Brak poprzedniego miesiąca do
+kreska oznacza 0,00 zł<`, `>Zobacz zmiany<`, `>Podrożały<`, `>Nowe<` (kit `<span>` label), `>1 koszt<`, `>+1,50 zł · wzrost<`, `>Brak poprzedniego miesiąca do
 porównania.<`) must render as the only content of its element, built in a helper/expression so prettier never wraps
 it onto its own indented line (`deltaClass` precedent in `fixed.astro`). Keep „względem” out of every new `/home`
 string („home has no comparison with one month” is a `notContains: "względem"`).
@@ -123,6 +123,12 @@ string („home has no comparison with one month” is a `notContains: "względe
 throws, so a `try` around `detailTarget` … `sequenceLabel` does not swallow them. The `catch` must leave the page in
 the existing `readError` branch: set the error, and clear `pattern` / `detail` (make them `let`) so the actions
 dialog and the 404 status never render alongside the error; log with `console.error("pattern detail failed", …)`.
+(Plan review F2) `readError` is a `const` read by the 404 check and by the template (`readError !== null || pattern
+!== undefined`, `readError ? …`): add `let assemblyError: unknown = null` next to it and derive one `const pageError =
+readError ?? assemblyError` AFTER the `try`, used by the 404 check (moved below the `try`) and by both template
+conditions. Every binding the template reads that is now assigned inside the `try` (`target`, `pattern`, `detail`,
+`month`, `refMonth`, `monthOptions`, `sumLabel`, `overLabel`, `overCount`, `sequenceSummary`) is declared with `let`
+and its empty default above the `try`, so the catch leaves them at the defaults.
 
 **`/fixed` message rule (one message per state).** Pure helper `fixedNotices(overview)` →
 `{ noComparison: !hasComparison, noChanges: hasComparison && changed.length === 0, noNew: hasComparison &&
@@ -143,13 +149,22 @@ read-error copy, and one `monthIndex` serves both month parsers. No new UI compo
 
 #### 1. Shared month index
 
-**File**: `src/lib/format.ts`, `src/pages/home.astro`, `test/unit/format.test.ts`
+**File**: `src/lib/format.ts`, `src/pages/home.astro`, `test/unit/format.test.ts`; (F1) `src/pages/fixed.astro`,
+`src/pages/patterns/[...key].astro`, `src/content/copy.ts`, `test/unit/kit-contract.test.ts`
 
 **Intent**: Two parsers of `YYYY-MM` in two styles (research §5) become one.
 
 **Contract**: `export function monthIndex(yearMonth: string): number` (`"2026-05"` → 4); `fillMonthLocative` and
 `home.astro` use it; the local `monthIndex` in `home.astro` is deleted. New `format.test.ts` cases: January → 0,
 December → 11, and `fillMonthLocative` unchanged for „wrześniu” (we).
+
+(Plan review F1) Locatives from the kit: `copyExtra.patterns.monthsLocative` is byte-identical to
+`Object.values(copy.patternDetail.monthNames)` (the „we” lives in `fillMonthLocative`, not in the table). Its three
+readers (`src/pages/fixed.astro` „Nowe w {month}” title, `src/pages/patterns/[...key].astro` `sumLabel` /
+`overLabel`) pass `Object.values(copy.patternDetail.monthNames)` instead; delete the leaf (and the copy.ts comment
+citing it as a precedent); `test/unit/kit-contract.test.ts` „has a locative for each of the 12 months” pins
+`Object.values(copy.patternDetail.monthNames)` (length 12, `[8]` „wrześniu”). Same bytes → smoke „Nowe w maju” /
+„Suma w maju” unchanged.
 
 #### 2. `/fixed` error boundary and kit error copy
 
@@ -185,7 +200,7 @@ names the boundary.
 
 - `npm test`: baseline + the new `format.test.ts` cases, 0 failed
 - Smoke baseline PASS, 0 FAIL (Δ0 — no smoke step pins the `/fixed` error text)
-- `grep -n "const monthIndex" src/pages/home.astro` empty; `grep -n "sumLabel" src/pages/home.astro` empty
+- `grep -n "const monthIndex" src/pages/home.astro` empty; `grep -n "sumLabel" src/pages/home.astro` empty; `grep -rn "monthsLocative" src test` empty
 - Deliberate break: `throw` inside the new `fixed.astro` `try` → `GET /fixed` as the test user answers 200 with „Nie udało się wczytać kosztów stałych. Odśwież widok.”, not 500; restored; meta-check recorded (the throw sits in assembly, after the read — it proves the boundary, not `loadPatternData`'s own error path)
 - Deliberate break: `throw` inside the `[...key].astro` `try` → `GET /patterns/kawiarnia%20smoke` (or any existing key of the test user) answers 200 with `copy.components.error` and no actions dialog; restored
 - Deliberate break: `monthIndex` returns the month number unshifted → the new format cases and the „we wrześniu” case go red; restored
@@ -324,8 +339,9 @@ p-[13px] text-xs text-muted`), optional `class` merged with `cn`. The slot conte
 **Contract**: `trendBarHeight` minimum 8; doc comment updated; the unit case `[10, 1000, 12]` becomes `[10, 1000, 8]`
 (a value change of the same assertion, not a weaker one) plus one case at the boundary (`[80, 1000, 8]`).
 `home.astro` `barsFor` adds `name` per bar: `` `${label}: ${…}` `` with `copy.trend.amountLabel` (`{amount}`) for a
-non-zero bar and `copy.trend.zeroMarker` for a zero bar; passes `hasZero` (any bar 0) and `noThreshold`
-(`!trend.hasThreshold`) instead of `hint`.
+non-zero bar and `copy.trend.zeroMarker` for a zero bar; passes `zeroNote={hasZero ? h.zeroNote : undefined}` (any
+bar 0) and `noThreshold={!trend.hasThreshold ? copy.trend.noThreshold : undefined}` instead of `hint` — strings chosen
+by the page, `TrendChart` imports no copy (plan review F3).
 
 #### 3. Chart markup and legend
 
@@ -341,7 +357,7 @@ text-ink` (≤ 560 px `text-[9px]`, ≤ 360 px `text-[8px]`), keeping `whitespac
 reversed scroll (G35 decisions for long axes); legend dot `bg-muted`. Legend row: „suma ponad progiem”, then
 `zeroNote` with `ml-auto` (≤ 560 px `text-[10px]`) when given, then the `noThreshold` chip when given; `note`
 (`tooShort`) renders through `InfoPanel`. New leaf `copyExtra.home.zeroNote = "Cienka kreska oznacza 0,00 zł"` under
-`DESIGN-GAP: K39`; the chip reads `copy.trend.noThreshold` (no `title` tooltip — the kit's `title` literal has no
+`DESIGN-GAP: K39`; the chip text is the `noThreshold` prop = `copy.trend.noThreshold` (no `title` tooltip — the kit's `title` literal has no
 carrier, K39). Delete `copyExtra.home.noThreshold` and its G35 comment. Header comment: G35 bar-grey part closed
 (exact `--rytm-sequence` = muted), gridline stays `border-line`.
 
@@ -361,7 +377,7 @@ contains `aria-label="maj 26: 5,50 zł ponad próg"`, notContains `">Cienka kres
 
 - `npm test`: Phase 2 count + 1 (boundary case), 0 failed
 - Smoke Phase 2 count + 2 PASS, 0 FAIL
-- `grep -rn "noThreshold\|hint=" src/pages/home.astro src/content/copy.ts` shows only `copy.trend.noThreshold`; `grep -n "infoPanel" src/components/home/TrendChart.astro` empty
+- `grep -n "h\.noThreshold\|hint" src/pages/home.astro src/components/home/TrendChart.astro` empty; `grep -n "noThreshold:" src/content/copy.ts` empty; `grep -n "infoPanel\|@/content/copy" src/components/home/TrendChart.astro` empty
 - Deliberate break: `zeroNote` passed unconditionally → „home names each trend bar” red; restored; meta-check recorded (proves the condition, not the text)
 - Deliberate break: `trendBarHeight` minimum back to 12 → the `trendBarHeight` cases red; restored
 - Deliberate break: `noThreshold` chip shown when `hasThreshold` → „home shows the over-limit sum” red; restored
@@ -440,7 +456,7 @@ that state; if the „Nowe” section also reads „0 pozycji”, keep the needl
 
 - `npm test`: Phase 3 count + the `fixed-view.test.ts` cases, 0 failed
 - Smoke Phase 3 count PASS, 0 FAIL (Δ0 steps; four steps re-pinned)
-- `grep -rn "compact\|changedEmpty\|newEmpty\|x.noComparison\|x.eyebrow\|x.itemForms\|G34" src/pages/fixed.astro src/components/fixed/FixedSection.astro` empty (FixedRow's own `compact` stays)
+- `grep -rn "changedEmpty\|newEmpty\|x.noComparison\|x.eyebrow\|x.itemForms\|G34" src/pages/fixed.astro src/components/fixed/FixedSection.astro` empty and `grep -n "compact" src/components/fixed/FixedSection.astro` empty (`fixed.astro` keeps `<FixedRow … compact />` — FixedRow's own prop; plan review F4)
 - Deliberate break: `noChanges` ignores `hasComparison` → `fixed-view.test.ts` and smoke „fixed with one month lists no change” red; restored; meta-check recorded (smoke proves the page uses the helper, the unit test proves the rule incl. the state smoke never reaches)
 - Deliberate break: `deltaText` drops the suffix → `fixed-view.test.ts` and „fixed lists a changed amount” red; restored
 - Full local gate vs baseline, smoke + 3 (cumulative)
@@ -485,8 +501,7 @@ stop and file it in `follow-ups/review-fixes.md` with `Trigger: next slice touch
 equals any string leaf of `copy`, unless the path is in an explicit `ROLE_EXCEPTIONS` map `{ path: reason }`. Expected
 exceptions after P1–P5 (verify by running it; add none without a reason): `auth.saving` (`threshold.saving` — other
 component's namespace), `settings.close` (`patternActions.close*` / `imports.deleteClose`), `settings.deleting`
-(`imports.deleteWaiting`), `patterns.mergeSubmit` (`patternActions.mergeTitle` — h2 role), `patterns.monthsLocative.*`
-(K30, deliberate „we wrześniu” helper), `imports.transactionForms.2` (one form of a 3-form array; `importFlow.transactions`
+(`imports.deleteWaiting`), `patterns.mergeSubmit` (`patternActions.mergeTitle` — h2 role), `imports.transactionForms.2` (one form of a 3-form array; `importFlow.transactions`
 is a label). Any S-15 leaf that collides (e.g. a kit string „Nowe”) is rebound instead.
 
 #### 3. Gap register
@@ -497,7 +512,8 @@ is a label). Any S-15 leaf that collides (e.g. a kit string „Nowe”) is rebou
 K25 partial (genitive months only), K29 moot for the app (second card removed — row kept for the author), G34 closed
 (S-15: kit states adopted; `unchangedEmpty` moved to G39), G35 text updated (no `ImportPanel` border, no `noThreshold`
 placeholder; bar grey exact `--rytm-sequence`; gridline still raw), K11 home/fixed/app part updated, K18 note: `/home`
-keeps `components.error` (no kit dashboard error view). New rows (next free ids at plan time; renumber if taken): K38
+keeps `components.error` (no kit dashboard error view), K30 note: `patternDetail.monthNames` now read (values = locatives,
+keys = nominatives; `monthsLocative` deleted in P1, „we” still from `fillMonthLocative`). New rows (next free ids at plan time; renumber if taken): K38
 dashboard summary literals („Zobacz zmiany”, „Podrożały”, „Nowe”, hard-coded counts, no plural forms — app adds
 „kosztów”); K39 trend legend literals („Cienka kreska oznacza 0,00 zł”, „Brak progu” + its `title`, group label
 „Miesięczna suma ponad progiem”) vs `trend.noThreshold` / `gridLabel`, legend `.dot` raw `#9aaab3`; K40 `/fixed` delta
@@ -577,6 +593,9 @@ any rebind from item 1 that had to be deferred.
 - `>0 pozycji<` / `>1 koszt<` needles can match more than one element; each step pairs them with a negative needle
   (`>0 kosztów<`, the old texts) so the step still discriminates.
 - The read-error states cannot be produced by smoke; the deliberate breaks in P1 prove them once.
+- (Plan review F6) The P5 leaf-reader grep keys on leaf names; generic names (`link`, `added`, `delta`, `increase`)
+  match unrelated code. Grep the access tail (`fixedSummary.link`, `delta.increase`, or the destructured name inside a
+  file that imports `copyExtra`), not the bare name, and say which leaves needed a manual check.
 
 ## Performance Considerations
 
@@ -606,7 +625,7 @@ departures and product-visible choices the maintainer may reverse are collected 
 | 9 | Nominative months | Derived from `Object.keys(copy.patternDetail.monthNames)` + kit-contract pin | Keep `copyExtra.home.monthsNominative` | The kit holds the 12 nominatives; the milestone audit requires no kit-equivalent leaf | Kit reshapes `monthNames` → pin fails, restore the `copyExtra` table with a K row |
 | 10 | Byte-identical leaves outside S-15 | Rebind in P5 (`imports.debitForms`, `imports.santanderAccountName`, `auth.resetNewVisual.eyebrow/title`) | File as follow-ups | Zero visible change; the milestone-closing audit asks for them fixed or filed — fixing is cheaper than tracking | A rebind needs more than one prop change → follow-up with `Trigger:` |
 | 11 | Audit durability | Unit guard over `copyExtra` vs `copy` string leaves with a reasoned `ROLE_EXCEPTIONS` map | One-off manual audit | A future duplicate fails CI | — |
-| 12 | Role exceptions | Keep `auth.saving`, `settings.close/deleting`, `patterns.mergeSubmit`, `patterns.monthsLocative`, `imports.transactionForms[2]` | Bind across namespaces | A view reading another component's key couples it to wording the author may change for that component | Kit adds shared `components.*` keys |
+| 12 | Role exceptions | Keep `auth.saving`, `settings.close/deleting`, `patterns.mergeSubmit`, `imports.transactionForms[2]` (`patterns.monthsLocative` rebound in P1 — plan review F1) | Bind across namespaces | A view reading another component's key couples it to wording the author may change for that component | Kit adds shared `components.*` keys |
 | 13 | `PanelTitle` reach | `/home` panels + `FixedSection` | All six call sites | One view + global tokens; other views stay untouched | Next slice touching settings / pattern detail |
 | 14 | Bar names | `role="img"` + aria-label per bar (`amountLabel` / `zeroMarker`), list named `trend.gridLabel` | No names; the kit's literal group label | Kit markup; key over literal | Screen-reader test showing duplicated reading is worse |
 | 15 | `/fixed` read error | Alert only, no sections | Kit sample sections under the alert | Rows from failed data would be invented (K18 precedent) | Kit draws an explicit error layout |
@@ -637,7 +656,7 @@ departures and product-visible choices the maintainer may reverse are collected 
 
 - [ ] 1.1 npm test: baseline plus new format cases, 0 failed
 - [ ] 1.2 Smoke baseline PASS, 0 FAIL, Δ0
-- [ ] 1.3 No local monthIndex and no sumLabel comment left in home.astro
+- [ ] 1.3 No local monthIndex and no sumLabel comment left in home.astro; no monthsLocative leaf or reader left
 - [ ] 1.4 Deliberate break: throw in the fixed.astro try renders readError with 200, not 500, restored, meta-check recorded
 - [ ] 1.5 Deliberate break: throw in the [...key].astro try renders components.error with 200 and no dialog, restored
 - [ ] 1.6 Deliberate break: unshifted monthIndex turns the format cases red, restored

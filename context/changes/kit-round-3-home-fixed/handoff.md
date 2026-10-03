@@ -1,80 +1,73 @@
 # Handoff — `kit-round-3-home-fixed` (slice S-15)
 
-Written by the `/10x-plan` step of autonomous run `2026-10-02-kit-round-3`. `plan.md` (5 phases, 42 Progress rows) and
-`plan-brief.md` are on disk; no code touched. The next agent must not get wrong: the plan departs from NO PRD clause
-(the PRD names neither the removed `/home` total nor the import panel) — every kit departure and product-visible
-choice is gathered in `[human]` row 5.11, and `/fixed` deliberately shows ONE message per state (no comparison →
-only `fixedCosts.noComparison`), which is a plan decision, not a kit literal.
+Written by the `/10x-plan-review` step of autonomous run `2026-10-02-kit-round-3`. Verdict PROCEED (SOUND after fixes):
+four warnings fixed in `plan.md`, no phase resized, no code touched. The next agent must not get wrong: Phase 1 now ALSO
+rebinds `copyExtra.patterns.monthsLocative` to `Object.values(copy.patternDetail.monthNames)` (plan review F1) and the
+`[...key].astro` `try` follows the hoisted-`let` / `pageError` contract in Critical Implementation Details (F2).
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-home-fixed`, cut from `main` at `1bf6a5c` (after S-14) |
-| Commits | 3 — `… change identity (autonomous run)`, `… research`, `docs(kit-round-3-home-fixed): plan` |
+| Commits | 4 — `… change identity`, `… research`, `… plan`, `docs(kit-round-3-home-fixed): plan review` |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `planned` (set by `metadata-guard.mjs mark-planned`) |
-| `## Progress` rows remaining | 42 (`grep -c '^- \[ \]' plan.md`) |
+| `change.md` status | `plan_reviewed` |
+| `## Progress` rows remaining | 42 (`grep -c '^- \[ \]' plan.md`; unchanged — row 1.3 title extended) |
 | Working tree | clean after the commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/kit-round-3-home-fixed/plan.md` | Full plan: current state, desired end state, 5 phases (Intent/Contract per change, automated + manual criteria, deliberate breaks), testing strategy, known risks, 17 autonomous decisions, `## Progress` |
-| `context/changes/kit-round-3-home-fixed/plan-brief.md` | Two-page brief (key decisions, phases at a glance) |
-| `context/changes/kit-round-3-home-fixed/change.md` | frontmatter `status: preparing → planned` |
-| `context/foundation/roadmap.md` | S-15 `Status` → `planning` (At a glance + slice body) |
+| `context/changes/kit-round-3-home-fixed/reviews/plan-review.md` | Review report: 0 critical, 4 warnings (F1–F4, fixed), 3 observations (F5 recorded, F6/F7 fixed); ends `VERDICT: PROCEED — …` |
+| `context/changes/kit-round-3-home-fixed/plan.md` | Triage edits: P1 §1 locatives rebind + files + criterion/Progress 1.3 (F1); Critical Implementation Details `[...key].astro` `try` contract (F2); P3 §2/§3 string props + criterion 3.3 grep (F3); P4 criterion 4.3 grep (F4); one-text-node list adds `>Podrożały<` / `>Nowe<` (F7); Known risks leaf-grep note (F6); P5 §2 `ROLE_EXCEPTIONS`, §3 K30 note, decision 12 (F1) |
+| `context/changes/kit-round-3-home-fixed/change.md` | `status: planned → plan_reviewed` |
 | `context/changes/kit-round-3-home-fixed/handoff.md` | this file |
 
 ## 3. Verification
 
 | Command | Result |
 | --- | --- |
-| Success Criteria ↔ Progress mapping (awk count per phase) | P1 7+1, P2 6+2, P3 7+1, P4 6+1, P5 7+4 = 42 rows, one-to-one |
-| `metadata-guard.mjs mark-planned` | `{"changed":true}` |
-| `copyExtra` vs `content.json` byte-identical scan (node, read-only) | 33 colliding leaves today; plan removes or rebinds all but the 6 role exceptions listed in P5 item 2 |
+| `git branch --show-current` | `feat/kit-round-3-home-fixed` |
+| `ls -l` of 9 plan paths; grep of named symbols | all present; new files absent as expected |
+| `node` read of `content.json` keys the plan binds | every key exists with the plan's text; `patternDetail.monthNames` keys = nominatives, values = locatives |
+| esbuild-bundled `copy.ts` collision scan (read-only, `$TMPDIR`) | 33 colliding leaves today; after P1–P5 only the 5 role exceptions; new S-15 literals collide with nothing |
+| `grep -c '^- \[ \]' plan.md` | 42 (before and after edits) |
+| Follow-up trigger grep (`context/archive/*/follow-ups/review-fixes.md`) | every `Trigger: S-15` item and every met condition included or justified moot |
 
-Docs-only step: no suite run (nothing in `src/`, `scripts/`, `supabase/`, `test/` changed). Baseline for the
-implement steps (inherited, unverified here): `main` at `1bf6a5c` — lint 0; astro check 0 / 162 files; fixture OK;
-vitest 375 / 26 files; build OK; pgTAP 119 PASS; smoke 192 / 0. Each phase measures it on the branch first.
+Docs-only step: no suite run (no change in `src/`, `scripts/`, `supabase/`, `test/`). Baseline for implement (inherited,
+unverified here): `main` at `1bf6a5c` — lint 0; astro check 0 / 162 files; fixture OK; vitest 375 / 26 files; build OK;
+pgTAP 119 PASS; smoke 192 / 0. Each phase measures it on the branch first.
 
 ## 4. Next command
 
-`/10x-plan-review kit-round-3-home-fixed`
+`/10x-implement kit-round-3-home-fixed phase 1`
 
 ## 5. Open
 
-- Phases: P1 error boundaries + `monthIndex` (`src/pages/fixed.astro`, `src/pages/patterns/[...key].astro`,
-  `src/lib/format.ts`); P2 dashboard body (`PanelTitle.astro`, `FixedSummary.astro`, `HomeStats.fixedNew`, delete
-  `ImportPanel.astro`); P3 trend (`InfoPanel.astro`, `trendBarHeight` 8 %, `TrendChart` chips/names); P4 `/fixed`
-  (`src/lib/patterns/fixed-view.ts` `fixedNotices` / `deltaText`, `FixedSection`); P5 audit + guard in
-  `test/unit/kit-contract.test.ts`, 3 rebinds outside S-15, register K38–K41 / G39, follow-ups file, visual gate.
-- Smoke: + 3 steps net (P2 lead step, P3 two trend steps); re-pins listed by step name in each phase.
-- Manual rows (human checklist): 1.8, 2.7, 3.8, 4.7, 5.8 `[reviewer]`; 2.8, 5.9, 5.10 `[visual]`; 5.11 `[human]`
-  (removed total and import panel, rises-only „Podrożały”, one-offs in „Nowe”, chip key text + removed hint panel,
-  min bar 12 → 8 %, conditional zero note, one `/fixed` message without comparison, „kosztów” form; K38–K41, G39 to the
-  kit author).
-- Plan-review attention points: `>0 pozycji<` / `>1 koszt<` needle uniqueness (P2/P4 smoke); `Object.keys(monthNames)`
-  order dependence (P2); the `ROLE_EXCEPTIONS` list must be confirmed by running the guard (P5); register ids K38–K41 /
-  G39 are "next free at plan time".
-- No migration. No `DESIGN-GAP` added in this step (P2–P4 add K38–K40, G39 comments).
+- Phase 1 scope (after review): `monthIndex` in `src/lib/format.ts` (`fillMonthLocative`, `home.astro`); `fixed.astro` `try` +
+  `fixedCosts.readError`; `[...key].astro` `try` with `assemblyError` / `pageError` and hoisted `let`s; F9 comment in `home.astro`
+  `leadFor`; locatives from `copy.patternDetail.monthNames` (delete `copyExtra.patterns.monthsLocative`, re-pin
+  `kit-contract.test.ts` „has a locative for each of the 12 months”).
+- Manual rows (human checklist): 1.8, 2.7, 3.8, 4.7, 5.8 `[reviewer]`; 2.8, 5.9, 5.10 `[visual]`; 5.11 `[human]` (removed `/home`
+  total and import panel, rises-only „Podrożały”, one-offs in „Nowe”, chip key text + removed hint panel, min bar 12 → 8 %,
+  conditional zero note, one `/fixed` message without comparison, „kosztów” form; K38–K41, G39 to the kit author).
+- Carried risks: `plan.md` § Known risks (no page render test; `Object.keys` order pinned by kit-contract; repeated
+  `>0 pozycji<` / `>1 koszt<` needles; read errors only via deliberate breaks; P5 leaf-reader grep must key on access tails).
+- No migration. No `DESIGN-GAP` added in this step.
 
 ## 6. Autonomous decisions
 
-1. **0 questions, MEDIUM complexity.** Chosen: decide every open point from research. Rejected: interview. Why: run
-   contract rule 1; research gave a recommendation for each. Would change: a product owner available.
-2. **`/fixed` one message per state; empty sections drop their list panel; `unchangedEmpty` joins the after-sections
-   block** (plan decisions 6–7). Rejected: kit-literal both messages / in-section lines. Why: a „no change” line without
-   a comparison month misleads; the kit never draws an empty list panel. Would change: visual gate or a kit state.
-3. **Nominative months derived from `copy.patternDetail.monthNames` keys** (decision 9). Rejected: keep
-   `copyExtra.home.monthsNominative`. Why: the milestone audit requires no leaf with a kit equivalent. Would change: the
-   kit reshaping `monthNames`.
-4. **Byte-identical leaves outside S-15 rebound in P5, not filed** (decision 10). Why: zero visible change. Would
-   change: a rebind needing more than one prop → follow-up with `Trigger:`.
-5. **Durable audit as a unit guard with reasoned `ROLE_EXCEPTIONS`** (decisions 11–12). Rejected: one-off manual audit;
-   binding role-different keys across namespaces. Would change: kit adding shared `components.*` keys.
-6. **Research recommendations adopted as-is**: card + total removed (`fixedTotalMinor` dropped), import panel removed,
-   „Podrożały” rises only, legend chips conditional with `trend.noThreshold`, min bar 8 %, `PanelTitle` narrow reach,
-   no sections under a `/fixed` error. Each is listed with its reversal condition in `plan.md` § Autonomous decisions;
-   the product-visible ones sit on `[human]` row 5.11.
+1. **Verified the risky claims inline instead of spawning the skill's sub-agent.** Why: the claims were few and file-local
+   (`[...key].astro`, `copy.ts` collisions, smoke data); reading them directly was cheaper and gave file evidence. Would change:
+   a plan with wide blast radius across modules.
+2. **F1: rebind `monthsLocative` in P1, not keep it as a role exception.** Rejected: correct only the exception's reason. Why: it
+   is byte-identical to the kit and decision 9 already derives nominatives from the same object; P1 touches all three readers.
+   Would change: the kit changing `monthNames` values away from plain locatives.
+3. **F2 fixed with `assemblyError` + `pageError` and hoisted `let`s.** Rejected: an IIFE returning a result object (redirect
+   `return`s inside it would not leave the page). Would change: a refactor of the page into a pure assembly helper.
+4. **No phase split/merge (F5).** Why: `[visual]`/`[reviewer]` rows belong to the visual-gate and impl-review steps; P2/P5
+   implement work is small per item. Would change: an implement step returning `NEEDS_CONTINUATION` on P2 or P5.
+5. **No product decision overturned.** Why: FR-011/012/013 figures unchanged; removals are PRD-silent and already on `[human]`
+   5.11. Would change: maintainer feedback on 5.11.

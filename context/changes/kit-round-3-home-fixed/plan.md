@@ -654,13 +654,13 @@ departures and product-visible choices the maintainer may reverse are collected 
 
 #### Automated
 
-- [x] 1.1 npm test: baseline plus new format cases, 0 failed
-- [x] 1.2 Smoke baseline PASS, 0 FAIL, Δ0
-- [x] 1.3 No local monthIndex and no sumLabel comment left in home.astro; no monthsLocative leaf or reader left
-- [x] 1.4 Deliberate break: throw in the fixed.astro try renders readError with 200, not 500, restored, meta-check recorded
-- [x] 1.5 Deliberate break: throw in the [...key].astro try renders components.error with 200 and no dialog, restored
-- [x] 1.6 Deliberate break: unshifted monthIndex turns the format cases red, restored
-- [x] 1.7 Full local gate vs baseline, smoke Δ0
+- [x] 1.1 npm test: baseline plus new format cases, 0 failed — 6108b70
+- [x] 1.2 Smoke baseline PASS, 0 FAIL, Δ0 — 6108b70
+- [x] 1.3 No local monthIndex and no sumLabel comment left in home.astro; no monthsLocative leaf or reader left — 6108b70
+- [x] 1.4 Deliberate break: throw in the fixed.astro try renders readError with 200, not 500, restored, meta-check recorded — 6108b70
+- [x] 1.5 Deliberate break: throw in the [...key].astro try renders components.error with 200 and no dialog, restored — 6108b70
+- [x] 1.6 Deliberate break: unshifted monthIndex turns the format cases red, restored — 6108b70
+- [x] 1.7 Full local gate vs baseline, smoke Δ0 — 6108b70
 
 #### Manual
 

@@ -12,7 +12,7 @@ pins (pixels belong to visual rows 8.6 / 8.7), and `ui/` now imports `focusRing`
 | Commits | `5956c76 (p1)`, `8518cde (p2)`, `4eb395d (p3)`, `cab9aca feat(kit-round-3-patterns): … (p4)` + handoff commits |
 | Pushed / PR / merged | no / no / no |
 | `change.md` status | `implementing` |
-| `## Progress` rows remaining | 34 (`grep -c '^- \[ \]' plan.md`); 4.1-4.6 ticked with `cab9aca`; 4.7 `[reviewer]` open |
+| `## Progress` rows remaining | 33 (`grep -c '^- \[ \]' plan.md`); 4.1-4.6 ticked with `cab9aca`; 4.7 `[reviewer]` open |
 | Working tree | clean after the handoff commit (`tree-clean.sh`) |
 
 ## 2. Artifacts

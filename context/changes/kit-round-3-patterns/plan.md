@@ -727,12 +727,12 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Automated
 
-- [x] 1.1 npm test: baseline minus table-columns cases plus render cases, 0 failed
-- [x] 1.2 Smoke baseline PASS, 0 FAIL, Δ0
-- [x] 1.3 No tableHeaders / table-columns left; no reader for deleted copyExtra.patterns leaves
-- [x] 1.4 Deliberate break: Kwota/Suma cells swapped back turns the render test red, restored, meta-check recorded
-- [x] 1.5 Deliberate break: throw inside the try renders components.error with 200, not 500, restored
-- [x] 1.6 Full local gate vs baseline, smoke Δ0
+- [x] 1.1 npm test: baseline minus table-columns cases plus render cases, 0 failed — 5956c76
+- [x] 1.2 Smoke baseline PASS, 0 FAIL, Δ0 — 5956c76
+- [x] 1.3 No tableHeaders / table-columns left; no reader for deleted copyExtra.patterns leaves — 5956c76
+- [x] 1.4 Deliberate break: Kwota/Suma cells swapped back turns the render test red, restored, meta-check recorded — 5956c76
+- [x] 1.5 Deliberate break: throw inside the try renders components.error with 200, not 500, restored — 5956c76
+- [x] 1.6 Full local gate vs baseline, smoke Δ0 — 5956c76
 
 #### Manual
 

@@ -1,76 +1,65 @@
 # Handoff — `kit-round-3-patterns` (slice S-14)
 
-Written by the `/10x-plan-review` step of autonomous run `2026-10-02-kit-round-3`. Verdict PROCEED; `plan.md` now has
-**8** phases (the dialog geometry moved into Phase 4) with 56 Progress rows; next is implement phase 1. The one thing
-not to get wrong: „Pokaż więcej” slices **after** filter and sort (`listView` in `src/lib/patterns/list-view.ts`), the
-count line counts the whole filtered list, and its smoke step sits where `/patterns` shows exactly 2 rows (deliberate
-break = page size 1, not 3).
+Written by the `/10x-implement … phase 1` step of autonomous run `2026-10-02-kit-round-3`. Phase 1 is committed
+(`5956c76`); next is phase 2. The one thing not to get wrong: `PatternsTable` now reads `copy.columns` directly, so
+the Kwota cell precedes Suma in the body — keep that order when adding the badge in „Ponad progiem” (P2).
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-patterns`, cut from `main` at `5ed97f4` |
-| Commits | 4 on the branch after this step (`… change identity`, `… research`, `… plan`, `docs(kit-round-3-patterns): plan review`) |
+| Commits | 5 + handoff commit: `5956c76 feat(kit-round-3-patterns): … (p1)` on top of the 4 docs commits |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `plan_reviewed` |
-| `## Progress` rows remaining | 56 of 56 (`grep -c '^- \[ \]' plan.md`) |
-| Working tree | clean after the commit (`tree-clean.sh`) |
+| `change.md` status | `implementing` |
+| `## Progress` rows remaining | 50 of 56 (`grep -c '^- \[ \]' plan.md`); 1.1–1.6 ticked with `5956c76`, 1.7 `[reviewer]` left open |
+| Working tree | clean after the handoff commit (`tree-clean.sh`) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/kit-round-3-patterns/reviews/plan-review.md` | Review report: 0 critical, 3 warnings (all fixed), 3 observations; ends `VERDICT: PROCEED — …` |
-| `context/changes/kit-round-3-patterns/plan.md` | F1: P3 smoke step placement + page-size-1 break, Current State smoke bullet, decision 2, Known risks; F2: old P8 merged into P4 (`#### 4. Dialog geometry and close glyph`, rows 4.5–4.7), old P9 → Phase 8 (rows 8.1–8.9), Implementation Approach, decision 16; F3: S-01 F9 close glyph on `Glyph` in P4 §4; F4: `patternActions.lead` added to `[human]` row 8.9, decision 7 |
-| `context/changes/kit-round-3-patterns/plan-brief.md` | Phase table and counts updated to 8 phases, `[human]` row 8.9 |
-| `context/changes/kit-round-3-patterns/change.md` | `status: plan_reviewed` |
-| `context/changes/kit-round-3-patterns/handoff.md` | This file |
+| `src/components/patterns/PatternsTable.tsx` | headers map `copy.columns`; Kwota cell before Suma; `patternForms` typed `readonly string[]` |
+| `src/lib/patterns/table-columns.ts`, `test/unit/table-columns.test.ts` | deleted (`tableHeaders` gone) |
+| `src/lib/format.ts` | `plural` accepts `readonly string[]` (kit `countForms` is `string[]` from JSON) |
+| `src/pages/patterns.astro` | `listOverview` inside `try` → `{ error }` → existing `copy.components.error` branch; eyebrow = `copy.app.patternsLong`; `patternForms` = `copy.patterns.countForms` |
+| `src/components/patterns/ExcludedPatterns.astro` | toggle = `copy.patterns.excluded`, forms = `copy.patterns.countForms`; `copyExtra` import dropped |
+| `src/content/copy.ts` | deleted `copyExtra.patterns` leaves `eyebrow`, `patternForms`, `excludedToggle` |
+| `test/unit/patterns-table.test.ts` | new: `renderToStaticMarkup` of `PatternsTable` — header order, Kwota before Suma |
+| `test/unit/kit-contract.test.ts` | column test rewritten without `tableHeaders` (Kwota idx 3, Suma idx 4) |
+| `context/changes/kit-round-3-patterns/{plan,change,handoff}.md` | Progress 1.1–1.6, status `implementing`, this file |
 
 ## 3. Verification
 
 | Command | Result |
 | --- | --- |
-| `git branch --show-current` | `feat/kit-round-3-patterns` |
-| Progress ↔ Success Criteria (python over `plan.md`) | 1:1 for all 8 phases (automated 6/5/6/6/6/5/6/5, manual 1×7 + 4); one `## Progress`; no checkboxes outside it |
-| Grounding | 11/11 paths exist; `fixedOverview(patterns, rows)` signature and new-wins confirmed in `src/lib/patterns/fixed.ts`; `focusRing` classes byte-identical in `button.tsx` / `BackLink.astro` / `PatternsTable.tsx` / `dialog.tsx`; `--rytm-badge-soft` and `--rytm-focus-ring` in `brand.css` + prototype `styles.css`; kit copy strings match the plan's smoke needles; no smoke assertion pins an old `copyExtra.patterns` string |
-| Smoke data check (`scripts/smoke.mjs`) | `/patterns` requests before the merge run on `importPayload` only (Sklep + Kawiarnia = 2 rows); `importPayloadJune` is posted after the merge — basis of F1 |
-| Code suites (lint, astro check, vitest, build, pgTAP, smoke) | not run: review only, no code changed. Baseline inherited, unverified: `main` at `5ed97f4`, vitest 354, pgTAP 119, smoke 184 PASS. Each implement phase measures it on the branch |
+| `npm run lint` | 0 errors (after fixing prettier/type-assertion in the new test) |
+| `npx astro check` | 0 errors (baseline 157 files; branch run reports 156 files: −`table-columns` +…; hints 3) |
+| `npm run fixture:check` | ing OK, santander OK |
+| `npm test` | 355 passed / 23 files (baseline 354 / 23: −1 `table-columns` case, +2 render cases) |
+| `npm run build` | OK |
+| `npx supabase db reset && test db` | Files=6, Tests=119 PASS (Δ0) |
+| `npm run smoke` on 4398 | 184 PASS / 0 FAIL (baseline 184, Δ0) |
+| Break 1: Kwota/Suma cells swapped back | `patterns-table.test.ts` red (1 failed), restored with `git checkout --`. Meta: smoke stays green on that break (props carry kit-order labels), which is why the render test exists |
+| Break 2: `throw` inside the `try` (`?boom=1`) | `GET /patterns` 200 with „Nie udało się wczytać danych…”, plain `/patterns` has no error text; restored. Meta: before this phase the IIFE had no `try`, so the same throw was a 500 (not re-run on old code) |
 
 ## 4. Next command
 
-`/10x-implement kit-round-3-patterns phase 1`
+`/10x-implement kit-round-3-patterns phase 2`
 
 ## 5. Open
 
-- Phases: P1 columns + list copy + `try` · P2 status badges · P3 „Pokaż więcej” · P4 toolbar field + `focusRing` /
-  `fieldBox` + `DialogContent` geometry (`dialogContentClass`) + close `Glyph` · P5 detail copy + sequence label · P6
-  detail states + merged variants · P7 dialog + rename (F5) + result lines · P8 register + seam sweep + visual gate.
-- Manual-only Progress rows: `[reviewer]` 1.7, 2.6, 3.7, 4.7, 5.7, 6.6, 7.7, 8.8; `[visual]` 8.6 (every pattern
-  state), 8.7 (imports / settings dialogs, `/fixed` badge, focus ring); `[human]` 8.9 (product-visible choices incl.
-  `patternActions.lead` reading, send K35–K37 to the kit author).
-- Register rows to add during implement: K35 (P5), K36 (P5), K37 (P6); G33 narrowed (P7); closures in P8.
-- Smoke delta + 8 (+ 9 if P6 finds a no-occurrences merchant). Paging beyond „no button on a short list” is not
-  smoke-provable (≤ 2 rows) — unit/render tests + visual row 8.6 (plan Known risks).
-- Observations for implementers (`reviews/plan-review.md` F5, F6): keep the badge tint on the prototype token
-  (`bg-excess/18`), not `brand.css` `#EFE4D1`; keep „—” in Kwota when `fixedAmountMinor` is null (kit's sum fallback is demo data).
-- Carried, out of scope: S-05 F6 (`validateMerge` excluded source), F7 (`unmerge` scoping), `fixed.astro` `try`
-  (S-15), Panel radius 20 vs 12. P8 files them in `follow-ups/review-fixes.md` with `Trigger:` lines.
-- No `DESIGN-GAP` added in this step.
+- Manual-only rows, not mine: `[reviewer]` 1.7, 2.6, 3.7, 4.7, 5.7, 6.6, 7.7, 8.8; `[visual]` 8.6, 8.7; `[human]` 8.9.
+- `DESIGN-GAP: G28` header in `PatternsTable.tsx` kept (badges P2; „Pokaż więcej” clause goes with P3).
+- `plural` signature widened in `src/lib/format.ts` (not in the plan; needed for kit `countForms`). Reviewer may prefer a typed tuple cast in `copy.ts` instead.
+- Roadmap `S-14` status not touched (orchestrator-owned); no `DESIGN-GAP` added; no register rows due in P1.
+- Carried from plan review: keep the badge tint on `bg-excess/18`; keep „—” in Kwota when `fixedAmountMinor` is null; K35–K37 register rows in P5/P6, G33 in P7.
 
 ## 6. Autonomous decisions
 
-1. **Merge old Phase 8 (dialog geometry) into Phase 4.** Rejected: keep 9 phases. Why: ~5 lines of class strings,
-   smoke Δ0, `dialog.tsx` already edited in P4, screenshots happen in the final phase anyway — a separate fresh agent
-   + full gate buys nothing. What would change it: P4's implementer running out of context (then split §4 back out).
-2. **No other merges.** P1–P3 each carry their own deliberate breaks on `PatternsTable`; P5/P6 and P7 are each a
-   full agent's work. What would change it: an implement phase finishing far under budget, suggesting coarser phases
-   for S-15.
-3. **S-01 F9 included, not deferred.** Its trigger names the dialog-geometry change; zero-visual swap to `Glyph`.
-   What would change it: `Glyph` markup diverging from the inline svg (visual row 8.7 would show it).
-4. **`patternActions.lead` not overturned, but put on the `[human]` row.** The detail page is where decisions are
-   reversed; the kit wording is acceptable. What would change it: the maintainer rejecting the reading → `copyExtra`
-   wording with a gap row.
-5. **Verdict PROCEED, not RETHINK.** Approach (presentation-only rebind, pure helpers, render tests) is sound and
-   PRD-consistent; FR-011 untouched by paging and badges. What would change it: nothing found in the code.
+1. **Execution mode: in this context** (skill asks delegate vs in-context). Rejected: subagent — phase is small. Would change if a phase exceeds context budget.
+2. **Widened `plural` and `PatternsTableCopy.patternForms` to `readonly string[]`** rather than casting at each call site. Rejected: `as unknown as` casts in three places. Would change if the reviewer wants kit JSON typed as tuples in `copy.ts`.
+3. **Commit message approved as drafted** (Polish subject per contract). Would change nothing.
+4. **Roadmap not flipped to `in-progress`**: the At-a-glance status is `planning` and orchestrator manages ship-time status. Would change if the verifier greps roadmap status.
+5. **Smoke run twice** (second only to count PASS lines): both 184 PASS; local DB accrues extra users, harmless.
 6. **No step asked the user** (run contract rule 1).

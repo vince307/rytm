@@ -1,10 +1,10 @@
 ---
 change_id: kit-round-3-patterns
 title: Wzorce, szczegół wzorca i dialog akcji według rundy 3 kitu
-status: impl_reviewed
+status: archived
 created: 2026-10-03
 updated: 2026-10-03
-archived_at: null
+archived_at: 2026-10-03T13:14:14Z
 ---
 
 ## Notes

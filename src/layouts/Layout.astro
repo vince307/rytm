@@ -15,7 +15,7 @@ const ogImage = new URL("/rytm/social/rytm-og-1200x630.png", Astro.url.origin).t
 ---
 
 <!doctype html>
-<html lang="pl">
+<html lang={Astro.locals.locale}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

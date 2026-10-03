@@ -223,6 +223,7 @@ async function request(path, { method = "GET", form } = {}) {
 
 const steps = [
   ["landing renders", () => request("/"), { status: 200, contains: "Zobacz swój rytm" }],
+  ["landing declares the page language", () => request("/"), { status: 200, contains: '<html lang="pl"' }],
   ["how-it-works renders", () => request("/how-it-works"), { status: 200, contains: ">Trzy spokojne kroki.<" }],
   ["for-who renders", () => request("/for-who"), { status: 200, contains: ">Rytm pasuje do Twojego tempa.<" }],
   ["landing footer links for-who", () => request("/"), { status: 200, contains: '>Dla kogo</a><a href="#"' }],

@@ -651,12 +651,12 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Automated
 
-- [ ] 1.1 npm test: baseline + 8 i18n cases, 0 failed
-- [ ] 1.2 Smoke baseline + 1 PASS, 0 FAIL
-- [ ] 1.3 No hard-coded lang="pl" left in Layout.astro
-- [ ] 1.4 Deliberate break: resolveLocale ignoring the cookie turns the cookie cases red, restored
-- [ ] 1.5 Deliberate break: locals.locale = "en" turns the lang smoke step red, restored, meta-check recorded
-- [ ] 1.6 Full local gate vs baseline, smoke + 1
+- [x] 1.1 npm test: baseline + 8 i18n cases, 0 failed
+- [x] 1.2 Smoke baseline + 1 PASS, 0 FAIL
+- [x] 1.3 No hard-coded lang="pl" left in Layout.astro
+- [x] 1.4 Deliberate break: resolveLocale ignoring the cookie turns the cookie cases red, restored
+- [x] 1.5 Deliberate break: locals.locale = "en" turns the lang smoke step red, restored, meta-check recorded
+- [x] 1.6 Full local gate vs baseline, smoke + 1
 
 #### Manual
 

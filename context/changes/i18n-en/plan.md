@@ -302,7 +302,7 @@ Each new leaf passes the duplicate guard (no kit string with the same bytes).
 
 - `npm test`: Phase 2 count PASS (Δ0), 0 failed
 - Smoke Phase 2 count PASS, 0 FAIL (Δ0 — PL bytes unchanged)
-- `grep -rn "export const copy\b\|export const copyExtra" src/content/copy.ts` empty; `grep -rn "import { copy\|copyExtra }" src test` empty; `grep -rn "monthNames)" src/pages` empty
+- `grep -rn "export const copy\b\|export const copyExtra" src/content/copy.ts` empty; `grep -rnE "import (type )?\{[^}]*\b(copy|copyExtra)\b[^}]*\} from \"@/content/copy\"" src test` empty; `grep -rn "monthNames)" src/pages` empty
 - `grep -n "Uwaga\|Dokumentacja\|842,60" src --include=*.astro --include=*.ts -r | grep -v src/content/` empty
 - Deliberate break: `getMonths("pl").nominative` built from values → smoke „home lead names the reference month” red; restored; meta-check recorded
 - Deliberate break: re-add `import { copy }` in one page → `npx astro check` red; restored (proves the export is gone, so EN cannot silently fall back to PL)
@@ -333,7 +333,8 @@ yet wired (`getCopy("en")` still PL).
 `export const kitEn = {…} satisfies KitCopy` (plain object). Same 28 top-level keys, every placeholder kept
 (`{month} {delta} {n} {items} {within} {over} {amount} {debits} {year} {seconds} {range} {maxMb} {maxTransactions}
 {bank}`), numbers equal, forms tuples as `[one, other, other]` (`["cost","costs","costs"]`), `patternDetail.monthNames`
-= Polish keys → English month names, `settings.deleteConfirm` contains `DELETE`, money examples written `52.99 zł`.
+= Polish keys → English month names, every leaf whose PL text contains `USUŃ` says `DELETE` instead, `ING Bank Śląski`
+kept verbatim (proper name), money examples written `52.99 zł`.
 Voice: short, calm, second person, like the kit; brand name `Rytm` untranslated.
 
 #### 2. Parity test
@@ -344,8 +345,11 @@ Voice: short, calm, second person, like the kit; brand name `Rytm` untranslated.
 
 **Contract**: cases over `content` vs `kitEn`: same leaf-path set; same length for every array; per string leaf the
 same set of `{placeholder}` tokens; numeric leaves equal; no EN string matches `/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/` after removing
-`zł`; 12 EN month names, `monthNames` keys equal to PL; `settings.deleteConfirm` contains `DELETE`. (P5 extends the
-file to `copyExtra`.)
+the allow-list `ALLOWED_PL_TOKENS = ["zł", "ING Bank Śląski"]` (currency and the bank's proper name — kit leaves
+`importFlow.supported`, `importErrors.unknownFormat` and the bank-name map carry it; never transliterate it; P6 adds
+`"Język"` for the bilingual section title); 12 EN month names, `monthNames` keys equal to PL; every EN leaf whose PL
+counterpart contains `USUŃ` contains `DELETE` (kit: `settings.confirmation`, `settings.deleteConfirm`,
+`settings.deleteDisabledHelp`). (P5 extends the file to `copyExtra`.)
 
 ### Success Criteria:
 
@@ -395,8 +399,10 @@ names; forms `[one, other, other]`; `config` / `landing.heroAmount` (`3,842.60 z
 context.request.headers.get("accept-language"))`. `request()` gains an optional `headers` object merged after the
 defaults. New smoke steps at the end of `steps`: „first visit honours Accept-Language” (`GET /` with
 `Accept-Language: en-GB,en;q=0.9`): contains `<html lang="en"` and the EN landing headline as `>…<`; „signed-in view
-follows Accept-Language” (`GET /settings` with the same header, after signing in the seeded test user if the jar holds
-no session at that point): contains the EN settings title as `>…<`.
+follows Accept-Language” — one composite step (the run's last baseline step is „signout seeded user”, so the jar
+holds no session): `POST /api/auth/signin` with `seeded`, then `GET /settings` with the same header (its response is
+the step's result), then `POST /api/auth/signout`; expects 200 and the EN settings title as `>…<`. Signing out inside
+the step matters: P6's „English persists on the next page” GETs `/login`, which a live session redirects to `/home`.
 
 #### 3. Delete word per locale
 
@@ -409,7 +415,8 @@ no session at that point): contains the EN settings title as `>…<`.
 boolean` (exact match against either); `/api/auth/delete` zod `refine(isDeleteConfirmWord)`; the dialog takes a
 `confirmWord` prop (lock state and `confirmParts` split use it, no client import of the constant); `settings.astro`
 passes `DELETE_CONFIRM_WORDS[locale]` as prop and placeholder. Unit cases: `USUŃ` true, `DELETE` true, `usuń` false,
-`delete` false, `` false. Kit-contract: each locale's `settings.deleteConfirm` contains its word.
+`delete` false, `` false. Kit-contract: each locale's `settings.confirmation`, `settings.deleteConfirm` and
+`settings.deleteDisabledHelp` contain its word (the dialog splits `deleteConfirm` on the word to bold it).
 
 ### Success Criteria:
 
@@ -462,7 +469,8 @@ Unit cases: same-origin `/settings?x=1` → `/settings?x=1`; foreign origin → 
 (`value="pl"` / `"en"`, visible `PL` / `EN`, `lang` + `aria-label` the language's own name, active one
 `aria-pressed="true"`); props `locale`, `labels`, `class?` (`cn`); colours `ink` / `muted` / `line` only, focus ring
 as in existing buttons. New `copyExtra.locale = { label, pl: "Polski", en: "English", sectionTitle: "Język /
-Language" }` in both dictionaries (native names and the bilingual title identical in both; `label` translated). Placement:
+Language" }` in both dictionaries (native names and the bilingual title identical in both; `label` translated; the
+parity diacritics case adds `"Język"` to `ALLOWED_PL_TOKENS`). Placement:
 end of `SiteFooter`; top-right corner of the `AuthLayout` form column; a `/settings` section copying the existing
 section markup (`Panel` + `<h2>`), placed before the danger zone. The P5 parity test allows these identical leaves.
 
@@ -581,6 +589,11 @@ slice adding a browser-only risk`), EN copy replacement (`Trigger: kit ships EN 
   identical (inference) — a hydration warning in the EN visual gate becomes the E2E follow-up trigger.
 - The diacritic sweep misses Polish words without diacritics; the EN visual gate is the backstop.
 - Translation quality is not machine-checkable; the `[human]` row owns it.
+- Plan review (2026-10-03): the parity diacritics rule needs an explicit allow-list (`zł`, `ING Bank Śląski`, P6
+  `Język`); widening it beyond proper names / the bilingual title would let real Polish leak into EN — keep it to
+  exact tokens.
+- Plan review: the composite P5 smoke step hides which sub-request failed; on red, the implementer reruns the three
+  requests by hand before touching code.
 
 ## Performance Considerations
 

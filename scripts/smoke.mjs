@@ -533,6 +533,11 @@ const steps = [
     { status: 200, contains: "Suma w maju" },
   ],
   [
+    "pattern detail shows the kit invalid-threshold line",
+    () => request("/patterns/kawiarnia%20smoke?error=value"),
+    { status: 200, contains: "Wpisz próg większy od zera." },
+  ],
+  [
     "pattern detail has no threshold yet",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: ">brak ustawionego progu<" },
@@ -593,6 +598,14 @@ const steps = [
     "pattern detail marks the over-limit transaction",
     () => request("/patterns/kawiarnia%20smoke"),
     { status: 200, contains: ">ponad próg<" },
+  ],
+  [
+    "pattern detail labels the sequence",
+    () => request("/patterns/kawiarnia%20smoke"),
+    {
+      status: 200,
+      contains: 'role="img" aria-label="0 wystąpień w ramach progu, 1 wystąpienie ponad próg"',
+    },
   ],
   [
     "pattern detail shows the over-limit sum",

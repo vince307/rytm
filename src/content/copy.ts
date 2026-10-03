@@ -127,13 +127,6 @@ export const copyExtra = {
     // DESIGN-GAP: K21 — detail / threshold-editor / list strings the prototype renders that content.json still
     // lacks (round 3); taken verbatim from app.js patternDetail() / thresholdEditor() / patternRows() / showToast().
     detailEyebrow: " wzorzec",
-    typeLeads: {
-      fixed: "Sprzedawca o stałej, powtarzalnej kwocie.",
-      frequent: "Sprzedawca, który wraca niezależnie od kwoty.",
-    },
-    thresholdPanel: "Próg wzorca",
-    thresholdActive: "aktywny",
-    thresholdNone: "brak ustawionego progu",
     // thresholdEditor()'s save button when no threshold is set yet; content.json's threshold.save ("Zapisz
     // próg") covers only the change path.
     setThreshold: "Ustaw próg",
@@ -141,10 +134,6 @@ export const copyExtra = {
     thresholdRemoved: "Próg usunięty.",
     // thresholdEditor()'s field label and input-suffix text; content.json's threshold object holds only the
     // button/note copy, not these.
-    valueLabel: { amount: "Kwota", count: "Liczba wystąpień" },
-    suffix: { money: "zł", count: "×" },
-    occurrencesPanel: "Wystąpienia w miesiącu",
-    sequenceWithin: "W ramach progu",
     overBadge: "ponad próg",
     // patternRows()'s Próg-cell format for a `count` threshold and the arrow cell's aria-label; verbatim.
     thresholdCount: "{n} × / miesiąc",
@@ -171,10 +160,9 @@ export const copyExtra = {
     detailMissing: "Nie znaleziono tego wzorca — mógł zniknąć po usunięciu importu.",
     monthEmpty: "Brak wystąpień w tym miesiącu.",
     overInMonth: "Ponad progiem w {month}",
-    sequenceSummary: "{n} {occurrences}, {over} ponad próg",
-    thresholdInvalid:
-      "Podaj wartość większą od zera — liczbę całkowitą lub kwotę z najwyżej dwoma miejscami po przecinku.",
-    thresholdSaveError: "Nie udało się zapisać progu. Spróbuj ponownie.",
+    // DESIGN-GAP: K35 — kit `patternDetail.sequenceSummary` has no plural forms ("{within} wystąpień …"); the app
+    // keeps this template and fills the forms from `occurrenceForms` (kit app.js aria-label shape).
+    sequenceSummary: "{within} {withinForms} w ramach progu, {over} {overForms} ponad próg",
     // Próg-cell format for a `sum` threshold — the kit's patternRows() never renders one (its five sample
     // patterns hold only count/amount thresholds), so this is a placeholder generalising the `count` format.
     thresholdSum: "{amount} / miesiąc",

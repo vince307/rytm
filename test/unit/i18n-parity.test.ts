@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import content from "../../design/rytm-os/react-kit/docs/content.json";
 import { kitEn } from "@/content/en/kit";
+import { extraEn } from "@/content/en/extra";
+import { copyExtraPl, getCopy, getMonths } from "@/content/copy";
 
 type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
 
@@ -115,5 +117,66 @@ describe("EN kit parity with content.json", () => {
       expect(t[1]).toBe(t[2]);
       expect(t[0]).not.toBe(t[1]);
     }
+  });
+});
+
+describe("EN extra parity with copyExtraPl", () => {
+  const plX = new Map(leaves(copyExtraPl as unknown as Json));
+  const enX = new Map(leaves(extraEn));
+
+  it("has the same leaf-path set and array lengths", () => {
+    expect([...enX.keys()].sort()).toEqual([...plX.keys()].sort());
+    expect(arrayLengths(extraEn as unknown as Json)).toEqual(arrayLengths(copyExtraPl as unknown as Json));
+  });
+
+  it("keeps the same placeholder set per string leaf", () => {
+    const mismatched = [...plX]
+      .filter(([, v]) => typeof v === "string")
+      .filter(([p, v]) => {
+        const e = enX.get(p);
+        return typeof e !== "string" || placeholders(e).join() !== placeholders(v as string).join();
+      })
+      .map(([p]) => p);
+    expect(mismatched).toEqual([]);
+  });
+
+  it("has no Polish diacritics in EN strings (allow-list: currency)", () => {
+    const offenders = [...enX]
+      .filter(([, v]) => typeof v === "string")
+      .filter(([, v]) => {
+        let s = v as string;
+        for (const token of ALLOWED_PL_TOKENS) s = s.split(token).join("");
+        return PL_DIACRITICS.test(s);
+      })
+      .map(([p]) => p);
+    expect(offenders).toEqual([]);
+  });
+
+  it("uses [one, other, other] for every forms tuple", () => {
+    for (const t of [
+      extraEn.home.fixedSummary.costForms,
+      extraEn.imports.transactionForms,
+      extraEn.imports.accountForms,
+      extraEn.patterns.occurrenceForms,
+    ]) {
+      expect(t).toHaveLength(3);
+      expect(t[1]).toBe(t[2]);
+      expect(t[0]).not.toBe(t[1]);
+    }
+  });
+});
+
+describe("getCopy / getMonths per locale", () => {
+  it("returns the EN pair for en and the PL pair for pl", () => {
+    expect(getCopy("en")).toEqual({ copy: kitEn, copyExtra: extraEn });
+    expect(getCopy("pl").copy).toBe(content);
+    expect(getCopy("pl").copyExtra).toBe(copyExtraPl);
+  });
+
+  it("builds month lists from the locale's dictionaries", () => {
+    expect(getMonths("en").genitive[4]).toBe("May");
+    expect(getMonths("en").locative[0]).toBe("January");
+    expect(getMonths("pl").genitive[4]).toBe("maja");
+    expect(getMonths("pl").locative[0]).toBe("styczniu");
   });
 });

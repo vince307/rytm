@@ -2,17 +2,14 @@ import type { APIRoute } from "astro";
 import { DEMO_EMAIL } from "astro:env/server";
 import { z } from "zod";
 import { createClient, verifyPassword } from "@/lib/supabase";
-import { DELETE_CONFIRM_WORD } from "@/lib/auth-rules";
+import { isDeleteConfirmWord } from "@/lib/auth-rules";
 import { DEMO_ERROR, isDemoEmail } from "@/lib/demo";
 
 export const prerender = false;
 
 const schema = z.object({
   current: z.string().min(1),
-  confirm: z
-    .string()
-    .trim()
-    .refine((v) => v === DELETE_CONFIRM_WORD),
+  confirm: z.string().trim().refine(isDeleteConfirmWord),
 });
 
 // Self-service account deletion (FR-019): the current password is verified first (the irreversible

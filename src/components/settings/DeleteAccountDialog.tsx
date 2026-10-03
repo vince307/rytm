@@ -5,7 +5,6 @@ import { FormField } from "@/components/auth/FormField";
 import { InfoAlert } from "@/components/app/InfoAlert";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { cn } from "@/lib/utils";
-import { DELETE_CONFIRM_WORD } from "@/lib/auth-rules";
 
 export interface DeleteAccountLabels {
   trigger: string;
@@ -29,6 +28,8 @@ interface Props {
   labels: DeleteAccountLabels;
   /** The shared demo account: password field and button disabled; the server guard in api/auth/delete.ts stays. */
   demo: boolean;
+  /** The locale's delete word (`confirmWordS[locale]`), passed by the page. */
+  confirmWord: string;
 }
 
 // Kit round 3 `modal('deleteAccount')`: password + the `USUŃ` word unlock the button; the eyebrow, title and body
@@ -36,14 +37,14 @@ interface Props {
 const CONFIRM_ID = "delete-account-confirm";
 const HELP_ID = "delete-account-help";
 
-export default function DeleteAccountDialog({ labels, demo }: Props) {
+export default function DeleteAccountDialog({ labels, demo, confirmWord }: Props) {
   // A failed deletion comes back as ?error=delete(-password): the alert lives on the page, the dialog stays closed.
   const [open, setOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
-  const showHelp = !demo && (currentPassword.length === 0 || confirmation.trim() !== DELETE_CONFIRM_WORD);
-  const locked = demo || currentPassword.length === 0 || confirmation.trim() !== DELETE_CONFIRM_WORD;
-  const confirmParts = labels.confirmationHint.split(DELETE_CONFIRM_WORD);
+  const showHelp = !demo && (currentPassword.length === 0 || confirmation.trim() !== confirmWord);
+  const locked = demo || currentPassword.length === 0 || confirmation.trim() !== confirmWord;
+  const confirmParts = labels.confirmationHint.split(confirmWord);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -71,7 +72,7 @@ export default function DeleteAccountDialog({ labels, demo }: Props) {
             {confirmParts[0]}
             {confirmParts.length > 1 && (
               <>
-                <strong className="text-ink font-bold">{DELETE_CONFIRM_WORD}</strong>
+                <strong className="text-ink font-bold">{confirmWord}</strong>
                 {confirmParts[1]}
               </>
             )}

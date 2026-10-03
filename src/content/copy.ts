@@ -1,5 +1,7 @@
 import content from "../../design/rytm-os/react-kit/docs/content.json";
 import type { Locale } from "@/lib/i18n";
+import { kitEn } from "@/content/en/kit";
+import { extraEn } from "@/content/en/extra";
 
 /** Kit copy — `design/rytm-os/react-kit/docs/content.json`, read-only. The shape every locale's kit dictionary satisfies. */
 export type KitCopy = typeof content;
@@ -19,7 +21,7 @@ type Widen<T> = T extends string
  * Strings the prototype renders but content.json does not contain (design-kit.md K11).
  * Taken verbatim from design/rytm-os/prototype/app.js. Remove entries as the author adds keys.
  */
-const copyExtraPl = {
+export const copyExtraPl = {
   auth: {
     // DESIGN-GAP: K13 — visual panels of confirm-email / reset-new are drawn in `app.js` but absent from content.json
     // (verbatim `confirmEmail()` / `resetNew()`).
@@ -195,8 +197,7 @@ export type CopyExtra = Widen<typeof copyExtraPl>;
 
 const dictionaries: Record<Locale, { copy: KitCopy; copyExtra: CopyExtra }> = {
   pl: { copy: content, copyExtra: copyExtraPl },
-  // EN dictionaries from Phase 5; until then English resolves to the Polish pair.
-  en: { copy: content, copyExtra: copyExtraPl },
+  en: { copy: kitEn, copyExtra: extraEn },
 };
 
 /** The kit copy and the kit-gap copy of one locale. */

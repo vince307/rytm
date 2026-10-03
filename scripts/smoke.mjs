@@ -204,7 +204,7 @@ function storeCookies(response) {
   }
 }
 
-async function request(path, { method = "GET", form } = {}) {
+async function request(path, { method = "GET", form, headers } = {}) {
   const response = await fetch(BASE_URL + path, {
     method,
     redirect: "manual",
@@ -212,6 +212,7 @@ async function request(path, { method = "GET", form } = {}) {
       Cookie: cookieHeader(),
       Origin: BASE_URL,
       ...(form ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
+      ...headers,
     },
     body: form ? new URLSearchParams(form).toString() : undefined,
   });
@@ -1240,6 +1241,24 @@ const steps = [
   ],
   ["patterns renders empty view", () => request("/patterns"), { status: 200, contains: "Wgraj pierwszy wyciąg" }],
   ["signout seeded user", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
+  // S-16 P5: the locale resolves from Accept-Language when no cookie is set (EN steps last; P6 appends the switch).
+  [
+    "first visit honours Accept-Language",
+    () => request("/", { headers: { "Accept-Language": "en-GB,en;q=0.9" } }),
+    { status: 200, contains: ['<html lang="en"', ">Rytm shows you that rhythm.<"] },
+  ],
+  // Composite: if red, rerun the three requests by hand before touching code (the step hides which one failed).
+  [
+    "signed-in view follows Accept-Language",
+    async () => {
+      const signin = await request("/api/auth/signin", { method: "POST", form: seeded });
+      if (signin.status !== 302) return signin;
+      const settings = await request("/settings", { headers: { "Accept-Language": "en-GB,en;q=0.9" } });
+      await request("/api/auth/signout", { method: "POST" });
+      return settings;
+    },
+    { status: 200, contains: ">Your account.<" },
+  ],
 ];
 
 let failed = 0;

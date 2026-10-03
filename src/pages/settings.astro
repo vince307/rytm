@@ -11,9 +11,10 @@ import { buttonVariants } from "@/components/ui/button";
 import { DEMO_EMAIL } from "astro:env/server";
 import { isDemoEmail } from "@/lib/demo";
 import { getCopy } from "@/content/copy";
-import { DELETE_CONFIRM_WORD, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
+import { DELETE_CONFIRM_WORDS, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 
-const { copy, copyExtra } = getCopy(Astro.locals.locale);
+const { locale } = Astro.locals;
+const { copy, copyExtra } = getCopy(locale);
 
 const s = copy.settings;
 const a = copy.authStates;
@@ -96,13 +97,14 @@ const demo = isDemoEmail(Astro.locals.user?.email, DEMO_EMAIL);
     <DeleteAccountDialog
       client:load
       demo={demo}
+      confirmWord={DELETE_CONFIRM_WORDS[locale]}
       labels={{
         trigger: s.deleteButton,
         eyebrow: x.deleteDialogEyebrow,
         title: x.deleteDialogTitle,
         body: x.deleteDialogBody,
         confirmationHint: s.deleteConfirm,
-        placeholder: DELETE_CONFIRM_WORD,
+        placeholder: DELETE_CONFIRM_WORDS[locale],
         currentPassword: s.deletePassword,
         passwordPlaceholder: copy.auth.passwordPlaceholder,
         confirm: s.deleteButton,

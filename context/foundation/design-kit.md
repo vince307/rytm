@@ -240,6 +240,7 @@ Nowe wiersze rundy 3 (do autora, lista do rundy 4):
 | G39 | Brak copy dla pustej sekcji „Bez zmian” na `/fixed` | aplikacja trzyma `copyExtra.fixed.unchangedEmpty` (komentarz `DESIGN-GAP: G39`) | open · runda 4 |
 | K42 | Kit nie ma copy w języku angielskim — `content.json` jest tylko po polsku | własne tłumaczenie w `src/content/en/kit.ts` i `en/extra.ts` (komentarz `DESIGN-GAP: K42`), do podmiany, gdy kit dostarczy EN | open · S-16 |
 | K43 | Kit nie ma przełącznika języka | `src/components/LocaleSwitch.astro` (dwa przyciski `PL` / `EN`, tokeny kitu; komentarz `DESIGN-GAP: K43`), w stopce, rogu layoutu auth i na `/settings` | open · S-16 |
+| K44 | Kwota w makiecie hero strony głównej (`3 842,60 zł`) jest literałem w markupie prototypu, bez klucza w `content.json` | `copyExtra.landing.heroAmount` w obu językach (komentarz `DESIGN-GAP: K44`) | open · S-16 |
 
 Dostarczone bez wiersza K/G: `patterns.showMore` „Pokaż więcej” (S-14); C6 etykieta konta Santandera „Rachunek · •• 1094” (S-13); `confirmEmail.resendCountdown` (S-12); `trend.amountLabel/zeroMarker/gridLabel` (S-15); widoki wyniku importu: oczekiwanie / błąd / nie znaleziono (S-13).
 

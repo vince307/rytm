@@ -190,7 +190,7 @@ export const copyExtraPl = {
   // DESIGN-GAP: K43 — the kit has no language switcher; native names and the bilingual title are identical in both locales.
   locale: { label: "Język", pl: "Polski", en: "English", sectionTitle: "Język / Language" },
   landing: {
-    // DESIGN-GAP: the kit landing mock-up amount is a literal in the prototype markup, no content.json key (register row with K42).
+    // DESIGN-GAP: K44 — the kit landing mock-up amount is a literal in the prototype markup, no content.json key.
     heroAmount: "3 842,60 zł",
   },
 } as const;

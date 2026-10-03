@@ -90,7 +90,7 @@ const importPayloadJune = JSON.stringify({
 });
 let importResultPath = "/imports/result";
 // S-10: a Santander payload on the re-created account (2 debits, no bank transaction id — rule 7),
-// `accountName: "Rachunek"` is what the wizard sends (Phase 5, copyExtra.imports.santanderAccountName).
+// `accountName: "Rachunek"` is what the wizard sends (Phase 5, copy.imports.santanderAccountName).
 const santanderTransactions = [
   {
     occurredOn: "2026-05-06",

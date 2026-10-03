@@ -127,4 +127,26 @@ describe("kit contract (content.json as the app reads it)", () => {
       expect(dialogContentClass).toContain(cls);
     }
   });
+
+  it("keeps copyExtra free of strings the kit already ships (S-15 milestone audit)", () => {
+    // A leaf equal to a kit string is a duplicate, not a gap — rebind it to `copy`. Each exception is a different
+    // role for the same bytes (the kit key belongs to another component / heading), so it must carry a reason.
+    const ROLE_EXCEPTIONS: Record<string, string> = {
+      "auth.saving": "`threshold.saving` belongs to the threshold editor, another component's namespace",
+      "settings.close": "`patternActions.close*` / `imports.deleteClose` are other dialogs' buttons",
+      "settings.deleting": "`imports.deleteWaiting` is the import dialog's pending label",
+      "patterns.mergeSubmit": "`patternActions.mergeTitle` is the dialog's h2, not the submit button",
+      "imports.transactionForms.2": "one form of a 3-form array; `importFlow.transactions` is a label",
+    };
+    const leaves = (node: unknown, path: string, out: [string, string][]): [string, string][] => {
+      if (typeof node === "string") out.push([path, node]);
+      else if (node && typeof node === "object") {
+        for (const [k, v] of Object.entries(node)) leaves(v, path ? `${path}.${k}` : k, out);
+      }
+      return out;
+    };
+    const kitStrings = new Set(leaves(copy, "", []).map(([, v]) => v));
+    const dupes = leaves(copyExtra, "", []).filter(([path, v]) => kitStrings.has(v) && !(path in ROLE_EXCEPTIONS));
+    expect(dupes).toEqual([]);
+  });
 });

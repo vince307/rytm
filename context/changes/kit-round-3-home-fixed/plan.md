@@ -717,13 +717,13 @@ departures and product-visible choices the maintainer may reverse are collected 
 
 #### Automated
 
-- [ ] 5.1 npm test: Phase 4 count plus the copyExtra guard case, 0 failed
-- [ ] 5.2 Every copyExtra leaf has a reader
-- [ ] 5.3 Seam greps empty; every DESIGN-GAP id in src has a register row
-- [ ] 5.4 Phase leaves design/ and brand.css untouched
-- [ ] 5.5 Deliberate break: copyExtra leaf equal to a kit string turns the guard red, restored, meta-check recorded
-- [ ] 5.6 Deliberate break: unread copyExtra leaf caught by the leaf-reader grep, restored
-- [ ] 5.7 Full local gate vs baseline, smoke + 3 cumulative
+- [x] 5.1 npm test: Phase 4 count plus the copyExtra guard case, 0 failed
+- [x] 5.2 Every copyExtra leaf has a reader
+- [x] 5.3 Seam greps empty; every DESIGN-GAP id in src has a register row
+- [x] 5.4 Phase leaves design/ and brand.css untouched
+- [x] 5.5 Deliberate break: copyExtra leaf equal to a kit string turns the guard red, restored, meta-check recorded
+- [x] 5.6 Deliberate break: unread copyExtra leaf caught by the leaf-reader grep, restored
+- [x] 5.7 Full local gate vs baseline, smoke + 3 cumulative
 
 #### Manual
 

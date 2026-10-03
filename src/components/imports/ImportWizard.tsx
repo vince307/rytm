@@ -190,7 +190,7 @@ export default function ImportWizard({ labels, existing, serverError, demoLocked
     if (!file || demoLocked) return;
     setPageError(null);
     setStep(1);
-    const result = await readStatement(file, x.santanderAccountName);
+    const result = await readStatement(file, kit.santanderAccountName);
     if ("error" in result) {
       setLoaded(null);
       setFileError(result.error);

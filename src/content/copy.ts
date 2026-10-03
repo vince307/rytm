@@ -16,9 +16,8 @@ export const copyExtra = {
       title: "Twój rytm zaczyna się od jasności.",
       lead: "Potwierdź adres e-mail, aby dokończyć tworzenie konta.",
     },
+    // eyebrow / title are the kit's `auth.resetVisual`; only the lead differs from the kit's (K13).
     resetNewVisual: {
-      eyebrow: "Spokojnie",
-      title: "Hasło można ustawić na nowo.",
       lead: "Wybierz nowe hasło, aby wrócić do swojego rytmu.",
     },
     // DESIGN-GAP: K11 — `resetNew('expired')` strings (verbatim `app.js`), content.json has only `resetNew.expired`.
@@ -38,10 +37,6 @@ export const copyExtra = {
     resendError: "Nie udało się wysłać ponownie. Spróbuj za chwilę.",
   },
   home: {
-    emptyEyebrow: "Przegląd miesiąca",
-    emptyTitle: "Zacznij od pierwszego importu.",
-    emptyLead: "Rytm pokaże Ci wzorce, kiedy dostanie pierwszy wyciąg.",
-    emptyIllustrationAlt: "Dokument czekający na import",
     // DESIGN-GAP: K39 — the kit's trend legend explains the zero mark only in a `title` literal, no content.json key.
     zeroNote: "Cienka kreska oznacza 0,00 zł",
     // DESIGN-GAP: K25 — `dashboard.stats[0].foot` is the template, the kit ships no genitive month names.
@@ -74,9 +69,6 @@ export const copyExtra = {
     saveError: "Nie udało się zapisać importu. Spróbuj ponownie.",
     // DESIGN-GAP: K11 — imports table headers the kit prototype draws but content.json lacks.
     table: { importedOn: "Data importu", debits: "Obciążenia" },
-    // Santander's export has no account name column (the owner's name, header col 3, is never stored, R2);
-    // "Rachunek" is the kit's own word (`imports.santanderAccountName`), sent by the wizard as the stored name.
-    santanderAccountName: "Rachunek",
     // Result screen (prototype importResult()); the eyebrow is the kit's `importFlow.result`.
     toPatterns: "Zobacz wzorce",
     toOverview: "Przejdź do przeglądu",
@@ -87,7 +79,6 @@ export const copyExtra = {
     // DESIGN-GAP: K11 — the kit result h1 („Dodaliśmy 64 obciążenia.”) is built in the prototype script, not in
     // content.json.
     resultTitle: "Dodaliśmy {n} {debits}.",
-    debitForms: ["obciążenie", "obciążenia", "obciążeń"],
     next: "Dalej",
     stepEyebrow: "Nowy import · krok {n} z 3",
     accountTitle: "Wybierz rachunek.",

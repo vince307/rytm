@@ -21,11 +21,13 @@ Each item carries a `Trigger:` line; later slices grep for it.
 
 ## From `/10x-impl-review` (2026-10-03, `reviews/impl-review.md`)
 
-- [ ] **F5 — dialog title can run under the close glyph on a phone** (`src/components/ui/dialog.tsx` `dialogContentClass`
+- [x] **F5 — dialog title can run under the close glyph on a phone** (`src/components/ui/dialog.tsx` `dialogContentClass`
   18 px side padding vs the close button at `right-[19px]`, 17 px wide; `DialogTitle` has no right padding). Affects the
   delete-import and delete-account dialogs too. Check in visual row 8.7; if a title overlaps, add right padding to
   `DialogTitle`.
   Trigger: visual gate of kit-round-3-patterns (row 8.7)
+  Resolved 2026-10-03 (visual gate): no overlap at 400 px in all three dialogs — the glyph shares its row with the
+  eyebrow, the title starts 14 px below it (rects in `reviews/visual-review.md` § F5). No change.
 - [ ] **F7 — `FormField.tsx` / `DeleteAccountDialog.tsx` keep their own 8 px box** (`focus:ring-ink/8` on the input) instead
   of `fieldBox` (`focus-within:` on a wrapper); `fieldBox`'s comment says „the one 8 px form box”.
   Trigger: next slice touching auth or settings forms

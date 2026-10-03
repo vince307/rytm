@@ -838,7 +838,7 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Manual
 
-- [ ] 8.6 [visual] Screenshots desktop + ~400 px of every listed pattern state, compared with the kit views
-- [ ] 8.7 [visual] Screenshots desktop + ~400 px of the other views touched by shared changes (imports and settings dialogs, /fixed badge, focus ring)
+- [x] 8.6 [visual] Screenshots desktop + ~400 px of every listed pattern state, compared with the kit views — d70e3a0 (visual gate: 27 pattern states × 1280/400 + kit frames, Playwright + Chrome keyboard check; empty-view centring fixed in d70e3a0; reviews/visual-review.md)
+- [x] 8.7 [visual] Screenshots desktop + ~400 px of the other views touched by shared changes (imports and settings dialogs, /fixed badge, focus ring) — d70e3a0 (visual gate: 8 states × 1280/400; F5 no overlap, closed; reviews/visual-review.md)
 - [x] 8.8 [reviewer] Seam sweep complete; register matches the plan; follow-ups carry Trigger lines — 5e85b9a (impl review: sweep missed dead copyExtra.patterns.sumLabel, a stale dialogFieldBox comment and G32 wording — fixed in 5e85b9a; follow-ups carry Trigger lines)
 - [ ] 8.9 [human] Accept S-14 product-visible choices (page size 10 kept expanded on search, field radius 14 → 8 px, dialog padding across 3 dialogs, /fixed badge tint, badges mean latest month, K35 plurals, K36 shorter invalid message, page-level dialog errors, lead „ustawienia wzorca” = detail page) and send K35–K37 to the kit author

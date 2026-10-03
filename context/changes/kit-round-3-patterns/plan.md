@@ -742,11 +742,11 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Automated
 
-- [x] 2.1 npm test: Phase 1 count plus pattern-status and badge render cases, 0 failed
-- [x] 2.2 Smoke Phase 1 count PASS, 0 FAIL, Δ0
-- [x] 2.3 G28 in PatternsTable.tsx names only Pokaż więcej
-- [x] 2.4 Deliberate break: empty status map and ignored status turn status and render tests red, restored, meta-check recorded
-- [x] 2.5 Full local gate vs baseline, smoke Δ0
+- [x] 2.1 npm test: Phase 1 count plus pattern-status and badge render cases, 0 failed — 8518cde
+- [x] 2.2 Smoke Phase 1 count PASS, 0 FAIL, Δ0 — 8518cde
+- [x] 2.3 G28 in PatternsTable.tsx names only Pokaż więcej — 8518cde
+- [x] 2.4 Deliberate break: empty status map and ignored status turn status and render tests red, restored, meta-check recorded — 8518cde
+- [x] 2.5 Full local gate vs baseline, smoke Δ0 — 8518cde
 
 #### Manual
 

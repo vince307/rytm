@@ -729,12 +729,12 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Automated
 
-- [ ] 6.1 npm test: Phase 5 count + 5 localeRedirectTarget cases, 0 failed
-- [ ] 6.2 Smoke Phase 5 count + 7 PASS, 0 FAIL
-- [ ] 6.3 K42 and K43 register rows and DESIGN-GAP comments present
-- [ ] 6.4 Deliberate break: full-referer redirect turns the foreign-origin unit case and smoke step red, restored, meta-check recorded
-- [ ] 6.5 Deliberate break: z.string() instead of z.enum turns the reject smoke step red, restored, meta-check recorded
-- [ ] 6.6 Full local gate vs baseline, smoke + 10 cumulative
+- [x] 6.1 npm test: Phase 5 count + 5 localeRedirectTarget cases, 0 failed
+- [x] 6.2 Smoke Phase 5 count + 7 PASS, 0 FAIL
+- [x] 6.3 K42 and K43 register rows and DESIGN-GAP comments present
+- [x] 6.4 Deliberate break: full-referer redirect turns the foreign-origin unit case and smoke step red, restored, meta-check recorded
+- [x] 6.5 Deliberate break: z.string() instead of z.enum turns the reject smoke step red, restored, meta-check recorded
+- [x] 6.6 Full local gate vs baseline, smoke + 10 cumulative
 
 #### Manual
 

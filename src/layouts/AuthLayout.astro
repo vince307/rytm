@@ -1,6 +1,8 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import Brand from "@/components/Brand.astro";
+import LocaleSwitch from "@/components/LocaleSwitch.astro";
+import { getCopy } from "@/content/copy";
 
 interface Props {
   title: string;
@@ -8,6 +10,7 @@ interface Props {
 }
 
 const { title, visual } = Astro.props;
+const { copyExtra } = getCopy(Astro.locals.locale);
 ---
 
 <Layout title={title}>
@@ -20,11 +23,14 @@ const { title, visual } = Astro.props;
       <Brand tone="paper" />
       <div class="absolute bottom-[68px] left-[52px] max-w-[430px] max-[899px]:static max-[899px]:mt-[62px]">
         <div class="text-xs font-extrabold tracking-[0.14em] text-excess uppercase">{visual.eyebrow}</div>
-        <p class="my-[18px] text-[52px] leading-[0.98] tracking-[-0.07em] max-[899px]:text-[37px]">{visual.title}</p>
+        <p class="my-[18px] text-[52px] font-bold leading-[0.98] tracking-[-0.07em] max-[899px]:text-[37px]">
+          {visual.title}
+        </p>
         <p class="leading-relaxed text-paper/75">{visual.lead}</p>
       </div>
     </aside>
-    <main class="flex items-center justify-center p-[42px] max-[899px]:px-[25px] max-[899px]:py-[45px]">
+    <main class="relative flex items-center justify-center p-[42px] max-[899px]:px-[25px] max-[899px]:py-[45px]">
+      <LocaleSwitch locale={Astro.locals.locale} labels={copyExtra.locale} class="absolute top-4 right-4" />
       <div class="w-full max-w-[390px]">
         <slot />
       </div>

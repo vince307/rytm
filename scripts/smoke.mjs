@@ -1259,6 +1259,51 @@ const steps = [
     },
     { status: 200, contains: ">Your account.<" },
   ],
+  // S-16 P6: the language switch. Order matters (cookie jar); the last step returns the jar to Polish.
+  [
+    "locale switch rejects an unknown value",
+    () => request("/api/locale", { method: "POST", form: { locale: "xx" } }),
+    { status: 400 },
+  ],
+  [
+    "locale switch sets English",
+    () => request("/api/locale", { method: "POST", form: { locale: "en" } }),
+    { status: 303, location: "/" },
+  ],
+  [
+    "landing renders in English after the switch",
+    () => request("/"),
+    {
+      status: 200,
+      contains: ['<html lang="en"', ">Rytm shows you that rhythm.<", 'aria-pressed="true"', ">EN<"],
+    },
+  ],
+  ["English persists on the next page", () => request("/login"), { status: 200, contains: ">Log in<" }],
+  [
+    "locale switch returns to a same-origin page",
+    () =>
+      request("/api/locale", {
+        method: "POST",
+        form: { locale: "en" },
+        headers: { Referer: `${BASE_URL}/how-it-works` },
+      }),
+    { status: 303, location: "/how-it-works" },
+  ],
+  [
+    "locale switch ignores a foreign referer",
+    () =>
+      request("/api/locale", { method: "POST", form: { locale: "en" }, headers: { Referer: "https://example.com/x" } }),
+    { status: 303, location: "/" },
+  ],
+  [
+    "locale switch returns to Polish",
+    async () => {
+      const post = await request("/api/locale", { method: "POST", form: { locale: "pl" } });
+      if (post.status !== 303) return post;
+      return request("/");
+    },
+    { status: 200, contains: ['<html lang="pl"', "Zobacz swój rytm"] },
+  ],
 ];
 
 let failed = 0;

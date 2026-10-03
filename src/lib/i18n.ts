@@ -29,3 +29,21 @@ export function resolveLocale(cookieValue: string | undefined, acceptLanguage: s
   }
   return best ? best.locale : DEFAULT_LOCALE;
 }
+
+/**
+ * Where the language switch sends the user back: path + search of a same-origin referer, else `/`.
+ * Never echoes a foreign origin or a protocol-relative path (no open redirect).
+ */
+export function localeRedirectTarget(referer: string | null, origin: string): string {
+  if (!referer) return "/";
+  let url: URL;
+  try {
+    url = new URL(referer);
+  } catch {
+    return "/";
+  }
+  if (url.origin !== origin) return "/";
+  const target = url.pathname + url.search;
+  if (!target.startsWith("/") || target.startsWith("//")) return "/";
+  return target;
+}

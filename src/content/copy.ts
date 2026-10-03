@@ -187,6 +187,8 @@ export const copyExtraPl = {
     supabaseMissing: "Supabase nie jest skonfigurowany — funkcje uwierzytelniania są wyłączone.",
     supabaseDocs: "Zobacz instrukcję konfiguracji",
   },
+  // DESIGN-GAP: K43 — the kit has no language switcher; native names and the bilingual title are identical in both locales.
+  locale: { label: "Język", pl: "Polski", en: "English", sectionTitle: "Język / Language" },
   landing: {
     // DESIGN-GAP: the kit landing mock-up amount is a literal in the prototype markup, no content.json key (register row with K42).
     heroAmount: "3 842,60 zł",

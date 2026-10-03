@@ -7,7 +7,7 @@ import { copyExtraPl, getCopy, getMonths } from "@/content/copy";
 type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
 
 /** Proper names and the currency that legitimately keep Polish letters in EN. */
-const ALLOWED_PL_TOKENS = ["zł", "ING Bank Śląski"];
+const ALLOWED_PL_TOKENS = ["zł", "ING Bank Śląski", "Język"];
 const PL_DIACRITICS = /[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/;
 
 function leaves(node: Json, path = ""): [string, string | number | boolean | null][] {

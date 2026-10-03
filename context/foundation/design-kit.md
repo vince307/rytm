@@ -238,6 +238,8 @@ Nowe wiersze rundy 3 (do autora, lista do rundy 4):
 | K40 | `/fixed`: słowa kierunku delty „wzrost” / „spadek” są literałami; `fixedCosts.decreased` nie jest renderowane nigdzie | aplikacja trzyma `copyExtra.fixed.delta` (komentarz `DESIGN-GAP: K40`) | open · runda 4 |
 | K41 | Osierocone klucze `dashboard.importTitle/importBody/stats[1].value/foot` — aplikacja ich nie czyta po usunięciu panelu importu i drugiej karty | bez zmian w aplikacji | open · runda 4 |
 | G39 | Brak copy dla pustej sekcji „Bez zmian” na `/fixed` | aplikacja trzyma `copyExtra.fixed.unchangedEmpty` (komentarz `DESIGN-GAP: G39`) | open · runda 4 |
+| K42 | Kit nie ma copy w języku angielskim — `content.json` jest tylko po polsku | własne tłumaczenie w `src/content/en/kit.ts` i `en/extra.ts` (komentarz `DESIGN-GAP: K42`), do podmiany, gdy kit dostarczy EN | open · S-16 |
+| K43 | Kit nie ma przełącznika języka | `src/components/LocaleSwitch.astro` (dwa przyciski `PL` / `EN`, tokeny kitu; komentarz `DESIGN-GAP: K43`), w stopce, rogu layoutu auth i na `/settings` | open · S-16 |
 
 Dostarczone bez wiersza K/G: `patterns.showMore` „Pokaż więcej” (S-14); C6 etykieta konta Santandera „Rachunek · •• 1094” (S-13); `confirmEmail.resendCountdown` (S-12); `trend.amountLabel/zeroMarker/gridLabel` (S-15); widoki wyniku importu: oczekiwanie / błąd / nie znaleziono (S-13).
 

@@ -118,6 +118,8 @@ export const extraEn = {
     supabaseMissing: "Supabase is not configured — authentication features are disabled.",
     supabaseDocs: "See the setup guide",
   },
+  // DESIGN-GAP: K43 — the kit has no language switcher; native names and the bilingual title are identical in both locales.
+  locale: { label: "Language", pl: "Polski", en: "English", sectionTitle: "Język / Language" },
   landing: {
     heroAmount: "3,842.60 zł",
   },

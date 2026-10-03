@@ -3,6 +3,7 @@
 import AppLayout from "@/layouts/AppLayout.astro";
 import PageTitle from "@/components/app/PageTitle.astro";
 import Panel from "@/components/app/Panel.astro";
+import LocaleSwitch from "@/components/LocaleSwitch.astro";
 import SettingsRow from "@/components/app/SettingsRow.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
 import SettingsPasswordRow from "@/components/settings/SettingsPasswordRow";
@@ -87,6 +88,12 @@ const demo = isDemoEmail(Astro.locals.user?.email, DEMO_EMAIL);
         </button>
       </form>
     </SettingsRow>
+  </Panel>
+  <Panel class="mt-[15px] max-w-[800px]">
+    <div class="mb-5 flex items-center justify-between">
+      <h2 class="m-0 text-[17px] tracking-[-0.03em]">{copyExtra.locale.sectionTitle}</h2>
+      <LocaleSwitch locale={locale} labels={copyExtra.locale} />
+    </div>
   </Panel>
   <Panel variant="danger" class="mt-[15px] max-w-[800px]">
     <div>

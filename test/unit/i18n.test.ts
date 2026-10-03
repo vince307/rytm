@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveLocale } from "@/lib/i18n";
+import { localeRedirectTarget, resolveLocale } from "@/lib/i18n";
 
 describe("resolveLocale", () => {
   const cases: [string, string | undefined, string | null, string][] = [
@@ -14,5 +14,19 @@ describe("resolveLocale", () => {
   ];
   it.each(cases)("%s", (_name, cookie, header, expected) => {
     expect(resolveLocale(cookie, header)).toBe(expected);
+  });
+});
+
+describe("localeRedirectTarget", () => {
+  const origin = "http://localhost:4321";
+  const cases: [string, string | null, string][] = [
+    ["same-origin path and search", `${origin}/settings?x=1`, "/settings?x=1"],
+    ["foreign origin", "https://example.com/x", "/"],
+    ["missing referer", null, "/"],
+    ["malformed referer", "not a url", "/"],
+    ["path-looking protocol-relative referer", "//evil.example/", "/"],
+  ];
+  it.each(cases)("%s", (_name, referer, expected) => {
+    expect(localeRedirectTarget(referer, origin)).toBe(expected);
   });
 });

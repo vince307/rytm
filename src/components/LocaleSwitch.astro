@@ -1,0 +1,43 @@
+---
+// DESIGN-GAP: K43 — the kit has no language switcher; a no-JS two-button form in kit tokens (ink / muted / line).
+import { cn } from "@/lib/utils";
+import { focusRing } from "@/components/app/field-styles";
+import type { Locale } from "@/lib/i18n";
+
+interface Props {
+  locale: Locale;
+  labels: { label: string; pl: string; en: string };
+  class?: string;
+}
+
+const { locale, labels, class: className } = Astro.props;
+const options: { value: Locale; short: string; name: string }[] = [
+  { value: "pl", short: "PL", name: labels.pl },
+  { value: "en", short: "EN", name: labels.en },
+];
+---
+
+<form
+  method="post"
+  action="/api/locale"
+  class:list={cn("inline-flex items-center gap-1 text-xs", className)}
+  aria-label={labels.label}
+>
+  {options.map((o) => (
+    <button
+      type="submit"
+      name="locale"
+      value={o.value}
+      lang={o.value}
+      aria-label={o.name}
+      aria-pressed={o.value === locale ? "true" : "false"}
+      class:list={cn(
+        "rounded-[6px] border border-line px-2 py-1 font-bold text-muted transition-colors duration-150 hover:border-ink hover:text-ink",
+        focusRing,
+        o.value === locale && "border-ink text-ink",
+      )}
+    >
+      {o.short}
+    </button>
+  ))}
+</form>

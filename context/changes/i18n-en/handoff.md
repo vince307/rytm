@@ -1,59 +1,55 @@
 # Handoff — `i18n-en` (slice S-16)
 
-Written by the `/10x-implement i18n-en phase 6` step of run `2026-10-03-i18n-en`. Phase 6 (language switch, `/api/locale`, K42/K43 register rows, two layout follow-ups) is committed `570cf20`; `change.md` stays `implementing`. The one thing not to get wrong: P7 must not leave Polish leaks in EN and the final smoke step must stay the `locale=pl` return.
+Written by the `/10x-implement i18n-en phase 7` step of run `2026-10-03-i18n-en`. Phase 7 (seam sweep, follow-ups, K44 register row) is committed `ce7a1f0`; `change.md` is `implemented`. The one thing not to get wrong: rows 7.8/7.9 screenshots were NOT captured here — the visual-gate step owns them, and PL shots need `rytm-locale=pl`.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/i18n-en`, cut from `main` at `b973428` |
-| Commits | docs commits + p1 `ace542d` + p2 `1def5ed` + p3 `3461cbc` + p4 `269b4df` + p5 `5374856` + p6 `570cf20` + handoff docs commits |
+| Commits | docs commits + p1 `ace542d` + p2 `1def5ed` + p3 `3461cbc` + p4 `269b4df` + p5 `5374856` + p6 `570cf20` + p7 `ce7a1f0` + handoff docs commits |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `implementing` |
-| `## Progress` rows remaining | 17 (`grep -c '^- \[ \]' plan.md`) |
+| `change.md` status | `implemented` |
+| `## Progress` rows remaining | 11 (`grep -c '^- \[ \]' plan.md`): all manual, see §5 |
 | Working tree | clean per `tree-clean.sh` after the handoff commit (allow-listed `?? design/prompts/2026-10-03-gaps-round-4.md` untouched) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `src/pages/api/locale.ts` | public `POST`, zod `z.enum(LOCALES)` → 400, cookie flags as signup, 303 to `localeRedirectTarget` |
-| `src/lib/i18n.ts` | `localeRedirectTarget(referer, origin)` |
-| `src/components/LocaleSwitch.astro` | no-JS form, `PL`/`EN` buttons, `aria-pressed`, `DESIGN-GAP: K43` |
-| `src/components/marketing/SiteFooter.astro`, `src/layouts/AuthLayout.astro`, `src/pages/settings.astro` | switch placements; AuthLayout `visual.title` now `font-bold` |
-| `src/pages/index.astro` | steps section head stacks below 560 px |
-| `src/content/copy.ts`, `src/content/en/extra.ts` | `copyExtra.locale` in both dictionaries |
-| `context/foundation/design-kit.md` | K42, K43 rows |
-| `scripts/smoke.mjs` | 7 switch steps appended, last = `locale=pl` |
-| `test/unit/i18n.test.ts`, `test/unit/i18n-parity.test.ts` | 5 `localeRedirectTarget` cases; `"Język"` allowed token |
-| `context/changes/i18n-en/plan.md`, `handoff.md` | Progress 6.1-6.6 ticked with SHA; this file |
+| `src/content/copy.ts` | hero amount comment now `DESIGN-GAP: K44` |
+| `context/foundation/design-kit.md` | K44 row (landing mock-up amount literal) |
+| `context/changes/i18n-en/follow-ups/review-fixes.md` | new: 2 closed, 5 open items each with `Trigger:` |
+| `context/changes/i18n-en/plan.md`, `change.md`, `handoff.md` | Progress 7.1-7.6 ticked with SHA; status; this file |
 
 ## 3. Verification
 
 | Command | Result |
 | --- | --- |
-| `npm run lint` | 0 errors, 0 warnings (baseline 0) |
-| `npx astro check` | 0 errors |
+| `npm run lint` | 0 errors, 0 warnings |
+| `npx astro check` | 0 errors (3 hints, as before) |
 | `npm run fixture:check` | ing OK, santander OK |
-| `npm test` | 430 passed (baseline 425, +5), 30 files |
+| `npm test` | 430 passed (baseline 430, +0), 30 files |
 | `npm run build` | OK |
 | `npx supabase db reset && npx supabase test db` | Files=6, Tests=119, PASS (Δ0) |
-| `npm run smoke` (port 4398) | 205 PASS / 0 FAIL (baseline 198, +7) |
-| Break 1: `localeRedirectTarget` returns the referer for a foreign origin | unit case "foreign origin" red (12 other cases green) and smoke "ignores a foreign referer" red (303 to `https://example.com/x`); restored. Meta-check: only the foreign-origin case failed, so the red is the origin guard, not the parser |
-| Break 2: `z.enum(LOCALES)` replaced by `z.string()` | smoke "rejects an unknown value" red (303, not 400), all else green; restored. Meta-check: the cookie value `xx` would still resolve to `pl`, so the status is the only observable proof |
+| `npm run smoke` (port 4398) | 205 PASS / 0 FAIL (baseline 205, +0; cumulative +10 over 195); last step `locale=pl` |
+| `git diff main -- design/ src/styles/brand.css` | empty |
+| Break: `<span>Zapisz</span>` then `<span>Usuń</span>` appended to `LocaleSwitch.astro` | diacritic grep: 0 hits for `Zapisz` (not caught), 1 hit for `Usuń` (caught); restored. Meta-check: the sweep catches diacritic words only; a diacritic-free Polish literal passes it |
 
 ## 4. Next command
 
-`/10x-implement i18n-en phase 7`
+`/10x-impl-review i18n-en`
 
 ## 5. Open
 
-- Phases: P7 seam sweep, `follow-ups/review-fixes.md`, visual gate in both locales (PL shots need `rytm-locale=pl`); P7 notes `AuthLayout` title weight and landing steps head as closed (done here in P6).
-- Manual-only rows still open: `[reviewer]` 1.7, 2.7, 3.8, 4.8, 5.8, 6.7, 7.7; `[visual]` 6.8, 7.8, 7.9; `[human]` 7.10.
-- DESIGN-GAPs: K42 and K43 registered in `design-kit.md` (status `open · S-16`); comments in `en/kit.ts`, `en/extra.ts`, `copy.ts` (`copyExtra.locale`), `LocaleSwitch.astro`.
-- Switch looks unverified visually (`LocaleSwitch` in the `SiteFooter` span, absolute top-right corner of `AuthLayout` main, `/settings` panel before the danger zone): row 6.8 and the P7 gate own it; the bilingual title crowding at 400 px is the decision-13 trigger.
+- Manual rows still open: `[reviewer]` 1.7, 2.7, 3.8, 4.8, 5.8, 6.7, 7.7; `[visual]` 6.8, 7.8, 7.9; `[human]` 7.10.
+- The diacritic sweep misses Polish words without diacritics (e.g. `Zapisz`); the EN visual gate is the backstop.
+- DESIGN-GAPs: K42, K43, K44 registered in `design-kit.md` (`open · S-16`); every `DESIGN-GAP` id in `src` has a row.
+- Follow-ups: `context/changes/i18n-en/follow-ups/review-fixes.md` (PanelTitle sweep, S-14 F7, E2E setup, EN copy replacement, K42-K44 to the kit author).
+- Visual gate watch: `LocaleSwitch` placements (`SiteFooter`, `AuthLayout` corner, `/settings` Panel) and bilingual title at 400 px (decision 13 trigger); a hydration warning in an EN `PatternsTable` becomes the E2E follow-up trigger.
+- Roadmap row S-16 still `planning`; archive flips it.
 - `checkOrigin` stays default (follow-up `2026-09-25-undo-import` F3).
-- Caveats: `prettier --write src` rewrites `src/styles/brand.css`; macOS `sed -i` needs `''`; zsh word-splitting breaks `[...key]` paths.
+- Caveats: `prettier --write src` rewrites `src/styles/brand.css`; prettier on `design-kit.md` realigns the whole table.
 - No migration.
 
 ## 6. Autonomous decisions
@@ -90,4 +86,11 @@ Written by the `/10x-implement i18n-en phase 6` step of run `2026-10-03-i18n-en`
 28. **Footer / auth / settings placement details** (switch inside the right footer span with `ml-[18px]`; auth corner `absolute top-4 right-4` on a `relative` main; settings Panel with title left, switch right) are my layout choice within the plan's placements, to be judged by row 6.8. Would change: the visual gate.
 29. **Landing steps head**: `max-[559px]:flex-col items-start gap-2` on the flex row (the plan said "stacks below 560 px"). Would change: the visual gate showing a gap mismatch with the kit.
 30. **Rows 6.7 and 6.8 left unticked**: `[reviewer]` / `[visual]`, not mine.
+31. **Exec mode: implement in this context** (comment, register row, follow-ups file). Would change: n/a.
+32. **Commit message `feat(i18n-en): Seam sweep, follow-ups and register (p7)` approved as drafted** (plan title is longer, includes the visual gate that is not this step's).
+33. **Hero amount gap gets its own row K44**, not K42 (K42 is "kit has no EN copy"; the PL amount literal is a separate kit gap). Comment `DESIGN-GAP: K44` in `copy.ts` `copyExtra.landing`. Would change: the owner wanting it folded into K42.
+34. **`design-kit.md` row inserted by hand, not prettier-formatted** (prettier realigns the whole table, 123-line diff). Would change: a repo-wide table reformat.
+35. **Seam greps found no code change**: one `INTL_TAG`, one `LOCALE_COOKIE`, one `getMonths`, one `Widen`, no `DELETE_CONFIRM_WORD`/`lang="pl"` mention; "Phase N" comments are older slices' own phase numbers (S-05, S-10, S-11), not this slice's. Diacritic hits outside `src/content/` are data or comments: `format.ts` (`zł`, `wrześniu` PL-only branch), `auth-rules.ts` (`USUŃ`), `santander.ts` regex, a `[...key].astro` comment.
+36. **Roadmap row S-16 left at `planning`**: archive owns the `done` flip; not touched. Would change: the orchestrator wanting `in-progress` mid-run.
+37. **Rows 7.7 [reviewer], 7.8, 7.9 [visual], 7.10 [human] left unticked** (not mine). `change.md` set to `implemented` per the last-phase epilogue even with those open.
 

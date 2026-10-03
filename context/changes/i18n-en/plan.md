@@ -745,12 +745,12 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Automated
 
-- [ ] 7.1 npm test: Phase 6 count PASS, 0 failed
-- [ ] 7.2 Smoke Phase 6 count PASS, 0 FAIL
-- [ ] 7.3 Seam greps empty or each hit named as data
-- [ ] 7.4 Slice leaves design/ and brand.css untouched
-- [ ] 7.5 Deliberate break: Polish literal outside src/content checked against the sweep grep, restored, meta-check recorded
-- [ ] 7.6 Full local gate vs baseline, smoke + 10 cumulative
+- [x] 7.1 npm test: Phase 6 count PASS, 0 failed — ce7a1f0
+- [x] 7.2 Smoke Phase 6 count PASS, 0 FAIL — ce7a1f0
+- [x] 7.3 Seam greps empty or each hit named as data — ce7a1f0
+- [x] 7.4 Slice leaves design/ and brand.css untouched — ce7a1f0
+- [x] 7.5 Deliberate break: Polish literal outside src/content checked against the sweep grep, restored, meta-check recorded — ce7a1f0
+- [x] 7.6 Full local gate vs baseline, smoke + 10 cumulative — ce7a1f0
 
 #### Manual
 

@@ -1,18 +1,20 @@
 // PatternsTable — prototype patterns() toolbar + table + foot (app.js), search/sort as in bindInteractions().
 // Renders only non-excluded patterns (`/patterns.astro` filters); the excluded ones go to `ExcludedPatterns`
-// (S-05 Phase 7). DESIGN-GAP: G28 — „Pokaż więcej” (`patterns.showMore`, kit round 3) is S-14.
+// (S-05 Phase 7).
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/app/Badge";
 import { field, control } from "@/components/app/field-styles";
 import { Glyph } from "@/components/Glyph";
+import { Button } from "@/components/ui/button";
+import { listView, type PatternSort } from "@/lib/patterns/list-view";
 import { formatMoney, plural } from "@/lib/format";
 import { merchantMark } from "@/components/patterns/merchant-mark";
 import { patternHref } from "@/lib/patterns/path";
 import { cn } from "@/lib/utils";
 import type { PatternListItem, Threshold } from "@/types";
 
-type SortKey = "sum" | "count" | "name";
+type SortKey = PatternSort;
 const SORT_KEYS: readonly SortKey[] = ["sum", "count", "name"];
 
 export interface PatternsTableCopy {
@@ -32,6 +34,8 @@ export interface PatternsTableCopy {
   thresholdSum: string;
   /** Arrow cell `aria-label` — „Otwórz wzorzec” (K21). */
   openPattern: string;
+  /** `copy.patterns.showMore` — the table-foot button. */
+  showMore: string;
   /** `copy.components.new` / `.changed`. */
   statusLabels: { new: string; changed: string };
 }
@@ -62,18 +66,14 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
   const [term, setTerm] = useState("");
   const [sort, setSort] = useState<SortKey>("sum");
 
-  const visible = useMemo(() => {
-    const needle = term.toLowerCase();
-    // The input order is the tie-breaker (stable sort), so equal sums/counts keep the server's order.
-    const list = patterns.filter((p) => p.name.toLowerCase().includes(needle));
-    if (sort === "name") return list.sort((a, b) => a.name.localeCompare(b.name, "pl"));
-    if (sort === "count") return list.sort((a, b) => b.occurrences - a.occurrences);
-    return list.sort((a, b) => b.sumMinor - a.sumMinor);
-  }, [patterns, term, sort]);
+  const [expanded, setExpanded] = useState(false);
 
-  const footer = copy.footer
-    .replace("{n}", String(visible.length))
-    .replace("{patterns}", plural(visible.length, copy.patternForms));
+  const { shown, total, hasMore } = useMemo(
+    () => listView(patterns, term, sort, expanded),
+    [patterns, term, sort, expanded],
+  );
+
+  const footer = copy.footer.replace("{n}", String(total)).replace("{patterns}", plural(total, copy.patternForms));
 
   return (
     <>
@@ -124,7 +124,7 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
               </tr>
             </thead>
             <tbody className="[&>tr:last-child>td]:border-b-0">
-              {visible.map((p) => (
+              {shown.map((p) => (
                 <tr key={p.key}>
                   <td className={cell}>
                     <a
@@ -179,8 +179,18 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
             </tbody>
           </table>
         </div>
-        <div className="border-line text-muted flex items-center justify-between border-t px-[17px] py-[13px] text-xs max-[559px]:flex-col max-[559px]:items-start">
+        <div className="border-line text-muted flex items-center justify-between border-t px-[17px] py-[13px] text-xs max-[559px]:flex-col max-[559px]:items-start max-[559px]:gap-[13px]">
           <span>{footer}</span>
+          {hasMore ? (
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setExpanded(true);
+              }}
+            >
+              {copy.showMore}
+            </Button>
+          ) : null}
         </div>
       </section>
     </>

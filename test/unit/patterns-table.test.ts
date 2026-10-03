@@ -17,6 +17,7 @@ const tableCopy: PatternsTableCopy = {
   thresholdCount: x.thresholdCount,
   thresholdSum: x.thresholdSum,
   openPattern: x.openPattern,
+  showMore: copy.patterns.showMore,
   statusLabels: { new: copy.components.new, changed: copy.components.changed },
 };
 
@@ -65,5 +66,17 @@ describe("PatternsTable render", () => {
     expect(html).toContain(`>${copy.components.new}<`);
     expect(html).toContain(`>${copy.components.changed}<`);
     expect(html.match(new RegExp(`>${copy.components.new}<`, "g"))).toHaveLength(1);
+  });
+
+  it("pages a 12-row list: 10 body rows, the button, count line for all 12", () => {
+    const rows = Array.from({ length: 12 }, (_, i) => item({ key: `k${i}`, name: `Sklep ${i}`, sumMinor: 1000 + i }));
+    const html = render(rows);
+    expect(html.match(/<tr/g)).toHaveLength(11); // 1 head + 10 body
+    expect(html).toContain(`>${copy.patterns.showMore}<`);
+    expect(html).toContain(">12 ");
+  });
+
+  it("shows no button for a short list", () => {
+    expect(render([item({})])).not.toContain(`>${copy.patterns.showMore}<`);
   });
 });

@@ -756,12 +756,12 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Automated
 
-- [ ] 3.1 npm test: Phase 2 count plus list-view and render cases, 0 failed
-- [ ] 3.2 Smoke Phase 2 count + 1 PASS, 0 FAIL
-- [ ] 3.3 No G28 left in PatternsTable.tsx
-- [ ] 3.4 Deliberate break: page size 1 turns the new smoke step and list-view tests red, restored, meta-check recorded
-- [ ] 3.5 Deliberate break: slice before filter in listView turns the last-by-sum search case red, restored
-- [ ] 3.6 Full local gate vs baseline, smoke + 1
+- [x] 3.1 npm test: Phase 2 count plus list-view and render cases, 0 failed
+- [x] 3.2 Smoke Phase 2 count + 1 PASS, 0 FAIL
+- [x] 3.3 No G28 left in PatternsTable.tsx
+- [x] 3.4 Deliberate break: page size 1 turns the new smoke step and list-view tests red, restored, meta-check recorded
+- [x] 3.5 Deliberate break: slice before filter in listView turns the last-by-sum search case red, restored
+- [x] 3.6 Full local gate vs baseline, smoke + 1
 
 #### Manual
 

@@ -485,6 +485,11 @@ const steps = [
     { status: 200, contains: ">Ponad progiem<" },
   ],
   [
+    "patterns list shows no Pokaż więcej for a short list",
+    () => request("/patterns"),
+    { status: 200, notContains: ">Pokaż więcej<" },
+  ],
+  [
     "home shows the trend without a threshold",
     () => request("/home"),
     {

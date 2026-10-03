@@ -18,3 +18,20 @@ Each item carries a `Trigger:` line; later slices grep for it.
       Trigger: kit ships EN copy (K42)
 - [ ] **K42–K44 to the kit author** — no EN copy, no language switcher, no key for the landing mock-up amount.
       Trigger: kit round 4
+
+## From `/10x-impl-review` (2026-10-03)
+
+- [x] **F1 `getMonths` EN nominative was Polish** — `src/content/copy.ts` `getMonths` read `Object.keys(monthNames)`
+      for every locale; EN keys are Polish, so `/home` lead said "Your wrzesień…". Fixed `1dbab76` + unit case.
+      Trigger: n/a (closed)
+- [ ] **F2 No `Vary` / `Cache-Control: private` on locale-varying HTML** — `src/middleware.ts` `onRequest` resolves the
+      locale from cookie + `Accept-Language`, but responses carry no `Vary: Cookie, Accept-Language`. Harmless today
+      (Vercel does not edge-cache SSR responses, no `s-maxage`, no prerendered page).
+      Trigger: any slice adding `Cache-Control` / `s-maxage` / ISR / `prerender = true` on a page, or a CDN in front of Vercel
+- [ ] **F3 EN imports store English default account names** — `importFlow.accountDefaultING` /
+      `copyExtra.imports.santanderAccountName` are locale-dependent, so an import made in EN saves "Main account" in
+      the DB and shows it in PL later. Data, user-editable; accepted for now.
+      Trigger: owner reports mixed-language account names, or a slice touching account naming
+- [ ] **F4 EN spelling "e-mail" (kit.ts) vs "email" (extra.ts)** — `kitEn.auth.fields.email`, `kitEn.authStates.*`
+      vs `extraEn.auth.confirmEmailVisual.lead`, `extraEn.auth.confirmedLogin`. Cosmetic.
+      Trigger: `[human]` row 7.10 translation review, or EN copy replacement (K42)

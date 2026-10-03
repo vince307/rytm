@@ -660,7 +660,7 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Manual
 
-- [ ] 1.7 [reviewer] i18n.ts pure; middleware adds no await before Supabase
+- [x] 1.7 [reviewer] i18n.ts pure; middleware adds no await before Supabase — impl-review
 
 ### Phase 2: Locale-aware formatting
 
@@ -675,7 +675,7 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Manual
 
-- [ ] 2.7 [reviewer] No pl-PL default in any formatter; time zones untouched; islands add only locale
+- [x] 2.7 [reviewer] No pl-PL default in any formatter; time zones untouched; islands add only locale — impl-review
 
 ### Phase 3: Copy channel getCopy(locale)
 
@@ -691,7 +691,7 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Manual
 
-- [ ] 3.8 [reviewer] copyExtraPl bytes unchanged apart from moved literals; month reads only via getMonths; island props via KitCopy/CopyExtra
+- [x] 3.8 [reviewer] copyExtraPl bytes unchanged apart from moved literals; month reads only via getMonths; island props via KitCopy/CopyExtra — 1dbab76
 
 ### Phase 4: EN kit dictionary
 
@@ -707,7 +707,7 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Manual
 
-- [ ] 4.8 [reviewer] EN translation natural, placeholders grammatical, no invented key
+- [x] 4.8 [reviewer] EN translation natural, placeholders grammatical, no invented key — impl-review
 
 ### Phase 5: EN extra dictionary, locale resolution live, delete word per locale
 
@@ -723,7 +723,7 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Manual
 
-- [ ] 5.8 [reviewer] getCopy("en") EN only; dialog and server share the word source; no PL string in extraEn
+- [x] 5.8 [reviewer] getCopy("en") EN only; dialog and server share the word source; no PL string in extraEn — impl-review
 
 ### Phase 6: Language switch and /api/locale
 
@@ -738,7 +738,7 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Manual
 
-- [ ] 6.7 [reviewer] Switch tokens only, no-JS, aria-pressed; no open redirect; cookie flags match signup
+- [x] 6.7 [reviewer] Switch tokens only, no-JS, aria-pressed; no open redirect; cookie flags match signup — impl-review
 - [ ] 6.8 [visual] Quick look 1280 and ~400 px of footer, auth corner and settings section in PL and EN
 
 ### Phase 7: Seam sweep, follow-ups and visual gate
@@ -754,7 +754,7 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Manual
 
-- [ ] 7.7 [reviewer] Seam sweep complete, follow-ups carry Trigger lines, register matches code
+- [x] 7.7 [reviewer] Seam sweep complete, follow-ups carry Trigger lines, register matches code — 1dbab76
 - [ ] 7.8 [visual] EN screenshots desktop + ~400 px of every listed view and state, switch focus in all three places
 - [ ] 7.9 [visual] PL screenshots desktop + ~400 px with rytm-locale=pl, copy unchanged apart from the switch and the two follow-ups
 - [ ] 7.10 [human] Accept S-16 product choices (own EN translation K42, switch design K43 with bilingual section title, USUŃ or DELETE, Accept-Language first visit, parity test instead of compile error for lengths and placeholders, default Supabase e-mails) and send K42–K43 to the kit author

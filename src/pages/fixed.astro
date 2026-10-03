@@ -49,7 +49,7 @@ if ("error" in result) {
 // K23 templates — verbatim row/section copy the kit only renders in `app.js` (`fixedCosts()`), not in
 // `content.json`; `{n}`/`{items}`/`{date}`/`{amount}` interpolation follows the codebase's `.replace()` convention
 // (`patterns/[...key].astro` `sumLabel`, `imports/result.astro` `title`).
-const itemForms = copy.fixedCosts.itemForms as unknown as readonly [string, string, string];
+const itemForms = copy.fixedCosts.itemForms as [string, string, string]; // 3 forms pinned in kit-contract.test.ts
 const countText = (n: number) => x.count.replace("{n}", String(n)).replace("{items}", plural(n, itemForms));
 const previouslyText = (occurredOn: string, previousMinor: number) =>
   x.previously.replace("{date}", formatIsoDate(occurredOn)).replace("{amount}", formatMoney(previousMinor));

@@ -1,10 +1,10 @@
 ---
 // /home — kit `dashboard()` no-name variant (round 3): one `.stats-single` accent card, the `trendChart()`
-// `.monthly-trend` panel and the `.dashboard-fixed` „Koszty stałe” summary (FR-013, US-05, FR-012, US-04, S-07, S-15). `loadPatternData` → `overLimitTrend(patterns, rows,
-// thresholds)` → `fixedOverview(patterns, rows)` → `homeStats(trend, fixed)`, all inside one `try` (S-06
-// follow-up: a `patternTxs` id-drift throw must not become a 500 here; `/patterns` and `/fixed` are not
-// retrofitted — one view, tracked as a follow-up). The pre-import state (`referenceMonth === null`) is
-// unchanged from before this change.
+// `.monthly-trend` panel and the `.dashboard-fixed` „Koszty stałe” summary (FR-013, US-05, FR-012, US-04, S-07,
+// S-15). `loadPatternData` → `overLimitTrend(patterns, rows, thresholds)` → `fixedOverview(patterns, rows)` →
+// `homeStats(trend, fixed)`, all inside one `try` (S-06 follow-up: a `patternTxs` id-drift throw must not become a
+// 500 here; `/fixed` and `/patterns/<key>` got the same boundary in S-15). The pre-import state
+// (`referenceMonth === null`) reads the kit `home.*` empty-state keys.
 import AppLayout from "@/layouts/AppLayout.astro";
 import EmptyState from "@/components/app/EmptyState.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";

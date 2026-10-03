@@ -83,6 +83,8 @@ describe("kit contract (content.json as the app reads it)", () => {
     expect(copy.importFlow.debitForms).toHaveLength(3);
     // patterns.astro / ExcludedPatterns cast `patterns.countForms` to a 3-tuple for `plural()` (S-14 impl review).
     expect(copy.patterns.countForms).toHaveLength(3);
+    // fixed.astro casts `fixedCosts.itemForms` to a 3-tuple for `plural()` (S-15 impl review).
+    expect(copy.fixedCosts.itemForms).toHaveLength(3);
   });
 
   it("keeps the auth keys confirm-email and reset/new read (S-12 P7)", () => {
@@ -132,7 +134,7 @@ describe("kit contract (content.json as the app reads it)", () => {
     // A leaf equal to a kit string is a duplicate, not a gap — rebind it to `copy`. Each exception is a different
     // role for the same bytes (the kit key belongs to another component / heading), so it must carry a reason.
     const ROLE_EXCEPTIONS: Record<string, string> = {
-      "auth.saving": "`threshold.saving` belongs to the threshold editor, another component's namespace",
+      "auth.saving": "`threshold.saving` / `patternActions.saving` belong to other components' namespaces",
       "settings.close": "`patternActions.close*` / `imports.deleteClose` are other dialogs' buttons",
       "settings.deleting": "`imports.deleteWaiting` is the import dialog's pending label",
       "patterns.mergeSubmit": "`patternActions.mergeTitle` is the dialog's h2, not the submit button",

@@ -815,12 +815,12 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Automated
 
-- [ ] 7.1 npm test: Phase 6 count, 0 failed, decision-form cases unchanged
-- [ ] 7.2 Smoke Phase 6 count + 3 PASS, 0 FAIL
-- [ ] 7.3 No G32 / G33 / defaultValue={name} left in PatternActionsDialog.tsx
-- [ ] 7.4 Deliberate break: renameLong without the {n} fill turns the error=name step red, restored, meta-check recorded
-- [ ] 7.5 Deliberate break: error=merge back to the old text turns the error=merge step red, restored
-- [ ] 7.6 Full local gate vs baseline, smoke + 8 (or + 9)
+- [x] 7.1 npm test: Phase 6 count, 0 failed, decision-form cases unchanged — 4775d69
+- [x] 7.2 Smoke Phase 6 count + 3 PASS, 0 FAIL — 4775d69
+- [x] 7.3 No G32 / G33 / defaultValue={name} left in PatternActionsDialog.tsx — 4775d69
+- [x] 7.4 Deliberate break: renameLong without the {n} fill turns the error=name step red, restored, meta-check recorded — 4775d69
+- [x] 7.5 Deliberate break: error=merge back to the old text turns the error=merge step red, restored — 4775d69
+- [x] 7.6 Full local gate vs baseline, smoke + 8 (or + 9) — 4775d69
 
 #### Manual
 

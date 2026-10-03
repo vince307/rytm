@@ -26,7 +26,9 @@ const { bars, legend, ariaLabel, note, zeroNote, noThreshold } = Astro.props;
 // the month labels hang 22 px below the baseline (kit `.tbar:after` `bottom:-22px`) inside the wrapper's `pb-[22px]`,
 // so the legend keeps the kit's 31 px from the baseline (9 px + 22 px). `flex-row-reverse` on the scroll box makes a
 // long axis that overflows (≈ 400 px viewport, 12 months) open scrolled to its END — the reference month the stat
-// card above reports — instead of the oldest one (DOM and reading order unchanged; G35).
+// card above reports — instead of the oldest one (DOM and reading order unchanged; G35). The value keeps kit
+// `.trend-value` `margin-bottom:5px` but not its ≤ 560 px `white-space:normal`: the long axis scrolls instead, so a
+// value never wraps onto two lines (visual gate S-15, impl review F5).
 ---
 
 <div class="flex flex-row-reverse overflow-x-auto">
@@ -38,7 +40,7 @@ const { bars, legend, ariaLabel, note, zeroNote, noThreshold } = Astro.props;
     <ol aria-label={ariaLabel} class="flex h-[200px] gap-[13px] border-b border-line px-2.5 max-[559px]:gap-[7px]">
       {bars.map((bar) => (
         <li class="relative flex min-w-[44px] flex-1 flex-col items-center">
-          <span class="shrink-0 text-[11px] font-bold whitespace-nowrap text-ink max-[559px]:text-[9px] max-[359px]:text-[8px]">
+          <span class="mb-[5px] shrink-0 text-[11px] font-bold whitespace-nowrap text-ink max-[559px]:text-[9px] max-[359px]:text-[8px]">
             {bar.amount}
           </span>
           <div class="relative w-full flex-1">

@@ -4,7 +4,7 @@
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/app/Badge";
-import { field, control } from "@/components/app/field-styles";
+import { field, control, focusRing } from "@/components/app/field-styles";
 import { Glyph } from "@/components/Glyph";
 import { Button } from "@/components/ui/button";
 import { listView, type PatternSort } from "@/lib/patterns/list-view";
@@ -51,7 +51,6 @@ interface PatternsTableProps {
 
 const cell = "border-b border-line px-[17px] py-4 align-middle";
 const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] whitespace-nowrap text-muted uppercase");
-const focusRing = "outline-none focus-visible:ring-[3px] focus-visible:ring-ink/15";
 
 /** Próg cell (kit `patternRows()`): `count` → „{n} × / miesiąc” (K21 verbatim), `amount` → the money itself,
  * `sum` → „{amount} / miesiąc” (G31 placeholder — the kit never renders a sum-kind threshold), none → „—”. */

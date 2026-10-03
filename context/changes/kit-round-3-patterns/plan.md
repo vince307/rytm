@@ -771,12 +771,12 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Automated
 
-- [ ] 4.1 npm test: Phase 3 count plus new kit-contract cases, 0 failed
-- [ ] 4.2 Smoke Phase 3 count PASS, 0 FAIL, Δ0
-- [ ] 4.3 No G29 / G32 in src; focus-visible:ring-ink/15 only in field-styles.ts
-- [ ] 4.4 Deliberate break: field back to rounded-lg turns kit-contract red, restored, meta-check recorded
-- [ ] 4.5 Deliberate break: dialog padding back to 31 px turns the dialog pin red, restored, meta-check recorded
-- [ ] 4.6 Full local gate vs baseline, smoke Δ0
+- [x] 4.1 npm test: Phase 3 count plus new kit-contract cases, 0 failed
+- [x] 4.2 Smoke Phase 3 count PASS, 0 FAIL, Δ0
+- [x] 4.3 No G29 / G32 in src; focus-visible:ring-ink/15 only in field-styles.ts
+- [x] 4.4 Deliberate break: field back to rounded-lg turns kit-contract red, restored, meta-check recorded
+- [x] 4.5 Deliberate break: dialog padding back to 31 px turns the dialog pin red, restored, meta-check recorded
+- [x] 4.6 Full local gate vs baseline, smoke Δ0
 
 #### Manual
 

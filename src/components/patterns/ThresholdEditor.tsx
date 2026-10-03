@@ -5,6 +5,7 @@
 // (type="submit") targeting a sibling <form> via the `form` attribute — forms cannot nest (S-04 Critical
 // Implementation Details, "Nested forms").
 import { useId, useState } from "react";
+import { fieldBox } from "@/components/app/field-styles";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { usePageShowReset } from "@/components/hooks/usePageShowReset";
@@ -101,9 +102,9 @@ export function ThresholdEditor({ patternKey, type, threshold, month, copy }: Th
         <div className="grid gap-[7px]">
           <label className="grid gap-[7px] text-xs font-bold">
             <span>{valueLabel}</span>
-            {/* kit `.input-suffix`: radius 8px; the suffix `b` keeps its bolder weight. DESIGN-GAP: G32 — the kit box is
-                `--white` (#fff), which is not one of the brand tokens; `paper` is kept until the author adds one. */}
-            <div className="border-line bg-paper focus-within:border-ink focus-within:ring-ink/8 flex items-center overflow-hidden rounded-[8px] border focus-within:ring-[3px]">
+            {/* kit `.input-suffix`: radius 8px; the suffix `b` keeps its bolder weight; the shared `fieldBox`
+                (`--rytm-field` = paper). */}
+            <div className={cn(fieldBox, "flex items-center overflow-hidden")}>
               {/* keyed on the active kind so switching frequent/sum resets the field to that kind's own stored value */}
               <input
                 key={activeKind}

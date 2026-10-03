@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { fieldBox } from "@/components/app/field-styles";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Glyph } from "@/components/Glyph";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { usePageShowReset } from "@/components/hooks/usePageShowReset";
+import { cn } from "@/lib/utils";
 import type { PatternType } from "@/types";
 
 // Kit modal('patternActions') (app.js) wired to POST /api/patterns/decision (S-05). The kit's four ghost buttons
@@ -44,11 +46,9 @@ interface Props {
 // `.modal-actions{display:grid}` and so stretch to the column's full width. Here each sits inside a `<div>` / `<form>`
 // wrapper (the grid item), so the button needs its own `w-full` (visual gate: content-width buttons at 1440 / 400).
 const actionButton = "w-full justify-start";
-// Kit `.modal-input`: radius 8px, padding 13, margin 4 0 16. DESIGN-GAP: G32 — `bg-paper` not the kit's `--white`
-// (ThresholdEditor precedent). The select has no kit reference (G33) — same box, no margin (labelled by a
+// Kit `.modal-input`: radius 8px, padding 13, margin 4 0 16; the box is the shared `fieldBox`. The select has no kit reference (G33) — same box, no margin (labelled by a
 // preceding <label>, F11: new fields use kit 8 px locally).
-const fieldBox =
-  "border-line bg-paper focus-within:border-ink focus-within:ring-ink/8 w-full rounded-[8px] border focus-within:ring-[3px]";
+const dialogFieldBox = cn(fieldBox, "w-full");
 
 export default function PatternActionsDialog({ patternKey, type, name, excluded, mergeTargets, copy }: Props) {
   // Which action is in flight: every submit is disabled while one posts, but only the one that was pressed shows
@@ -113,7 +113,7 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
                 <input type="hidden" name="action" value="merge" />
                 <label className="grid gap-[7px] text-xs font-bold">
                   <span>{copy.mergeLabel}</span>
-                  <div className={fieldBox}>
+                  <div className={dialogFieldBox}>
                     <select
                       name="target"
                       required
@@ -193,7 +193,7 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
                 <input type="hidden" name="action" value="rename" />
                 <label className="grid gap-[7px] text-xs font-bold">
                   <span>{copy.renameLabel}</span>
-                  <div className={fieldBox}>
+                  <div className={dialogFieldBox}>
                     <input
                       name="name"
                       maxLength={100}

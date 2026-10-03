@@ -6,6 +6,9 @@
  */
 import { describe, expect, it } from "vitest";
 
+import { field, fieldBox, focusRing } from "@/components/app/field-styles";
+import { buttonVariants } from "@/components/ui/button";
+import { dialogContentClass } from "@/components/ui/dialog";
 import { copy, copyExtra } from "@/content/copy";
 import { DELETE_CONFIRM_WORD, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 import { MAX_DEBITS, MAX_FILE_BYTES } from "@/lib/import/schema";
@@ -98,5 +101,18 @@ describe("kit contract (content.json as the app reads it)", () => {
     }
     // The dialog's confirmation hint must name the word the server compares against.
     expect(s.deleteConfirm).toContain(DELETE_CONFIRM_WORD);
+  });
+
+  it("pins the shared field / focus / box classes and the round-3 dialog geometry (S-14 p4)", () => {
+    expect(field).toContain("rounded-[8px]");
+    expect(field).toContain("focus-within:ring-ink/12");
+    expect(field).toContain("focus-within:text-ink");
+    expect(focusRing).toContain("focus-visible:ring-ink/15");
+    for (const cls of focusRing.split(" ")) expect(buttonVariants()).toContain(cls);
+    expect(fieldBox).toContain("rounded-[8px]");
+    expect(fieldBox).toContain("bg-paper");
+    for (const cls of ["p-[26px]", "max-[559px]:px-[18px]", "max-[559px]:py-[22px]", "w-[calc(100%-32px)]"]) {
+      expect(dialogContentClass).toContain(cls);
+    }
   });
 });

@@ -37,7 +37,7 @@ if ("error" in result) {
   console.error("patterns list failed", result.error);
 }
 const items: PatternRow[] = "patterns" in result ? result.patterns : [];
-// Excluded patterns leave the table for the "Wykluczone" section below it (S-05 Phase 7, G28); the empty state
+// Excluded patterns leave the table for the "Wykluczone" section below it (S-05 Phase 7; kit „Wykluczone” section, final state); the empty state
 // (below) still keys off `items.length` — a list of only-excluded patterns is not "no patterns at all".
 const visibleItems = items.filter((p) => !p.excluded);
 const excludedItems = items.filter((p) => p.excluded).map((p) => ({ key: p.key, name: p.name }));

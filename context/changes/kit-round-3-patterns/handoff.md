@@ -1,6 +1,6 @@
 # Handoff — `kit-round-3-patterns` (slice S-14)
 
-Written by the visual-gate step of autonomous run `2026-10-02-kit-round-3`. All 35 `[visual]` states of rows 8.6 / 8.7
+Written by the visual-gate step of autonomous run `2026-10-02-kit-round-3`; final pre-merge state written by the archive + ship step. All 35 `[visual]` states of rows 8.6 / 8.7
 captured at 1280 + 400 px with kit frames, one real discrepancy fixed (`d70e3a0`, empty-view panel centring), F5
 closed with no change; `reviews/visual-review.md` ends `VISUAL: PASS`. Only `[human]` 8.9 stays open — it is a human
 checklist, not a blocker for archive/ship. No migrations in this slice.
@@ -11,8 +11,8 @@ checklist, not a blocker for archive/ship. No migrations in this slice.
 | --- | --- |
 | Branch | `feat/kit-round-3-patterns`, cut from `main` at `5ed97f4` |
 | Commits | p1 `5956c76` … p8 `76cdf39`, review fixes `5e85b9a`, impl-review docs `30d74b3`, visual fix `d70e3a0`, screenshots `2cbc2ed` + `3fe8416`, + this docs commit |
-| Pushed / PR / merged | no / no / no |
-| `change.md` status | `impl_reviewed` (unchanged; archive sets the next status) |
+| Pushed / PR / merged | PR/CI/merge/deploy recorded in `context/runs/2026-10-02-kit-round-3/run-log.md` |
+| `change.md` status | `archived` (`chore(archive): close kit-round-3-patterns`), folder → `context/archive/2026-10-03-kit-round-3-patterns/` |
 | `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`): `[human]` 8.9 |
 | Working tree | clean after the docs commit (`tree-clean.sh`) |
 
@@ -49,7 +49,7 @@ pgTAP 119 PASS; smoke 184/0). Observed in this step, after the fix.
 
 ## 4. Next command
 
-`/10x-archive kit-round-3-patterns then ship (no migrations)`
+none — shipped
 
 ## 5. Open
 
@@ -64,7 +64,8 @@ pgTAP 119 PASS; smoke 184/0). Observed in this step, after the fix.
 - Visual observations (not fixed, `reviews/visual-review.md`): kit threshold input renders UA white inside a paper
   box (app keeps paper); kit not-found `h1` falls back to the global h1 size (app keeps view-empty size); detail hero
   „Ponad progiem w tym miesiącu” predates S-14.
-- No new `DESIGN-GAP` ids. Roadmap `S-14` status not touched (orchestrator-owned).
+- No new `DESIGN-GAP` ids. Roadmap `S-14` closed as `done` by `/10x-archive`; Backlog Handoff refreshed.
+- Restated triggers for S-15 (`grep -n 'Trigger: S-15' context/archive/2026-10-03-kit-round-3-patterns/follow-ups/review-fixes.md`): `fixed.astro` `try` (adopt the kit error boundary), F8 `[...key].astro` assembly `try`, F9 `home.astro` stale `sumLabel` precedent comment. Shared changes S-15 inherits: field radius 8 px (`field-styles.ts`), one focus ring, `DialogContent` padding, centred `ViewEmpty`.
 
 ## 6. Autonomous decisions
 
@@ -85,3 +86,7 @@ pgTAP 119 PASS; smoke 184/0). Observed in this step, after the fix.
 5. **Kit-vs-app differences recorded as observations, not fixed:** UA white input and the kit not-found `h1` size are
    kit CSS artefacts; the in-place dialog sections, merged-variants placement and page-level errors are approved plan
    decisions 3 / 9 / 4 under `[human]` 8.9.
+6. **Archived with `[human]` 8.9 open** (archive step). Rejected: holding the archive until the owner signs off. Why:
+   the row is a post-run human checklist (agent contract), every automated and reviewer row is ticked with a SHA,
+   and the PR body lists it under „Do decyzji właściciela produktu”. Would change if the owner rejects a choice —
+   then a new change reverts it, the archive stays read-only.

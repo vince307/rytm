@@ -1,31 +1,28 @@
 ---
 // FixedSection.astro — kit `.fixed-section` (prototype `styles.css` `.fixed-section`, `.section-label`,
-// `.fixed-list`, `.compact`), one of the three `/fixed` sections (S-06 `fixedOverview`). The list wrapper reuses
+// `.fixed-list`), one of the three `/fixed` sections (S-06 `fixedOverview`). The list wrapper reuses
 // `ExcludedPatterns.astro`'s panel-look shape (`rounded-xl border border-line bg-paper`) with `px-5`, plus the
 // kit's `.fixed-list` ≤ 560 px padding that `ExcludedPatterns` has no kit rule for — so the class string is not
-// extracted into a shared constant: the two lists already differ (S-06 impl-review). Not the
-// shared `Panel` component, whose `p-[22px]` cannot be overridden reliably under tailwind-merge (same note as
-// that component). `compact` only marks the wrapper with the kit's own class name for parity with the prototype
-// markup — the actual row height difference is `FixedRow`'s own `compact` prop (a section's rows are rendered
-// through the slot, so this component cannot resize them after the fact).
-import { cn } from "@/lib/utils";
+// extracted into a shared constant. Not the shared `Panel` component, whose `p-[22px]` cannot be overridden
+// reliably under tailwind-merge. The list panel renders only when there are rows: an empty section is explained by
+// the page's kit info panel, not by an empty list panel. Row height belongs to `FixedRow`.
+import PanelTitle from "@/components/app/PanelTitle.astro";
 
 interface Props {
   title: string;
   count: string;
-  empty: string;
-  compact?: boolean;
   hasRows: boolean;
 }
-const { title, count, empty, compact = false, hasRows } = Astro.props;
+const { title, count, hasRows } = Astro.props;
 ---
 
 <section class="mt-[22px] mb-[22px]">
-  <div class="mb-[9px] flex items-center justify-between">
-    <h2 class="text-[17px] tracking-[-0.03em]">{title}</h2>
+  <PanelTitle variant="section" title={title}>
     <span class="text-xs text-muted">{count}</span>
-  </div>
-  <div class:list={cn("rounded-xl border border-line bg-paper px-5 max-[559px]:px-[14px]", compact && "compact")}>
-    {hasRows ? <slot /> : <p class="py-[18px] text-[13px] text-muted">{empty}</p>}
-  </div>
+  </PanelTitle>
+  {hasRows && (
+    <div class="rounded-xl border border-line bg-paper px-5 max-[559px]:px-[14px]">
+      <slot />
+    </div>
+  )}
 </section>

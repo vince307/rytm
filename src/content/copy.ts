@@ -146,22 +146,17 @@ export const copyExtra = {
     unmerged: "Scalenie cofnięte.",
   },
   fixed: {
-    eyebrow: "Koszty stałe",
     lead: "Rytm porównuje miesiące kalendarzowe i pokazuje różnice.",
     // DESIGN-GAP: K23 — row/section copy `fixedCosts()` (app.js) renders but `content.json` does not define:
-    // Polish plural count line, the "poprzednio" meta line and the "pierwsze wystąpienie" meta line. Verbatim
-    // from the prototype.
-    itemForms: ["pozycja", "pozycje", "pozycji"],
+    // the count line, the "poprzednio" meta line and the "pierwsze wystąpienie" meta line. Verbatim from the
+    // prototype (the plural forms come from `copy.fixedCosts.itemForms`).
     count: "{n} {items}",
     previously: "{date} · poprzednio {amount}",
     firstSeen: "pierwsze wystąpienie · {date}",
-    // DESIGN-GAP: G34 — "Koszty stałe" states the kit does not define: an empty section line (the kit's three
-    // sample sections always have rows) and the no-comparison-month message (US-04 AC). Placeholders; the author
-    // supplies the final copy.
-    changedEmpty: "Żaden koszt stały nie zmienił kwoty w tym miesiącu.",
+    // DESIGN-GAP: K40 — the delta direction word; the kit colours `.increase` / `.decrease` but names neither.
+    delta: { increase: "wzrost", decrease: "spadek" },
+    // DESIGN-GAP: G39 — the one empty state the kit does not define (the "Bez zmian" section with no rows).
     unchangedEmpty: "Brak kosztów stałych bez zmian w tym miesiącu.",
-    newEmpty: "Brak nowych kosztów stałych w tym miesiącu.",
-    noComparison: "Nie ma poprzedniego miesiąca do porównania.",
   },
   settings: {
     loginData: "Dane logowania",

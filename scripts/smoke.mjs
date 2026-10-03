@@ -508,7 +508,11 @@ const steps = [
   [
     "fixed with one month lists no change",
     () => request("/fixed"),
-    { status: 200, contains: ">Żaden koszt stały nie zmienił kwoty w tym miesiącu.<" },
+    {
+      status: 200,
+      contains: [">Zmieniły kwotę<", ">0 pozycji<"],
+      notContains: ">W tym miesiącu nie zmieniły się żadne koszty stałe.<",
+    },
   ],
   [
     "fixed fills the month in the new section title",
@@ -525,7 +529,7 @@ const steps = [
     () => request("/fixed"),
     {
       status: 200,
-      contains: ">Nie ma poprzedniego miesiąca do porównania.<",
+      contains: ">Brak poprzedniego miesiąca do porównania.<",
       notContains: ">nowy<",
     },
   ],
@@ -893,7 +897,11 @@ const steps = [
   [
     "fixed lists a changed amount",
     () => request("/fixed"),
-    { status: 200, contains: ">+1,50 zł<", notContains: ">Żaden koszt stały nie zmienił kwoty w tym miesiącu.<" },
+    {
+      status: 200,
+      contains: ">+1,50 zł · wzrost<",
+      notContains: ">W tym miesiącu nie zmieniły się żadne koszty stałe.<",
+    },
   ],
   [
     // "Koszty stałe" summary: Kawiarnia Rytm rose (`homeStats.fixedRisen` counts `deltaMinor > 0` only), Piekarnia
@@ -915,7 +923,10 @@ const steps = [
   [
     "fixed compares with the previous month",
     () => request("/fixed"),
-    { status: 200, notContains: ">Nie ma poprzedniego miesiąca do porównania.<" },
+    {
+      status: 200,
+      notContains: [">Brak poprzedniego miesiąca do porównania.<", ">Nie pojawiły się nowe koszty stałe.<"],
+    },
   ],
   ["pattern detail of an unknown key is not found", () => request("/patterns/nie%20ma%20takiego"), { status: 404 }],
   ["imports lists the delete action", () => request("/imports"), { status: 200, contains: ">Usuń import<" }],

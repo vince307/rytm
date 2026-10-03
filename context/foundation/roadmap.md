@@ -45,7 +45,7 @@ Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stał
 | S-12 | kit-round-3-auth-settings | przejść logowanie, rejestrację, reset hasła i ustawienia konta (zmiana hasła, usunięcie, wylogowanie, konto demo) w wersji rundy 3 kitu    | F-04          | FR-001, FR-019                         | done     |
 | S-13 | kit-round-3-imports       | wgrać plik z ING lub Santandera, zobaczyć wynik, odrzucenia i historię importów (z cofnięciem) w wersji rundy 3 kitu                       | F-04          | FR-003, FR-004, FR-005, FR-018         | done    |
 | S-14 | kit-round-3-patterns      | przeglądać wzorce, szczegół z progiem i dialog akcji (scal, zmień nazwę, typ, wyklucz) we wszystkich stanach rundy 3 kitu                  | F-04          | FR-007, FR-008, FR-009, FR-010, FR-011 | done |
-| S-15 | kit-round-3-home-fixed    | zobaczyć przegląd, trend „ponad progiem” i koszty stałe ze wszystkimi stanami (puste, brak porównania, błąd odczytu) w wersji rundy 3 kitu | F-04          | FR-011, FR-012, FR-013                 | pending |
+| S-15 | kit-round-3-home-fixed    | zobaczyć przegląd, trend „ponad progiem” i koszty stałe ze wszystkimi stanami (puste, brak porównania, błąd odczytu) w wersji rundy 3 kitu | F-04          | FR-011, FR-012, FR-013                 | planning |
 
 ## Baseline
 
@@ -120,7 +120,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Ostatni, bo zbiera resztki `copyExtra` (`home`, `fixed`, `app`) — jego ostatnia faza sprawdza, czy `copyExtra` zawiera już tylko to, czego kit naprawdę nie dał. Pozycje: K11 (home, fixed, app), K18 (przegląd, koszty stałe), K23, K24, K25, G34, G35, G36.
-- **Status:** pending
+- **Status:** planning
 
 ## Backlog Handoff
 

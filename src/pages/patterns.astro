@@ -48,7 +48,7 @@ const params = Astro.url.searchParams;
 const resultAlert = params.get("restored")
   ? { kind: "success" as const, message: copy.patternActions.restored }
   : params.get("error") === "decision"
-    ? { kind: "error" as const, message: x.decisionError }
+    ? { kind: "error" as const, message: copy.patternActions.saveError }
     : null;
 
 const tableCopy: PatternsTableCopy = {

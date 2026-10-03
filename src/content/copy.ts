@@ -166,31 +166,16 @@ export const copyExtra = {
     // Próg-cell format for a `sum` threshold — the kit's patternRows() never renders one (its five sample
     // patterns hold only count/amount thresholds), so this is a placeholder generalising the `count` format.
     thresholdSum: "{amount} / miesiąc",
-    // DESIGN-GAP: K22 — the "Akcje" dialog and its result toasts exist only in prototype/app.js
-    // (modal('patternActions'), showToast() calls in modal()), not in content.json; taken verbatim.
+    // K22: "Akcje" is the trigger label of modal('patternActions'); the kit's content.json has no key for it.
     actions: "Akcje",
-    actionsEyebrow: "Akcje na wzorcu",
-    actionsTitle: "Zarządzaj wzorcem.",
-    actionsLead: "Decyzje dotyczą wszystkich kolejnych miesięcy. Możesz je później odwrócić w ustawieniach wzorca.",
-    typeChanged: "Typ wzorca zmieniony.",
-    excludedToast: "Wzorzec wykluczony z analizy.",
-    // modal()'s close button aria-label is shared across every modal type, including patternActions.
-    close: "Zamknij",
-    // DESIGN-GAP: G33 — the kit names no merge picker, rename field, direct-submit type/exclude, merged-variants
-    // list, merge undo or result-line copy for FR-009 (the prototype only fires toasts on closeModal()); every
-    // string below is a placeholder built from tokens and kit-adjacent phrasing, not a design decision.
-    mergeLabel: "Scal z wzorcem",
-    mergeSubmit: "Scal",
-    mergeNone: "Brak innych wzorców do scalenia.",
-    renameLabel: "Nazwa sprzedawcy",
+    // DESIGN-GAP: G33 — the kit now draws merge, merge-empty and rename (content.json `patternActions.*`), but
+    // names no screen for the lead ("Decyzje dotyczą…": read here as the detail page), no separate modal views
+    // (the app reveals the forms in place) and no in-dialog errors (results are page lines); the merge field label
+    // and submit are app.js literals, the rename hint has no kit text.
+    mergeField: "Wzorzec",
+    mergeSubmit: "Scal wzorce",
     renameHint: "Pusta nazwa przywraca nazwę z wyciągu.",
-    renameSubmit: "Zapisz nazwę",
-    merged: "Wzorce scalone.",
     unmerged: "Scalenie cofnięte.",
-    renamed: "Nazwa zmieniona.",
-    mergeInvalid: "Nie można scalić z tym wzorcem.",
-    nameInvalid: "Nazwa może mieć najwyżej 100 znaków.",
-    decisionError: "Nie udało się zapisać decyzji. Spróbuj ponownie.",
   },
   fixed: {
     eyebrow: "Koszty stałe",

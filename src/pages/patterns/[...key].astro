@@ -20,6 +20,7 @@ import RestoreForm from "@/components/patterns/RestoreForm.astro";
 import { ThresholdEditor, type ThresholdEditorCopy } from "@/components/patterns/ThresholdEditor";
 import { copy, copyExtra } from "@/content/copy";
 import { fillMonthLocative, formatIsoDate, formatMoney, formatMonthShort, plural } from "@/lib/format";
+import { DISPLAY_NAME_MAX } from "@/lib/patterns/decision-form";
 import { loadPatternData } from "@/lib/patterns/load";
 import { sequenceLabel } from "@/lib/patterns/sequence-label";
 import { referenceMonth } from "@/lib/patterns/over-limit";
@@ -109,22 +110,30 @@ const editorCopy: ThresholdEditorCopy = {
 
 const actionsCopy: PatternActionsCopy = {
   actions: x.actions,
-  actionsEyebrow: x.actionsEyebrow,
-  actionsTitle: x.actionsTitle,
-  actionsLead: x.actionsLead,
+  eyebrow: copy.patternActions.eyebrow,
+  title: copy.patternActions.title,
+  lead: copy.patternActions.lead,
+  close: copy.patternActions.closeLabel,
+  saving: copy.patternActions.saving,
   merge: copy.patternActions.merge,
   changeType: copy.patternActions.changeType,
   rename: copy.patternActions.rename,
   exclude: copy.patternActions.exclude,
-  mergeLabel: x.mergeLabel,
+  mergeTitle: copy.patternActions.mergeTitle,
+  mergeLead: copy.patternActions.mergeLead,
+  mergeEmpty: copy.patternActions.mergeEmpty,
+  mergeField: x.mergeField,
   mergeSubmit: x.mergeSubmit,
-  mergeNone: x.mergeNone,
-  renameLabel: x.renameLabel,
+  renameTitle: copy.patternActions.renameTitle,
+  renameLabel: copy.patternActions.renamePlaceholder,
   renameHint: x.renameHint,
-  renameSubmit: x.renameSubmit,
-  saving: copyExtra.auth.saving,
-  close: x.close,
+  renameSubmit: copy.patternActions.save,
 };
+
+// The stored rename override of this pattern ("" = none): the rename field's value, so an untouched save posts what
+// is already stored (an empty value writes no override) instead of freezing the statement name as one (F5).
+const storedName =
+  pattern && "patterns" in dataResult ? (dataResult.decisions.get(pattern.key)?.displayName ?? "") : "";
 
 // Other analysed (non-excluded — S-05 decision 7: a merge target must not itself be excluded), non-self patterns,
 // sorted by name (`pl`) — mirrors validateMerge's own root/excluded checks so the picker never offers a target the
@@ -158,23 +167,26 @@ const unmergeClass = buttonVariants({ variant: "text", size: "inline" });
 
 // Decision result line (S-05 Phase 6), rendered under `.detail-top`, above the heading.
 const decisionAlert = params.get("merged")
-  ? { kind: "success" as const, message: x.merged }
+  ? { kind: "success" as const, message: copy.patternActions.merged }
   : params.get("unmerged")
     ? { kind: "success" as const, message: x.unmerged }
     : params.get("typed")
-      ? { kind: "success" as const, message: x.typeChanged }
+      ? { kind: "success" as const, message: copy.patternActions.typeChanged }
       : params.get("renamed")
-        ? { kind: "success" as const, message: x.renamed }
+        ? { kind: "success" as const, message: copy.patternActions.renamed }
         : params.get("excluded")
-          ? { kind: "success" as const, message: x.excludedToast }
+          ? { kind: "success" as const, message: copy.patternActions.excludedToast }
           : params.get("restored")
             ? { kind: "success" as const, message: copy.patternActions.restored }
             : params.get("error") === "merge"
-              ? { kind: "error" as const, message: x.mergeInvalid }
+              ? { kind: "error" as const, message: copy.patternActions.mergeInvalid }
               : params.get("error") === "name"
-                ? { kind: "error" as const, message: x.nameInvalid }
+                ? {
+                    kind: "error" as const,
+                    message: copy.patternActions.renameLong.replace("{n}", String(DISPLAY_NAME_MAX)),
+                  }
                 : params.get("error") === "decision"
-                  ? { kind: "error" as const, message: x.decisionError }
+                  ? { kind: "error" as const, message: copy.patternActions.saveError }
                   : null;
 ---
 
@@ -188,6 +200,7 @@ const decisionAlert = params.get("merged")
           patternKey={pattern.key}
           type={pattern.type}
           name={pattern.name}
+          storedName={storedName}
           excluded={pattern.excluded}
           mergeTargets={mergeTargets}
           copy={actionsCopy}

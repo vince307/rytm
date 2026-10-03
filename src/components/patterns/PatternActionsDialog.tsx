@@ -2,41 +2,48 @@ import { useState } from "react";
 import { fieldBox } from "@/components/app/field-styles";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { InfoAlert } from "@/components/app/InfoAlert";
 import { Glyph } from "@/components/Glyph";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { usePageShowReset } from "@/components/hooks/usePageShowReset";
 import { cn } from "@/lib/utils";
+import { DISPLAY_NAME_MAX } from "@/lib/patterns/decision-form";
 import type { PatternType } from "@/types";
 
-// Kit modal('patternActions') (app.js) wired to POST /api/patterns/decision (S-05). The kit's four ghost buttons
-// only fire toasts (closeModal();showToast(...)) — here "Scal z…" and "Zmień nazwę" reveal a real form (no kit
-// layout for either, G33), "Zmień typ" and "Wyklucz z analizy" submit directly, one <form> per action (forms
-// cannot nest — ThresholdEditor precedent). `copy` carries only the strings this dialog renders, never the
-// result-line strings (`merged`, `unmerged`, …): those are asserted in smoke as bare text (plan review F1), which
-// this island's serialized props would otherwise satisfy.
+// Kit modal('patternActions' | 'merge' | 'mergeEmpty' | 'rename') (app.js) wired to POST /api/patterns/decision
+// (S-05). The kit draws one modal per state; here the merge and rename forms are revealed in place under the
+// action buttons (the kit's separate modal views are not adopted), "Zmień typ" and "Wyklucz z analizy" submit directly, one <form>
+// per action (forms cannot nest — ThresholdEditor precedent). `copy` carries only the strings this dialog renders,
+// never the result-line strings (`merged`, `unmerged`, …): those are asserted in smoke as bare text (plan review
+// F1), which this island's serialized props would otherwise satisfy.
 export interface PatternActionsCopy {
   actions: string;
-  actionsEyebrow: string;
-  actionsTitle: string;
-  actionsLead: string;
+  eyebrow: string;
+  title: string;
+  lead: string;
+  close: string;
+  saving: string;
   merge: string;
   changeType: string;
   rename: string;
   exclude: string;
-  mergeLabel: string;
+  mergeTitle: string;
+  mergeLead: string;
+  mergeEmpty: string;
+  mergeField: string;
   mergeSubmit: string;
-  mergeNone: string;
+  renameTitle: string;
   renameLabel: string;
   renameHint: string;
   renameSubmit: string;
-  saving: string;
-  close: string;
 }
 
 interface Props {
   patternKey: string;
   type: PatternType;
   name: string;
+  /** The stored rename override ("" = none) — the rename field's value (F5). */
+  storedName: string;
   excluded: boolean;
   mergeTargets: { key: string; name: string }[];
   copy: PatternActionsCopy;
@@ -46,11 +53,19 @@ interface Props {
 // `.modal-actions{display:grid}` and so stretch to the column's full width. Here each sits inside a `<div>` / `<form>`
 // wrapper (the grid item), so the button needs its own `w-full` (visual gate: content-width buttons at 1440 / 400).
 const actionButton = "w-full justify-start";
-// Kit `.modal-input`: radius 8px, padding 13, margin 4 0 16; the box is the shared `fieldBox`. The select has no kit reference (G33) — same box, no margin (labelled by a
+// Kit `.modal-input`: radius 8px, padding 13, margin 4 0 16; the box is the shared `fieldBox`. The select has no kit reference — same box, no margin (labelled by a
 // preceding <label>, F11: new fields use kit 8 px locally).
 const dialogFieldBox = cn(fieldBox, "w-full");
 
-export default function PatternActionsDialog({ patternKey, type, name, excluded, mergeTargets, copy }: Props) {
+export default function PatternActionsDialog({
+  patternKey,
+  type,
+  name,
+  storedName,
+  excluded,
+  mergeTargets,
+  copy,
+}: Props) {
   // Which action is in flight: every submit is disabled while one posts, but only the one that was pressed shows
   // the pending text (visual gate: a shared boolean relabelled all three submits „Zapisywanie…”).
   const [pending, setPending] = useState<"merge" | "type" | "rename" | "exclude" | null>(null);
@@ -80,9 +95,9 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
           (event.currentTarget as HTMLElement | null)?.focus();
         }}
       >
-        <div className="text-excess-text text-xs font-extrabold tracking-[0.14em] uppercase">{copy.actionsEyebrow}</div>
-        <DialogTitle>{copy.actionsTitle}</DialogTitle>
-        <DialogDescription>{copy.actionsLead}</DialogDescription>
+        <div className="text-excess-text text-xs font-extrabold tracking-[0.14em] uppercase">{copy.eyebrow}</div>
+        <DialogTitle>{copy.title}</DialogTitle>
+        <DialogDescription>{copy.lead}</DialogDescription>
 
         <div className="mt-[22px] grid gap-2">
           <div>
@@ -90,7 +105,6 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
               type="button"
               variant="ghost"
               className={actionButton}
-              disabled={!canMerge}
               aria-expanded={revealed === "merge"}
               onClick={() => {
                 setRevealed((current) => (current === "merge" ? null : "merge"));
@@ -99,47 +113,58 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
               <Glyph name="merge" size={16} />
               <span>{copy.merge}</span>
             </Button>
-            {!canMerge && <p className="text-muted mt-2 text-[13px]">{copy.mergeNone}</p>}
-            {canMerge && revealed === "merge" && (
-              <form
-                method="POST"
-                action="/api/patterns/decision"
-                className="mt-2"
-                onSubmit={() => {
-                  setPending("merge");
-                }}
-              >
-                <input type="hidden" name="key" value={patternKey} />
-                <input type="hidden" name="action" value="merge" />
-                <label className="grid gap-[7px] text-xs font-bold">
-                  <span>{copy.mergeLabel}</span>
-                  <div className={dialogFieldBox}>
-                    <select
-                      name="target"
-                      required
-                      className="text-ink w-full min-w-0 border-0 bg-transparent p-[13px] text-[13px] outline-none"
-                    >
-                      {mergeTargets.map((target) => (
-                        <option key={target.key} value={target.key}>
-                          {target.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </label>
-                <div className="mt-3">
-                  <SubmitButton
-                    variant="primary"
-                    size="default"
-                    showArrow={false}
-                    pending={pending === "merge"}
-                    disabled={busy}
-                    pendingText={copy.saving}
+            {revealed === "merge" && (
+              <div className="mt-2">
+                <h3 className="text-[17px] font-extrabold">{copy.mergeTitle}</h3>
+                <p className="text-muted mt-1 mb-3 text-[13px] leading-[1.55]">{copy.mergeLead}</p>
+                {canMerge ? (
+                  <form
+                    method="POST"
+                    action="/api/patterns/decision"
+                    onSubmit={() => {
+                      setPending("merge");
+                    }}
                   >
-                    {copy.mergeSubmit}
-                  </SubmitButton>
-                </div>
-              </form>
+                    <input type="hidden" name="key" value={patternKey} />
+                    <input type="hidden" name="action" value="merge" />
+                    <label className="grid gap-[7px] text-xs font-bold">
+                      <span>{copy.mergeField}</span>
+                      <div className={dialogFieldBox}>
+                        <select
+                          name="target"
+                          required
+                          className="text-ink w-full min-w-0 border-0 bg-transparent p-[13px] text-[13px] outline-none"
+                        >
+                          {mergeTargets.map((target) => (
+                            <option key={target.key} value={target.key}>
+                              {target.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </label>
+                    <div className="mt-3">
+                      <SubmitButton
+                        variant="primary"
+                        size="default"
+                        showArrow={false}
+                        pending={pending === "merge"}
+                        disabled={busy}
+                        pendingText={copy.saving}
+                      >
+                        {copy.mergeSubmit}
+                      </SubmitButton>
+                    </div>
+                  </form>
+                ) : (
+                  <>
+                    <InfoAlert>{copy.mergeEmpty}</InfoAlert>
+                    <Button type="button" variant="ghost" className="mt-3" disabled>
+                      {copy.mergeSubmit}
+                    </Button>
+                  </>
+                )}
+              </div>
             )}
           </div>
 
@@ -191,13 +216,15 @@ export default function PatternActionsDialog({ patternKey, type, name, excluded,
               >
                 <input type="hidden" name="key" value={patternKey} />
                 <input type="hidden" name="action" value="rename" />
-                <label className="grid gap-[7px] text-xs font-bold">
+                <h3 className="text-[17px] font-extrabold">{copy.renameTitle}</h3>
+                <label className="mt-3 grid gap-[7px] text-xs font-bold">
                   <span>{copy.renameLabel}</span>
                   <div className={dialogFieldBox}>
                     <input
                       name="name"
-                      maxLength={100}
-                      defaultValue={name}
+                      maxLength={DISPLAY_NAME_MAX}
+                      placeholder={name}
+                      defaultValue={storedName}
                       className="text-ink w-full min-w-0 border-0 bg-transparent p-[13px] text-[13px] outline-none"
                     />
                   </div>

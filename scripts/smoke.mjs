@@ -747,6 +747,16 @@ const steps = [
     { status: 302, location: "/patterns/kawiarnia%20smoke?error=name" },
   ],
   [
+    "rename error line fills the limit",
+    () => request("/patterns/kawiarnia%20smoke?error=name"),
+    { status: 200, contains: "Nazwa może mieć maksymalnie 100 znaków." },
+  ],
+  [
+    "merge error line uses the kit text",
+    () => request("/patterns/kawiarnia%20smoke?error=merge"),
+    { status: 200, contains: "Nie można scalić tych wzorców." },
+  ],
+  [
     "pattern is renamed",
     () =>
       request("/api/patterns/decision", {
@@ -754,6 +764,11 @@ const steps = [
         form: { key: "kawiarnia smoke", action: "rename", name: "Kawiarnia Rytm" },
       }),
     { status: 302, location: "/patterns/kawiarnia%20smoke?renamed=1" },
+  ],
+  [
+    "rename confirms the result",
+    () => request("/patterns/kawiarnia%20smoke?renamed=1"),
+    { status: 200, contains: "Nazwa wzorca zmieniona." },
   ],
   [
     "rename keeps the exclusion",

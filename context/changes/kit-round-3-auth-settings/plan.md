@@ -785,6 +785,6 @@ are collected in the Phase 8 `[human]` row.
 
 #### Manual
 
-- [ ] 8.6 [visual] Screenshots desktop + ~400 px of every listed state, compared with the kit views
+- [x] 8.6 [visual] Screenshots desktop + ~400 px of every listed state, compared with the kit views — visual-review d84b1ad
 - [x] 8.7 [reviewer] Seam sweep complete; register matches the plan; follow-ups carry Trigger lines — impl-review 11eeeed
 - [ ] 8.8 [human] Accept S-12 product-visible choices (header sign-out removed, collapsed password form (JS-only), dialog closes on error, short demo strip text, redirect / vs PRD Access Control, longer deleted notice) and send K34 to the kit author

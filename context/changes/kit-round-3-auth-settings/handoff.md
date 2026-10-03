@@ -1,67 +1,88 @@
 # Handoff — `kit-round-3-auth-settings` (slice S-12)
 
-Written by the `/10x-impl-review kit-round-3-auth-settings` step of run `2026-10-02-kit-round-3`. The review is APPROVED with `MERGE: CLEAR`; one warning was fixed (`11eeeed`) and `change.md` is `impl_reviewed`. The next agent must not miss that the [visual] row 8.6 is still undone and comes before the archive.
+Written by the visual-gate step of run `2026-10-02-kit-round-3`. Result: `VISUAL: PASS`. Every state in the [visual]
+row 8.6 was captured at 1280 + 400 px against the round-3 kit. The gate made two kit-alignment fixes in the settings
+password form (`d84b1ad`) and kept F4 as kit-exact. Next: archive, then ship. There are no migrations.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-auth-settings`, cut from `main` at `60e92e1` (after S-13) |
-| Commits | 26 on the branch; this step: `fix(…): poprawki z przeglądu implementacji` (11eeeed), then `docs(…): przegląd implementacji` (this handoff + report) |
+| Commits | 30 on the branch after this step's final docs commit. This step added `d84b1ad` (fix), `0682a3a` + `24d8754` (screenshots, parts 1–2) and the final `docs(…): bramka wizualna` (README, review, plan tick, follow-up F3, register K34 note, this handoff) |
 | Pushed / PR / merged | no / none / no |
-| `change.md` status | `impl_reviewed` |
-| `## Progress` rows remaining | 2 (`grep -c '^- \[ \]' plan.md`): [visual] 8.6, [human] 8.8 |
-| Working tree | clean after the docs commit |
+| `change.md` status | `impl_reviewed` (unchanged; archive sets the next one) |
+| `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`): [human] 8.8 |
+| Working tree | clean after the docs commit; dev servers on 4398/4399 killed; local DB reset |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/kit-round-3-auth-settings/reviews/impl-review.md` | full-plan review (phases 1–8): verdicts, auth-sensitive checks, F1 (fixed), F2–F4 observations, `MERGE: CLEAR` line |
-| `src/pages/settings.astro` | F1 fix: `SettingsPasswordRow` `masked={copy.auth.passwordPlaceholder}` instead of the literal |
-| `context/changes/kit-round-3-auth-settings/plan.md` | [reviewer] rows 1.6, 2.6, 3.7, 4.5, 5.7, 6.6, 7.8, 8.7 ticked (`impl-review 11eeeed`) |
-| `context/changes/kit-round-3-auth-settings/change.md` | `status: impl_reviewed` |
+| `src/components/settings/SettingsPasswordRow.tsx` | fix: open form wrapper `border-t` (kit `.settings-password-form`), was `border-b`; comment updated |
+| `src/components/auth/NewPasswordForm.tsx` | fix: `SubmitButton` `showArrow={false}` in the `cancel` (settings) branch only — kit „Zapisz hasło” has no ↗ |
+| `context/changes/kit-round-3-auth-settings/screenshots/*.png` | 133 PNGs: 41 app states × 2 widths, `landing-360`, 2 „Sesja” close-ups, 2 short-viewport dialog shots, 23 kit frames × 2 |
+| `context/changes/kit-round-3-auth-settings/screenshots/README.md` | state table (state · file · how reached · kit frame), accounts, capture method |
+| `context/changes/kit-round-3-auth-settings/reviews/visual-review.md` | verdicts per group, F4 verdict, discrepancies + fixes, observations, `VISUAL: PASS` line |
+| `context/changes/kit-round-3-auth-settings/plan.md` | [visual] row 8.6 ticked (`visual-review d84b1ad`) |
+| `context/changes/kit-round-3-auth-settings/follow-ups/review-fixes.md` | new F3: landing steps head does not stack at 400 px (pre-existing), with a `Trigger:` line |
+| `context/foundation/design-kit.md` | row K34: note on the kit's stretched/underlined „Wyloguj się” `<a>` + app resolution |
 | `context/changes/kit-round-3-auth-settings/handoff.md` | this file |
 
 ## 3. Verification
 
-All observed in this step on the branch; baseline = contract line (`main` `60e92e1`, after S-13).
+All of it was observed in this step on the branch. Baseline = the contract line (`main` `60e92e1`, after S-13).
 
 | Command | Result |
 | --- | --- |
+| Visual capture (Playwright 1.55, headless system Chrome, :4399) | 82 app PNGs + extras, 0 NOT CAPTURED; `scrollWidth` = viewport in every shot (1280/400, and 360 for 4 public pages); no `undefined`, no unfilled `{…}` |
+| Claude-in-Chrome (inherited browser, own tab, closed) | `/settings` „Zmień hasło” → `aria-expanded="true"`, Tab → `#current`; headed screenshot matched the PNG |
+| Dialog measurements | delete dialog initial focus `#delete-current` (never the danger button); Esc → focus back on „Usuń konto”; 400×460: height 428 = 460−32, `overflow-y: auto`, scrolls 50 px; import dialog and pattern-actions + merge picker fit at 400×812 |
+| Resend countdown | „Wyślij ponownie za 60 s” at load on `?resent=1`, then „59 s” (both widths) |
 | `npm run lint` | 0 errors (baseline 0, Δ0) |
-| `npx astro check` | 0 errors, 0 warnings, 3 hints; 157 files (baseline 155, +2 = `DemoNotice.astro`, `SettingsPasswordRow.tsx`) |
-| `npm run fixture:check` | ing OK, santander OK |
-| `npm test` | 354 passed / 23 files (baseline 352, +2 kit-contract cases) |
-| `npm run build` | OK (before and after the F1 fix) |
-| `npx supabase db reset` + `npx supabase test db` | Files=6, Tests=119, PASS (Δ0) |
-| `npm run smoke` (`astro dev` :4398) | 184 PASS / 0 FAIL (baseline 166, +18 = plan's P1–P7 total); re-run after F1 fix 184/0; server killed |
-| `git diff main...HEAD -- src/pages/api src/pages/auth src/middleware.ts src/lib astro.config.mjs supabase` | empty: no endpoint, zod, current-password / `USUŃ` check, demo guard, callback `next`, middleware or `checkOrigin` change; no migration |
-| demo session curl (`POST /api/auth/signin` demo → `/reset/new?error=demo`, `/settings`) | `Na wspólnym koncie demo zmiana hasła jest wyłączona.<` rendered node; demo strip node on `/settings` (row 7.8) |
-| unused-key grep over `copyExtra.auth` + `copyExtra.settings` | keys=25 unused=0; seam grep (`copyExtra.app/landing/howItWorks/forWho`, `deletedLogin`, `DESIGN-GAP: G20/23/24/37`) empty |
-| Break | `AppLayout.astro` `const demo = true \|\| isDemoEmail(…)` → only `home has no demo note for the test user` FAIL; restored by `git checkout`. Meta-check: the demo server-guard smoke steps stayed green, so the step proves the shell gating, not the endpoint guard; it proves the strip cannot leak to a non-demo user |
+| `npx astro check` | 0 errors, 157 files (baseline 155, +2 from the slice; the fix adds 0) |
+| `npm test` | 354 passed / 23 files (baseline 352, +2 from the slice) |
+| `npm run build` | OK |
+| `npx supabase db reset` → `npm run smoke` (:4398) | 184 PASS / 0 FAIL (baseline 166, +18 from the slice); server killed; then `db reset` again |
+| `npx supabase test db` | Files=6, Tests=119, PASS (Δ0) |
+| `npm run fixture:check` | not run in this step: no fixture or parser changed. Last observed by the impl-review step (inherited, unverified here) |
+| Deliberate break | none in this step. The fix is presentational (border side, arrow), so no automated check covers it. The before/after screenshots (`settings-form-open-*` re-shot after `d84b1ad`) are the proof |
 
 ## 4. Next command
 
-`visual gate (kit-round-3-auth-settings), then /10x-archive kit-round-3-auth-settings`
+`/10x-archive kit-round-3-auth-settings then ship (no migrations)`
 
 ## 5. Open
 
 - Manual rows, as a checklist:
-  - [ ] [visual] 8.6 — every state listed in plan Phase 8 Manual Verification, 1280 + ~400 px on :4399, incl. the `max-h` check of one import delete dialog and the pattern-actions dialog with the merge picker; also judge the logout-row double line (review F4) and the `/imports/new` demo strip + S-13 note
-  - [ ] [human] 8.8 — accept header sign-out removal, collapsed password form (JS-only), dialog closed on error, short demo strip text, redirect `/` vs PRD, longer deleted notice; send K34 to the kit author
-- Review observations (no action required): F2 `SettingsPasswordRow` toggle `aria-controls` names an unmounted element while closed; F3 `SettingsPasswordRow` mirrors `SettingsRow` classes by hand; F4 logout row `border-t` next to the previous row's `border-b` (kit-exact).
-- Follow-ups: `follow-ups/review-fixes.md` F1 (`field-styles.ts` `field`), F2 (`DialogContent` padding/radius), both `Trigger: S-14`; nothing new from this review.
+  - [ ] [human] 8.8: accept the header sign-out removal, the collapsed password form (JS-only), the dialog staying closed on error, the short demo strip text, the redirect to `/` vs the PRD, and the longer deleted notice; send K34 to the kit author
+- Follow-ups in `follow-ups/review-fixes.md`: F1 (`field-styles.ts` `field`) and F2 (`DialogContent` padding/radius), both `Trigger: S-14`. New F3: `src/pages/index.astro` steps section head should stack below 560 px. Trigger: the next slice that touches the public pages.
+- Register `context/foundation/design-kit.md` K34 now also notes the kit `settings()` „Wyloguj się” `<a>` artifact.
+- Review observations carried: F2 `SettingsPasswordRow` `aria-controls` names an unmounted element while closed; F3 `SettingsPasswordRow` mirrors the `SettingsRow` classes by hand. F4 is closed: kit-exact, kept.
 - Known risks as in plan § Known risks (password form needs JS; same alert for `current-password` / `delete-password`).
-- Invariants: never `npm run format`, never stage `design/**` or `src/styles/brand.css`, never touch `checkOrigin`.
-- Roadmap item S-12 not flipped (orchestrator owns roadmap).
+- Invariants: never run `npm run format`, never stage `design/**` or `src/styles/brand.css`, never touch `checkOrigin`.
+- No `DESIGN-GAP` added. Roadmap item S-12 not flipped (the orchestrator owns the roadmap).
 
 ## 6. Autonomous decisions
 
-1. **Reviewed the diff directly instead of dispatching the skill's two subagents.** Why: 37 files, ~250 deleted / ~600 product lines; reading the full product diff in one context was cheaper and the run has seen agent stalls. Rejected: two general-purpose subagents. Would change: a diff too large for one context.
-2. **F1 (literal masked value) classed WARNING and fixed**, committed with the review-fix message. Why: one-line, plan contract + CLAUDE.md copy rule. Would change: nothing.
-3. **F2–F4 recorded as observations, no follow-up file entry.** Why: no behaviour or rule violation; F4 is kit-exact, F3 is a documented constraint. Would change: the visual gate flagging the double line or an a11y audit flagging F2 (then add a follow-up with `Trigger: S-14`).
-4. **`MERGE: CLEAR` with [visual] 8.6 and [human] 8.8 open.** Why: the step brief puts the visual gate as the next step and [human] rows are collected by the orchestrator; neither is an impl-review criterion. Rejected: BLOCKED. Would change: the orchestrator treating the visual row as an impl-review criterion.
-5. **Row 2.6 ticked on code**: Tailwind names only (`line`, `paper-soft`, `ink`, `green`), strip text differs from the S-13 import notes; the layout clash itself stays in [visual] 8.6. Would change: the visual gate showing the two notes stacking badly.
-6. **Row 7.8 ticked on a demo sign-in session, not a real recovery link**: `/reset/new` only needs `locals.user`, so a normal demo session exercises the same `error=demo` branch. Would change: the branch depending on the recovery AMR.
-7. **One deliberate break (demo-strip gating) instead of re-running the phase breaks**; the auth-guard breaks (P5 `USUŃ` removal) were inherited and their endpoints are unchanged by the diff. Would change: any diff under `src/pages/api`.
+1. **Playwright for the PNG set, Claude-in-Chrome as a cross-check.** Why: 41 states × 2 widths, a 400 px width the
+   Chrome window cannot reach, and full-page shots. This follows the S-13 precedent. Rejected: Chrome-only (would need
+   an iframe for every mobile state). Would change: a Chrome window able to go to 400 px, or a state only headed
+   Chrome can show (for example bfcache).
+2. **F4 kept as is.** Why: kit `.settings-row` border-bottom + `.logout-row` border-top produce the same 2 px rule in
+   the kit frame, and it reads as an intentional divider. Would change: the kit author removing one border, or the
+   maintainer finding it heavy (`[human]`).
+3. **Fixed the form border side and the „Zapisz hasło” arrow.** Why: both are visible deviations from kit
+   `settings()`, and the border also deviates from the plan's P4 contract. Each is a one-line change. Rejected:
+   recording them as observations. Would change: nothing.
+4. **Kit's stretched underlined „Wyloguj się” `<a>` not copied.** Why: it looks like a prototype artifact (link
+   underline on a `.btn`). The app keeps the standard ghost button inside a POST form. Noted in K34. Would change:
+   the kit author confirming that a full-width sign-out is intended.
+5. **Landing steps head (not stacking at 400 px) deferred as follow-up F3.** Why: the layout predates S-12 (P1 only
+   rebinds copy), and the plan's scope rule is one view and no neighbouring redesign. There is no overflow. Would
+   change: the orchestrator treating it as an S-12 regression.
+6. **`/reset/new` form and demo error captured on a normal sign-in session, not a recovery link.** Why: the page
+   needs only `locals.user` (impl-review decision 6). Would change: the page starting to depend on the recovery AMR.
+7. **Two throwaway accounts registered and deleted through the real dialog.** Why: the confirm-email cookie states
+   need a fresh signup, and deleting through the product also exercises the real `/login?deleted=1` path. A DB reset
+   ran afterwards anyway. Would change: nothing.

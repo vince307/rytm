@@ -664,7 +664,7 @@ departures and product-visible choices the maintainer may reverse are collected 
 
 #### Manual
 
-- [ ] 1.8 [reviewer] Both try blocks wrap assembly only; redirects and 404 unchanged; F8/F9 closed
+- [x] 1.8 [reviewer] Both try blocks wrap assembly only; redirects and 404 unchanged; F8/F9 closed — impl-review fcc4554
 
 ### Phase 2: Dashboard body — one stat card and the Koszty stałe summary
 
@@ -679,7 +679,7 @@ departures and product-visible choices the maintainer may reverse are collected 
 
 #### Manual
 
-- [ ] 2.7 [reviewer] Layout matches kit stats-single, dashboard-fixed, fixed-summary-row; Tailwind colour names only; components carry no copy
+- [x] 2.7 [reviewer] Layout matches kit stats-single, dashboard-fixed, fixed-summary-row; Tailwind colour names only; components carry no copy — impl-review fcc4554
 - [ ] 2.8 [visual] Quick look 1280 and ~400 px: one card, summary rows side by side then stacked
 
 ### Phase 3: Trend — legend chips, bar names and kit geometry
@@ -696,7 +696,7 @@ departures and product-visible choices the maintainer may reverse are collected 
 
 #### Manual
 
-- [ ] 3.8 [reviewer] Trend strings from copy.trend except zeroNote (K39); no hex; hint panel gone
+- [x] 3.8 [reviewer] Trend strings from copy.trend except zeroNote (K39); no hex; hint panel gone — impl-review fcc4554
 
 ### Phase 4: /fixed — kit states, delta suffixes and copy
 
@@ -711,7 +711,7 @@ departures and product-visible choices the maintainer may reverse are collected 
 
 #### Manual
 
-- [ ] 4.7 [reviewer] One message per state; no sections under a read error; Tailwind colour names only
+- [x] 4.7 [reviewer] One message per state; no sections under a read error; Tailwind colour names only — impl-review fcc4554
 
 ### Phase 5: Milestone-closing copyExtra audit, gap register, seam sweep and visual gate
 
@@ -727,7 +727,7 @@ departures and product-visible choices the maintainer may reverse are collected 
 
 #### Manual
 
-- [ ] 5.8 [reviewer] Audit complete, role exceptions reasoned, register matches code, follow-ups carry Trigger lines
+- [x] 5.8 [reviewer] Audit complete, role exceptions reasoned, register matches code, follow-ups carry Trigger lines — impl-review fcc4554
 - [ ] 5.9 [visual] Screenshots desktop + ~400 px of every listed /home and /fixed state, compared with the kit views
 - [ ] 5.10 [visual] Screenshots desktop + ~400 px of the rebound views outside S-15 (reset/new panel, import result title, Santander account step)
 - [ ] 5.11 [human] Accept S-15 product-visible choices (removed total and import panel, rises-only Podrożały, one-offs in Nowe, chip key text and removed hint panel, minimum bar 12 → 8 %, conditional zero note, one /fixed message without comparison, kosztów form) and send K38–K41, G39 to the kit author

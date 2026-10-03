@@ -1,67 +1,64 @@
 # Handoff — `kit-round-3-home-fixed` (slice S-15)
 
-Written by the `/10x-implement … phase 5` step of autonomous run `2026-10-02-kit-round-3`. All five phases are committed (P5 `ab93627`), `change.md` is `implemented`; only `[reviewer]` / `[visual]` / `[human]` rows are open. The next agent must not get wrong: the visual gate (5.9, 5.10) has NOT been run — no screenshot exists.
+Written by the `/10x-impl-review kit-round-3-home-fixed` step of autonomous run `2026-10-02-kit-round-3`. Review is APPROVED, `MERGE: CLEAR`; two warnings fixed in `fcc4554`, `change.md` is `impl_reviewed`. The next agent must not get wrong: the visual gate (2.8, 5.9, 5.10) has still NOT been run — no screenshot exists.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-home-fixed`, cut from `main` at `1bf6a5c` (after S-14) |
-| Commits | P1 `6108b70`, P2 `7934a98`, P3 `bcf364a`, P4 `e875337`, P5 `ab93627 feat(kit-round-3-home-fixed): Audyt copyExtra, rejestr luk i szwy kitu (p5)` (+ handoff/epilogue commit) |
+| Commits | P1 `6108b70`, P2 `7934a98`, P3 `bcf364a`, P4 `e875337`, P5 `ab93627`, docs commits, review fix `fcc4554`, + this review's docs commit |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `implemented` |
-| `## Progress` rows remaining | 9 (`grep -c '^- \[ \]' plan.md`), all manual: 1.8, 2.7, 3.8, 4.7, 5.8 `[reviewer]`; 2.8, 5.9, 5.10 `[visual]`; 5.11 `[human]` |
-| Working tree | clean after the handoff commit |
+| `change.md` status | `impl_reviewed` |
+| `## Progress` rows remaining | 4 (`grep -c '^- \[ \]' plan.md`): 2.8, 5.9, 5.10 `[visual]`; 5.11 `[human]` |
+| Working tree | clean after the docs commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `src/content/copy.ts` | removed `imports.debitForms`, `imports.santanderAccountName`, `auth.resetNewVisual.eyebrow/title` (kit keys now) and the four unread `home.empty*` leaves |
-| `src/components/imports/ImportWizard.tsx` | `readStatement(file, kit.santanderAccountName)` (kit `imports`) |
-| `src/pages/imports/result.astro` | `plural(n, flow.debitForms as [string, string, string])` |
-| `src/pages/reset/new.astro` | `visual={{ ...copy.auth.resetVisual, lead: x.resetNewVisual.lead }}` (K13 lead kept) |
-| `test/unit/kit-contract.test.ts` | new guard case: no `copyExtra` leaf equals a kit string, `ROLE_EXCEPTIONS` with reasons (5 entries) |
-| `context/foundation/design-kit.md` | round-3 rows K11/K18/K23/K24/K25/G34/G35/G36/K29/K30 updated; new K38-K41, G39; „Do rundy 4” item 11 |
-| `context/changes/kit-round-3-home-fixed/follow-ups/review-fixes.md` | closed items with commits, open items with `Trigger:` |
-| `scripts/smoke.mjs` | one comment re-pointed (`copy.imports.santanderAccountName`); no step change |
-| `plan.md`, `change.md` | rows 5.1-5.7 ticked with `ab93627`; status `implemented` |
+| `context/changes/kit-round-3-home-fixed/reviews/impl-review.md` | review report (F1–F7, verdicts, re-run suites, `MERGE: CLEAR`) |
+| `src/pages/home.astro` | header comment corrected (F1, `fcc4554`) |
+| `src/pages/fixed.astro` | `itemForms` plain 3-tuple cast (F2, `fcc4554`) |
+| `test/unit/kit-contract.test.ts` | pin `copy.fixedCosts.itemForms` length 3; `ROLE_EXCEPTIONS["auth.saving"]` reason names both collisions (F2/F3, `fcc4554`) |
+| `context/changes/kit-round-3-home-fixed/plan.md` | `[reviewer]` rows 1.8, 2.7, 3.8, 4.7, 5.8 ticked |
+| `context/changes/kit-round-3-home-fixed/change.md` | `status: impl_reviewed` |
 
 ## 3. Verification
+
+Observed in this step; baseline `main` 1bf6a5c (after S-14).
 
 | Command | Result |
 | --- | --- |
 | `npm run lint` | 0 errors (baseline 0) |
-| `npx astro check` | Result (166 files): 0 errors, 0 warnings, 3 hints (baseline 162 files / 0 errors) |
+| `npx astro check` | 0 errors, 166 files (baseline 162, +4) |
 | `npm run fixture:check` | ing OK, santander OK |
-| `npm test` | 387 passed / 27 files (P4 386, +1 guard case; baseline 375 / 26 files, cumulative +12) |
-| `npm run build` | OK |
+| `npm test` | 387 passed / 27 files (baseline 375 / 26, +12 / +1), before and after `fcc4554` |
+| `npm run build` | OK, before and after `fcc4554` |
 | `npx supabase db reset && npx supabase test db` | Files=6, Tests=119 PASS (Δ0) |
-| `npm run smoke` on :4398 | 195 PASS / 0 FAIL, "All smoke steps passed" (baseline 192, cumulative +3, Δ0 this phase) |
-| `git diff --stat main -- design src/styles/brand.css` | empty |
-| Seam greps (`ImportPanel`, `fixedTotalMinor`, `risenFootFor`, `DESIGN-GAP: K24/G34`) | empty in `src/`; every `DESIGN-GAP` id in `src/` (G31 G33 G38 K11 K13 K19 K21 K23 K25 K35-K40 plus G39) has a register row. `noThreshold` remains only as a `TrendChart` prop name |
-| Break 1: `copyExtra.home.probe = "Bez zmian"` | guard case red (`home.probe`), restored. Meta-check: catches byte-identical duplicates only; same meaning with different text stays a reviewer row |
-| Break 2: unread `copyExtra.fixed.unused` | NOT caught by a bare-name grep (`unused` matches unrelated source); caught by the access-tail grep (`\.key` or destructured name in braces) -> `NOREADER fixed.unused`; restored. The access-tail grep prints nothing on the real tree. Generic leaves checked by hand: `fixedSummary.*`, `fixed.delta`, `next`, `selected`, `saving`, `cancel`, `close`, `deleting` |
-
-Dev server on :4398 killed; local DB reset before smoke. Leaf-reader script lived in `$TMPDIR`, not committed.
+| smoke on :4398 | 195 PASS / 0 FAIL, „All smoke steps passed” (baseline 192, +3), before and after `fcc4554`; dev server killed |
+| `git diff --name-only main...HEAD -- supabase src/pages/api` | empty — no migration, no endpoint change |
+| Break 1: `copyExtra.fixed.probe` = `copy.fixedCosts.noComparison` | guard case red (`fixed.probe`), restored. Meta-check: catches byte-identical duplicates only. With `ROLE_EXCEPTIONS` removed a listing script found exactly the 5 listed collisions — every exception is live |
+| Break 2: `home.astro` `zeroNote` unconditional | smoke „home names each trend bar” FAIL, restored. Meta-check: proves the page's „any bar is 0” condition, not the wording |
 
 ## 4. Next command
 
-`/10x-impl-review kit-round-3-home-fixed`
+`visual gate (kit-round-3-home-fixed), then /10x-archive kit-round-3-home-fixed`
 
 ## 5. Open
 
-- Manual rows (human checklist): 1.8, 2.7, 3.8, 4.7, 5.8 `[reviewer]`; 2.8, 5.9, 5.10 `[visual]` (every `/home` and `/fixed` state, rebound views `/reset/new`, import result title, Santander account step: confirm no change); 5.11 `[human]` (product-visible choices, send K38-K41 and G39 to the kit author).
-- `DESIGN-GAP`s with register rows: K38, K39, K40, K41 (no code comment, orphan kit keys), G39.
-- Follow-ups: `context/changes/kit-round-3-home-fixed/follow-ups/review-fixes.md` (PanelTitle for `settings.astro` and `patterns/[...key].astro`, one-off merchants as „nowy”, kit round 4, guard-test limit).
-- Carried risk: `plan.md` § Known risks (no page render test). Rebinds were byte-identical; no component API change beyond reading `kit` instead of `x` in `ImportWizard`.
-- `Badge.tsx` comment still says „G34 delivered” (not a `DESIGN-GAP` marker; left).
+- [ ] 2.8 `[visual]` quick look 1280 / ~400 px: one card, summary rows side by side then stacked.
+- [ ] 5.9 `[visual]` every `/home` and `/fixed` state at 1280 + ~400 px vs kit views `home*`, `fixed*` (list in `plan.md` Phase 5 Manual). Check F5: `TrendChart.astro` value `span` keeps `whitespace-nowrap` and no 5 px bottom margin vs kit `.trend-value`.
+- [ ] 5.10 `[visual]` rebound views: `/reset/new` visual panel, import result title, Santander account step (byte-identical — confirm no change).
+- [ ] 5.11 `[human]` product-visible choices (removed `/home` total and `ImportPanel`, rises-only „Podrożały”, one-offs in „Nowe”, chip text `trend.noThreshold`, bar min 8 %, conditional zero note, one `/fixed` message without comparison, „kosztów”) and send K38–K41, G39 to the kit author.
+- Observations recorded, no code: F4 `Badge.tsx` header comment „G34 delivered”; F7 nav reaches the wizard through `/imports`.
+- Follow-ups: `context/changes/kit-round-3-home-fixed/follow-ups/review-fixes.md` (unchanged by this step; all open items carry `Trigger:`).
+- Carried risk: `/home` and `/fixed` have no render test (`plan.md` § Known risks).
 
 ## 6. Autonomous decisions
 
-1. **Implemented in this context, not delegated.** Why: small, file-local phase. Would change: a larger phase.
-2. **Deleted the four unread `copyExtra.home.empty*` leaves** (found by the new guard: byte-equal to `copy.home.empty*`, `home.astro` already reads the kit). Rejected: adding them to `ROLE_EXCEPTIONS`. Would change: the kit dropping those keys.
-3. **`result.astro` casts `flow.debitForms` to a 3-tuple** like `new.astro` does. Would change: `plural` accepting `readonly string[]`.
-4. **Leaf-reader check keys on the access tail**, not the bare name (plan F6), after the bare-name version missed the planted leaf. Would change: a typed accessor that makes unread leaves a compile error.
-5. **Register edits one row per Edit; K41 added as an app-side no-op row** (orphan keys only). Would change: the kit author's reply.
-6. **Commit message in Polish, approved as drafted; epilogue + handoff in one docs commit.** Would change: maintainer preference.
+1. **Did not launch the skill's two review subagents; read the full source diff in this context.** Why: ≈ 1 200 diff lines, cheaper and no hand-off loss. Would change: a diff too large to read whole.
+2. **Fixed F1/F2/F3 (warning / observation) instead of filing them.** Why: one-line edits, suites re-run green. Would change: a fix touching another view or a component API.
+3. **Ticked all five `[reviewer]` rows.** Why: each check performed (try scope + redirect/404 path, kit CSS rules vs classes, no hex / copy only from `copy.trend.*` + `zeroNote`, `fixedNotices` one-message rule, audit + register + `Trigger:` lines). Would change: the visual gate showing a layout mismatch against the kit — then reopen 2.7.
+4. **F5 recorded, not changed.** Why: the plan's P3 contract keeps `whitespace-nowrap` (G35 long-axis decision); the visual gate is the arbiter. Would change: screenshots at 400 px showing clipped or crowded values.
+5. **Commit messages in Polish, review fix and docs as two commits.** Would change: maintainer preference.

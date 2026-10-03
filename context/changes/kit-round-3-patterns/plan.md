@@ -830,11 +830,11 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Automated
 
-- [ ] 8.1 Every copyExtra.patterns leaf has a reader
-- [ ] 8.2 Seam greps empty (tableHeaders, BODY_ORDER, detailMissing, monthEmpty, G28, G29, G32)
-- [ ] 8.3 Phase leaves design/ and brand.css untouched
-- [ ] 8.4 Deliberate break: re-added unused copyExtra.patterns.mergeNone caught by the leaf-reader grep, restored
-- [ ] 8.5 Full local gate vs baseline, smoke + 8 (or + 9)
+- [x] 8.1 Every copyExtra.patterns leaf has a reader
+- [x] 8.2 Seam greps empty (tableHeaders, BODY_ORDER, detailMissing, monthEmpty, G28, G29, G32)
+- [x] 8.3 Phase leaves design/ and brand.css untouched
+- [x] 8.4 Deliberate break: re-added unused copyExtra.patterns.mergeNone caught by the leaf-reader grep, restored
+- [x] 8.5 Full local gate vs baseline, smoke + 8 (or + 9)
 
 #### Manual
 

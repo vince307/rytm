@@ -1,29 +1,29 @@
 # Handoff — `i18n-en` (slice S-16)
 
-Written by the `/10x-implement i18n-en phase 1` step of run `2026-10-03-i18n-en`. Phase 1 (locale plumbing) is committed `ace542d`; `change.md` is `implementing`. The one thing not to get wrong (unchanged): the middleware keeps `locals.locale` pinned to `pl` and `getCopy("en")` returns PL until Phase 5 — PL must stay byte-identical at every phase boundary.
+Written by the `/10x-implement i18n-en phase 2` step of run `2026-10-03-i18n-en`. Phase 2 (locale-aware formatting) is committed `1def5ed`; `change.md` stays `implementing`. The one thing not to get wrong (unchanged): the middleware keeps `locals.locale` pinned to `pl` and `getCopy("en")` returns PL until Phase 5 — PL must stay byte-identical at every phase boundary.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/i18n-en`, cut from `main` at `b973428` |
-| Commits | 7 on the branch: the 6 docs commits + `ace542d` (`feat(i18n-en): Locale plumbing (p1)`) + this handoff commit |
+| Commits | the 6 docs commits + `ace542d` (p1) + `7b147ee` (handoff p1) + `1def5ed` (p2) + SHA-stamp/handoff docs commit |
 | Pushed / PR / merged | no / none / no |
 | `change.md` status | `implementing` |
-| `## Progress` rows remaining | 50 (`grep -c '^- \[ \]' plan.md`) |
+| `## Progress` rows remaining | 44 (`grep -c '^- \[ \]' plan.md`) |
 | Working tree | clean per `tree-clean.sh` after the commit (allow-listed `?? design/prompts/2026-10-03-gaps-round-4.md` untouched) |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `src/lib/i18n.ts` | New: `Locale`, `LOCALES`, `DEFAULT_LOCALE`, `LOCALE_COOKIE`, `INTL_TAG`, `isLocale`, `resolveLocale` (pure, no copy/Astro import) |
-| `test/unit/i18n.test.ts` | New: 8 table-driven `resolveLocale` cases |
-| `src/env.d.ts` | `App.Locals.locale` |
-| `src/middleware.ts` | `onRequest` sets `locals.locale = DEFAULT_LOCALE` first, before `createClient` |
-| `src/layouts/Layout.astro` | `<html lang={Astro.locals.locale}>` |
-| `scripts/smoke.mjs` | New step „landing declares the page language” |
-| `context/changes/i18n-en/plan.md`, `change.md`, `handoff.md` | Progress 1.1–1.6 ticked with SHA; status; this file |
+| `src/lib/format.ts` | Every formatter takes required `locale`; `Intl` memoised per locale via `perLocale`; EN numeric dates `DD/MM/YYYY`; `fillMonthLocative` EN = plain `{month}` replace; `formatMonthYear` lost its `new Date()` default |
+| `src/lib/patterns/sequence-label.ts`, `fixed-view.ts` (`deltaText`), `threshold-form.ts` (`formatThresholdInput`, EN `55.50`) | `locale` parameter |
+| `src/components/patterns/PatternsTable.tsx`, `ThresholdEditor.tsx`, `src/components/imports/ImportWizard.tsx` | new `locale: Locale` island prop |
+| `src/components/app/AppHeader.astro`, `ExcludedPatterns.astro` | read `Astro.locals.locale` |
+| `src/pages/{index,home,fixed,patterns,imports/index,imports/new,imports/result}.astro`, `src/pages/patterns/[...key].astro` | pass `locals.locale` |
+| `test/unit/{format,sequence-label,threshold-form,fixed-view,patterns-table}.test.ts` | PL cases get `"pl"` (expected strings unchanged); EN cases added |
+| `context/changes/i18n-en/plan.md`, `handoff.md` | Progress 2.1–2.6 ticked with SHA; this file |
 
 ## 3. Verification
 
@@ -32,30 +32,32 @@ Written by the `/10x-implement i18n-en phase 1` step of run `2026-10-03-i18n-en`
 | `npm run lint` | 0 errors (baseline 0) |
 | `npx astro check` | 0 errors (baseline 0) |
 | `npm run fixture:check` | ing OK, santander OK |
-| `npm test` | 395 passed, 28 files (baseline 387 / 27, +8 / +1) |
+| `npm test` | 408 passed, 28 files (baseline 395 / 28, +13 / 0) |
+| `grep '"pl-PL"' src/lib/format.ts` | empty |
 | `npm run build` | OK |
 | `npx supabase db reset && npx supabase test db` | Files=6, Tests=119, PASS (Δ0) |
-| `npm run smoke` (port 4398) | 196 PASS / 0 FAIL (baseline 195, +1) |
-| Break 1: `resolveLocale` ignores the cookie | 2 cases red (cookie `en`; cookie `pl` + `en-US`), 393 green; restored. Meta-check: the first attempt used BSD `sed` that did not apply and stayed green — redone with python, red as expected |
-| Break 2: `locals.locale = "en"` in the middleware | smoke „landing declares the page language” FAIL, all else green; restored. Meta-check: proves Layout reads `locals`, not the resolution rule (the unit test's job) |
+| `npm run smoke` (port 4398) | 196 PASS / 0 FAIL (baseline 196, Δ0) |
+| Break 1: `INTL_TAG.en = "pl-PL"` | 6 EN cases red (money, signed money, range long, month short/axis, month year, date), all PL green; restored. Meta-check: `plural`, `formatIsoDate`, `formatRangeShort`, `fillMonthLocative` EN cases stayed green — correct, they use no `Intl` tag; the break proves the locale reaches `Intl`, not the string-split branches |
+| Break 2: `formatIsoDate(t.occurredOn)` without locale in `patterns/[...key].astro` | `astro check` 1 error (ts2554); restored. Meta-check: proves the required parameter is the gate for `.astro` callers |
 
 ## 4. Next command
 
-`/10x-implement i18n-en phase 2`
+`/10x-implement i18n-en phase 3`
 
 ## 5. Open
 
-- Phases: P2 `format.ts` required `locale` + `INTL_TAG`; P3 `getCopy` / `getMonths` in `src/content/copy.ts`; P4 `src/content/en/kit.ts` + `test/unit/i18n-parity.test.ts`; P5 `src/content/en/extra.ts`, middleware `resolveLocale`, `auth-rules.ts` `DELETE_CONFIRM_WORDS`; P6 `LocaleSwitch.astro`, `src/pages/api/locale.ts`; P7 sweep + visual gate.
-- Manual-only rows still open: `[reviewer]` 1.7 (i18n.ts pure — it is; middleware adds no await before Supabase — it does not), 2.7, 3.8, 4.8, 5.8, 6.7, 7.7; `[visual]` 6.8, 7.8, 7.9; `[human]` 7.10.
+- Phases: P3 `getCopy` / `getMonths` in `src/content/copy.ts` (drops `copy` / `copyExtra` value exports; tests move to `getCopy("pl")`); P4 `src/content/en/kit.ts` + `test/unit/i18n-parity.test.ts`; P5 `src/content/en/extra.ts`, middleware `resolveLocale`, `auth-rules.ts` `DELETE_CONFIRM_WORDS`; P6 `LocaleSwitch.astro`, `src/pages/api/locale.ts`; P7 sweep + visual gate.
+- Manual-only rows still open: `[reviewer]` 1.7, 2.7, 3.8, 4.8, 5.8, 6.7, 7.7; `[visual]` 6.8, 7.8, 7.9; `[human]` 7.10.
 - DESIGN-GAPs to add: K42 (P4/P5), K43 (P6) in `context/foundation/design-kit.md`.
 - Follow-ups: P6 closes `AuthLayout.astro` `visual.title` weight and `index.astro` steps head; P7 writes `follow-ups/review-fixes.md`.
-- Smoke now 196; P2 Δ0 per plan wording of that phase's cumulative count.
-- No migration.
+- Caveat: running `prettier --write src` rewrites `src/styles/brand.css` (generated by `scripts/sync-kit.sh`) — revert it with `git checkout src/styles/brand.css` (done this phase).
+- Smoke stays 196 until P5 adds EN steps. No migration.
 
 ## 6. Autonomous decisions
 
-1. **Exec mode: implement in this context.** Rejected: delegating to a subagent. Why: the phase is ~6 small files. Would change: a phase touching dozens of files.
-2. **Commit message `feat(i18n-en): Locale plumbing (p1)` approved as drafted**, no prompt. Would change: an owner naming convention.
-3. **Manual row 1.7 left unticked** though I observed both facts; it is `[reviewer]`, not mine.
-4. **Table-driven test (`it.each`)** instead of 8 shorthand `it`s: lint rule `no-confusing-void-expression` forbids the shorthand. Would change: the rule being relaxed.
-5. **Roadmap sync skipped**: S-16 has no roadmap row yet (owner decision in change.md Notes).
+1. **Exec mode: implement in this context.** Rejected: subagent. Why: mechanical edits across ~25 files, regex-assisted. Would change: a phase needing design judgement.
+2. **Commit message `feat(i18n-en): Locale-aware formatting (p2)` approved as drafted**, no prompt. Would change: an owner naming convention.
+3. **Manual row 2.7 left unticked**: `[reviewer]`, not mine.
+4. **EN `plural` mapping**: `one` → forms[0], `few` → forms[1], else forms[2] exactly per plan; EN dictionaries (P4) must carry `[one, other, other]`. Would change: a locale with other categories.
+5. **EN date separator `/`** also applied to `formatRangeShort` (`01/05–28/05/2026`), plan only named `formatIsoDate`; consistent with `formatDate` output of `en-GB`. Would change: the owner wanting dots in EN ranges.
+6. **`PatternsTable` render test** (`patterns-table.test.ts`) got `locale: "pl"` — not in the plan's file list but a required prop consequence (minor adaptation).

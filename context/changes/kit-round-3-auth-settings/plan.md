@@ -684,7 +684,7 @@ are collected in the Phase 8 `[human]` row.
 
 #### Manual
 
-- [ ] 1.6 [reviewer] Public pages read only copy.*; header/footer match the kit 560/360 rules
+- [x] 1.6 [reviewer] Public pages read only copy.*; header/footer match the kit 560/360 rules — impl-review 11eeeed
 
 ### Phase 2: Demo strip in the app shell
 
@@ -698,7 +698,7 @@ are collected in the Phase 8 `[human]` row.
 
 #### Manual
 
-- [ ] 2.6 [reviewer] DemoNotice uses Tailwind color names only; no clash with the import pages' demo notes
+- [x] 2.6 [reviewer] DemoNotice uses Tailwind color names only; no clash with the import pages' demo notes — impl-review 11eeeed
 
 ### Phase 3: Settings copy, result alerts and the sign-out row
 
@@ -713,7 +713,7 @@ are collected in the Phase 8 `[human]` row.
 
 #### Manual
 
-- [ ] 3.7 [reviewer] One alert per param; demo refusals info, errors error; logout is a plain POST
+- [x] 3.7 [reviewer] One alert per param; demo refusals info, errors error; logout is a plain POST — impl-review 11eeeed
 
 ### Phase 4: Collapsed password form
 
@@ -726,7 +726,7 @@ are collected in the Phase 8 `[human]` row.
 
 #### Manual
 
-- [ ] 4.5 [reviewer] reset/new form unchanged; cancel unmounts the form; aria-expanded follows the state
+- [x] 4.5 [reviewer] reset/new form unchanged; cancel unmounts the form; aria-expanded follows the state — impl-review 11eeeed
 
 ### Phase 5: Delete dialog on kit round 3
 
@@ -741,7 +741,7 @@ are collected in the Phase 8 `[human]` row.
 
 #### Manual
 
-- [ ] 5.7 [reviewer] delete.ts server checks untouched; demo flag from the page only; aria-describedby names hint and help
+- [x] 5.7 [reviewer] delete.ts server checks untouched; demo flag from the page only; aria-describedby names hint and help — impl-review 11eeeed
 
 ### Phase 6: Login, register, reset and field styling
 
@@ -755,7 +755,7 @@ are collected in the Phase 8 `[human]` row.
 
 #### Manual
 
-- [ ] 6.6 [reviewer] Login/register/reset read only copy.* plus K11 keys; no other bg-white field in the slice
+- [x] 6.6 [reviewer] Login/register/reset read only copy.* plus K11 keys; no other bg-white field in the slice — impl-review 11eeeed
 
 ### Phase 7: Confirm-email, reset/new and the resend countdown
 
@@ -771,7 +771,7 @@ are collected in the Phase 8 `[human]` row.
 
 #### Manual
 
-- [ ] 7.8 [reviewer] reset/new demo error shows demoPasswordBlocked; resend countdown reads Wyślij ponownie za 60 s at load
+- [x] 7.8 [reviewer] reset/new demo error shows demoPasswordBlocked; resend countdown reads Wyślij ponownie za 60 s at load — impl-review 11eeeed
 
 ### Phase 8: Gap register, seam sweep and visual gate
 
@@ -786,5 +786,5 @@ are collected in the Phase 8 `[human]` row.
 #### Manual
 
 - [ ] 8.6 [visual] Screenshots desktop + ~400 px of every listed state, compared with the kit views
-- [ ] 8.7 [reviewer] Seam sweep complete; register matches the plan; follow-ups carry Trigger lines
+- [x] 8.7 [reviewer] Seam sweep complete; register matches the plan; follow-ups carry Trigger lines — impl-review 11eeeed
 - [ ] 8.8 [human] Accept S-12 product-visible choices (header sign-out removed, collapsed password form (JS-only), dialog closes on error, short demo strip text, redirect / vs PRD Access Control, longer deleted notice) and send K34 to the kit author

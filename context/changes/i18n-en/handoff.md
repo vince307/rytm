@@ -1,6 +1,6 @@
 # Handoff — `i18n-en` (slice S-16)
 
-Written by the visual-gate step of run `2026-10-03-i18n-en`. Gate done: `VISUAL: PASS`, no discrepancies, no code changed; `[visual]` rows 6.8, 7.8, 7.9 ticked, only `[human]` 7.10 open. The one thing not to get wrong: 7.10 stays open through archive and ship — it is the maintainer's, not a step's.
+Written by the archive + ship step of run `2026-10-03-i18n-en` (final pre-merge state; earlier: visual gate `VISUAL: PASS`, no code changed). Archived with `[human]` 7.10 open — it is the maintainer's post-run checklist, listed in the PR under „Do decyzji właściciela produktu”, not a blocker.
 
 ## 1. State
 
@@ -8,8 +8,8 @@ Written by the visual-gate step of run `2026-10-03-i18n-en`. Gate done: `VISUAL:
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | Branch                       | `feat/i18n-en`, cut from `main` at `b973428`                                                                                          |
 | Commits                      | docs + p1 `ace542d` … p7 `ce7a1f0` + fix `1dbab76` + impl-review docs `15707b7` + this docs commit (`docs(i18n-en): bramka wizualna`) |
-| Pushed / PR / merged         | no / none / no                                                                                                                        |
-| `change.md` status           | `impl_reviewed` (archive flips it)                                                                                                    |
+| Pushed / PR / merged         | PR/CI/merge/deploy recorded in context/runs/2026-10-03-i18n-en/run-log.md                                                             |
+| `change.md` status           | `archived` (`chore(archive): close i18n-en`)                                                                                          |
 | `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`): `[human]` 7.10                                                                                      |
 | Working tree                 | clean per `tree-clean.sh` after the commit (allow-listed `?? design/prompts/2026-10-03-gaps-round-4.md` untouched)                    |
 
@@ -41,7 +41,7 @@ Baseline (contract, `d2b8d49`): lint 0; astro check 0 (166 files); fixture OK; v
 
 ## 4. Next command
 
-`/10x-archive i18n-en then ship (no migrations)`
+`none — shipped`
 
 ## 5. Open
 
@@ -50,7 +50,7 @@ Baseline (contract, `d2b8d49`): lint 0; astro check 0 (166 files); fixture OK; v
 - DESIGN-GAPs: K42, K43, K44 (`design-kit.md`, `open · S-16`); none added here.
 - Observations (visual-review): shared `focusRing` low contrast (app-wide); tables scroll inside panels at 400 px in both locales (pre-existing).
 - The maintainer's Chrome now holds `rytm-locale=pl` for `localhost` (cookies ignore ports, so `:4321` sees it too) — same language its `pl-PL` gives; clear it to retest the first-visit rule there.
-- Roadmap row S-16 still `planning`; archive flips it. No migration.
+- Roadmap S-16 `done` (At a glance, `### S-16`, `## Done`, Backlog Handoff row refreshed with the open follow-up triggers). No migration.
 
 ## 6. Autonomous decisions
 
@@ -61,3 +61,4 @@ Baseline (contract, `d2b8d49`): lint 0; astro check 0 (166 files); fixture OK; v
 5. **`/reset/new` form reached through the real recovery mail (Mailpit)**, password not changed. Would change: nothing.
 6. **Overlap shot taken without reload.** The overlap check is client-side on step 3, so a reload would lose it. Would change: a server-side overlap URL state.
 7. **Chrome left on `rytm-locale=pl`** rather than deleting the cookie. Why: the extension blocks `document.cookie`; PL matches the browser's language. Would change: the maintainer wanting no cookie.
+8. **Archive despite one pending `[human]` row (7.10) and 7 SHA-less `[reviewer]`/`[visual]` rows.** Rejected: waiting for the maintainer. Why: the pending row is manual-only (archive recommends continuing), the SHA-less rows are review/visual checks with no diff, every recorded SHA is an ancestor of the branch and `gh pr merge --merge` keeps them — no repoint. Would change: an automated row still open, or a squash merge.

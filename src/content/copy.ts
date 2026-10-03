@@ -44,7 +44,7 @@ export const copyExtra = {
     emptyIllustrationAlt: "Dokument czekający na import",
     // DESIGN-GAP: K24 — verbatim from `prototype/app.js` `applyDashboardState` (`#/home-no-name`); the kit bakes
     // the month into the sentence ("Twój maj w jednym spokojnym widoku."), `{month}` + `monthsNominative`
-    // generalise it (May reproduces the kit string byte for byte, `patterns.monthsLocative` precedent).
+    // generalise it (May reproduces the kit string byte for byte).
     lead: "Twój {month} w jednym spokojnym widoku.",
     monthsNominative: [
       "styczeń",
@@ -139,20 +139,6 @@ export const copyExtra = {
     thresholdCount: "{n} × / miesiąc",
     openPattern: "Otwórz wzorzec",
     occurrenceForms: ["wystąpienie", "wystąpienia", "wystąpień"],
-    monthsLocative: [
-      "styczniu",
-      "lutym",
-      "marcu",
-      "kwietniu",
-      "maju",
-      "czerwcu",
-      "lipcu",
-      "sierpniu",
-      "wrześniu",
-      "październiku",
-      "listopadzie",
-      "grudniu",
-    ],
     // DESIGN-GAP: K37 — `app.js` patternDetail() has this transactions-panel line as a literal, no content.json key.
     noTransactions: "Brak transakcji do pokazania w wybranym miesiącu.",
     // DESIGN-GAP: G31 — the kit has no label for the over-limit sum of a month other than the reference one.

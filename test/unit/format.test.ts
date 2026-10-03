@@ -10,6 +10,7 @@ import {
   formatRangeLong,
   formatRangeShort,
   formatSignedMoney,
+  monthIndex,
   plural,
 } from "@/lib/format";
 
@@ -126,5 +127,15 @@ describe("fillMonthLocative", () => {
     ["Ponad progiem {month}", "2026-09", "Ponad progiem wrześniu"],
   ])("%s / %s → %s", (template, yearMonth, expected) => {
     expect(fillMonthLocative(template, yearMonth, locatives)).toBe(expected);
+  });
+});
+
+describe("monthIndex", () => {
+  it.each([
+    ["2026-01", 0],
+    ["2026-05", 4],
+    ["2026-12", 11],
+  ])("%s → %i", (yearMonth, expected) => {
+    expect(monthIndex(yearMonth)).toBe(expected);
   });
 });

@@ -26,8 +26,13 @@ const supabase = createClient(Astro.request.headers, Astro.cookies);
 const dataResult = supabase ? await loadPatternData(supabase) : { error: new Error("Supabase is not configured") };
 const result: { error: unknown } | { referenceMonth: null } | { overview: FixedOverview } = (() => {
   if ("error" in dataResult) return { error: dataResult.error };
-  const overview = fixedOverview(dataResult.patterns, dataResult.rows);
-  return overview.referenceMonth === null ? { referenceMonth: null } : { overview };
+  // Error boundary (S-14 follow-up): an assembly throw after a good read renders the read-error alert, not a 500.
+  try {
+    const overview = fixedOverview(dataResult.patterns, dataResult.rows);
+    return overview.referenceMonth === null ? { referenceMonth: null } : { overview };
+  } catch (err) {
+    return { error: err };
+  }
 })();
 if ("error" in result) {
   // eslint-disable-next-line no-console -- server-side only; the runtime log is the one place this error is visible
@@ -53,7 +58,7 @@ const deltaClass = (deltaMinor: number) =>
   {"error" in result ? (
     <>
       <PageTitle eyebrow={x.eyebrow} title={copy.fixedCosts.title} lead={x.lead} />
-      <InlineAlert kind="error">{copy.components.error}</InlineAlert>
+      <InlineAlert kind="error">{copy.fixedCosts.readError}</InlineAlert>
     </>
   ) : "referenceMonth" in result ? (
     <>
@@ -83,7 +88,7 @@ const deltaClass = (deltaMinor: number) =>
         title={fillMonthLocative(
           copy.fixedCosts.new,
           result.overview.referenceMonth ?? "",
-          copyExtra.patterns.monthsLocative,
+          Object.values(copy.patternDetail.monthNames),
         )}
         count={countText(result.overview.new.length)}
         empty={result.overview.hasComparison ? x.newEmpty : x.noComparison}

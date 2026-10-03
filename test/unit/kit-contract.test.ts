@@ -49,7 +49,9 @@ describe("kit contract (content.json as the app reads it)", () => {
   });
 
   it("has a locative for each of the 12 months", () => {
-    expect(copyExtra.patterns.monthsLocative).toHaveLength(12);
+    const locatives = Object.values(copy.patternDetail.monthNames);
+    expect(locatives).toHaveLength(12);
+    expect(locatives[8]).toBe("wrześniu");
   });
 
   it("keeps the import rejection messages, placeholders and limits the wizard fills (S-13)", () => {

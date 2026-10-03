@@ -15,7 +15,7 @@ import StatCard from "@/components/home/StatCard.astro";
 import TrendChart from "@/components/home/TrendChart.astro";
 import { buttonVariants } from "@/components/ui/button";
 import { copy, copyExtra } from "@/content/copy";
-import { formatMoney, formatMonthAxis, formatSignedMoney, plural } from "@/lib/format";
+import { formatMoney, formatMonthAxis, formatSignedMoney, monthIndex, plural } from "@/lib/format";
 import { fixedOverview } from "@/lib/patterns/fixed";
 import { homeStats, type HomeStats } from "@/lib/patterns/home";
 import { loadPatternData } from "@/lib/patterns/load";
@@ -49,9 +49,8 @@ if ("error" in result) {
 }
 
 // K24 template — verbatim lead from `applyDashboardState` (`#/home-no-name`); `{month}` + `monthsNominative`
-// generalise the kit's baked-in "maj" (`patterns.astro` `sumLabel` precedent).
-// `2026-05` → 4 — index into the `months*` declension tables below (one parse for both K24 and K25 templates).
-const monthIndex = (yearMonth: string) => Number(yearMonth.split("-")[1]) - 1;
+// generalise the kit's baked-in "maj" (`fillMonthLocative` month templates in `src/lib/format.ts` is the precedent).
+// `monthIndex` (shared, `src/lib/format.ts`) indexes the `months*` declension tables (one parse for K24 and K25).
 
 const leadFor = (month: string) => h.lead.replace("{month}", h.monthsNominative[monthIndex(month)]);
 

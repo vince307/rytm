@@ -786,12 +786,12 @@ unchanged. Kit departures and product-visible choices are collected in the `[hum
 
 #### Automated
 
-- [ ] 5.1 npm test: Phase 4 count plus sequence-label cases, 0 failed
-- [ ] 5.2 Smoke Phase 4 count + 2 PASS, 0 FAIL, Suma w maju and brak ustawionego progu still green
-- [ ] 5.3 No reader left for the rebound threshold / detail copyExtra leaves
-- [ ] 5.4 Deliberate break: within = count turns sequence-label test and label smoke step red, restored, meta-check recorded
-- [ ] 5.5 Deliberate break: error=value back to the old text turns the invalid-threshold step red, restored
-- [ ] 5.6 Full local gate vs baseline, smoke + 3
+- [x] 5.1 npm test: Phase 4 count plus sequence-label cases, 0 failed — c8b16bf
+- [x] 5.2 Smoke Phase 4 count + 2 PASS, 0 FAIL, Suma w maju and brak ustawionego progu still green — c8b16bf
+- [x] 5.3 No reader left for the rebound threshold / detail copyExtra leaves — c8b16bf
+- [x] 5.4 Deliberate break: within = count turns sequence-label test and label smoke step red, restored, meta-check recorded — c8b16bf
+- [x] 5.5 Deliberate break: error=value back to the old text turns the invalid-threshold step red, restored — c8b16bf
+- [x] 5.6 Full local gate vs baseline, smoke + 3 — c8b16bf
 
 #### Manual
 

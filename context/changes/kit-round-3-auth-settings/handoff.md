@@ -1,6 +1,6 @@
 # Handoff — `kit-round-3-auth-settings` (slice S-12)
 
-Written by the visual-gate step of run `2026-10-02-kit-round-3`. Result: `VISUAL: PASS`. Every state in the [visual]
+Written by the visual-gate step of run `2026-10-02-kit-round-3`; final pre-merge state set by the ship step (archive + PR). Result: `VISUAL: PASS`. Every state in the [visual]
 row 8.6 was captured at 1280 + 400 px against the round-3 kit. The gate made two kit-alignment fixes in the settings
 password form (`d84b1ad`) and kept F4 as kit-exact. Next: archive, then ship. There are no migrations.
 
@@ -10,8 +10,8 @@ password form (`d84b1ad`) and kept F4 as kit-exact. Next: archive, then ship. Th
 | --- | --- |
 | Branch | `feat/kit-round-3-auth-settings`, cut from `main` at `60e92e1` (after S-13) |
 | Commits | 30 on the branch after this step's final docs commit. This step added `d84b1ad` (fix), `0682a3a` + `24d8754` (screenshots, parts 1–2) and the final `docs(…): bramka wizualna` (README, review, plan tick, follow-up F3, register K34 note, this handoff) |
-| Pushed / PR / merged | no / none / no |
-| `change.md` status | `impl_reviewed` (unchanged; archive sets the next one) |
+| Pushed / PR / merged | PR/CI/merge/deploy recorded in context/runs/2026-10-02-kit-round-3/run-log.md (branch already on origin since the slice was parked, tip then `e804e59`) |
+| `change.md` status | `archived` (ship step, `/10x-archive`) |
 | `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`): [human] 8.8 |
 | Working tree | clean after the docs commit; dev servers on 4398/4399 killed; local DB reset |
 
@@ -50,7 +50,7 @@ All of it was observed in this step on the branch. Baseline = the contract line 
 
 ## 4. Next command
 
-`/10x-archive kit-round-3-auth-settings then ship (no migrations)`
+`none — shipped`
 
 ## 5. Open
 
@@ -61,7 +61,8 @@ All of it was observed in this step on the branch. Baseline = the contract line 
 - Review observations carried: F2 `SettingsPasswordRow` `aria-controls` names an unmounted element while closed; F3 `SettingsPasswordRow` mirrors the `SettingsRow` classes by hand. F4 is closed: kit-exact, kept.
 - Known risks as in plan § Known risks (password form needs JS; same alert for `current-password` / `delete-password`).
 - Invariants: never run `npm run format`, never stage `design/**` or `src/styles/brand.css`, never touch `checkOrigin`.
-- No `DESIGN-GAP` added. Roadmap item S-12 not flipped (the orchestrator owns the roadmap).
+- No `DESIGN-GAP` added. Roadmap item S-12 flipped to `done` by `/10x-archive` in the ship step; Backlog Handoff refreshed.
+- Restated triggers: F1, F2 `Trigger: S-14`; F3 `Trigger: the next slice that touches the public pages` (`grep -n 'Trigger:' context/archive/2026-10-03-kit-round-3-auth-settings/follow-ups/review-fixes.md`).
 
 ## 6. Autonomous decisions
 
@@ -86,3 +87,9 @@ All of it was observed in this step on the branch. Baseline = the contract line 
 7. **Two throwaway accounts registered and deleted through the real dialog.** Why: the confirm-email cookie states
    need a fresh signup, and deleting through the product also exercises the real `/login?deleted=1` path. A DB reset
    ran afterwards anyway. Would change: nothing.
+8. **Archived with [human] 8.8 open (ship step).** `/10x-archive` warned `1 Progress item still pending (0 automated,
+   1 manual)`; chosen: Continue archiving. Why: the open row is a product-owner acceptance, listed in the PR body under
+   „Do decyzji właściciela produktu” as a post-run checklist; every automated, reviewer and visual row is ticked with a
+   SHA reachable from the branch tip (merge commit keeps them in `main` history, so no SHA repoint). Rejected: Resume
+   implementation (nothing left for an agent). Would change: an automated row left open, or the maintainer requiring
+   human sign-off before merge.

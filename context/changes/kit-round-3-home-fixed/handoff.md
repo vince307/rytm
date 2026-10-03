@@ -1,78 +1,88 @@
 # Handoff — `kit-round-3-home-fixed` (slice S-15)
 
-Written by the `/10x-new` step of autonomous run `2026-10-02-kit-round-3`. The change folder exists with
-`change.md` (identity, roadmap-claims-vs-repo table, kit binding, triggered follow-ups, autonomous decisions); no
-code touched. The next agent must not get wrong: the round-3 kit dashboard has ONE stat card, a full-width trend and
-a „Koszty stałe” summary panel and NO import panel (`prototype/app.js` `dashboard()`) — the app today still has two
-cards + `ImportPanel`; and the closing phase audits every `copyExtra` namespace, not only home/fixed.
+Written by the `/10x-research` step of autonomous run `2026-10-02-kit-round-3`. `research.md` answers the kit binding
+for `/home` and `/fixed`, the PRD/user-path check for the two removals (no conflict) and the full `copyExtra` audit;
+no code touched. The next agent must not get wrong: the kit's `app.js` reads NO `content.json` key for these views —
+wording comes from `content.json` keys where one with that meaning exists (`trend.noThreshold`, `fixedCosts.noChanges/
+noNew/noComparison/readError`), layout from the prototype, and prototype "always-on" sample states (legend chips,
+sections with rows under an error) render in the app only under the condition they describe.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-home-fixed`, cut from `main` at `1bf6a5c` (after S-14) |
-| Commits | 1 — `docs(kit-round-3-home-fixed): change identity (autonomous run)` |
+| Commits | 2 — `docs(kit-round-3-home-fixed): change identity (autonomous run)`, `docs(kit-round-3-home-fixed): research` |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `new` |
+| `change.md` status | `preparing` (set by `metadata-guard.mjs mark-researched`) |
 | `## Progress` rows remaining | n/a — no `plan.md` yet |
-| Working tree | clean after the commit (only the two files below were added) |
+| Working tree | clean after the commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/kit-round-3-home-fixed/change.md` | identity + `## Roadmap claims vs repo now`, `## Kit binding`, `## Follow-ups triggered`, `## Autonomous decisions` |
+| `context/changes/kit-round-3-home-fixed/research.md` | §1 `/home` kit binding, §2 PRD + user paths + smoke/unit pins, §3 trend, §4 `/fixed`, §5 follow-ups state, §6 `copyExtra` audit (every leaf, reader, kit key, verdict), Open Questions |
+| `context/changes/kit-round-3-home-fixed/change.md` | frontmatter only: `status: new → preparing`, `updated` |
 | `context/changes/kit-round-3-home-fixed/handoff.md` | this file |
 
 ## 3. Verification
 
-Docs-only step; no suite run (nothing in `src/`, `scripts/`, `supabase/` changed). Baseline for later steps
-(inherited, unverified here): contract line, `main` at `1bf6a5c` — lint 0; astro check 0 / 162 files; fixture OK;
-vitest 375 / 26 files; build OK; pgTAP 119 PASS; smoke 192 / 0. Repo facts in `change.md` were read from the branch
-in this step (`src/pages/home.astro`, `src/pages/fixed.astro`, `src/content/copy.ts`, `content.json`,
-`prototype/app.js` `dashboard()` / `trendChart()` / `fixedCosts()` / `emptyView()`, `prototype/styles.css`,
-`scripts/smoke.mjs` greps).
+Docs-only step; no suite run (nothing in `src/`, `scripts/`, `supabase/`, `test/` changed). No live-DB experiment
+(no schema question arose — no migration). Facts were read from the branch in this step: kit `prototype/app.js`,
+`styles.css`, `views/*.html`, `react-kit/docs/{content.json,routes.md,copy-map.md}`, `CHANGELOG.md`; `src/pages/
+{home,fixed}.astro`, `patterns/[...key].astro`, home/fixed components, `src/lib/patterns/{home,trend,fixed}.ts`,
+`src/lib/format.ts`, `src/content/copy.ts`, `scripts/smoke.mjs`, `test/unit/{home-stats,over-limit-trend}.test.ts`,
+PRD, roadmap, `design-kit.md`, archive S-07/F-04/S-14. Baseline for later steps (inherited, unverified here): `main`
+at `1bf6a5c` — lint 0; astro check 0 / 162 files; fixture OK; vitest 375 / 26 files; build OK; pgTAP 119 PASS;
+smoke 192 / 0.
 
 ## 4. Next command
 
-`/10x-research kit-round-3-home-fixed`
+`/10x-plan kit-round-3-home-fixed`
 
 ## 5. Open
 
-- Research must map, key by key: every `copyExtra.home` / `copyExtra.fixed` / `copyExtra.emptyViews` entry →
-  `content.json` key or „no key” (`src/content/copy.ts`); then the same for `auth`, `imports`, `patterns`,
-  `settings` (closing audit, decision 7). Known byte-identical duplicates: `copyExtra.home.emptyEyebrow/emptyTitle/
-  emptyLead/emptyIllustrationAlt` = `home.*`; `copyExtra.home.lead` = `dashboard.descriptionNoName`;
-  `copyExtra.home.deltaFoot` = `dashboard.stats[0].foot`; `copyExtra.fixed.itemForms` = `fixedCosts.itemForms`;
-  `copyExtra.fixed.eyebrow` = `app.fixedLong`.
-- Open mappings for research: trend legend (`.trend-zero-note` / `.trend-no-threshold` literals vs `trend.zeroMarker`
-  / `trend.noThreshold` / `trend.gridLabel` / `trend.amountLabel`), `TrendChart` min bar height (`trendBarHeight` 12 %
-  vs kit 8 %), whether the `copyExtra.home.noThreshold` info panel survives, „· wzrost / · spadek” suffix vs
-  `fixedCosts.decreased`, `.info-panel` placement for `noComparison` / `noChanges` / `noNew` on `/fixed`.
-- Smoke strings that will move (`scripts/smoke.mjs`): „>Nie ma poprzedniego miesiąca do porównania.<”,
-  „>Żaden koszt stały nie zmienił kwoty w tym miesiącu.<”, „>Dodaj najnowszy wyciąg<” (×2), „Ustaw próg na wzorcu…”,
-  „względem”, the „Koszty stałe” card total/„podrożała” assertions.
-- Follow-ups in scope (detail in `change.md` § Follow-ups triggered): `fixed.astro` `try` + `fixedCosts.readError`;
-  S-14 F8 (`patterns/[...key].astro` `try`); S-14 F9 (`home.astro` stale comment); `FixedSection` `compact` prop;
-  `monthIndex` into `src/lib/format.ts`; narrow `PanelTitle.astro`; close G36 follow-up (C5). Out of scope: one-off
-  merchants as „nowy” (`d5Type`), D5 flip, Panel radius.
-- `[human]` candidates: removed `/home` fixed-cost total (A2), removed import panel (A3), one-off merchants in the new
-  „Nowe” count.
-- No migration expected. No `DESIGN-GAP` added in this step.
+- Plan decisions with research recommendations (`research.md` § Open Questions): drop `HomeStats.fixedTotalMinor`
+  (`src/lib/patterns/home.ts` `homeStats`, rewrite 3 cases in `test/unit/home-stats.test.ts`); „Podrożały” = rises only
+  (`fixedRisen`); new `copyExtra.home` leaves for „Zobacz zmiany”, „Podrożały”, „Nowe”, `koszt/koszty/kosztów`, legend
+  „Cienka kreska oznacza 0,00 zł”, delta suffixes „wzrost”/„spadek” (each `DESIGN-GAP` + gap row); trend chip text
+  `trend.noThreshold`, shown only when `!hasThreshold`; zero note only when a bar is 0; `trendBarHeight` 12 → 8 %
+  (update `describe("trendBarHeight")` case); bar `bg-muted`; group name `trend.gridLabel`; bar name `trend.amountLabel`.
+- `/fixed`: `try` around `fixedOverview` → `fixedCosts.readError`; `noComparison` info panel under the title;
+  `noChanges`/`noNew` in a `.fixed-empty-states` block after the sections; `unchangedEmpty` stays `copyExtra` (G34)
+  — placement consistency open; drop `FixedSection` `compact`; drop the `deltaClass` G34 comment.
+- Follow-ups in scope (verified open in code): S-14 F8 (`patterns/[...key].astro` `try` around `detailTarget` →
+  `sequenceSummary`), F9 (`home.astro` comment above `leadFor`), `monthIndex` into `src/lib/format.ts` (used by
+  `fillMonthLocative`), `PanelTitle.astro` with `.panel-title`/`.section-label` variant for `/home` + `FixedSection`
+  (other 4 call sites stay), G36 tick.
+- Smoke pins that move (`scripts/smoke.mjs`, by step name): „home offers the next import”, „home counts fixed costs
+  that rose”, „home before import has no trend” (negative control), „home shows the trend without a threshold” /
+  „home shows the over-limit sum”, „fixed with one month lists no change” / „fixed lists a changed amount” (suffix
+  joins the `>+1,50 zł<` node), „fixed without a previous month says so” / „fixed compares with the previous month”;
+  header comment. Keep „względem” out of new strings („home has no comparison with one month”).
+- Closing audit (`research.md` § 6): in-scope drops `home.empty*` ×4, `home.lead`, `home.deltaFoot`, `fixed.eyebrow`,
+  `fixed.itemForms`; deletions `home.risen`, `home.risenForms`, `home.noThreshold`; outside S-15, byte-identical:
+  `imports.debitForms`, `imports.santanderAccountName`, `auth.resetNewVisual.eyebrow/title` (do or follow-up).
+  Register drift in `context/foundation/design-kit.md` (K24/G34 comments, G35 text, K29 moot, `home.empty*` no row).
+- `[human]` rows: removed `/home` fixed-cost total (PRD silent; S-07 `[human]` 4.11 never ticked); removed import
+  panel (PRD silent); one-off merchants in the „Nowe” count; trend chip key vs literal.
+- No migration. No `DESIGN-GAP` added in this step.
 
 ## 6. Autonomous decisions
 
-Full text with reversal conditions in `change.md` § Autonomous decisions. Summary:
-
-1. Next step `/10x-research` (not the skill's default `/10x-plan`) — key-by-key copy map + smoke pins needed. Would
-   change: an up-to-date copyExtra→content.json map already on disk.
-2. One stat card; the fixed-cost total leaves `/home` (kit `.stats-single`). Would change: maintainer wanting the
-   total back → card with `DESIGN-GAP`.
-3. `ImportPanel` leaves `/home` (absent from round-3 `dashboard()`). Would change: research finding it in any round-3
-   home view / `routes.md`.
-4. S-14 F8 in scope (follow-up names S-15). Would change: plan size → new follow-up.
-5. `PanelTitle.astro` adopted only on `/home` + `FixedSection`. Would change: kit `.panel-title` vs `.section-label`
-   not fitting one component.
-6. One-off merchants as „nowy” out of scope (rule). Would change: visual gate showing the „Nowe” count misleading.
-7. Closing audit covers all `copyExtra` namespaces; non-identical rebinds outside S-15 views become follow-ups. Would
-   change: nothing short of the maintainer narrowing M-3's closing criterion.
+1. **Removal of `ImportPanel` and the second card confirmed (A2/A3 of `change.md`).** Chosen: remove both. Rejected:
+   keep either with a `DESIGN-GAP`. Why: no round-3 home view (incl. `home-demo`) draws them, the PRD names neither
+   (FR-011/012/013, US-04/05, Success Criteria checked), `/imports/new` stays reachable from the title button, empty
+   states and nav, demo gating lives in `/imports/new`. Would change: the maintainer asking for the total or the panel.
+2. **Copy key over prototype literal when the meaning matches** (`trend.noThreshold` over „Brak progu”,
+   `trend.gridLabel` over „Miesięczna suma ponad progiem”). Rejected: literal verbatim in `copyExtra`. Why: CLAUDE.md
+   rule „copy from `content.json`”; precedent `fixedCosts.new` over „Nowe w tym miesiącu”. Would change: visual gate
+   or maintainer preferring the literal → `copyExtra` + gap row.
+3. **Conditional rendering of prototype sample states** (legend chips, info panels; no sections under an error).
+   Rejected: always-on as in the prototype. Why: an always-on „Brak progu” is false for users with thresholds; rows
+   under an error would be invented data. Would change: the kit adding conditions or an explicit error layout.
+4. **„Podrożały” counts rises only.** Rejected: all changed rows (kit sample `fixedCosts.counts.changed`). Why: the
+   label says „went up”; PRD Success Criteria „które podrożały”. Would change: the kit adding a rule or the maintainer.
+5. **Research did not run suites or DB experiments.** Why: no question needed them (docs step, no schema). Would
+   change: a schema question in the plan.

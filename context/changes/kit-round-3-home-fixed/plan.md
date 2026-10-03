@@ -670,12 +670,12 @@ departures and product-visible choices the maintainer may reverse are collected 
 
 #### Automated
 
-- [x] 2.1 npm test: Phase 1 count plus home-stats and kit-contract cases, 0 failed
-- [x] 2.2 Smoke Phase 1 count + 1 PASS, 0 FAIL, three home steps re-pinned
-- [x] 2.3 No reader left for ImportPanel, fixedTotalMinor, risenFootFor or deleted copyExtra.home leaves
-- [x] 2.4 Deliberate break: fixedNew = 0 turns home-stats and the rose step red, restored, meta-check recorded
-- [x] 2.5 Deliberate break: shifted nominative index turns the lead step red, restored, meta-check recorded
-- [x] 2.6 Full local gate vs baseline, smoke + 1
+- [x] 2.1 npm test: Phase 1 count plus home-stats and kit-contract cases, 0 failed — 7934a98
+- [x] 2.2 Smoke Phase 1 count + 1 PASS, 0 FAIL, three home steps re-pinned — 7934a98
+- [x] 2.3 No reader left for ImportPanel, fixedTotalMinor, risenFootFor or deleted copyExtra.home leaves — 7934a98
+- [x] 2.4 Deliberate break: fixedNew = 0 turns home-stats and the rose step red, restored, meta-check recorded — 7934a98
+- [x] 2.5 Deliberate break: shifted nominative index turns the lead step red, restored, meta-check recorded — 7934a98
+- [x] 2.6 Full local gate vs baseline, smoke + 1 — 7934a98
 
 #### Manual
 

@@ -36,7 +36,7 @@ const item = (over: Partial<PatternRow>): PatternRow => ({
 });
 
 function render(patterns: PatternRow[]): string {
-  return renderToStaticMarkup(createElement(PatternsTable, { patterns, copy: tableCopy }));
+  return renderToStaticMarkup(createElement(PatternsTable, { patterns, copy: tableCopy, locale: "pl" }));
 }
 
 describe("PatternsTable render", () => {

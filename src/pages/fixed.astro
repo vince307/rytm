@@ -20,6 +20,8 @@ import { loadPatternData } from "@/lib/patterns/load";
 import { createClient } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
+const locale = Astro.locals.locale;
+
 const e = copy.emptyViews;
 const x = copyExtra.fixed;
 
@@ -50,10 +52,13 @@ if ("error" in result) {
 // `content.json`; `{n}`/`{items}`/`{date}`/`{amount}` interpolation follows the codebase's `.replace()` convention
 // (`patterns/[...key].astro` `sumLabel`, `imports/result.astro` `title`).
 const itemForms = copy.fixedCosts.itemForms as [string, string, string]; // 3 forms pinned in kit-contract.test.ts
-const countText = (n: number) => x.count.replace("{n}", String(n)).replace("{items}", plural(n, itemForms));
+const countText = (n: number) => x.count.replace("{n}", String(n)).replace("{items}", plural(n, itemForms, locale));
 const previouslyText = (occurredOn: string, previousMinor: number) =>
-  x.previously.replace("{date}", formatIsoDate(occurredOn)).replace("{amount}", formatMoney(previousMinor));
-const firstSeenText = (firstOccurredOn: string) => x.firstSeen.replace("{date}", formatIsoDate(firstOccurredOn));
+  x.previously
+    .replace("{date}", formatIsoDate(occurredOn, locale))
+    .replace("{amount}", formatMoney(previousMinor, locale));
+const firstSeenText = (firstOccurredOn: string) =>
+  x.firstSeen.replace("{date}", formatIsoDate(firstOccurredOn, locale));
 // Kit `.increase` (amber) / `.decrease` (green). Kept short (helper, not inline) so prettier never wraps the `<b>`
 // element onto three lines — a wrap would put the smoke-asserted delta text on its own indented line, which fails
 // the `>text<` anchor (agent-contract smoke-assertion note, plan review F1).
@@ -85,9 +90,9 @@ const deltaClass = (deltaMinor: number) =>
           <FixedRow
             name={row.name}
             meta={previouslyText(row.occurredOn, row.previousMinor)}
-            amount={formatMoney(row.amountMinor)}
+            amount={formatMoney(row.amountMinor, locale)}
           >
-            <b class:list={deltaClass(row.deltaMinor)}>{deltaText(row.deltaMinor, x.delta)}</b>
+            <b class:list={deltaClass(row.deltaMinor)}>{deltaText(row.deltaMinor, x.delta, locale)}</b>
           </FixedRow>
         ))}
       </FixedSection>
@@ -96,12 +101,17 @@ const deltaClass = (deltaMinor: number) =>
           copy.fixedCosts.new,
           result.overview.referenceMonth ?? "",
           Object.values(copy.patternDetail.monthNames),
+          locale,
         )}
         count={countText(result.overview.new.length)}
         hasRows={result.overview.new.length > 0}
       >
         {result.overview.new.map((row) => (
-          <FixedRow name={row.name} meta={firstSeenText(row.firstOccurredOn)} amount={formatMoney(row.amountMinor)}>
+          <FixedRow
+            name={row.name}
+            meta={firstSeenText(row.firstOccurredOn)}
+            amount={formatMoney(row.amountMinor, locale)}
+          >
             <Badge tone="new">{copy.components.new}</Badge>
           </FixedRow>
         ))}
@@ -112,7 +122,7 @@ const deltaClass = (deltaMinor: number) =>
         hasRows={result.overview.unchanged.length > 0}
       >
         {result.overview.unchanged.map((row) => (
-          <FixedRow name={row.name} amount={formatMoney(row.amountMinor)} compact />
+          <FixedRow name={row.name} amount={formatMoney(row.amountMinor, locale)} compact />
         ))}
       </FixedSection>
       {(notices.noChanges || notices.noNew || notices.unchangedEmpty) && (

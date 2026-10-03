@@ -16,6 +16,8 @@ import { createClient } from "@/lib/supabase";
 import { formatDate, formatRangeShort } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
+const locale = Astro.locals.locale;
+
 const e = copy.emptyViews;
 const k = copy.imports;
 const flow = copy.importFlow;
@@ -37,10 +39,10 @@ if (error) {
 }
 const rows = (data ?? []).map((i) => ({
   id: i.id,
-  importedOn: formatDate(i.created_at),
+  importedOn: formatDate(i.created_at, locale),
   bank: bankDisplayName(k.bankName, i.source),
   account: accountDisplay(i.account_name, i.account_number),
-  range: formatRangeShort(i.period_start, i.period_end),
+  range: formatRangeShort(i.period_start, i.period_end, locale),
   debits: i.transactions[0]?.count ?? 0,
 }));
 

@@ -7,6 +7,7 @@ import { Badge } from "@/components/app/Badge";
 import { field, control, focusRing } from "@/components/app/field-styles";
 import { Glyph } from "@/components/Glyph";
 import { Button } from "@/components/ui/button";
+import type { Locale } from "@/lib/i18n";
 import { listView, type PatternSort } from "@/lib/patterns/list-view";
 import { formatMoney, plural } from "@/lib/format";
 import { merchantMark } from "@/components/patterns/merchant-mark";
@@ -47,6 +48,7 @@ interface PatternsTableProps {
   /** Already in the default order (sum desc, then name, then key). */
   patterns: PatternRow[];
   copy: PatternsTableCopy;
+  locale: Locale;
 }
 
 const cell = "border-b border-line px-[17px] py-4 align-middle";
@@ -54,14 +56,14 @@ const head = cn(cell, "text-left text-[11px] font-extrabold tracking-[0.07em] wh
 
 /** Próg cell (kit `patternRows()`): `count` → „{n} × / miesiąc” (K21 verbatim), `amount` → the money itself,
  * `sum` → „{amount} / miesiąc” (G31 placeholder — the kit never renders a sum-kind threshold), none → „—”. */
-function thresholdLabel(threshold: Threshold | null, copy: PatternsTableCopy): string {
+function thresholdLabel(threshold: Threshold | null, copy: PatternsTableCopy, locale: Locale): string {
   if (!threshold) return "—";
   if (threshold.kind === "count") return copy.thresholdCount.replace("{n}", String(threshold.value));
-  if (threshold.kind === "amount") return formatMoney(threshold.value);
-  return copy.thresholdSum.replace("{amount}", formatMoney(threshold.value));
+  if (threshold.kind === "amount") return formatMoney(threshold.value, locale);
+  return copy.thresholdSum.replace("{amount}", formatMoney(threshold.value, locale));
 }
 
-export function PatternsTable({ patterns, copy }: PatternsTableProps) {
+export function PatternsTable({ patterns, copy, locale }: PatternsTableProps) {
   const [term, setTerm] = useState("");
   const [sort, setSort] = useState<SortKey>("sum");
 
@@ -72,7 +74,9 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
     [patterns, term, sort, expanded],
   );
 
-  const footer = copy.footer.replace("{n}", String(total)).replace("{patterns}", plural(total, copy.patternForms));
+  const footer = copy.footer
+    .replace("{n}", String(total))
+    .replace("{patterns}", plural(total, copy.patternForms, locale));
 
   return (
     <>
@@ -145,13 +149,13 @@ export function PatternsTable({ patterns, copy }: PatternsTableProps) {
                   </td>
                   <td className={cell}>{p.occurrences}</td>
                   <td className={cn(cell, "whitespace-nowrap")}>
-                    {p.fixedAmountMinor === null ? "—" : formatMoney(p.fixedAmountMinor)}
+                    {p.fixedAmountMinor === null ? "—" : formatMoney(p.fixedAmountMinor, locale)}
                   </td>
-                  <td className={cn(cell, "whitespace-nowrap")}>{formatMoney(p.sumMinor)}</td>
-                  <td className={cn(cell, "whitespace-nowrap")}>{thresholdLabel(p.threshold, copy)}</td>
+                  <td className={cn(cell, "whitespace-nowrap")}>{formatMoney(p.sumMinor, locale)}</td>
+                  <td className={cn(cell, "whitespace-nowrap")}>{thresholdLabel(p.threshold, copy, locale)}</td>
                   <td className={cn(cell, "whitespace-nowrap")}>
                     {p.overMinor > 0 ? (
-                      <span className="text-excess-text font-extrabold">{formatMoney(p.overMinor)}</span>
+                      <span className="text-excess-text font-extrabold">{formatMoney(p.overMinor, locale)}</span>
                     ) : (
                       "—"
                     )}

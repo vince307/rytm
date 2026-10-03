@@ -23,6 +23,8 @@ import { loadPatternData } from "@/lib/patterns/load";
 import { overLimitTrend, trendBarHeight, type OverLimitTrend } from "@/lib/patterns/trend";
 import { createClient } from "@/lib/supabase";
 
+const locale = Astro.locals.locale;
+
 const h = copyExtra.home;
 const e = copy.emptyState;
 
@@ -57,11 +59,13 @@ const leadFor = (month: string) => copy.dashboard.descriptionNoName.replace("{mo
 const barsFor = (trend: OverLimitTrend) => {
   const max = Math.max(0, ...trend.months.map((m) => m.overMinor));
   return trend.months.map((m) => ({
-    label: formatMonthAxis(m.month),
-    amount: formatMoney(m.overMinor),
+    label: formatMonthAxis(m.month, locale),
+    amount: formatMoney(m.overMinor, locale),
     height: trendBarHeight(m.overMinor, max),
-    name: `${formatMonthAxis(m.month)}: ${
-      m.overMinor === 0 ? copy.trend.zeroMarker : copy.trend.amountLabel.replace("{amount}", formatMoney(m.overMinor))
+    name: `${formatMonthAxis(m.month, locale)}: ${
+      m.overMinor === 0
+        ? copy.trend.zeroMarker
+        : copy.trend.amountLabel.replace("{amount}", formatMoney(m.overMinor, locale))
     }`,
   }));
 };
@@ -69,11 +73,11 @@ const barsFor = (trend: OverLimitTrend) => {
 // K25 — kit foot template `dashboard.stats[0].foot` with the app's genitive months (`copyExtra.home`).
 const deltaFootFor = (previous: NonNullable<HomeStats["previous"]>) =>
   copy.dashboard.stats[0].foot
-    .replace("{delta}", formatSignedMoney(previous.deltaMinor))
+    .replace("{delta}", formatSignedMoney(previous.deltaMinor, locale))
     .replace("{month}", h.monthsGenitive[monthIndex(previous.month)]);
 
 // One text node per smoke-pinned count (`>1 koszt<`): built here so prettier never wraps it in the template.
-const costsText = (n: number) => `${n} ${plural(n, h.fixedSummary.costForms)}`;
+const costsText = (n: number) => `${n} ${plural(n, h.fixedSummary.costForms, locale)}`;
 ---
 
 <AppLayout title={copy.dashboard.eyebrow} active="home">
@@ -109,7 +113,7 @@ const costsText = (n: number) => `${n} ${plural(n, h.fixedSummary.costForms)}`;
         <StatCard
           accent
           label={copy.dashboard.stats[0].label}
-          value={formatMoney(result.stats.overMinor)}
+          value={formatMoney(result.stats.overMinor, locale)}
           foot={result.stats.previous ? deltaFootFor(result.stats.previous) : undefined}
         />
       </div>

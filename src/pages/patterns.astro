@@ -90,7 +90,7 @@ const tableCopy: PatternsTableCopy = {
           <InlineAlert kind={resultAlert.kind}>{resultAlert.message}</InlineAlert>
         </div>
       )}
-      <PatternsTable client:load patterns={visibleItems} copy={tableCopy} />
+      <PatternsTable client:load patterns={visibleItems} copy={tableCopy} locale={Astro.locals.locale} />
       <ExcludedPatterns patterns={excludedItems} />
     </>
   )}

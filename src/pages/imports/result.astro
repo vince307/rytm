@@ -14,6 +14,8 @@ import { accountDisplay, bankDisplayName, fillTemplate } from "@/lib/import/pres
 import { createClient } from "@/lib/supabase";
 import { formatRangeShort, plural } from "@/lib/format";
 
+const locale = Astro.locals.locale;
+
 const x = copyExtra.imports;
 const k = copy.imports;
 const flow = copy.importFlow;
@@ -49,13 +51,16 @@ if (imported && parsedId.success) {
   n = count ?? 0;
 }
 
-const title = fillTemplate(x.resultTitle, { n, debits: plural(n, flow.debitForms as [string, string, string]) });
+const title = fillTemplate(x.resultTitle, {
+  n,
+  debits: plural(n, flow.debitForms as [string, string, string], locale),
+});
 const meta = imported
   ? [
       [flow.bank, bankDisplayName(k.bankName, imported.source)],
       [flow.accountLabel, accountDisplay(imported.account_name, imported.account_number)],
-      [flow.rangeLabel, formatRangeShort(imported.period_start, imported.period_end)],
-      [x.transactionsLabel, `${n} ${plural(n, x.transactionForms)}`],
+      [flow.rangeLabel, formatRangeShort(imported.period_start, imported.period_end, locale)],
+      [x.transactionsLabel, `${n} ${plural(n, x.transactionForms, locale)}`],
     ]
   : [];
 ---

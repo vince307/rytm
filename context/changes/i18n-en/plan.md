@@ -666,12 +666,12 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Automated
 
-- [ ] 2.1 npm test: Phase 1 count + EN format cases, 0 failed, no PL expected string changed
-- [ ] 2.2 Smoke Phase 1 count PASS, 0 FAIL, Δ0
-- [ ] 2.3 No pl-PL literal left in format.ts
-- [ ] 2.4 Deliberate break: INTL_TAG.en = pl-PL turns EN cases red, PL green, restored, meta-check recorded
-- [ ] 2.5 Deliberate break: missing locale argument at a page call site turns astro check red, restored
-- [ ] 2.6 Full local gate vs baseline, smoke + 1 cumulative
+- [x] 2.1 npm test: Phase 1 count + EN format cases, 0 failed, no PL expected string changed
+- [x] 2.2 Smoke Phase 1 count PASS, 0 FAIL, Δ0
+- [x] 2.3 No pl-PL literal left in format.ts
+- [x] 2.4 Deliberate break: INTL_TAG.en = pl-PL turns EN cases red, PL green, restored, meta-check recorded
+- [x] 2.5 Deliberate break: missing locale argument at a page call site turns astro check red, restored
+- [x] 2.6 Full local gate vs baseline, smoke + 1 cumulative
 
 #### Manual
 

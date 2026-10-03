@@ -3,7 +3,7 @@ import { copyExtra } from "@/content/copy";
 import { sequenceLabel } from "@/lib/patterns/sequence-label";
 
 const label = (count: number, over: number) =>
-  sequenceLabel(count, over, copyExtra.patterns.sequenceSummary, copyExtra.patterns.occurrenceForms);
+  sequenceLabel(count, over, copyExtra.patterns.sequenceSummary, copyExtra.patterns.occurrenceForms, "pl");
 
 describe("sequenceLabel", () => {
   it("uses singular and genitive plural forms", () => {

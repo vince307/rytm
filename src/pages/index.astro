@@ -45,7 +45,7 @@ const barHeights = ["32%", "49%", "41%", "65%", "54%", "72%", "88%", "62%"];
       <span class="absolute -right-10 -bottom-[120px] size-[290px] rounded-full border border-paper/15"></span>
       <div class="flex items-center justify-between text-xs text-paper/80">
         <span>{x.heroCardTop}</span>
-        <span>{formatMonthYear()}</span>
+        <span>{formatMonthYear(new Date(), Astro.locals.locale)}</span>
       </div>
       <div class="mt-[35px] mb-2 text-[42px] font-bold tracking-[-0.06em]">3 842,60 zł</div>
       <div class="text-xs text-paper/60">{x.heroCardSub}</div>

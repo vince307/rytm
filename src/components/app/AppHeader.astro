@@ -2,7 +2,7 @@
 import Brand from "@/components/Brand.astro";
 import { formatMonthYear } from "@/lib/format";
 
-const month = formatMonthYear();
+const month = formatMonthYear(new Date(), Astro.locals.locale);
 ---
 
 <header class="flex h-[72px] items-center justify-between border-b border-line bg-paper px-[30px] max-[899px]:px-[18px]">

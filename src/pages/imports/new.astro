@@ -46,6 +46,7 @@ const serverError: WizardServerError | undefined = kind.success
 <AppLayout title={f.title} active="imports">
   <ImportWizard
     client:load
+    locale={Astro.locals.locale}
     labels={{
       flow: {
         title: f.title,

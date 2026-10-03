@@ -22,7 +22,8 @@ const { patterns } = Astro.props;
       <Icon name="arrow" size={14} class="-rotate-90 transition-transform group-open:rotate-0" />
       {copy.patterns.excluded}
       <span class="font-normal">
-        {patterns.length} {plural(patterns.length, copy.patterns.countForms as [string, string, string])}
+        {patterns.length}{" "}
+        {plural(patterns.length, copy.patterns.countForms as [string, string, string], Astro.locals.locale)}
       </span>
     </summary>
     {/* Panel-styled (border/radius/bg as Panel.astro), but padding 0 20 (plan contract) — each row supplies its

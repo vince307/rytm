@@ -9,6 +9,7 @@ import { fieldBox } from "@/components/app/field-styles";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { usePageShowReset } from "@/components/hooks/usePageShowReset";
+import type { Locale } from "@/lib/i18n";
 import { formatThresholdInput } from "@/lib/patterns/threshold-form";
 import { cn } from "@/lib/utils";
 import type { PatternType, Threshold, ThresholdKind } from "@/types";
@@ -34,6 +35,7 @@ interface ThresholdEditorProps {
   threshold: Threshold | null;
   month: string;
   copy: ThresholdEditorCopy;
+  locale: Locale;
 }
 
 // Kit `.threshold-option`: radius 8px, inherited (400) weight — not the app-wide `rounded-lg` (14px) / bold.
@@ -41,7 +43,7 @@ const switchBase = "rounded-[8px] border px-[11px] py-[9px] text-xs";
 const switchActive = "border-ink bg-ink text-paper";
 const switchIdle = "border-line text-muted";
 
-export function ThresholdEditor({ patternKey, type, threshold, month, copy }: ThresholdEditorProps) {
+export function ThresholdEditor({ patternKey, type, threshold, month, copy, locale }: ThresholdEditorProps) {
   const deleteFormId = useId();
   const [saving, setSaving] = useState(false);
   // S-04 F8 / undo-import F4: a bfcache restore (back-navigation after the POST) must not leave the button stuck.
@@ -55,7 +57,7 @@ export function ThresholdEditor({ patternKey, type, threshold, month, copy }: Th
   const valueLabel = activeKind === "count" ? copy.valueLabel.count : copy.valueLabel.amount;
   const suffix = activeKind === "count" ? copy.suffix.count : copy.suffix.money;
   const inputMode = activeKind === "count" ? "numeric" : "decimal";
-  const defaultValue = threshold?.kind === activeKind ? formatThresholdInput(threshold) : "";
+  const defaultValue = threshold?.kind === activeKind ? formatThresholdInput(threshold, locale) : "";
 
   return (
     <div className="threshold-editor">

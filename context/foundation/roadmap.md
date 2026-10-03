@@ -46,6 +46,7 @@ Rytm wgrywa CSV z banku, normalizuje opisy do sprzedawców, wykrywa wzorce stał
 | S-13 | kit-round-3-imports       | wgrać plik z ING lub Santandera, zobaczyć wynik, odrzucenia i historię importów (z cofnięciem) w wersji rundy 3 kitu                       | F-04          | FR-003, FR-004, FR-005, FR-018         | done    |
 | S-14 | kit-round-3-patterns      | przeglądać wzorce, szczegół z progiem i dialog akcji (scal, zmień nazwę, typ, wyklucz) we wszystkich stanach rundy 3 kitu                  | F-04          | FR-007, FR-008, FR-009, FR-010, FR-011 | done |
 | S-15 | kit-round-3-home-fixed    | zobaczyć przegląd, trend „ponad progiem” i koszty stałe ze wszystkimi stanami (puste, brak porównania, błąd odczytu) w wersji rundy 3 kitu | F-04          | FR-011, FR-012, FR-013                 | done |
+| S-16 | i18n-en                   | przełączyć interfejs na angielski (i z powrotem) przełącznikiem w stopce, panelu auth i `/settings`; wybór przetrwa przeładowanie, pierwsza wizyta respektuje `Accept-Language`, PL bez zmian | S-12…S-15     | — (PRD milczy o językach)              | ready |
 
 ## Baseline
 
@@ -122,6 +123,18 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Risk:** Ostatni, bo zbiera resztki `copyExtra` (`home`, `fixed`, `app`) — jego ostatnia faza sprawdza, czy `copyExtra` zawiera już tylko to, czego kit naprawdę nie dał. Pozycje: K11 (home, fixed, app), K18 (przegląd, koszty stałe), K23, K24, K25, G34, G35, G36.
 - **Status:** done
 
+### S-16: Angielska wersja językowa i przełącznik języka
+
+- **Outcome:** Użytkownik przełącza interfejs na angielski (i z powrotem) przyciskami PL / EN w stopce stron publicznych, w rogu stron auth i w sekcji „Język / Language” w `/settings`; każdy widok (marketing, auth, aplikacja) renderuje się w całości po angielsku — teksty, `<title>`/meta, daty, liczby i kwoty w `en-GB` (`52.99 zł`), liczba mnoga — a dane użytkownika (sprzedawcy, opisy z wyciągów, PLN) się nie zmieniają; wybór przetrwa przeładowanie i nawigację (ciasteczko `rytm-locale`), pierwsza wizyta respektuje `Accept-Language`, wersja PL renderuje się jak przed zmianą.
+- **Change ID:** i18n-en
+- **PRD refs:** none — PRD v1 milczy o językach interfejsu (zmiana poza zakresem M-3, decyzja właściciela 2026-10-03; projekt `context/changes/i18n-en/design.md`)
+- **Prerequisites:** S-12, S-13, S-14, S-15 (done — cały interfejs czyta copy z `content.json` / `copyExtra` rundy 3)
+- **Parallel with:** —
+- **Blockers:** —
+- **Unknowns:** — (kit nie ma copy EN ani przełącznika → luki `DESIGN-GAP` K42/K43, własne tłumaczenie do podmiany)
+- **Risk:** Dotyka każdego widoku: przepięcie 30 konsumentów `@/content/copy` i wszystkich formaterów `format.ts` na `locale` musi zostać refactorem bez zmiany PL (smoke, kit-contract test). Polska gramatyka zaszyta poza słownikiem (`fillMonthLocative` „we wrześniu”, klucze `patternDetail.monthNames` jako mianowniki, krotki `[one, few, many]`, słowo `USUŃ`) wymaga decyzji per locale. Bez migracji.
+- **Status:** ready
+
 ## Backlog Handoff
 
 | Roadmap ID | Change ID                 | Suggested issue title                              | Ready for `/10x-plan` | Notes                                                                                                                                                                                                                                                                                                                                    |
@@ -131,6 +144,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | S-13       | kit-round-3-imports       | Import i historia importów według rundy 3 kitu     | done                  | Zarchiwizowane 2026-10-02 → `context/archive/2026-10-02-kit-round-3-imports/`; follow-up F3 (`Trigger: next change touching src/pages/imports/result.astro, or an observability audit`); [human] 6.8 otwarte (lista w PR)                                                                                                                |
 | S-14       | kit-round-3-patterns      | Wzorce, szczegół i akcje według rundy 3 kitu       | done                  | Zarchiwizowane 2026-10-03 → `context/archive/2026-10-03-kit-round-3-patterns/`; follow-upy z `Trigger:` (S-15: `fixed.astro` `try`, F8, F9; kit round 4: K35–K37, Panel radius, błędy w dialogu; S-05 F6/F7); [human] 8.9 otwarte (lista w PR; m.in. promień pól 14 → 8 px, padding `DialogContent`, wyśrodkowany `ViewEmpty` także na `/fixed` i `/imports`) |
 | S-15       | kit-round-3-home-fixed    | Przegląd, trend i koszty stałe według rundy 3 kitu | done                  | Zarchiwizowane 2026-10-03 → `context/archive/2026-10-03-kit-round-3-home-fixed/`; bez migracji. `/home`: jedna karta „Ponad progiem” + trend + zestawienie „Koszty stałe” (bez panelu importu i sumy kosztów stałych), minimalny słupek trendu 12 → 8 %; nowy test jednostkowy pilnuje, by `copyExtra` nie dublował tekstu kitu. [human] 5.11 otwarte (lista w PR; K38–K41, G39 → autor kitu). Follow-up: `AuthLayout.astro` waga tytułu jak kit `.auth-copy h1` — `Trigger: next slice touching AuthLayout.astro` (`grep -n 'Trigger:' context/archive/2026-10-03-kit-round-3-home-fixed/follow-ups/review-fixes.md`) |
+| S-16       | i18n-en                   | Angielska wersja językowa i przełącznik języka     | yes                   | Poza M-3 (zamknięty); zmiana wpisana przed runem `2026-10-03-i18n-en` — projekt `context/changes/i18n-en/design.md`, korekty planu względem repo w `change.md`. Bez migracji. Luki kitu K42 (brak EN), K43 (brak przełącznika). Następny krok `/10x-research i18n-en` |
 
 ## Open Roadmap Questions
 

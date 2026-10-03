@@ -114,13 +114,13 @@ export const extraEn = {
   emptyViews: { body: "A single CSV file is enough for Rytm to recognise the rhythm of your spending." },
   config: {
     warning: "Note:",
-    docs: "Documentation",
     supabaseMissing: "Supabase is not configured — authentication features are disabled.",
     supabaseDocs: "See the setup guide",
   },
   // DESIGN-GAP: K43 — the kit has no language switcher; native names and the bilingual title are identical in both locales.
   locale: { label: "Language", pl: "Polski", en: "English", sectionTitle: "Język / Language" },
   landing: {
+    // DESIGN-GAP: K44 — the kit landing mock-up amount is a literal in the prototype markup, no content.json key.
     heroAmount: "3,842.60 zł",
   },
 } satisfies CopyExtra;

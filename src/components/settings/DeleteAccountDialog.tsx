@@ -28,11 +28,11 @@ interface Props {
   labels: DeleteAccountLabels;
   /** The shared demo account: password field and button disabled; the server guard in api/auth/delete.ts stays. */
   demo: boolean;
-  /** The locale's delete word (`confirmWordS[locale]`), passed by the page. */
+  /** The locale's delete word (`DELETE_CONFIRM_WORDS[locale]`), passed by the page. */
   confirmWord: string;
 }
 
-// Kit round 3 `modal('deleteAccount')`: password + the `USUŃ` word unlock the button; the eyebrow, title and body
+// Kit round 3 `modal('deleteAccount')`: password + the locale's delete word (`USUŃ` / `DELETE`) unlock the button; the eyebrow, title and body
 // stay in `copyExtra.settings` (design-kit.md K15). Opens closed; server errors show on the page.
 const CONFIRM_ID = "delete-account-confirm";
 const HELP_ID = "delete-account-help";

@@ -25,6 +25,9 @@ describe("localeRedirectTarget", () => {
     ["missing referer", null, "/"],
     ["malformed referer", "not a url", "/"],
     ["path-looking protocol-relative referer", "//evil.example/", "/"],
+    ["same-origin backslash path normalised to //host", `${origin}/\\evil.example`, "/"],
+    ["same-origin dot-segment path normalised to //host", `${origin}/a/..//evil.example`, "/"],
+    ["userinfo pointing at a foreign host", "http://localhost:4321@evil.example/x", "/"],
   ];
   it.each(cases)("%s", (_name, referer, expected) => {
     expect(localeRedirectTarget(referer, origin)).toBe(expected);

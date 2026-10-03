@@ -183,7 +183,6 @@ export const copyExtraPl = {
   // App chrome with no kit key (operator-facing missing-configuration banner of Layout.astro).
   config: {
     warning: "Uwaga:",
-    docs: "Dokumentacja",
     supabaseMissing: "Supabase nie jest skonfigurowany — funkcje uwierzytelniania są wyłączone.",
     supabaseDocs: "Zobacz instrukcję konfiguracji",
   },
@@ -216,7 +215,9 @@ export function getMonths(locale: Locale): {
   const { copy, copyExtra } = getCopy(locale);
   const monthNames = copy.patternDetail.monthNames;
   return {
-    nominative: Object.keys(monthNames),
+    // PL nominatives are the kit's keys; EN keeps those Polish keys (`satisfies KitCopy`), so its
+    // nominative is the English value — in English nominative and locative are the same word.
+    nominative: locale === "pl" ? Object.keys(monthNames) : Object.values(monthNames),
     locative: Object.values(monthNames),
     genitive: copyExtra.home.monthsGenitive,
   };

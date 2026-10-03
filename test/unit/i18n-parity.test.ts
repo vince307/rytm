@@ -179,4 +179,9 @@ describe("getCopy / getMonths per locale", () => {
     expect(getMonths("pl").genitive[4]).toBe("maja");
     expect(getMonths("pl").locative[0]).toBe("styczniu");
   });
+
+  it("gives EN nominatives in English (the EN monthNames keys stay Polish)", () => {
+    expect(getMonths("en").nominative[8]).toBe("September");
+    expect(getMonths("pl").nominative[8]).toBe("wrzesień");
+  });
 });

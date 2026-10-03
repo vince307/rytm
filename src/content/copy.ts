@@ -139,9 +139,6 @@ export const copyExtra = {
     thresholdCount: "{n} × / miesiąc",
     openPattern: "Otwórz wzorzec",
     occurrenceForms: ["wystąpienie", "wystąpienia", "wystąpień"],
-    // `patternDetail.sumLabel` bakes the month in ("Suma w maju"); `{month}` + `monthsLocative` generalise it —
-    // May reproduces the kit string byte for byte.
-    sumLabel: "Suma w {month}",
     monthsLocative: [
       "styczniu",
       "lutym",

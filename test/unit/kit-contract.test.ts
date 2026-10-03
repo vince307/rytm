@@ -71,6 +71,8 @@ describe("kit contract (content.json as the app reads it)", () => {
     expect(copy.importFlow.importButton).toContain("{debits}");
     // new.astro casts `importFlow.debitForms` to a 3-tuple for `plural()`.
     expect(copy.importFlow.debitForms).toHaveLength(3);
+    // patterns.astro / ExcludedPatterns cast `patterns.countForms` to a 3-tuple for `plural()` (S-14 impl review).
+    expect(copy.patterns.countForms).toHaveLength(3);
   });
 
   it("keeps the auth keys confirm-email and reset/new read (S-12 P7)", () => {

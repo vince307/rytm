@@ -53,8 +53,8 @@ interface Props {
 // `.modal-actions{display:grid}` and so stretch to the column's full width. Here each sits inside a `<div>` / `<form>`
 // wrapper (the grid item), so the button needs its own `w-full` (visual gate: content-width buttons at 1440 / 400).
 const actionButton = "w-full justify-start";
-// Kit `.modal-input`: radius 8px, padding 13, margin 4 0 16; the box is the shared `fieldBox`. The select has no kit reference — same box, no margin (labelled by a
-// preceding <label>, F11: new fields use kit 8 px locally).
+// Kit `.modal-input`: radius 8px, padding 13, margin 4 0 16; the box is the shared `fieldBox`. The merge select
+// („Wzorzec”, kit merge view) uses the same box, labelled by a preceding <label>.
 const dialogFieldBox = cn(fieldBox, "w-full");
 
 export default function PatternActionsDialog({

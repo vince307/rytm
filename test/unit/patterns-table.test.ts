@@ -13,7 +13,7 @@ const tableCopy: PatternsTableCopy = {
   columns: copy.patterns.columns,
   typeLabels: x.typeLabels,
   footer: x.footer,
-  patternForms: copy.patterns.countForms,
+  patternForms: copy.patterns.countForms as [string, string, string],
   thresholdCount: x.thresholdCount,
   thresholdSum: x.thresholdSum,
   openPattern: x.openPattern,

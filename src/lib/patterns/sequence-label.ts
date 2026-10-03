@@ -2,7 +2,12 @@
 // take the Polish plural forms, no trailing full stop. `within = count − over`.
 import { plural } from "@/lib/format";
 
-export function sequenceLabel(count: number, over: number, template: string, forms: readonly string[]): string {
+export function sequenceLabel(
+  count: number,
+  over: number,
+  template: string,
+  forms: readonly [string, string, string],
+): string {
   const within = count - over;
   return template
     .replace("{within}", String(within))

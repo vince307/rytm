@@ -26,8 +26,8 @@ export interface PatternsTableCopy {
   columns: readonly string[];
   typeLabels: { fixed: string; frequent: string };
   footer: string;
-  /** `copy.patterns.countForms` (kit round 3). */
-  patternForms: readonly string[];
+  /** `copy.patterns.countForms` (kit round 3) — content.json types it `string[]`; the page hands over the three forms. */
+  patternForms: readonly [string, string, string];
   /** Próg cell, `count` kind — `"{n} × / miesiąc"` (K21 verbatim format). */
   thresholdCount: string;
   /** Próg cell, `sum` kind — `"{amount} / miesiąc"` (G31 placeholder). */

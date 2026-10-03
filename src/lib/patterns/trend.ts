@@ -61,10 +61,10 @@ export function overLimitTrend(
 }
 
 /** Bar height as a percentage of the panel's max (kit `trendChart()`): `0` for a `0` value (rendered as a 2 px
- * stub so the month stays visibly present on the axis), otherwise at least 12 % so a small non-zero sum is still
+ * stub so the month stays visibly present on the axis), otherwise at least 8 % (kit `Math.max(8, …)`) so a small non-zero sum is still
  * visible, scaled linearly to `max`. `max === 0` never divides (every value is 0 too, so the branch above already
  * returns 0). */
 export function trendBarHeight(value: number, max: number): number {
   if (value === 0 || max === 0) return 0;
-  return Math.max(12, (value / max) * 100);
+  return Math.max(8, (value / max) * 100);
 }

@@ -1,0 +1,14 @@
+---
+// InfoPanel.astro — kit `.info-panel` (prototype/styles.css): a quiet note under a panel's content. One component for
+// the trend note and the `/fixed` messages. The slot renders without wrapping whitespace (smoke anchors `>text<`).
+import { cn } from "@/lib/utils";
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<div class:list={cn("mt-[14px] border-l-[3px] border-ink bg-paper-soft p-[13px] text-xs text-muted", className)}>
+  <slot />
+</div>

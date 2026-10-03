@@ -42,9 +42,8 @@ export const copyExtra = {
     emptyTitle: "Zacznij od pierwszego importu.",
     emptyLead: "Rytm pokaże Ci wzorce, kiedy dostanie pierwszy wyciąg.",
     emptyIllustrationAlt: "Dokument czekający na import",
-    // DESIGN-GAP: G35 — the kit's trend panel has no state for "no pattern has an applicable threshold at all";
-    // placeholder, the author supplies the final copy.
-    noThreshold: "Ustaw próg na wzorcu, a tu pojawi się suma ponad progiem.",
+    // DESIGN-GAP: K39 — the kit's trend legend explains the zero mark only in a `title` literal, no content.json key.
+    zeroNote: "Cienka kreska oznacza 0,00 zł",
     // DESIGN-GAP: K25 — `dashboard.stats[0].foot` is the template, the kit ships no genitive month names.
     monthsGenitive: [
       "stycznia",

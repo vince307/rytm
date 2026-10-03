@@ -60,6 +60,9 @@ const barsFor = (trend: OverLimitTrend) => {
     label: formatMonthAxis(m.month),
     amount: formatMoney(m.overMinor),
     height: trendBarHeight(m.overMinor, max),
+    name: `${formatMonthAxis(m.month)}: ${
+      m.overMinor === 0 ? copy.trend.zeroMarker : copy.trend.amountLabel.replace("{amount}", formatMoney(m.overMinor))
+    }`,
   }));
 };
 
@@ -115,7 +118,7 @@ const costsText = (n: number) => `${n} ${plural(n, h.fixedSummary.costForms)}`;
           <span class="text-xs text-muted">{copy.trend.range}</span>
         </PanelTitle>
         <TrendChart
-          ariaLabel={copy.trend.title}
+          ariaLabel={copy.trend.gridLabel}
           bars={barsFor(result.trend)}
           legend={copy.trend.legend}
           note={
@@ -123,7 +126,8 @@ const costsText = (n: number) => `${n} ${plural(n, h.fixedSummary.costForms)}`;
               ? copy.trend.tooShort.replace("{n}", String(copy.trend.minimumMonths))
               : undefined
           }
-          hint={!result.trend.hasThreshold ? h.noThreshold : undefined}
+          zeroNote={result.trend.months.some((m) => m.overMinor === 0) ? h.zeroNote : undefined}
+          noThreshold={!result.trend.hasThreshold ? copy.trend.noThreshold : undefined}
         />
       </Panel>
       <FixedSummary

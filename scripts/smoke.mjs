@@ -500,10 +500,11 @@ const steps = [
         ">0,00 zł<",
         ">maj 26<",
         "Trend pojawi się po 3 miesiącach danych.",
-        "Ustaw próg na wzorcu, a tu pojawi się suma ponad progiem.",
+        ">Brak ustawionego progu<",
       ],
     },
   ],
+  ["home explains the zero bar", () => request("/home"), { status: 200, contains: ">Cienka kreska oznacza 0,00 zł<" }],
   [
     "fixed with one month lists no change",
     () => request("/fixed"),
@@ -579,7 +580,16 @@ const steps = [
     {
       status: 200,
       contains: ">5,50 zł<",
-      notContains: "Ustaw próg na wzorcu, a tu pojawi się suma ponad progiem.",
+      notContains: ">Brak ustawionego progu<",
+    },
+  ],
+  [
+    "home names each trend bar",
+    () => request("/home"),
+    {
+      status: 200,
+      contains: 'aria-label="maj 26: 5,50 zł ponad próg"',
+      notContains: ">Cienka kreska oznacza 0,00 zł<",
     },
   ],
   [

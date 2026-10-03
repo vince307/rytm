@@ -1,69 +1,63 @@
 # Handoff — `i18n-en` (slice S-16)
 
-Written by the `/10x-impl-review i18n-en` step of run `2026-10-03-i18n-en`. Review done, one CRITICAL (EN `/home` lead showed the Polish month) fixed in `1dbab76`; `change.md` is `impl_reviewed`; `MERGE: CLEAR`. The one thing not to get wrong: the visual gate must check `/home` in EN **with data** (demo account or an imported fixture) — the empty state hides the month lead, which is how the bug slipped through.
+Written by the visual-gate step of run `2026-10-03-i18n-en`. Gate done: `VISUAL: PASS`, no discrepancies, no code changed; `[visual]` rows 6.8, 7.8, 7.9 ticked, only `[human]` 7.10 open. The one thing not to get wrong: 7.10 stays open through archive and ship — it is the maintainer's, not a step's.
 
 ## 1. State
 
-| Item | Value |
-| --- | --- |
-| Branch | `feat/i18n-en`, cut from `main` at `b973428` |
-| Commits | docs + p1 `ace542d` … p7 `ce7a1f0` + fix `1dbab76` + this docs commit |
-| Pushed / PR / merged | no / none / no |
-| `change.md` status | `impl_reviewed` |
-| `## Progress` rows remaining | 4 (`grep -c '^- \[ \]' plan.md`): `[visual]` 6.8, 7.8, 7.9; `[human]` 7.10 |
-| Working tree | clean per `tree-clean.sh` after the commit (allow-listed `?? design/prompts/2026-10-03-gaps-round-4.md` untouched) |
+| Item                         | Value                                                                                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Branch                       | `feat/i18n-en`, cut from `main` at `b973428`                                                                                          |
+| Commits                      | docs + p1 `ace542d` … p7 `ce7a1f0` + fix `1dbab76` + impl-review docs `15707b7` + this docs commit (`docs(i18n-en): bramka wizualna`) |
+| Pushed / PR / merged         | no / none / no                                                                                                                        |
+| `change.md` status           | `impl_reviewed` (archive flips it)                                                                                                    |
+| `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`): `[human]` 7.10                                                                                      |
+| Working tree                 | clean per `tree-clean.sh` after the commit (allow-listed `?? design/prompts/2026-10-03-gaps-round-4.md` untouched)                    |
 
 ## 2. Artifacts
 
-| Path | What it is |
-| --- | --- |
-| `src/content/copy.ts` | `getMonths`: EN nominative from `Object.values`; `copyExtraPl.config.docs` removed (orphan) |
-| `src/content/en/extra.ts` | `config.docs` removed; `DESIGN-GAP: K44` comment on `landing` |
-| `src/components/settings/DeleteAccountDialog.tsx` | stale comments (`confirmWordS`, "the `USUŃ` word") corrected |
-| `test/unit/i18n-parity.test.ts` | case `getMonths("en").nominative` |
-| `test/unit/i18n.test.ts` | 3 `localeRedirectTarget` cases for the `//` guard and userinfo |
-| `context/changes/i18n-en/reviews/impl-review.md` | review report, ends `MERGE: CLEAR — …` |
-| `context/changes/i18n-en/follow-ups/review-fixes.md` | review section: F1 closed, F2-F4 open with `Trigger:` |
-| `context/changes/i18n-en/plan.md`, `change.md`, `handoff.md` | `[reviewer]` rows 1.7-7.7 ticked; status; this file |
+| Path                                               | What it is                                                                                             |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `context/changes/i18n-en/screenshots/*.png`        | 89 PNGs: 75 app (29 EN + 8 PL states × 1440/400, `en-patterns-one-month` desktop only) + 14 kit frames |
+| `context/changes/i18n-en/screenshots/README.md`    | state · file · how reached, accounts and data                                                          |
+| `context/changes/i18n-en/reviews/visual-review.md` | gate report, ends `VISUAL: PASS — …`                                                                   |
+| `context/changes/i18n-en/plan.md`                  | rows 6.8, 7.8, 7.9 ticked                                                                              |
+| `context/changes/i18n-en/handoff.md`               | this file                                                                                              |
 
 ## 3. Verification
 
-Baseline (contract, `d2b8d49`): lint 0; astro check 0 (166 files); fixture OK; vitest 387; build OK; pgTAP 6/119; smoke 195.
+Baseline (contract, `d2b8d49`): lint 0; astro check 0 (166 files); fixture OK; vitest 387; build OK; pgTAP 6/119; smoke 195. No code changed in this step, so the suites were not re-run; the impl-review step's observed results stand (vitest 434 = +47, smoke 205 = +10, pgTAP Δ0).
 
-| Command | Result |
-| --- | --- |
-| `npm run lint` | 0 errors, 0 warnings |
-| `npx astro check` | 0 errors (174 files, +8; 3 hints) |
-| `npm run fixture:check` | ing OK, santander OK |
-| `npm test` | 434 passed, 30 files (baseline 387, +47; +4 in this step) |
-| `npm run build` | Complete |
-| `npx supabase db reset && npx supabase test db` | Files=6, Tests=119, PASS (Δ0) |
-| smoke on :4398 | 205 PASS / 0 FAIL (baseline 195, +10); last step `locale switch returns to Polish` |
-| `git diff main...HEAD --stat -- supabase/` | empty (no migration) |
-| EN render, 14 views with `rytm-locale=en` (test + demo user) | all `lang="en"`; diacritics only `zł`, `ING Bank Śląski`, `Język / Language`; 0 non-diacritic Polish words |
-| PL default (no header, `Accept-Language: *`) on `/`, `/login`, `/home`, `/settings` | `lang="pl"`, Polish titles |
-| Probes | `/api/locale` foreign Origin 403; CRLF referer stays encoded in `Location`; cookie HttpOnly/Lax/1y/Path=/; `/api/auth/delete` anon → `/login`, lowercase `delete` → `?error=delete`, account intact |
-| Break 1: `getMonths` unfixed vs new EN-nominative case | red (`'wrzesień'` ≠ `'September'`), green after fix; live demo `/home` EN reads "Your May in one calm view." |
-| Break 2: `localeRedirectTarget` without `startsWith("//")` | 2 new same-origin `//` cases red, restored (`git diff` empty). Meta-check: the old `//evil.example/` case was proved by `new URL` throwing, not the guard |
+| Check                                                            | Result                                                                                                                                               |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 75 app PNGs, Playwright on `:4399`                               | 0 NOT CAPTURED; `scrollWidth` = viewport in all; no `undefined`/`NaN`/unfilled `{…}`; every page `lang` matches the cookie                           |
+| Console on every EN and PL page                                  | 0 errors, 0 warnings, 0 page errors (incl. `PatternsTable`, `ImportWizard`) — no hydration mismatch                                                  |
+| Switch in footer `/`, auth corner `/login`, `/settings`          | keyboard focus `:focus-visible` with ring; Enter → other locale on the same path; mouse click back → start locale on the same path (18/18 checks OK) |
+| EN `/home` with ING fixture + limit 3 on STACJA PALIW DROGOWSKAZ | lead „Your August in one calm view.”; `548.59 zł` = 244.18 + 304.41                                                                                  |
+| EN one-month account                                             | „Your May in one calm view.”; `52.99 zł` from `amountMinor` 5299                                                                                     |
+| Delete dialog EN                                                 | initial focus on „Current password”; `DELETE` + password enables the button; never submitted                                                         |
+| PL text vs `main` b973428 (`:4398`, same data)                   | only `PL`/`EN` and `Język / Language` added; nothing removed on `/`, `/login`, `/home`, `/patterns`, `/fixed`, `/imports`, `/settings`               |
+| Claude-in-Chrome headed                                          | `pl-PL` browser → PL first visit; click EN → `/login` EN; PL restored → `/login` PL; tab closed                                                      |
+| Cleanup                                                          | `:4398`/`:4399` killed, `:4321` untouched; `npx supabase db reset` at the end                                                                        |
 
 ## 4. Next command
 
-`visual gate (S-16 i18n-en: EN + PL views, switch in 3 places)`
+`/10x-archive i18n-en then ship (no migrations)`
 
 ## 5. Open
 
-- Manual rows: `[visual]` 6.8, 7.8 (EN, incl. `/home` with data — check the month lead and console hydration warnings in `PatternsTable` / `ImportWizard`), 7.9 (PL with `rytm-locale=pl`); `[human]` 7.10.
-- Follow-ups `context/changes/i18n-en/follow-ups/review-fixes.md`: F2 `Vary`/`Cache-Control` in `src/middleware.ts` `onRequest`; F3 EN default account names stored in DB; F4 "e-mail"/"email" spelling; plus the p7 items (PanelTitle, S-14 F7, E2E setup, EN copy replacement, K42-K44 to the kit author).
-- DESIGN-GAPs: K42, K43, K44 (`design-kit.md`, `open · S-16`); comments now in both dictionaries for K44.
-- Diacritic sweep misses diacritic-free Polish; this step's render scan of a word list found none.
-- Roadmap row S-16 still `planning`; archive flips it. No migration. `checkOrigin` default.
+- Manual row (human checklist): `[ ]` 7.10 `[human]` accept S-16 product choices (own EN translation K42, switch design K43 with bilingual „Język / Language”, `USUŃ` or `DELETE`, `Accept-Language` first visit, parity test instead of compile error for lengths/placeholders, default Supabase e-mails) and send K42–K43 to the kit author.
+- Follow-ups `context/changes/i18n-en/follow-ups/review-fixes.md`: F2 `Vary`/`Cache-Control` in `src/middleware.ts` `onRequest`; F3 EN default account names in DB; F4 "e-mail"/"email" — hydration trigger did not fire in this gate; plus p7 items (PanelTitle, S-14 F7, E2E setup, EN copy replacement, K42-K44 to the kit author).
+- DESIGN-GAPs: K42, K43, K44 (`design-kit.md`, `open · S-16`); none added here.
+- Observations (visual-review): shared `focusRing` low contrast (app-wide); tables scroll inside panels at 400 px in both locales (pre-existing).
+- The maintainer's Chrome now holds `rytm-locale=pl` for `localhost` (cookies ignore ports, so `:4321` sees it too) — same language its `pl-PL` gives; clear it to retest the first-visit rule there.
+- Roadmap row S-16 still `planning`; archive flips it. No migration.
 
 ## 6. Autonomous decisions
 
-1. **F1 is CRITICAL, fixed here.** Rejected: WARNING + follow-up. Why: user-visible Polish in EN on the main view, an unmet P3 contract. Would change: nothing.
-2. **Orphan `config.docs` removed rather than wired back as a fallback.** Rejected: restore `?? copyExtra.config.docs`. Why: `docsLabelKey` is required, a fallback would be dead code; plan P7 forbids leaves without a reader. Would change: an optional docs label in `ConfigStatus`.
-3. **K44 comment added to `extraEn.landing`** to match the register row text "w obu językach". Would change: register row reworded instead.
-4. **`Vary`/`private` deferred** (follow-up F2). Why: no cache anywhere, every SSR response uncached on Vercel. Would change: any cache header or prerendered page.
-5. **Hydration risk recorded, not fixed** — existing E2E follow-up trigger covers it. Would change: a warning seen in the visual gate.
-6. **All seven `[reviewer]` rows ticked** — 3.8 and 7.7 only after `1dbab76`. Would change: a reviewer reading the translation more strictly than "natural, grammatical" (row 7.10 is the human's).
-7. **No subagent re-review after fixes**; I re-ran every suite instead. Would change: a fix touching more than copy/test files.
+1. **Playwright for the PNG set, Chrome as headed cross-check.** Rejected: Chrome-only. Why: 37 states × 2 widths, a 400 px viewport and keyboard modality need a scripted browser (the extension missed one of two clicks and cannot go below ~587 px). Would change: an extension that sends key events and narrow viewports reliably.
+2. **1440 px desktop, not the plan's 1280.** Why: the step brief and `visual-capture.mjs` default say 1440; nothing at 1280 is a different breakpoint. Would change: a layout breakpoint between 1280 and 1440.
+3. **PL "byte-for-byte" proven by a rendered-text diff against `main` on `:4398`** (from `git archive`, outside the repo, no worktree). Rejected: eyeballing screenshots. Why: catches any one-word copy change. Would change: nothing; line-set diff misses pure reordering — none expected from a dictionary swap.
+4. **One-month account seeded with `POST /api/imports`** (the smoke path) instead of a one-month CSV. Why: the fixture spans 12 months; there is no one-month CSV. Would change: a one-month fixture file.
+5. **`/reset/new` form reached through the real recovery mail (Mailpit)**, password not changed. Would change: nothing.
+6. **Overlap shot taken without reload.** The overlap check is client-side on step 3, so a reload would lose it. Would change: a server-side overlap URL state.
+7. **Chrome left on `rytm-locale=pl`** rather than deleting the cookie. Why: the extension blocks `document.cookie`; PL matches the browser's language. Would change: the maintainer wanting no cookie.

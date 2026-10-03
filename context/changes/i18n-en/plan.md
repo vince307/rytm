@@ -15,7 +15,7 @@ Source: `research.md` (Summary 1–9, Detailed Findings), `change.md` (claims ta
 this step. Anchors are symbols.
 
 - `src/content/copy.ts`: `copy = content` (kit JSON `design/rytm-os/react-kit/docs/content.json`), `copyExtra = {…}
-  as const` (namespaces `auth home imports patterns fixed settings emptyViews`), `ICON_NAMES` / `IconName`
+as const` (namespaces `auth home imports patterns fixed settings emptyViews`), `ICON_NAMES` / `IconName`
   (locale-free). 30 `src` files import it: 27 value imports (pages, `Layout`, `AppLayout`, `Sidebar`, `MobileNav`,
   `ViewEmpty`, `Brand`, `Icon`, `SiteHeader`, `SiteFooter`, `ExcludedPatterns`, `RestoreForm`), 3 type-only
   (`Glyph.tsx`, `ImportWizard.tsx`, `src/lib/import/presentation.ts`). Tests importing it: `kit-contract.test.ts`,
@@ -578,7 +578,7 @@ slice adding a browser-only risk`), EN copy replacement (`Trigger: kit ships EN 
 ### Manual Testing Steps:
 
 1. `npx supabase start`; import the synthetic ING fixture for the test user; `ASTRO_DEV_BACKGROUND=1 npx astro dev
-   --port 4399 --ignore-lock`.
+--port 4399 --ignore-lock`.
 2. Switch to EN in the footer; walk the P7 EN list at 1280 and ~400 px; set `rytm-locale=pl` and walk the PL list.
 3. Kill the dev server (`lsof -ti :4399 | xargs kill`).
 
@@ -611,25 +611,25 @@ Recorded in place of the skill's questions (run contract rule 1). **No decision 
 criterion „Brak klucza w EN to błąd kompilacji” holds for keys and `copyExtra` tuples, but kit array lengths and
 placeholders are guarded by a unit test, not the compiler — named in `[human]` row 7.10.
 
-| # | Decision | Chosen | Rejected | Why | What would change it |
-| --- | --- | --- | --- | --- | --- |
-| 1 | Complexity / questions | HIGH, 0 questions | Interview | design + research decided everything else with recommendations | A product owner available |
-| 2 | `copy` / `copyExtra` value exports | Dropped; tests use `getCopy("pl")` | Keep as PL aliases | A missed consumer then fails `astro check` instead of staying Polish in EN | — |
-| 3 | `KitCopy` | `typeof content`, EN kit a plain object | `DeepReadonly` | Fewer types; JSON arrays are mutable already | A consumer needing readonly tuples |
-| 4 | `CopyExtra` | `Widen<typeof copyExtraPl>` | design's `typeof copyExtraPl` | `as const` literal types reject every EN string (research scratch run) | — |
-| 5 | Month names | EN `monthNames` = PL keys → English values; one `getMonths(locale)` | Relax `KitCopy` for one key; a separate nominative table | Keeps `satisfies KitCopy` strict and the kit untouched | Kit ships EN month data |
-| 6 | `fillMonthLocative` | `locale` parameter, EN plain replace | Unchanged function | Its „w {month}” branch would fire on EN strings by accident | — |
-| 7 | Locale before P5 | Pinned `pl` in middleware; `getCopy("en")` = PL until P5 | Resolve from P1 | No mixed PL copy + EN numbers between phases | Phases shipped separately to prod (they are not) |
-| 8 | Required `locale` params | Required everywhere, no default | `locale = "pl"` default | The compiler lists every caller | — |
-| 9 | Threshold input EN decimal | In scope (`55.50`) | Follow-up | One function; parser already accepts both | — |
-| 10 | Hero amount | Dictionary string (`3 842,60 zł` / `3,842.60 zł`) | `formatMoney(locale)` | pl-PL `formatMoney` prints `3842,60 zł` → PL regression | Owner accepts the PL change |
-| 11 | Banner / config strings | Moved to `copyExtra.config` | Leave operator-only Polish | Success criterion „no Polish UI strings” is cheap here (A6) | Banner removed from the app |
-| 12 | Delete word (A4) | Dialog shows the locale's word; server accepts `USUŃ` or `DELETE` | `USUŃ` in EN; server checks only request locale | `Ń` untypeable on most keyboards; a cookie switch mid-dialog must not reject a correct entry | Owner wants one word |
-| 13 | Switch labels | Visible `PL` / `EN`, native names as `aria-label` / `lang`, bilingual section title „Język / Language” in both locales | Translated section title | A user who cannot read the current language still finds it (design's literal title) | Visual gate shows the bilingual title crowded at 400 px |
-| 14 | E2E (A5) | No Playwright; smoke + unit + visual gate | `/10x-e2e-setup` now | No browser-only risk found; setup is its own infra change | Hydration mismatch in EN gate → follow-up trigger |
-| 15 | API route test | Pure `localeRedirectTarget` unit + smoke | Route-level unit test | Repo tests no route directly; same split as other routes | A test harness for routes appears |
-| 16 | Triggered follow-ups | Auth title weight and landing steps stack done in P6; `PanelTitle` and F7 re-armed | All in; all out | Two are one class each in files P6 edits; two are visual sweeps unrelated to i18n | — |
-| 17 | Phase size | 7 phases, ≤ 1 new UI component per phase | Design's 5 phases | Contract: fresh agent per phase; P4 (≈ 405 strings) alone is a full phase | — |
+| #   | Decision                           | Chosen                                                                                                                 | Rejected                                                 | Why                                                                                          | What would change it                                    |
+| --- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| 1   | Complexity / questions             | HIGH, 0 questions                                                                                                      | Interview                                                | design + research decided everything else with recommendations                               | A product owner available                               |
+| 2   | `copy` / `copyExtra` value exports | Dropped; tests use `getCopy("pl")`                                                                                     | Keep as PL aliases                                       | A missed consumer then fails `astro check` instead of staying Polish in EN                   | —                                                       |
+| 3   | `KitCopy`                          | `typeof content`, EN kit a plain object                                                                                | `DeepReadonly`                                           | Fewer types; JSON arrays are mutable already                                                 | A consumer needing readonly tuples                      |
+| 4   | `CopyExtra`                        | `Widen<typeof copyExtraPl>`                                                                                            | design's `typeof copyExtraPl`                            | `as const` literal types reject every EN string (research scratch run)                       | —                                                       |
+| 5   | Month names                        | EN `monthNames` = PL keys → English values; one `getMonths(locale)`                                                    | Relax `KitCopy` for one key; a separate nominative table | Keeps `satisfies KitCopy` strict and the kit untouched                                       | Kit ships EN month data                                 |
+| 6   | `fillMonthLocative`                | `locale` parameter, EN plain replace                                                                                   | Unchanged function                                       | Its „w {month}” branch would fire on EN strings by accident                                  | —                                                       |
+| 7   | Locale before P5                   | Pinned `pl` in middleware; `getCopy("en")` = PL until P5                                                               | Resolve from P1                                          | No mixed PL copy + EN numbers between phases                                                 | Phases shipped separately to prod (they are not)        |
+| 8   | Required `locale` params           | Required everywhere, no default                                                                                        | `locale = "pl"` default                                  | The compiler lists every caller                                                              | —                                                       |
+| 9   | Threshold input EN decimal         | In scope (`55.50`)                                                                                                     | Follow-up                                                | One function; parser already accepts both                                                    | —                                                       |
+| 10  | Hero amount                        | Dictionary string (`3 842,60 zł` / `3,842.60 zł`)                                                                      | `formatMoney(locale)`                                    | pl-PL `formatMoney` prints `3842,60 zł` → PL regression                                      | Owner accepts the PL change                             |
+| 11  | Banner / config strings            | Moved to `copyExtra.config`                                                                                            | Leave operator-only Polish                               | Success criterion „no Polish UI strings” is cheap here (A6)                                  | Banner removed from the app                             |
+| 12  | Delete word (A4)                   | Dialog shows the locale's word; server accepts `USUŃ` or `DELETE`                                                      | `USUŃ` in EN; server checks only request locale          | `Ń` untypeable on most keyboards; a cookie switch mid-dialog must not reject a correct entry | Owner wants one word                                    |
+| 13  | Switch labels                      | Visible `PL` / `EN`, native names as `aria-label` / `lang`, bilingual section title „Język / Language” in both locales | Translated section title                                 | A user who cannot read the current language still finds it (design's literal title)          | Visual gate shows the bilingual title crowded at 400 px |
+| 14  | E2E (A5)                           | No Playwright; smoke + unit + visual gate                                                                              | `/10x-e2e-setup` now                                     | No browser-only risk found; setup is its own infra change                                    | Hydration mismatch in EN gate → follow-up trigger       |
+| 15  | API route test                     | Pure `localeRedirectTarget` unit + smoke                                                                               | Route-level unit test                                    | Repo tests no route directly; same split as other routes                                     | A test harness for routes appears                       |
+| 16  | Triggered follow-ups               | Auth title weight and landing steps stack done in P6; `PanelTitle` and F7 re-armed                                     | All in; all out                                          | Two are one class each in files P6 edits; two are visual sweeps unrelated to i18n            | —                                                       |
+| 17  | Phase size                         | 7 phases, ≤ 1 new UI component per phase                                                                               | Design's 5 phases                                        | Contract: fresh agent per phase; P4 (≈ 405 strings) alone is a full phase                    | —                                                       |
 
 ## References
 
@@ -739,7 +739,7 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 #### Manual
 
 - [x] 6.7 [reviewer] Switch tokens only, no-JS, aria-pressed; no open redirect; cookie flags match signup — impl-review
-- [ ] 6.8 [visual] Quick look 1280 and ~400 px of footer, auth corner and settings section in PL and EN
+- [x] 6.8 [visual] Quick look 1280 and ~400 px of footer, auth corner and settings section in PL and EN — visual gate (1440 + 400 px, `screenshots/*-switch-*`)
 
 ### Phase 7: Seam sweep, follow-ups and visual gate
 
@@ -755,6 +755,6 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 #### Manual
 
 - [x] 7.7 [reviewer] Seam sweep complete, follow-ups carry Trigger lines, register matches code — 1dbab76
-- [ ] 7.8 [visual] EN screenshots desktop + ~400 px of every listed view and state, switch focus in all three places
-- [ ] 7.9 [visual] PL screenshots desktop + ~400 px with rytm-locale=pl, copy unchanged apart from the switch and the two follow-ups
+- [x] 7.8 [visual] EN screenshots desktop + ~400 px of every listed view and state, switch focus in all three places — visual gate (`reviews/visual-review.md`)
+- [x] 7.9 [visual] PL screenshots desktop + ~400 px with rytm-locale=pl, copy unchanged apart from the switch and the two follow-ups — visual gate (text diff vs `main` b973428)
 - [ ] 7.10 [human] Accept S-16 product choices (own EN translation K42, switch design K43 with bilingual section title, USUŃ or DELETE, Accept-Language first visit, parity test instead of compile error for lengths and placeholders, default Supabase e-mails) and send K42–K43 to the kit author

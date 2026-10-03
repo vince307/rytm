@@ -713,13 +713,13 @@ placeholders are guarded by a unit test, not the compiler — named in `[human]`
 
 #### Automated
 
-- [x] 5.1 npm test: Phase 4 count + extra parity and isDeleteConfirmWord cases, 0 failed (416 -> 425, +9)
-- [x] 5.2 Smoke Phase 4 count + 2 PASS, 0 FAIL (196 -> 198)
-- [x] 5.3 No DELETE_CONFIRM_WORD and no pinned DEFAULT_LOCALE in middleware left
-- [x] 5.4 Deliberate break: middleware pinned to pl turns both Accept-Language steps red, restored, meta-check recorded
-- [x] 5.5 Deliberate break: USUŃ-only check turns the DELETE case red, restored, meta-check recorded
-- [x] 5.6 Deliberate break: 2-entry extraEn forms tuple turns astro check red, restored
-- [x] 5.7 Full local gate vs baseline, smoke + 3 cumulative
+- [x] 5.1 npm test: Phase 4 count + extra parity and isDeleteConfirmWord cases, 0 failed (416 -> 425, +9) — 5374856
+- [x] 5.2 Smoke Phase 4 count + 2 PASS, 0 FAIL (196 -> 198) — 5374856
+- [x] 5.3 No DELETE_CONFIRM_WORD and no pinned DEFAULT_LOCALE in middleware left — 5374856
+- [x] 5.4 Deliberate break: middleware pinned to pl turns both Accept-Language steps red, restored, meta-check recorded — 5374856
+- [x] 5.5 Deliberate break: USUŃ-only check turns the DELETE case red, restored, meta-check recorded — 5374856
+- [x] 5.6 Deliberate break: 2-entry extraEn forms tuple turns astro check red, restored — 5374856
+- [x] 5.7 Full local gate vs baseline, smoke + 3 cumulative — 5374856
 
 #### Manual
 

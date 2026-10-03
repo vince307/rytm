@@ -9,10 +9,12 @@ import Icon from "@/components/Icon.astro";
 import InlineAlert from "@/components/app/InlineAlert.astro";
 import Panel from "@/components/app/Panel.astro";
 import { buttonVariants } from "@/components/ui/button";
-import { copy, copyExtra } from "@/content/copy";
+import { getCopy } from "@/content/copy";
 import { accountDisplay, bankDisplayName, fillTemplate } from "@/lib/import/presentation";
 import { createClient } from "@/lib/supabase";
 import { formatRangeShort, plural } from "@/lib/format";
+
+const { copy, copyExtra } = getCopy(Astro.locals.locale);
 
 const locale = Astro.locals.locale;
 

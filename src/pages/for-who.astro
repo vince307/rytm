@@ -1,7 +1,9 @@
 ---
 import MarketingLayout from "@/layouts/MarketingLayout.astro";
 import { buttonVariants } from "@/components/ui/button";
-import { copy } from "@/content/copy";
+import { getCopy } from "@/content/copy";
+
+const { copy } = getCopy(Astro.locals.locale);
 
 const w = copy.forWho;
 const x = copy.forWho;

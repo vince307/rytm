@@ -9,9 +9,11 @@ import { describe, expect, it } from "vitest";
 import { field, fieldBox, focusRing } from "@/components/app/field-styles";
 import { buttonVariants } from "@/components/ui/button";
 import { dialogContentClass } from "@/components/ui/dialog";
-import { copy, copyExtra } from "@/content/copy";
+import { getCopy } from "@/content/copy";
 import { DELETE_CONFIRM_WORD, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
 import { MAX_DEBITS, MAX_FILE_BYTES } from "@/lib/import/schema";
+
+const { copy, copyExtra } = getCopy("pl");
 
 describe("kit contract (content.json as the app reads it)", () => {
   it("keeps the 4 authStates keys the login and reset pages read", () => {

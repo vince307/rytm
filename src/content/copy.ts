@@ -1,13 +1,25 @@
 import content from "../../design/rytm-os/react-kit/docs/content.json";
+import type { Locale } from "@/lib/i18n";
 
-/** Kit copy — `design/rytm-os/react-kit/docs/content.json`, read-only. */
-export const copy = content;
+/** Kit copy — `design/rytm-os/react-kit/docs/content.json`, read-only. The shape every locale's kit dictionary satisfies. */
+export type KitCopy = typeof content;
+
+/** `as const` literal types widened to their primitives (tuples kept element-wise) so another locale's strings fit. */
+type Widen<T> = T extends string
+  ? string
+  : T extends number
+    ? number
+    : T extends readonly unknown[]
+      ? { readonly [K in keyof T]: Widen<T[K]> }
+      : T extends object
+        ? { [K in keyof T]: Widen<T[K]> }
+        : T;
 
 /**
  * Strings the prototype renders but content.json does not contain (design-kit.md K11).
  * Taken verbatim from design/rytm-os/prototype/app.js. Remove entries as the author adds keys.
  */
-export const copyExtra = {
+const copyExtraPl = {
   auth: {
     // DESIGN-GAP: K13 — visual panels of confirm-email / reset-new are drawn in `app.js` but absent from content.json
     // (verbatim `confirmEmail()` / `resetNew()`).
@@ -166,7 +178,46 @@ export const copyExtra = {
   },
   // DESIGN-GAP: K11 — the empty-view paragraph is in the prototype but not in content.json (round 3).
   emptyViews: { body: "Jeden plik CSV wystarczy, aby Rytm mógł rozpoznać Twój rytm wydatków." },
+  // App chrome with no kit key (operator-facing missing-configuration banner of Layout.astro).
+  config: {
+    warning: "Uwaga:",
+    docs: "Dokumentacja",
+    supabaseMissing: "Supabase nie jest skonfigurowany — funkcje uwierzytelniania są wyłączone.",
+    supabaseDocs: "Zobacz instrukcję konfiguracji",
+  },
+  landing: {
+    // DESIGN-GAP: the kit landing mock-up amount is a literal in the prototype markup, no content.json key (register row with K42).
+    heroAmount: "3 842,60 zł",
+  },
 } as const;
+
+export type CopyExtra = Widen<typeof copyExtraPl>;
+
+const dictionaries: Record<Locale, { copy: KitCopy; copyExtra: CopyExtra }> = {
+  pl: { copy: content, copyExtra: copyExtraPl },
+  // EN dictionaries from Phase 5; until then English resolves to the Polish pair.
+  en: { copy: content, copyExtra: copyExtraPl },
+};
+
+/** The kit copy and the kit-gap copy of one locale. */
+export function getCopy(locale: Locale): { copy: KitCopy; copyExtra: CopyExtra } {
+  return dictionaries[locale];
+}
+
+/** Month names of one locale: nominative and locative come from the kit's `monthNames`, genitive from `copyExtra`. */
+export function getMonths(locale: Locale): {
+  nominative: readonly string[];
+  locative: readonly string[];
+  genitive: readonly string[];
+} {
+  const { copy, copyExtra } = getCopy(locale);
+  const monthNames = copy.patternDetail.monthNames;
+  return {
+    nominative: Object.keys(monthNames),
+    locative: Object.values(monthNames),
+    genitive: copyExtra.home.monthsGenitive,
+  };
+}
 
 export const ICON_NAMES = [
   "overview",

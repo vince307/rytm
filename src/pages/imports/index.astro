@@ -8,13 +8,15 @@ import PageTitle from "@/components/app/PageTitle.astro";
 import Panel from "@/components/app/Panel.astro";
 import ViewEmpty from "@/components/app/ViewEmpty.astro";
 import { buttonVariants } from "@/components/ui/button";
-import { copy, copyExtra } from "@/content/copy";
+import { getCopy } from "@/content/copy";
 import { DEMO_EMAIL } from "astro:env/server";
 import { isDemoEmail } from "@/lib/demo";
 import { accountDisplay, bankDisplayName } from "@/lib/import/presentation";
 import { createClient } from "@/lib/supabase";
 import { formatDate, formatRangeShort } from "@/lib/format";
 import { cn } from "@/lib/utils";
+
+const { copy, copyExtra } = getCopy(Astro.locals.locale);
 
 const locale = Astro.locals.locale;
 

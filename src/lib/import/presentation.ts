@@ -1,6 +1,6 @@
 // Presentation helpers shared by every import surface (S-13): the wizard, the history list and the result page
 // derive the same strings here, so unit tests pin them and the three screens cannot drift. Pure module.
-import type { copy } from "@/content/copy";
+import type { KitCopy } from "@/content/copy";
 import { isBankSource, type BankSource } from "@/lib/import/banks";
 import type { FileError } from "@/lib/import/detect";
 import { formatAccountTail } from "@/lib/format";
@@ -23,7 +23,7 @@ export function accountDisplay(name: string, accountNumber: string): string {
   return `${name} · ${formatAccountTail(accountNumber)}`;
 }
 
-type ImportErrors = typeof copy.importErrors;
+type ImportErrors = KitCopy["importErrors"];
 
 /** `importErrors.tooMany` with the limit filled — shared by the wizard's step 3 and the unit tests. */
 export function tooManyMessage(errors: ImportErrors): string {

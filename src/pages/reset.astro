@@ -2,7 +2,9 @@
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import ResetForm from "@/components/auth/ResetForm";
 import { buttonVariants } from "@/components/ui/button";
-import { copy } from "@/content/copy";
+import { getCopy } from "@/content/copy";
+
+const { copy } = getCopy(Astro.locals.locale);
 
 const sent = Astro.url.searchParams.has("sent");
 const s = copy.authStates;

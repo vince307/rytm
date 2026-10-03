@@ -3,7 +3,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { PatternsTable, type PatternRow, type PatternsTableCopy } from "@/components/patterns/PatternsTable";
-import { copy, copyExtra } from "@/content/copy";
+import { getCopy } from "@/content/copy";
+
+const { copy, copyExtra } = getCopy("pl");
 
 const x = copyExtra.patterns;
 const tableCopy: PatternsTableCopy = {

@@ -1,8 +1,10 @@
 ---
 import Brand from "@/components/Brand.astro";
 import { buttonVariants } from "@/components/ui/button";
-import { copy } from "@/content/copy";
+import { getCopy } from "@/content/copy";
 import { cn } from "@/lib/utils";
+
+const { copy } = getCopy(Astro.locals.locale);
 
 const nav = copy.navigation;
 ---

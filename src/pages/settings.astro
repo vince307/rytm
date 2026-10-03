@@ -10,8 +10,10 @@ import DeleteAccountDialog from "@/components/settings/DeleteAccountDialog";
 import { buttonVariants } from "@/components/ui/button";
 import { DEMO_EMAIL } from "astro:env/server";
 import { isDemoEmail } from "@/lib/demo";
-import { copy, copyExtra } from "@/content/copy";
+import { getCopy } from "@/content/copy";
 import { DELETE_CONFIRM_WORD, MIN_PASSWORD_LENGTH } from "@/lib/auth-rules";
+
+const { copy, copyExtra } = getCopy(Astro.locals.locale);
 
 const s = copy.settings;
 const a = copy.authStates;

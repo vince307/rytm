@@ -18,7 +18,7 @@ import { MonthSelect } from "@/components/patterns/MonthSelect";
 import PatternActionsDialog, { type PatternActionsCopy } from "@/components/patterns/PatternActionsDialog";
 import RestoreForm from "@/components/patterns/RestoreForm.astro";
 import { ThresholdEditor, type ThresholdEditorCopy } from "@/components/patterns/ThresholdEditor";
-import { copy, copyExtra } from "@/content/copy";
+import { getCopy, getMonths } from "@/content/copy";
 import { fillMonthLocative, formatIsoDate, formatMoney, formatMonthShort, plural } from "@/lib/format";
 import { DISPLAY_NAME_MAX } from "@/lib/patterns/decision-form";
 import { loadPatternData } from "@/lib/patterns/load";
@@ -28,6 +28,8 @@ import { keyFromPath, patternHref } from "@/lib/patterns/path";
 import { detailTarget, patternDetail, type DetailTarget, type PatternDetailView } from "@/lib/patterns/view";
 import { createClient } from "@/lib/supabase";
 import type { MerchantPattern } from "@/types";
+
+const { copy, copyExtra } = getCopy(Astro.locals.locale);
 
 const locale = Astro.locals.locale;
 
@@ -58,7 +60,7 @@ let monthOptions: { value: string; label: string }[] = [];
 let sumLabel = "";
 let overLabel = "";
 let sequenceSummary = "";
-const monthLocatives = Object.values(copy.patternDetail.monthNames);
+const monthLocatives = getMonths(locale).locative;
 
 try {
   // Resolves the requested key through the decisions before looking it up (S-05): an absorbed key's URL redirects

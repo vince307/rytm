@@ -16,7 +16,7 @@ import { SubmitButton } from "@/components/auth/SubmitButton";
 import { Stepper } from "@/components/app/Stepper";
 import { Glyph } from "@/components/Glyph";
 import { usePageShowReset } from "@/components/hooks/usePageShowReset";
-import type { copy, copyExtra } from "@/content/copy";
+import type { CopyExtra, KitCopy } from "@/content/copy";
 import { buildPayload, readImportFile, type DetectResult, type FileError } from "@/lib/import/detect";
 import {
   accountDisplay,
@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 
 export interface ImportWizardLabels {
   flow: Pick<
-    typeof copy.importFlow,
+    KitCopy["importFlow"],
     | "title"
     | "steps"
     | "supported"
@@ -49,10 +49,10 @@ export interface ImportWizardLabels {
     debitForms: readonly [string, string, string];
   };
   /** Kit `imports` — step-1 copy, bank names, the recognised-format chip. */
-  kit: typeof copy.imports;
+  kit: KitCopy["imports"];
   /** `copyExtra.imports` — the K11 / K28 placeholders for wizard steps 2–3 (kit round 3 has no content.json keys for them). */
-  imports: typeof copyExtra.imports;
-  errors: typeof copy.importErrors;
+  imports: CopyExtra["imports"];
+  errors: KitCopy["importErrors"];
   /** `copyExtra.imports.saveError` (kit round 3 has the text only in `app.js`; K28 in design-kit.md) — a save that failed for a reason the user cannot act on. */
   genericError: string;
 }

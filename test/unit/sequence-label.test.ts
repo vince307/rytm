@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { copyExtra } from "@/content/copy";
+import { getCopy } from "@/content/copy";
 import { sequenceLabel } from "@/lib/patterns/sequence-label";
+
+const { copyExtra } = getCopy("pl");
 
 const label = (count: number, over: number) =>
   sequenceLabel(count, over, copyExtra.patterns.sequenceSummary, copyExtra.patterns.occurrenceForms, "pl");

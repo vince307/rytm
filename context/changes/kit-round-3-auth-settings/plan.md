@@ -777,11 +777,11 @@ are collected in the Phase 8 `[human]` row.
 
 #### Automated
 
-- [ ] 8.1 Every copyExtra.auth / settings key has a reader
-- [ ] 8.2 Seam greps empty (copyExtra.app/landing/howItWorks/forWho, deletedLogin, demoLocked, stale DESIGN-GAP ids)
-- [ ] 8.3 Phase leaves design/ and brand.css untouched
-- [ ] 8.4 Deliberate break: re-added copyExtra.settings.demoLocked caught by the unused-key grep, restored
-- [ ] 8.5 Full local gate vs baseline, smoke + 18
+- [x] 8.1 Every copyExtra.auth / settings key has a reader
+- [x] 8.2 Seam greps empty (copyExtra.app/landing/howItWorks/forWho, deletedLogin, demoLocked, stale DESIGN-GAP ids)
+- [x] 8.3 Phase leaves design/ and brand.css untouched
+- [x] 8.4 Deliberate break: re-added copyExtra.settings.demoLocked caught by the unused-key grep, restored
+- [x] 8.5 Full local gate vs baseline, smoke + 18
 
 #### Manual
 

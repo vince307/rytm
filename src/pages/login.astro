@@ -7,7 +7,8 @@ import { copy, copyExtra } from "@/content/copy";
 const hasError = Astro.url.searchParams.has("error");
 // Kit round 2: #/login?confirmed=1 — the confirmation link was verified but /auth/callback could not open a session here.
 const confirmed = Astro.url.searchParams.has("confirmed");
-// G24: the account was deleted; /api/auth/delete lands here with the session already cleared.
+// Kit round 3 `login-deleted.html`: the account was deleted; /api/auth/delete lands here with the session already
+// cleared. Notice text `settings.deletedNotice`.
 const deleted = Astro.url.searchParams.has("deleted");
 const a = copy.auth;
 const s = copy.authStates;

@@ -31,6 +31,8 @@ interface Props {
   demo: boolean;
 }
 
+// Kit round 3 `modal('deleteAccount')`: password + the `USUŃ` word unlock the button; the eyebrow, title and body
+// stay in `copyExtra.settings` (design-kit.md K15). Opens closed; server errors show on the page.
 const CONFIRM_ID = "delete-account-confirm";
 const HELP_ID = "delete-account-help";
 

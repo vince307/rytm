@@ -1,10 +1,10 @@
 ---
 change_id: i18n-en
 title: Angielska wersja językowa i przełącznik języka
-status: impl_reviewed
+status: archived
 created: 2026-10-03
 updated: 2026-10-03
-archived_at: null
+archived_at: 2026-10-03T19:30:32Z
 ---
 
 ## Notes

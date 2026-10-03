@@ -1,64 +1,63 @@
 # Handoff — `kit-round-3-home-fixed` (slice S-15)
 
-Written by the `/10x-impl-review kit-round-3-home-fixed` step of autonomous run `2026-10-02-kit-round-3`. Review is APPROVED, `MERGE: CLEAR`; two warnings fixed in `fcc4554`, `change.md` is `impl_reviewed`. The next agent must not get wrong: the visual gate (2.8, 5.9, 5.10) has still NOT been run — no screenshot exists.
+Written by the visual-gate step of autonomous run `2026-10-02-kit-round-3`. `VISUAL: PASS`; [visual] rows 2.8, 5.9, 5.10 ticked; one fix (`c9574d7`, trend value 5 px bottom margin — F5 decided). The next agent must not get wrong: only the `[human]` row 5.11 stays open — it is a maintainer checklist, not a blocker for archive/ship; no migrations.
 
 ## 1. State
 
 | Item | Value |
 | --- | --- |
 | Branch | `feat/kit-round-3-home-fixed`, cut from `main` at `1bf6a5c` (after S-14) |
-| Commits | P1 `6108b70`, P2 `7934a98`, P3 `bcf364a`, P4 `e875337`, P5 `ab93627`, docs commits, review fix `fcc4554`, + this review's docs commit |
+| Commits | P1 `6108b70` … P5 `ab93627`, review fix `fcc4554`, review docs `1657af6`; this step: fix `c9574d7`, screenshots `0e89f25` + `f30be8f`, + docs commit `docs(kit-round-3-home-fixed): bramka wizualna` |
 | Pushed / PR / merged | no / no / no |
-| `change.md` status | `impl_reviewed` |
-| `## Progress` rows remaining | 4 (`grep -c '^- \[ \]' plan.md`): 2.8, 5.9, 5.10 `[visual]`; 5.11 `[human]` |
+| `change.md` status | `impl_reviewed` (unchanged) |
+| `## Progress` rows remaining | 1 (`grep -c '^- \[ \]' plan.md`): 5.11 `[human]` |
 | Working tree | clean after the docs commit |
 
 ## 2. Artifacts
 
 | Path | What it is |
 | --- | --- |
-| `context/changes/kit-round-3-home-fixed/reviews/impl-review.md` | review report (F1–F7, verdicts, re-run suites, `MERGE: CLEAR`) |
-| `src/pages/home.astro` | header comment corrected (F1, `fcc4554`) |
-| `src/pages/fixed.astro` | `itemForms` plain 3-tuple cast (F2, `fcc4554`) |
-| `test/unit/kit-contract.test.ts` | pin `copy.fixedCosts.itemForms` length 3; `ROLE_EXCEPTIONS["auth.saving"]` reason names both collisions (F2/F3, `fcc4554`) |
-| `context/changes/kit-round-3-home-fixed/plan.md` | `[reviewer]` rows 1.8, 2.7, 3.8, 4.7, 5.8 ticked |
-| `context/changes/kit-round-3-home-fixed/change.md` | `status: impl_reviewed` |
+| `src/components/home/TrendChart.astro` | value `span` `mb-[5px]` (kit `.trend-value`) + header comment on nowrap vs kit wrap (`c9574d7`) |
+| `context/changes/kit-round-3-home-fixed/screenshots/*.png` | 72 PNGs: 22 app states × 1280/400 + 14 kit frames × 2 |
+| `context/changes/kit-round-3-home-fixed/screenshots/README.md` | state table, accounts, data, how each state was reached |
+| `context/changes/kit-round-3-home-fixed/reviews/visual-review.md` | verdicts, hand-checked numbers, F5 verdict, observations, `VISUAL:` line |
+| `context/changes/kit-round-3-home-fixed/follow-ups/review-fixes.md` | + auth visual heading weight follow-up (`Trigger:`) |
+| `context/changes/kit-round-3-home-fixed/plan.md` | rows 2.8, 5.9, 5.10 ticked |
 
 ## 3. Verification
 
-Observed in this step; baseline `main` 1bf6a5c (after S-14).
+Observed in this step after `c9574d7`; baseline `main` 1bf6a5c (after S-14).
 
 | Command | Result |
 | --- | --- |
 | `npm run lint` | 0 errors (baseline 0) |
-| `npx astro check` | 0 errors, 166 files (baseline 162, +4) |
-| `npm run fixture:check` | ing OK, santander OK |
-| `npm test` | 387 passed / 27 files (baseline 375 / 26, +12 / +1), before and after `fcc4554` |
-| `npm run build` | OK, before and after `fcc4554` |
-| `npx supabase db reset && npx supabase test db` | Files=6, Tests=119 PASS (Δ0) |
-| smoke on :4398 | 195 PASS / 0 FAIL, „All smoke steps passed” (baseline 192, +3), before and after `fcc4554`; dev server killed |
-| `git diff --name-only main...HEAD -- supabase src/pages/api` | empty — no migration, no endpoint change |
-| Break 1: `copyExtra.fixed.probe` = `copy.fixedCosts.noComparison` | guard case red (`fixed.probe`), restored. Meta-check: catches byte-identical duplicates only. With `ROLE_EXCEPTIONS` removed a listing script found exactly the 5 listed collisions — every exception is live |
-| Break 2: `home.astro` `zeroNote` unconditional | smoke „home names each trend bar” FAIL, restored. Meta-check: proves the page's „any bar is 0” condition, not the wording |
+| `npx astro check` | 0 errors, 0 warnings, 3 hints, 166 files (baseline 162, +4 from the slice, Δ0 from this fix) |
+| `npm test` | 387 passed / 27 files (baseline 375 / 26, +12 / +1; Δ0 from this fix) |
+| `npm run build` | OK |
+| `npx supabase db reset` → smoke on :4398 | 195 PASS / 0 FAIL, „All smoke steps passed” (baseline 192, +3; Δ0 from this fix) |
+| Visual gate | 44 app PNGs + 28 kit PNGs, 0 NOT CAPTURED; every app shot `scrollWidth` = viewport, no `undefined` / `{…}`; value→bar gap measured 5 px at 1280 and 400 after the fix |
+| Hand-check | trend sie 26 = 244,18 + 304,41 = 548,59 zł (STACJA PALIW, count threshold 3, fixture rows); Podrożały 1 / Nowe 1 on the two-month account |
+| Read-error states | `revoke select on public.transactions from authenticated` → 3 shots → `npx supabase db reset` immediately; second `db reset` after smoke |
+| pgTAP | not re-run (no schema or SQL change in this step; last run Files=6, Tests=119 PASS in impl review) |
+| Dev servers | :4398 and :4399 killed (`lsof` empty); :4321 untouched |
 
 ## 4. Next command
 
-`visual gate (kit-round-3-home-fixed), then /10x-archive kit-round-3-home-fixed`
+`/10x-archive kit-round-3-home-fixed then ship (no migrations)`
 
 ## 5. Open
 
-- [ ] 2.8 `[visual]` quick look 1280 / ~400 px: one card, summary rows side by side then stacked.
-- [ ] 5.9 `[visual]` every `/home` and `/fixed` state at 1280 + ~400 px vs kit views `home*`, `fixed*` (list in `plan.md` Phase 5 Manual). Check F5: `TrendChart.astro` value `span` keeps `whitespace-nowrap` and no 5 px bottom margin vs kit `.trend-value`.
-- [ ] 5.10 `[visual]` rebound views: `/reset/new` visual panel, import result title, Santander account step (byte-identical — confirm no change).
-- [ ] 5.11 `[human]` product-visible choices (removed `/home` total and `ImportPanel`, rises-only „Podrożały”, one-offs in „Nowe”, chip text `trend.noThreshold`, bar min 8 %, conditional zero note, one `/fixed` message without comparison, „kosztów”) and send K38–K41, G39 to the kit author.
-- Observations recorded, no code: F4 `Badge.tsx` header comment „G34 delivered”; F7 nav reaches the wizard through `/imports`.
-- Follow-ups: `context/changes/kit-round-3-home-fixed/follow-ups/review-fixes.md` (unchanged by this step; all open items carry `Trigger:`).
-- Carried risk: `/home` and `/fixed` have no render test (`plan.md` § Known risks).
+- [ ] 5.11 `[human]` accept S-15 product-visible choices (removed `/home` total and `ImportPanel`, rises-only „Podrożały”, one-offs in „Nowe”, chip text `trend.noThreshold`, bar min 8 %, conditional zero note, one `/fixed` message without comparison, „kosztów”) and send K38–K41, G39 to the kit author.
+- Follow-ups: `context/changes/kit-round-3-home-fixed/follow-ups/review-fixes.md` — new: `AuthLayout.astro` visual title weight (kit `.auth-copy h1` bold), `Trigger:` next slice touching `AuthLayout.astro`.
+- Observations (no code): app-wide `paper-soft` for both page and `InfoPanel` (kit `#edf0ef` vs `#e8ecea`); „Import gotowy.” full stop from `content.json`; F4 `Badge.tsx` header comment; F7 nav reaches the wizard through `/imports`.
+- Carried risk: `/home` and `/fixed` have no render test (`plan.md` § Known risks); the visual gate covers them once.
+- No `DESIGN-GAP` added in this step.
 
 ## 6. Autonomous decisions
 
-1. **Did not launch the skill's two review subagents; read the full source diff in this context.** Why: ≈ 1 200 diff lines, cheaper and no hand-off loss. Would change: a diff too large to read whole.
-2. **Fixed F1/F2/F3 (warning / observation) instead of filing them.** Why: one-line edits, suites re-run green. Would change: a fix touching another view or a component API.
-3. **Ticked all five `[reviewer]` rows.** Why: each check performed (try scope + redirect/404 path, kit CSS rules vs classes, no hex / copy only from `copy.trend.*` + `zeroNote`, `fixedNotices` one-message rule, audit + register + `Trigger:` lines). Would change: the visual gate showing a layout mismatch against the kit — then reopen 2.7.
-4. **F5 recorded, not changed.** Why: the plan's P3 contract keeps `whitespace-nowrap` (G35 long-axis decision); the visual gate is the arbiter. Would change: screenshots at 400 px showing clipped or crowded values.
-5. **Commit messages in Polish, review fix and docs as two commits.** Would change: maintainer preference.
+1. **F5: kept `whitespace-nowrap`, adopted kit `margin-bottom:5px`.** Rejected: kit's ≤ 560 px `white-space:normal` (the app's axis scrolls; values never collide — min gap 21 px at 400 px — and the kit's wrap makes two-line values that overlap the range label). Would change: a kit round that drops the scrolling axis, or values clipping at a narrower width.
+2. **Read errors reached by revoking a grant, then `db reset` at once.** Rejected: transaction rollback (a dev-server request runs on its own connection and cannot see an uncommitted revoke). Would change: an app-level fault-injection path.
+3. **Keyboard path proven in Playwright, not Chrome.** The extension's `Tab` key events did not reach the page (`keydown` listener logged nothing); Chrome kept as headed render cross-check. Would change: an extension that delivers key events — then repeat the focus check headed.
+4. **Small two-month accounts via `POST /api/imports` (smoke payload format, `Origin` header) instead of the wizard.** Why: the ING fixture cannot produce one-month / no-changes / no-new states; the endpoint is the wizard's own submit target. Would change: fixtures for those states.
+5. **Auth visual heading weight filed, not fixed.** Why: pre-existing on `main`, shared by every auth page; S-15 only changed the prop source. Would change: the maintainer wanting it in this slice.
+6. **Ticked 2.8, 5.9, 5.10.** Each listed state captured at both widths and compared. Would change: a state found missing from the plan list.

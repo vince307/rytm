@@ -18,3 +18,4 @@ Written by the Phase 5 step (`/10x-implement kit-round-3-home-fixed phase 5`). E
 - **One-off merchants count as „nowy” on `/home` and `/fixed`** (`d5Type` classifies a merchant seen once as fixed). Trigger: `d5Type` rule change, or product feedback on real data.
 - **K38, K39, K40, K41, G39** — kit gaps recorded in `context/foundation/design-kit.md`. Trigger: kit round 4.
 - **Guard test catches byte-identical duplicates only** — a `copyExtra` string with the same meaning but different text stays a reviewer judgment. Trigger: next `copyExtra` addition.
+- **Auth visual heading renders at normal weight** — `AuthLayout.astro` puts `visual.title` in a `<p>` without `font-bold`; kit `.auth-copy h1` is bold (UA `h1`). Pre-existing, every auth page (visual gate S-15, observation 1). Trigger: next slice touching `AuthLayout.astro` or the auth views.

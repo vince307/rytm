@@ -1304,7 +1304,23 @@ const steps = [
     },
     { status: 200, contains: ['<html lang="pl"', "Zobacz swój rytm"] },
   ],
+  ["keep-alive refuses a caller without the secret", () => request("/api/keep-alive"), { status: 401 }],
 ];
+
+// Keep-alive roundtrip: runs only when the smoke env knows the server's CRON_SECRET (CI sets both). The 200 proves
+// the query reached Postgres and that `anon` is still refused there (42501) — see src/pages/api/keep-alive.ts.
+if (process.env.CRON_SECRET) {
+  steps.push([
+    "keep-alive reaches Postgres and anon is refused",
+    async () => {
+      const response = await fetch(`${BASE_URL}/api/keep-alive`, {
+        headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
+      });
+      return { status: response.status, location: "", body: await response.text() };
+    },
+    { status: 200, contains: '"code":"42501"' },
+  ]);
+}
 
 let failed = 0;
 for (const [name, run, expected] of steps) {

@@ -1,0 +1,66 @@
+name: Supabase keep-alive
+
+# Keeps the free-tier Supabase project (ref psqbtvooufapkatpkxlw) from auto-pausing after ~7 days without
+# activity. A pause takes production down and breaks deploys.
+#
+# GitHub Actions, not a Vercel cron: Vercel registers a cron against the generated deployment URL
+# (rytm-<hash>-kamilps-projects.vercel.app), which Vercel Authentication answers with a 302 to SSO; crons do not
+# follow redirects and a redirected run is not logged, so it would look green while Supabase saw nothing. The
+# production alias (rytm-phi.vercel.app) is not protected, so we ping that, from a scheduler we can trigger by
+# hand and whose logs persist.
+#
+# Requires the CRON_SECRET repository secret to match CRON_SECRET on Vercel's Production scope — the route fails
+# closed (401) on any mismatch. Rotate the two together.
+
+on:
+  schedule:
+    # 03:17 UTC daily, off the hour: GitHub delays schedules that land on :00.
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+# A missed ping is recoverable (the pause window is ~7 days); overlapping runs are pointless.
+concurrency:
+  group: keep-alive
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /api/keep-alive
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${CRON_SECRET}" ]; then
+            echo "::error::CRON_SECRET repository secret is not set — the route would answer 401 and Supabase would never be pinged."
+            exit 1
+          fi
+
+          url="https://rytm-phi.vercel.app/api/keep-alive"
+          body_file="$(mktemp)"
+
+          # Body to a file, status via -w. No -f: a non-2xx body is the diagnostic (the route reports Supabase's
+          # own status back), so print it rather than let curl swallow it.
+          status="$(curl -sS --max-time 30 --retry 2 --retry-delay 10 \
+                      -o "${body_file}" -w '%{http_code}' \
+                      -H "Authorization: Bearer ${CRON_SECRET}" \
+                      "${url}")" || {
+            echo "::error::Could not reach ${url} at all. Supabase was NOT pinged."
+            exit 1
+          }
+
+          echo "HTTP ${status} — $(cat "${body_file}")"
+
+          # 401 => secret drift between GitHub and Vercel.
+          # 503 => Supabase env missing on Vercel.
+          # 502 => Supabase answered something other than the expected anon refusal (42501), or the fetch failed.
+          if [ "${status}" != "200" ]; then
+            echo "::error::Keep-alive ping failed (HTTP ${status}). The project will auto-pause if this keeps failing."
+            exit 1
+          fi
+
+          echo "Supabase pinged; the inactivity clock is reset."

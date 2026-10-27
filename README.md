@@ -10,7 +10,7 @@
 Wgraj wyciąg bankowy i zobacz, które wydatki wracają zbyt często.<br>
 Bez oceniania. Z jasną granicą, którą ustawiasz sam.
 
-**[Wypróbuj demo →](https://rytm-phi.vercel.app)** · [Jak to działa](#jak-to-działa) · [Dla deweloperów](#dla-deweloperów)
+**[Wypróbuj demo →](https://rytm.ariom.cloud)** · [Jak to działa](#jak-to-działa) · [Dla deweloperów](#dla-deweloperów)
 
 <br>
 
@@ -112,7 +112,7 @@ Ten sam wyciąg i te same progi zawsze dają ten sam wynik. Reguły są proste i
 
 ## Demo
 
-Wersja produkcyjna: **https://rytm-phi.vercel.app** (polski i angielski — przełącznik w stopce).
+Wersja produkcyjna: **https://rytm.ariom.cloud** (polski i angielski — przełącznik w stopce).
 
 Konto demo działa wyłącznie na syntetycznym wyciągu ING (12 miesięcy, fikcyjne transakcje) — żadnych prawdziwych danych.
 
@@ -125,7 +125,7 @@ Konto jest wspólne dla wszystkich recenzentów, dlatego zmiana hasła, usunięc
 
 ## Dla deweloperów
 
-**Stos:** [Astro 7](https://astro.build) (SSR) · React 19 · Tailwind 4 · shadcn/ui · [Supabase](https://supabase.com) (Postgres, Auth, RLS) · Vercel (`fra1`) · Vitest · pgTAP · GitHub Actions
+**Stos:** [Astro 7](https://astro.build) (SSR) · React 19 · Tailwind 4 · shadcn/ui · [Supabase](https://supabase.com) (Postgres, Auth, RLS) · Docker + Caddy na VPS · Vitest · pgTAP · GitHub Actions
 
 ### Uruchomienie lokalne
 
@@ -146,7 +146,8 @@ Konto testowe z seeda: `test@rytm.local` / `Rytm-Test-Passw0rd!`.
 | Komenda                | Co robi                                                                                   |
 | ---------------------- | ----------------------------------------------------------------------------------------- |
 | `npm run dev`          | serwer deweloperski                                                                       |
-| `npm run build`        | build produkcyjny (`@astrojs/vercel`)                                                     |
+| `npm run build`        | build produkcyjny (`@astrojs/node`, `dist/server/entry.mjs`)                              |
+| `npm run start`        | uruchamia build produkcyjny (`HOST`, `PORT` i zmienne Supabase z otoczenia procesu)       |
 | `npm run lint`         | ESLint z regułami opartymi na typach                                                      |
 | `npm test`             | testy jednostkowe Vitest — parsery ING/Santander na fixture'ach, detektor formatu, wzorce |
 | `npx supabase test db` | testy bazy w pgTAP — izolacja RLS, kaskada usuwania konta, ograniczenia                   |
@@ -155,7 +156,7 @@ Konto testowe z seeda: `test@rytm.local` / `Rytm-Test-Passw0rd!`.
 
 ### CI/CD
 
-Każdy PR przechodzi `ci` (lint, typy, testy, build) i `smoke` (pgTAP + smoke na lokalnym Supabase). Merge do `main` uruchamia `deploy`: migracje na hostowanej bazie, potem `vercel deploy --prod`. Osobny workflow raz dziennie pinguje bazę, żeby darmowy projekt Supabase nie usypiał.
+Każdy PR przechodzi `ci` (lint, typy, testy, build) i `smoke` (pgTAP + smoke na lokalnym Supabase). Merge do `main` buduje obraz `ghcr.io/vince307/rytm:<sha>` i uruchamia `deploy`: migracje na hostowanej bazie, potem wdrożenie kontenera na VPS (Caddy → `https://rytm.ariom.cloud`, health `GET /api/health`, automatyczny powrót do poprzedniego obrazu, gdy health check nie przejdzie). Osobny workflow raz dziennie pinguje bazę, żeby darmowy projekt Supabase nie usypiał.
 
 Szczegóły architektury i zasady pracy z repozytorium: [`CLAUDE.md`](CLAUDE.md). Stan wdrożenia i sekrety: [`context/deployment/deploy-plan.md`](context/deployment/deploy-plan.md).
 

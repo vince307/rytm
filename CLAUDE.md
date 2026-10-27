@@ -5,13 +5,16 @@
 - Never run `npm run smoke` against production (it creates real users).
 - **Supabase migrations**: `supabase/migrations/` using naming format `YYYYMMDDHHmmss_short_description.sql`. Always enable RLS on new tables with granular per-operation, per-role policies. Every table holding a user's data needs a `user_id` FK to `auth.users(id)` with `on delete cascade` (never `set null`, never a bare uuid) — account deletion (`delete_own_account`) removes only the `auth.users` row and relies on the cascade. Migrations must be backward-compatible with the deploy currently in production: the `deploy` job pushes the schema minutes before the new code goes live, so the old code runs on the new schema meanwhile. A drop or rename of anything live code uses goes expand → deploy → contract over two merges.
 - **Design kit**: `design/rytm-os/` is read-only; assets via `scripts/sync-kit.sh` → `public/rytm/` + `src/styles/brand.css`; colors only via the Tailwind names `ink`/`paper`/`paper-soft`/`excess`/`excess-text`/`muted`/`line`/`green`; copy from `src/content/copy.ts` (`copy` = kit JSON, `copyExtra` = kit gaps K11); missing UI → gap row in `context/foundation/design-kit.md` + `DESIGN-GAP` comment, never invented.
-- Env vars: `SUPABASE_URL`, `SUPABASE_KEY`, optional `DEMO_EMAIL` (shared demo account guard, `src/lib/demo.ts`; unset = no demo account) (copy `.env.example` to `.env`, gitignored). `.env.example` already holds the local-Supabase values, so a fresh clone runs against Docker, never production. On Vercel they are project env vars (`vercel env ls`), read at runtime through `astro:env/server`
-- Preview deploy from a working tree: `npx vercel` (Vercel Authentication gates previews by default). Never run `vercel --prod` by hand except for an emergency; rollback is `vercel rollback` / `vercel promote <url>` (human-only)
+- Env vars: `SUPABASE_URL`, `SUPABASE_KEY`, optional `DEMO_EMAIL` (shared demo account guard, `src/lib/demo.ts`; unset = no demo account) (copy `.env.example` to `.env`, gitignored). `.env.example` already holds the local-Supabase values, so a fresh clone runs against Docker, never production. In production they live in the server's env file `/opt/apps/rytm/.env` (never in the image or the repo), read at runtime through `astro:env/server`; `CRON_SECRET` there must match the repository secret of the same name
+- Production deploys only from the CI `deploy` job. Rollback is `ssh apps-deploy@<host> rollback rytm` (back to the previous good image), run by the owner or from CI only — never from an agent session; `status rytm` shows the tags and health. Neither touches Supabase
 
 ## Commands
 
-- `npm run dev` — start dev server (Node; Astro's Vite dev server). There is no `astro preview` — the Vercel adapter does not support it; test a production build via a preview deploy (`npx vercel`)
-- `npm run build` — production build (SSR via `@astrojs/vercel`, emits `.vercel/output/`)
+- `npm run dev` — start dev server (Node; Astro's Vite dev server)
+- `npm run build` — production build (SSR via `@astrojs/node` standalone, emits `dist/server/entry.mjs` + `dist/client/`)
+- `npm run start` (= `node dist/server/entry.mjs`) — run the production build; it reads `HOST`/`PORT` and the Supabase env from the process environment, not from `.env`: `set -a; . ./.env; set +a; HOST=127.0.0.1 PORT=4402 npm run start`
+- `docker build -t rytm:local .` — the production image (`Dockerfile`, port 4402, health `GET /api/health`); CI builds and pushes it as `ghcr.io/vince307/rytm:<sha>`
+- `node scripts/check-proxy-origin.mjs` — proves the built server behind Caddy-style `X-Forwarded-*` headers sees `https://rytm.ariom.cloud` (no 403 on form POSTs, e-mailed `redirect_to` on the public origin); `BASE_URL` (loopback only, default `http://127.0.0.1:4402`), `PUBLIC_ORIGIN`; needs the local Supabase with Mailpit. CI runs it in the `smoke` job. Creates and deletes an account — never against production
 - `npm run lint` — ESLint with type-checked rules
 - `npm run lint:fix` — auto-fix lint issues
 - `npm run format` — Prettier (includes prettier-plugin-astro + prettier-plugin-tailwindcss)
@@ -25,7 +28,7 @@ Pre-commit hooks: husky + lint-staged runs `eslint --fix` on `*.{ts,tsx,astro}` 
 
 ## Architecture
 
-**Astro 7 SSR app** with React 19 islands, Tailwind 4, Supabase auth, and shadcn/ui components. Deployed to Vercel (Node.js 22 functions, single region `fra1` pinned in `vercel.json`).
+**Astro 7 SSR app** with React 19 islands, Tailwind 4, Supabase auth, and shadcn/ui components. Deployed as a Docker container (Node 22, `@astrojs/node` standalone) on the owner's VPS at `https://rytm.ariom.cloud`: Caddy terminates TLS and proxies to `127.0.0.1:4402`; `security.allowedDomains` in `astro.config.mjs` makes Astro trust Caddy's `X-Forwarded-Proto`/`-Host` for that host only (without it form POSTs get 403 and e-mailed links point at `http://`). `GET /api/health` is the container health check and must never touch Supabase.
 
 ### Rendering mode
 
@@ -58,12 +61,12 @@ Full server-side rendering (`output: "server"` in astro.config.mjs). All pages a
 - Local Supabase: start Docker Desktop, then `npx supabase start` (project `rytm`; API `:54321`, Studio `:54323`, Mailpit `:54324`). `supabase/seed.sql` runs on every `start` / `db reset` and creates the confirmed test account `test@rytm.local` / `Rytm-Test-Passw0rd!` (fixed UUID `11111111-1111-4111-8111-111111111111`); it also creates the demo account `demo@rytm.local` / `Rytm-Demo-Passw0rd!` (UUID `22222222-2222-4222-8222-222222222222`), guarded because `.env.example` sets `DEMO_EMAIL=demo@rytm.local` (`astro dev` reads `DEMO_EMAIL` from `.env`, not from the launching shell); local signup needs no email confirmation (`enable_confirmations = false`). Seed is local/CI only — `db push` never applies it
 - First local run: `npx supabase start` → `npm run dev` → `npm run smoke` (must end with `All smoke steps passed`, including "seeded test user signs in")
 - Migrations: `npx supabase start` applies everything in `supabase/migrations/`; after pulling new ones run `npx supabase migration up` (or `db reset`). The hosted DB is reached only by the CI `deploy` job after the merge (`supabase link` → `db push --dry-run` → `db push --yes` → `migration list`, secrets on the GitHub Environment `production`); nobody runs `db push` against `psqbtvooufapkatpkxlw` by hand or from an agent session. A failed push stops the deploy; fix forward in a new PR. `migration repair` and a hosted `db reset` stay human-only. `db push` never applies `seed.sql`. A new table needs its pgTAP proof: a new file in `supabase/tests/database/` or an extension of `domain_rls.test.sql`
-- Production deploy: push to `main` → GitHub Actions `deploy` job (build → hosted migrations → `vercel deploy --prebuilt --prod`). Vercel's Git integration is disabled for `main` (`vercel.json`) and only builds previews for other branches/PRs
+- Production deploy: push to `main` → `ci` + `smoke` + `image` (push `ghcr.io/vince307/rytm:<sha>`) → `deploy` job: Tailscale → `ssh apps-deploy@… status rytm` → hosted migrations → `login rytm` / `deploy rytm <sha>` / `logout rytm` (forced-command dispatcher from the `ariom-infra` repo; it health-checks and falls back to the last good image) → `curl https://rytm.ariom.cloud/api/health`. There are no preview deploys
 - Deployment state and secret inventory: `context/deployment/deploy-plan.md`
 
 ## CI
 
-CI gate and production deploy job: `@.github/workflows/ci.yml` (`ci` → `smoke` → `deploy` on push to `main`; `deploy` needs the `VERCEL_*` repository secrets plus `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` on the `production` environment, all listed in `context/deployment/deploy-plan.md`).
+CI gate and production deploy job: `@.github/workflows/ci.yml` (`ci` → `smoke` + `image` → `deploy` on push to `main`; `deploy` needs `DEPLOY_HOST`, `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS`, `TS_OAUTH_CLIENT_ID`, `TS_OAUTH_SECRET` plus `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` on the `production` environment, all listed in `context/deployment/deploy-plan.md`).
 <!-- BEGIN @przeprogramowani/10x-cli -->
 
 ## Zestaw narzędzi AI 10xDevs — Moduł 3, Lekcja 4 (testy E2E)

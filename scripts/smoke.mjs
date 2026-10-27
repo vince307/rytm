@@ -1,4 +1,4 @@
-// Smoke test: proves the built app, the Vercel adapter and the Supabase auth flow still work together,
+// Smoke test: proves the app and the Supabase auth flow still work together,
 // including the account contract (password change, self-service deletion) which also cleans up the smoke user,
 // the import write path (POST /api/imports: saved, overlap, invalid payload, anonymous), the import delete
 // path (POST /api/imports/delete: not-found, own delete, patterns dropping the import, re-import accepted) and

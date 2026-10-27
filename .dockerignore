@@ -1,0 +1,21 @@
+# Build context for the Dockerfile. Secrets and real bank exports never enter the image (AGENTS.md hard rules).
+data/
+.env*
+.vercel
+node_modules
+dist
+.astro
+test
+.git
+.github
+.husky
+.claude
+context
+docs
+supabase
+*.csv
+*.log
+.DS_Store
+# The design kit stays out except the copy source src/content/copy.ts imports at build time.
+design
+!design/rytm-os/react-kit/docs/content.json

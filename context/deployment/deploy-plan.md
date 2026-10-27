@@ -1,12 +1,10 @@
 ---
 project: rytm
 deployed_at: 2026-09-18
-platform: Vercel
-plan: Hobby
-team: kamilps-projects
-vercel_project: rytm
-region: fra1
-production_url: https://rytm-phi.vercel.app
+platform: VPS (Docker container behind Caddy, ariom-infra)
+production_url: https://rytm.ariom.cloud
+image: ghcr.io/vince307/rytm:<commit sha>
+previous_platform: Vercel Hobby, team kamilps-projects, project rytm, fra1, https://rytm-phi.vercel.app (until the VPS cut-over)
 deploy_path: github-actions-gate
 repository: https://github.com/vince307/rytm
 supabase_project_ref: psqbtvooufapkatpkxlw
@@ -18,6 +16,21 @@ source_contracts:
 ---
 
 # Deploy plan — first production deployment
+
+## Current production: VPS (ariom-cloud-hosting, 2026-10)
+
+Rytm left Vercel for the owner's VPS; Supabase stays hosted (`psqbtvooufapkatpkxlw`), only the hosting changed. The Vercel sections below are the audit trail of the first deployment and no longer describe production.
+
+- **Runtime**: `@astrojs/node` standalone (`dist/server/entry.mjs`) in the image built from `Dockerfile` (`node:22.14.0-bookworm-slim`, `USER node`, `HOST=0.0.0.0`, `PORT=4402`). One container per host, published on `127.0.0.1:4402` only; Caddy terminates TLS for `https://rytm.ariom.cloud` and reverse-proxies to it. Compose file, env file and the deploy dispatcher live in the `ariom-infra` repo (`server/apps/rytm/compose.yml`, `server/app-deploy`), installed under `/opt/apps/rytm/`.
+- **Health**: `GET /api/health` → `200 {"status":"ok"}`; touches neither Supabase nor env, so a paused database does not make the container unhealthy. Used by the compose healthcheck, by `app-deploy` and by the `deploy` job's final public check.
+- **Behind the proxy**: `astro.config.mjs` sets `security.allowedDomains: [{ hostname: "rytm.ariom.cloud", protocol: "https" }]`, so Astro trusts Caddy's `X-Forwarded-Proto`/`X-Forwarded-Host` for that host only. Without it `context.url` is `http://…`: every form POST gets 403 from Astro's origin check and e-mailed links (`signup.ts`, `resend.ts`, `reset.ts` build them from `context.url.origin`) point at `http://`. `scripts/check-proxy-origin.mjs` (CI `smoke` job) guards both against the built server.
+- **Production path**: push to `main` → `ci` + `smoke` + `image` (build, push `ghcr.io/vince307/rytm:<sha>`) → `deploy`: Tailscale (`tag:ci`) → `ssh apps-deploy@$DEPLOY_HOST status rytm` (fails before the schema changes if the VPS is unreachable) → `supabase link` → `db push --dry-run` → `db push --yes` → `migration list` → `login rytm` (job token on stdin) → `deploy rytm <sha>` → `logout rytm` (always) → `curl -fsS https://rytm.ariom.cloud/api/health`. `app-deploy` pulls, switches the tag, waits for the health check and restores the last good tag by itself when it fails (the job then fails).
+- **Rollback**: `ssh apps-deploy@<host> rollback rytm` — back to the good tag before the last one (a second rollback returns). Owner only (or a CI job); it does not touch Supabase, a bad migration is still fixed forward. `status rytm` shows the tags, container state and local images.
+- **Runtime env** (`/opt/apps/rytm/.env`, `640 root:apps-deploy`, never in the image or the repo): `SUPABASE_URL`, `SUPABASE_KEY`, `DEMO_EMAIL`, `CRON_SECRET` — the same four that were Vercel env vars.
+- **New GitHub secrets** read by `deploy`: `DEPLOY_HOST`, `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS`, `TS_OAUTH_CLIENT_ID`, `TS_OAUTH_SECRET`. The image push and the server's pull use the job's own `GITHUB_TOKEN` (`packages: write` in `image`, `packages: read` in `deploy`); no PAT.
+- **Supabase Auth URL configuration** (dashboard, owner): Site URL `https://rytm.ariom.cloud` and Redirect URLs must contain `https://rytm.ariom.cloud/**`; otherwise GoTrue rewrites every e-mailed `redirect_to` to the Site URL. Local `supabase/config.toml` lists the same pattern so the proxy check can prove it.
+- **Keep-alive**: `.github/workflows/keep-alive.yml` pings `https://rytm.ariom.cloud/api/keep-alive`; `CRON_SECRET` in the server env file must equal the GitHub secret.
+- **No previews**: there is no preview deploy any more; test a production build locally with `npm run build && node dist/server/entry.mjs` or the image (`docker build -t rytm:local .`).
 
 Audit trail for the first deployment, executed from Plan Mode on 2026-09-18 against the decision in `infrastructure.md` (Vercel over Cloudflare Workers). This file is the source of truth for **what is already deployed and which secrets are wired**; milestone planning reads it before touching infrastructure.
 
@@ -57,6 +70,8 @@ Commits `4b27098` (swap) and `aaad9c9` (framework preset), then this file.
 
 ## Secrets inventory
 
+Vercel-era inventory. Since the VPS move the `Vercel env` rows live in `/opt/apps/rytm/.env`, the `VERCEL_*` GitHub secrets are no longer read by any workflow (delete them with the Vercel project), and the deploy secrets are listed under _Current production_ above.
+
 | Where                           | Name                                 | Environments / notes                                                                                                                                                                                                                                                                                                                                   |
 | ------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Vercel env                      | `SUPABASE_URL`                       | production, preview (encrypted)                                                                                                                                                                                                                                                                                                                        |
@@ -75,6 +90,8 @@ Commits `4b27098` (swap) and `aaad9c9` (framework preset), then this file.
 No secret value has ever been written to the repo or pasted into a chat; `vercel env add` and `gh secret set` were fed from `.env` via stdin.
 
 ## Operating model (who may do what)
+
+Vercel-era; on the VPS the `vercel` commands are gone, rollback is `ssh apps-deploy@<host> rollback rytm` (owner or CI) and hosted migrations stay CI-only exactly as below.
 
 - **Agent, unattended**: `npx vercel` (preview deploy), `vercel ls`, `vercel inspect <url> --logs`, `vercel logs <url>`, `vercel env ls`, `gh run watch`, `npm run smoke` against a local/preview server.
 - **Human only**: `vercel deploy --prod` outside the workflow, `vercel rollback` / `vercel promote <url>`, `vercel env rm/add` (rotation → then redeploy), plan changes, deleting the project, `supabase migration repair` and a hosted `db reset`, creating/rotating `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD`, rotating `VERCEL_TOKEN` (expiry ≤ 1 year — set a reminder).
@@ -166,18 +183,18 @@ Recommendation (not a blocker): authenticate an owned domain in Brevo (DKIM/DMAR
 
 ## Demo account (S-09)
 
-One shared account that reviewers sign in to on `https://rytm-phi.vercel.app`; credentials are in `README.md` § Demo. The server recognises it by `DEMO_EMAIL` (trimmed, case-insensitive; `src/lib/demo.ts`). No script, migration or agent writes demo data to production — seeding and reset are owner steps in the app and the Supabase dashboard.
+One shared account that reviewers sign in to on `https://rytm.ariom.cloud` (until the cut-over `https://rytm-phi.vercel.app`); credentials are in `README.md` § Demo. The server recognises it by `DEMO_EMAIL` (trimmed, case-insensitive; `src/lib/demo.ts`). No script, migration or agent writes demo data to production — seeding and reset are owner steps in the app and the Supabase dashboard.
 
-- **Env var**: `DEMO_EMAIL` on Vercel, production and preview environments (previews use the production database; without it the guard fails open there). Human only, like every `vercel env add/rm` (operating model below); a change takes effect with the next production deploy.
+- **Env var**: `DEMO_EMAIL` in the server env file `/opt/apps/rytm/.env` (was: Vercel production and preview). Human only; a change takes effect when the container is recreated (next deploy).
 - **Data rule**: only the synthetic fixture `test/fixtures/ing/Lista_transakcji_nr_0000123456_010926.csv` is ever imported into this account — never a real statement, the account is shared.
 
 ### Seeding (in order)
 
 1. Pick the demo address and a strong password; both get published. The address needs no inbox (the user is confirmed by hand in step 4), so a reserved domain such as `demo@rytm.example` works.
-2. `printf '<address>' | vercel env add DEMO_EMAIL production` and the same for `preview` (piped — the interactive prompt does not work from an agent's `!` shell).
+2. Set `DEMO_EMAIL=<address>` in `/opt/apps/rytm/.env` on the VPS (at the first seeding: `printf '<address>' | vercel env add DEMO_EMAIL production` and the same for `preview`).
 3. Deploy: merge to `main` and wait for the green `deploy` job (or wait for the next one, if the code is already live). Never create the user before the guard is live.
 4. Supabase dashboard → project `rytm` → Authentication → Users → Add user → Create new user: the address and password, **Auto Confirm User** ticked.
-5. Sign in on `https://rytm-phi.vercel.app/login`.
+5. Sign in on `https://rytm.ariom.cloud/login`.
 6. `/imports/new`: import the fixture in the wizard with its default account „Rachunek Firmowy Główny” (not „Rachunek VAT”). Expected: 206 debits, 01.09.2025–31.08.2026; `/patterns`, `/fixed` and `/home` show the synthetic data.
 
 ### What the guard refuses

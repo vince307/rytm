@@ -15,7 +15,7 @@ describe("supabase/migrations", () => {
   });
 
   it("names every file <14 digits>_<name>.sql", () => {
-    const bad = readdirSync(dir).filter((f) => !/^\d{14}_[A-Za-z0-9_]+\.sql$/.test(f));
+    const bad = readdirSync(dir).filter((f) => !/^\d{14}_[a-z0-9_]+\.sql$/.test(f));
     expect(bad).toEqual([]);
   });
 });

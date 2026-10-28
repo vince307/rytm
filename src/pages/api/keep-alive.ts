@@ -3,16 +3,13 @@ import { SUPABASE_URL, SUPABASE_KEY, CRON_SECRET } from "astro:env/server";
 
 export const prerender = false;
 
-// Supabase keep-alive ping, invoked daily by .github/workflows/keep-alive.yml against the production alias
-// (rytm-phi.vercel.app). The free-tier project auto-pauses after ~7 days without activity, which takes production
+// Supabase keep-alive ping, invoked daily by .github/workflows/keep-alive.yml against production
+// (https://rytm.ariom.cloud). The free-tier project auto-pauses after ~7 days without activity, which takes production
 // down and breaks deploys. The request must reach Postgres itself, so this runs a real PostgREST query.
 //
 // Every table revokes all privileges from `anon`, and this route must not widen that. So the expected answer is
 // Postgres refusing the anon role (SQLSTATE 42501): the query was planned and checked inside the database, which
 // is the activity we need, and it also proves the revoke still holds. Any other answer is surfaced as 502.
-//
-// External scheduler, not a Vercel cron: Vercel aims crons at the deployment URL, which Vercel Authentication
-// answers with a 302 to SSO, and a redirected cron neither runs nor logs (deploy-plan.md, Production alias).
 //
 // Auth: `Authorization: Bearer <CRON_SECRET>`. No secret configured, or a mismatch → 401 (fails closed).
 export const GET: APIRoute = async ({ request }) => {

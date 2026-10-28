@@ -3,14 +3,11 @@ name: Supabase keep-alive
 # Keeps the free-tier Supabase project (ref psqbtvooufapkatpkxlw) from auto-pausing after ~7 days without
 # activity. A pause takes production down and breaks deploys.
 #
-# GitHub Actions, not a Vercel cron: Vercel registers a cron against the generated deployment URL
-# (rytm-<hash>-kamilps-projects.vercel.app), which Vercel Authentication answers with a 302 to SSO; crons do not
-# follow redirects and a redirected run is not logged, so it would look green while Supabase saw nothing. The
-# production alias (rytm-phi.vercel.app) is not protected, so we ping that, from a scheduler we can trigger by
-# hand and whose logs persist.
+# GitHub Actions rather than a host cron: a scheduler we can trigger by hand and whose logs persist. It pings the
+# production app at https://rytm.ariom.cloud (VPS container behind Caddy).
 #
-# Requires the CRON_SECRET repository secret to match CRON_SECRET on Vercel's Production scope — the route fails
-# closed (401) on any mismatch. Rotate the two together.
+# Requires the CRON_SECRET repository secret to match CRON_SECRET in the server's env file (/opt/apps/rytm/.env) —
+# the route fails closed (401) on any mismatch. Rotate the two together.
 
 on:
   schedule:
@@ -40,7 +37,7 @@ jobs:
             exit 1
           fi
 
-          url="https://rytm-phi.vercel.app/api/keep-alive"
+          url="https://rytm.ariom.cloud/api/keep-alive"
           body_file="$(mktemp)"
 
           # Body to a file, status via -w. No -f: a non-2xx body is the diagnostic (the route reports Supabase's
@@ -55,8 +52,8 @@ jobs:
 
           echo "HTTP ${status} — $(cat "${body_file}")"
 
-          # 401 => secret drift between GitHub and Vercel.
-          # 503 => Supabase env missing on Vercel.
+          # 401 => secret drift between GitHub and the server's env file.
+          # 503 => Supabase env missing on the server.
           # 502 => Supabase answered something other than the expected anon refusal (42501), or the fetch failed.
           if [ "${status}" != "200" ]; then
             echo "::error::Keep-alive ping failed (HTTP ${status}). The project will auto-pause if this keeps failing."

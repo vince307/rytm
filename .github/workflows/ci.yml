@@ -103,19 +103,20 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # Production ships only from here: push to main -> ci + smoke + image green -> hosted migrations -> VPS deploy.
+  # Production ships only from here: push to main -> ci + smoke + image green -> self-hosted migrations -> VPS deploy.
   # The VPS (https://rytm.ariom.cloud, Caddy -> container on 127.0.0.1:4402) is reached over Tailscale as
-  # apps-deploy, whose forced command (ariom-infra server/app-deploy) accepts only `login|deploy|rollback|status|logout
+  # apps-deploy, whose forced command (ariom-infra server/app-deploy) accepts only `login|deploy|rollback|status|logout|migrate|migrations
   # rytm`: deploy pulls the image, waits for /api/health and falls back to the last good tag on its own.
   # The schema goes live minutes before the new code, so migrations must stay backward-compatible with the
   # deploy currently in production. The server is checked before the migrations, so an unreachable VPS stops the job
-  # before the hosted schema changes; a failed migration stops it before the deploy.
+  # before the schema changes; a failed migration stops it before the deploy.
   deploy:
     needs: [ci, smoke, image]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # Holds SUPABASE_ACCESS_TOKEN / SUPABASE_DB_PASSWORD; jobs running on PRs cannot read them.
+    # Holds the deploy secrets (DEPLOY_*, TS_OAUTH_*); jobs running on PRs cannot read them. No Supabase secrets:
+    # migrations run on the VPS against the self-hosted stack (rytm-supabase) through the forced command.
     environment: production
     # app-deploy holds a per-app lock and fails a concurrent deploy: queue instead, never cancel a running one.
     concurrency:
@@ -163,34 +164,23 @@ jobs:
           chmod 600 ~/.ssh/config
       - name: Server status before the deploy
         run: ssh "apps-deploy@$DEPLOY_HOST" status rytm
-      - uses: supabase/setup-cli@v1
-        with:
-          # Same pin as the smoke job.
-          version: 2.117.0
-      # `link` stores the IPv4 session pooler URL; runners have no IPv6 route to the direct DB host.
-      - name: Link hosted Supabase
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: supabase link --project-ref psqbtvooufapkatpkxlw
-      # --skip-vault: never let a future [db.vault] in config.toml rewrite production Vault secrets from CI.
-      - name: Pending hosted migrations
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: supabase db push --dry-run --skip-vault
-      - name: Push hosted migrations
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: supabase db push --yes --skip-vault
+      # The migration tar is plain ustar (GNU tar), uncompressed, containing only migrations/<version>_<name>.sql;
+      # `migrate` reads it on stdin and rejects anything else (exit 2), including files with a backslash
+      # (test/unit/migrations-no-backslash.test.ts catches those in the PR). pipefail: a failed tar must fail the step.
+      - name: Pending migrations
+        shell: bash
+        run: |
+          set -o pipefail
+          tar --format=ustar -C supabase -cf - migrations | ssh "apps-deploy@$DEPLOY_HOST" migrate rytm --dry-run
+      - name: Push migrations
+        shell: bash
+        run: |
+          set -o pipefail
+          tar --format=ustar -C supabase -cf - migrations | ssh "apps-deploy@$DEPLOY_HOST" migrate rytm
       # Agents verify the push from this step's log (10x-autonomous-run ship gate); keep the name stable.
-      # JSON must be explicit: the CLI prints JSON on its own only when it detects an AI agent, never in plain CI.
-      - name: Hosted migration ledger
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: supabase migration list --output-format json
+      # Prints a JSON array of {version,name} in version order.
+      - name: Migration ledger
+        run: ssh "apps-deploy@$DEPLOY_HOST" migrations rytm
       # The token goes over stdin, never on a command line; app-deploy runs `docker login ghcr.io --password-stdin`.
       - name: Log the server in to GHCR
         env:

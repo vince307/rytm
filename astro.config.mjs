@@ -28,8 +28,8 @@ export default defineConfig({
       SUPABASE_URL: envField.string({ context: "server", access: "secret", optional: true }),
       SUPABASE_KEY: envField.string({ context: "server", access: "secret", optional: true }),
       DEMO_EMAIL: envField.string({ context: "server", access: "secret", optional: true }),
-      // Bearer secret for /api/keep-alive, sent by .github/workflows/keep-alive.yml. Server .env on the VPS; must
-      // match the CRON_SECRET repository secret. Optional so builds pass without it; the route fails closed (401).
+      // Bearer secret for /api/keep-alive, used by smoke only (the scheduled keep-alive workflow is gone with hosted Supabase).
+      // Optional so builds pass without it; the route fails closed (401).
       CRON_SECRET: envField.string({ context: "server", access: "secret", optional: true }),
     },
   },

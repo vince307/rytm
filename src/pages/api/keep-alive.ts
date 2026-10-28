@@ -3,9 +3,8 @@ import { SUPABASE_URL, SUPABASE_KEY, CRON_SECRET } from "astro:env/server";
 
 export const prerender = false;
 
-// Supabase keep-alive ping, invoked daily by .github/workflows/keep-alive.yml against production
-// (https://rytm.ariom.cloud). The free-tier project auto-pauses after ~7 days without activity, which takes production
-// down and breaks deploys. The request must reach Postgres itself, so this runs a real PostgREST query.
+// Supabase keep-alive ping, kept for the smoke test. It was invoked daily against production while Supabase was a
+// free-tier hosted project that auto-paused; the self-hosted stack does not pause, so nothing schedules it now. The request must reach Postgres itself, so this runs a real PostgREST query.
 //
 // Every table revokes all privileges from `anon`, and this route must not widen that. So the expected answer is
 // Postgres refusing the anon role (SQLSTATE 42501): the query was planned and checked inside the database, which
